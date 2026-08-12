@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Mock Console</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .panel,
+    .route-row,
+    .command-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .panel span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .panel strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .console-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .route-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .route-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.75fr) minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:focus,
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .blocked {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .command-box {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      background: var(--code);
+      color: #d1fae5;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      border-color: #f3c7c7;
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .section-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .summary-grid,
+      .console-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .route-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Phase 1 Mock Console</h1>
+      <p>/console · ConsoleNavPanel · 前端 2.0 统一 Mock 控制台</p>
+    </div>
+    <div class="pill-row">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill warn">真实大模型：禁用</span>
+      <span class="pill warn">真实云资源：禁用</span>
+      <span class="pill warn">真实智能体：禁用</span>
+      <span class="pill warn">真实沙箱：禁用</span>
+      <span class="pill warn">自动发布：禁用</span>
+      <span class="pill warn">真实发布：禁用</span>
+      <span class="pill warn">密钥展示：禁用</span>
+      <span class="pill warn">标准答案选手端：隐藏</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">控制台总览</h2>
+          <p>统一进入 Phase 1 页面、交付验收、审核队列、内容生成、评分、环境、Skills 和 Provider Mock。</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">GET /api/health</span>
+          <span class="pill">GET /api/review-task-summary</span>
+          <span class="pill">GET /api/workflow-runs</span>
+          <span class="pill">GET /api/workflow-registry</span>
+          <span class="pill">GET /api/artifacts</span>
+          <span class="pill">GET /api/providers</span>
+          <span class="pill">GET /api/provider-audit-events</span>
+          <span class="pill">GET /api/mcp-tool-call-records</span>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Routes</span>
+          <strong>30</strong>
+        </div>
+        <div class="metric">
+          <span>Mock Only Routes</span>
+          <strong>30</strong>
+        </div>
+        <div class="metric">
+          <span>Waiting Review</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>Delivery Ready</span>
+          <strong>137 / 137</strong>
+        </div>
+        <div class="metric">
+          <span>Phase 1 Check</span>
+          <strong>20 / 20</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="nav-title">
+      <div class="section-head">
+        <div>
+          <h2 id="nav-title">页面导航</h2>
+          <p>所有链接都指向本地静态 HTML 原型；真实后端依赖保持禁用。</p>
+        </div>
+        <span class="pill strong">frontend/ui.manifest.json</span>
+      </div>
+      <div class="console-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>总览与交付</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <a href="console.html">/console</a>
+                <span>统一 Mock 控制台，串联 Phase 1 页面和安全边界</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="dashboard.html">/dashboard</a>
+                <span>健康状态、待审核压力、Workflow Run、Artifact 和安全总览</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="audit.html">/audit</a>
+                <span>Provider / MCP / Workflow / Operation 审计可观测</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="audit-detail.html">/audit/:id</a>
+                <span>单条 Provider / MCP 审计详情、Trace 关联和错误上下文</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="audit-incidents.html">/audit/incidents</a>
+                <span>失败审计记录的本地规则复盘和运营排查建议</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-launchpad.html">/operations/launchpad</a>
+                <span>运营演示首页，集中打开验收入口、页面地图、交付页和审计页</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-runbook.html">/operations/runbook</a>
+                <span>运营本地演示入口、白名单命令、审计复盘和安全红线</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-acceptance.html">/operations/acceptance</a>
+                <span>运营验收总览、交付状态、Runbook、FAQ、Handoff 和准入门禁</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-demo-map.html">/operations/demo-map</a>
+                <span>运营演示路径总览，按角色和顺序串联全部静态 Mock 页面</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-presenter.html">/operations/presenter</a>
+                <a href="operations-signoff.html">/operations/signoff</a>
+                <span>运营讲解台，一页式展示 speakerCue、验收信号和禁用动作</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="operations-demo-script.html">/operations/demo-script</a>
+                <span>运营演示脚本清单页面，展示 12 步顺序、验收信号和安全边界</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="delivery.html">/delivery</a>
+                <span>交付清单、验收摘要、Phase 1 自检和安全断言</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>审核与任务</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <a href="ai-tasks.html">/ai-tasks</a>
+                <span>AI Task 列表、状态过滤和 Workflow 日志入口</span>
+                <strong class="status">WAITING_REVIEW</strong>
+              </div>
+              <div class="route-row">
+                <a href="review-center.html">/review-center</a>
+                <span>审核队列、单任务详情、DSL 预览和操作栏</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="workflows.html">/workflows</a>
+                <span>Phase 2 Workflow Registry 能力目录、MCP Mock 工具和只读选择器</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="agent-entities.html">/platform-entities</a>
+                <span>本地平台实体草稿列表与详情，只读查看 mock-import 结果</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>内容生成与审核</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <a href="labs.html">/labs</a>
+                <span>Lab 列表、生成入口、审核入口和 LabDslPreview</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="lab-generate.html">/labs/generate</a>
+                <span>本地素材分析、MockProvider、PromptVersionSelector 和 Lab DSL</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="lab-review.html">/labs/:id/review</a>
+                <span>Lab DSL 审核详情、AiTaskTimeline 和 ReviewActionBar</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="exams.html">/exams</a>
+                <span>Exam 列表、Grading DSL 关联和标准答案隐藏</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="exam-generate.html">/exams/generate</a>
+                <span>Lab 到 Exam DSL / Grading DSL 的 Mock 生成入口</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="exam-review.html">/exams/:id/review</a>
+                <span>Exam DSL、Grading DSL、Timeline 和选手端答案脱敏</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="ppt.html">/ppt</a>
+                <span>PPT DSL 清单、生成入口和真实 PPT 文件生成禁用策略</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="ppt-review.html">/ppt/:id/review</a>
+                <span>PPT DSL、Slide Plan、Timeline 和审核策略</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>评分与环境</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <a href="grading.html">/grading</a>
+                <span>Grading DSL 清单、Mock 评分入口和报告入口</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="grading-review.html">/grading/:id/review</a>
+                <span>Grading DSL 审核详情、Mock 报告预览和执行禁用策略</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="grading-report.html">/grading/:id/report</a>
+                <span>Mock 分数、check 明细和审计入口</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="environments.html">/environments</a>
+                <span>VM / Notebook Mock 记录、状态流转和操作审计</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>运营复用与配置</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <a href="skills.html">/skills</a>
+                <span>Skill、Prompt、Workflow、DSL Schema 和 CLI Mock 关联</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="route-row">
+                <a href="provider-settings.html">/settings/providers</a>
+                <span>MockProvider 启用态、真实 Provider 禁用态和密钥不展示</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>安全断言</h3>
+            <div class="route-group">
+              <div class="route-row">
+                <span>realLlmCalled=false</span>
+                <span>真实大模型调用保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>realAgentStarted=false</span>
+                <span>真实智能体启动保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>realCloudResourceCreated=false</span>
+                <span>真实云资源创建保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>sandboxExecuted=false</span>
+                <span>真实沙箱执行保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>contestantCodeExecuted=false</span>
+                <span>选手代码执行保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>unknownShellExecuted=false</span>
+                <span>未知 Shell 执行保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>autoPublishAllowed=false</span>
+                <span>自动发布保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>standardAnswerRevealToCandidate=false</span>
+                <span>标准答案选手端：隐藏</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="route-row">
+                <span>secretVisibleInFrontend=false</span>
+                <span>密钥展示保持禁用</span>
+                <strong class="status">PASS</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>本地验证命令</h3>
+            <div class="command-box">
+              <div>start .\frontend\console.html</div>
+              <div>start .\frontend\audit.html</div>
+              <div>start .\frontend\audit-detail.html</div>
+              <div>start .\frontend\audit-incidents.html</div>
+              <div>start .\frontend\operations-launchpad.html</div>
+              <div>start .\frontend\operations-runbook.html</div>
+              <div>start .\frontend\operations-acceptance.html</div>
+              <div>start .\frontend\operations-demo-map.html</div>
+              <div>start .\frontend\operations-presenter.html</div>
+              <div>start .\frontend\operations-signoff.html</div>
+              <div>start .\frontend\operations-demo-script.html</div>
+              <div>start .\frontend\workflows.html</div>
+              <div>python lab_cli.py phase1 check</div>
+              <div>python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</div>
+              <div>python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</div>
+              <div>python -m pytest tests/test_frontend_manifest.py</div>
+              <div>python -m pytest</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="primary">打开 Mock 页面</button>
+        <button>打开审计看板</button>
+        <button>查看前端契约</button>
+        <button>查看交付验收</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>创建真实云资源</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+        <button disabled>展示密钥</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="limits-title">
+      <div class="section-head">
+        <div>
+          <h2 id="limits-title">Phase 1 限制</h2>
+          <p>Prompt 散落：禁用 · 批量状态变更：禁用 · remoteUploadAllowed=false · realPublish=false</p>
+        </div>
+        <span class="pill warn blocked">真实发布：禁用</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Provider Settings Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .provider-card,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .provider-card span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .provider-card strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .provider-grid,
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .provider-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .provider-card,
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .provider-head,
+    .kv-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .provider-grid,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Provider 设置 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">真实 Provider：禁用</span>
+      <span class="pill">网络访问：禁用</span>
+      <span class="pill">密钥展示：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">Provider 运行态</h2>
+          <p>providers/provider.contract.json + config/runtime.contract.json + .env.example</p>
+        </div>
+        <span class="pill strong">provider=mock</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Active Provider</span>
+          <strong>MockProvider</strong>
+        </div>
+        <div class="metric">
+          <span>Enabled</span>
+          <strong>1 / 4</strong>
+        </div>
+        <div class="metric">
+          <span>Real LLM</span>
+          <strong class="danger">disabled</strong>
+        </div>
+        <div class="metric">
+          <span>Secrets Read</span>
+          <strong class="ok">false</strong>
+        </div>
+        <div class="metric">
+          <span>Network Access</span>
+          <strong class="ok">false</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="providers-title">
+      <div class="section-head">
+        <div>
+          <h2 id="providers-title">Provider 清单</h2>
+          <p>Phase 1 只启用确定性 Mock 输出，真实 Provider 保持占位和禁用态</p>
+        </div>
+        <span class="pill warn">real providers blocked</span>
+      </div>
+      <div class="content-grid">
+        <div class="provider-grid" aria-label="Configured providers">
+          <article class="provider-card">
+            <div class="provider-head">
+              <div>
+                <h3>Mock Provider</h3>
+                <p>id=mock</p>
+              </div>
+              <span class="pill strong">enabled</span>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <span>phase1Allowed</span>
+                <strong>true</strong>
+              </div>
+              <div class="field">
+                <span>requiresApiKey</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>realLlmCalled</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>networkAccess</span>
+                <strong>false</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill strong">default=true</span>
+              <span class="pill">generatedStatus=WAITING_REVIEW</span>
+            </div>
+          </article>
+
+          <article class="provider-card">
+            <div class="provider-head">
+              <div>
+                <h3>OpenAI Provider</h3>
+                <p>id=openai</p>
+              </div>
+              <span class="pill blocked">disabled</span>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <span>secretEnv</span>
+                <strong>OPENAI_API_KEY</strong>
+              </div>
+              <div class="field">
+                <span>API Key</span>
+                <strong>[HIDDEN]</strong>
+              </div>
+              <div class="field">
+                <span>phase1Allowed</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>realLlmCalled</span>
+                <strong>false</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill blocked">networkAccess=false</span>
+              <span class="pill blocked">secretVisibleInFrontend=false</span>
+            </div>
+          </article>
+
+          <article class="provider-card">
+            <div class="provider-head">
+              <div>
+                <h3>Anthropic Provider</h3>
+                <p>id=anthropic</p>
+              </div>
+              <span class="pill blocked">disabled</span>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <span>secretEnv</span>
+                <strong>ANTHROPIC_API_KEY</strong>
+              </div>
+              <div class="field">
+                <span>API Key</span>
+                <strong>[HIDDEN]</strong>
+              </div>
+              <div class="field">
+                <span>phase1Allowed</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>realLlmCalled</span>
+                <strong>false</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill blocked">networkAccess=false</span>
+              <span class="pill blocked">secretVisibleInFrontend=false</span>
+            </div>
+          </article>
+
+          <article class="provider-card">
+            <div class="provider-head">
+              <div>
+                <h3>Local Model Provider</h3>
+                <p>id=local</p>
+              </div>
+              <span class="pill blocked">disabled</span>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <span>secretEnv</span>
+                <strong>none</strong>
+              </div>
+              <div class="field">
+                <span>requiresApiKey</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>phase1Allowed</span>
+                <strong>false</strong>
+              </div>
+              <div class="field">
+                <span>networkAccess</span>
+                <strong>false</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill blocked">realProviderInstantiationBlocked=true</span>
+              <span class="pill">implementationStatus=placeholder</span>
+            </div>
+          </article>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>运行配置</h3>
+            <p class="ok">ENABLE_REAL_LLM=false</p>
+            <p class="ok">ENABLE_REAL_CLOUD=false</p>
+            <p class="ok">ENABLE_REAL_SANDBOX=false</p>
+            <p class="ok">ENABLE_AUTO_PUBLISH=false</p>
+            <p class="ok">secretVisibleInFrontend=false</p>
+          </div>
+          <div class="card">
+            <h3>API / CLI</h3>
+            <pre>GET /api/providers
+GET /api/providers/mock/health
+POST /api/providers/mock/generate
+
+python lab_cli.py provider list
+python lab_cli.py provider health
+python lab_cli.py provider mock-generate --prompt-id lab_generation_v0</pre>
+          </div>
+          <div class="card">
+            <h3>Mock 输出</h3>
+            <p class="ok">outputKind=Lab</p>
+            <p class="ok">dslPath=templates/lab/examples/basic-lab.yaml</p>
+            <p class="ok">generatedStatus=WAITING_REVIEW</p>
+            <p class="ok">reviewRequired=true</p>
+            <p class="ok">publishBlockedUntilApproved=true</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button">查看 Provider 列表</button>
+        <button type="button">查看 Mock 健康状态</button>
+        <button type="button">运行 Mock 生成</button>
+        <button type="button" disabled title="Phase 1 禁止启用真实 Provider">启用真实 Provider</button>
+        <button type="button" disabled title="Phase 1 禁止调用真实大模型">调用真实大模型</button>
+        <button type="button" disabled title="密钥不得进入前端">显示 API Key</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

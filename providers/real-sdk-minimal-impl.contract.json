@@ -1,0 +1,220 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_sdk_minimal_impl_contract",
+  "title": "Default Disabled Real SDK Minimal Implementation Contract",
+  "description": "Machine-testable contract for the first implementation-shaped real SDK shell. It requires the real SDK enablement checklist and explicit implementation opt-in, but still prevents SDK installation, SDK imports, client creation, secret presence checks, secret reads, network calls, generated content, AI task creation, and publish actions.",
+  "implementationId": "real_sdk_minimal_impl",
+  "interfaceName": "LLMProvider",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "inputs": [
+    {
+      "id": "real_sdk_minimal_impl",
+      "path": "providers/real_sdk_minimal_impl.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement",
+      "path": "providers/real_sdk_enablement.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement_contract",
+      "path": "providers/real-sdk-enablement.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_sdk_poc",
+      "path": "providers/real_provider_sdk_poc.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_sdk_poc_contract",
+      "path": "providers/real-provider-sdk-poc.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "path": "providers/real_llm_sdk_task_blueprint.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "env_example",
+      "path": ".env.example",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-impl describe",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-impl generate-json --provider openai",
+      "expectedCode": "REAL_SDK_ENABLEMENT_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-impl generate-json --provider openai --approval-ref APPROVAL-001 --reviewer teacher_1 --confirm-dry-run-plan --confirm-runtime-guard --confirm-schema-review --confirm-human-review-policy --confirm-audit-redaction --confirm-sdk-dependency-review --confirm-provider-contract-review --confirm-runtime-contract-review --confirm-secret-injection-review --confirm-network-access-review --confirm-rollback-plan",
+      "expectedCode": "REAL_SDK_IMPLEMENTATION_OPT_IN_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-impl generate-json --provider openai --explicit-implementation-opt-in --approval-ref APPROVAL-001 --reviewer teacher_1 --confirm-dry-run-plan --confirm-runtime-guard --confirm-schema-review --confirm-human-review-policy --confirm-audit-redaction --confirm-sdk-dependency-review --confirm-provider-contract-review --confirm-runtime-contract-review --confirm-secret-injection-review --confirm-network-access-review --confirm-rollback-plan",
+      "expectedCode": "REAL_SDK_IMPLEMENTATION_DISABLED"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "real_sdk_enablement_checklist",
+      "required": true,
+      "mustPassBeforeImplementationGate": true
+    },
+    {
+      "id": "explicit_real_sdk_implementation_opt_in",
+      "required": true,
+      "mustPassBeforeImplementationGate": true
+    },
+    {
+      "id": "provider_contract_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "runtime_contract_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "sdk_import_disabled",
+      "required": true,
+      "enabled": false
+    },
+    {
+      "id": "network_call_disabled",
+      "required": true,
+      "enabled": false
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "allowedScope": "lab_generate_from_source_only",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "implementationId": "real_sdk_minimal_impl",
+    "mode": "MOCK_ONLY",
+    "implementationMode": "DEFAULT_DISABLED_REAL_SDK_SHELL",
+    "defaultProvider": "mock",
+    "supportedProvider": "openai",
+    "enablementRequired": true,
+    "enablementReady": false,
+    "switchDesignReady": false,
+    "readyForRealSdkImplementationTask": false,
+    "implementationAllowed": false,
+    "sdkImplementationEnabled": false,
+    "sdkImplementationPassed": false,
+    "providerContractChangeApplied": false,
+    "runtimeContractChangeApplied": false,
+    "secretInjectionApplied": false,
+    "sdkDependencyInstalled": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realCallAuthorized": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "networkAccessEnabledNow": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "errorCodes": [
+    "REAL_SDK_ENABLEMENT_REQUIRED",
+    "REAL_SDK_IMPLEMENTATION_OPT_IN_REQUIRED",
+    "REAL_SDK_IMPLEMENTATION_DISABLED",
+    "VALIDATION_ERROR",
+    "PROVIDER_CONTRACT_ERROR"
+  ],
+  "blockedOperations": [
+    "install_sdk_dependency",
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "check_secret_presence",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "modify_runtime_contract_now",
+    "enable_provider_contract_now",
+    "inject_secret_now",
+    "bypass_enablement",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_minimal_impl",
+    "test_real_sdk_enablement",
+    "test_real_provider_sdk_poc",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realCallAuthorized": false,
+    "implementationAllowed": false,
+    "sdkImplementationEnabled": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

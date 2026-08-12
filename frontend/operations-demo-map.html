@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations Demo Map Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --warn: #b45309;
+      --ok-bg: #e7f8f2;
+      --warn-bg: #fff7ed;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #123f46;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 980px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .action-bar,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.86fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(210px, 0.56fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(200px, 0.5fr) minmax(260px, 1fr);
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .command {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 940px) {
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">ConsoleNavPanel</span>
+      <span class="pill">DeliveryChecklistPanel</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill warn">readOnly=true</span>
+    </div>
+    <h1>Operations Demo Map Mock</h1>
+    <p>运营演示路径总览。数据来自 <code>frontend/mock-data.json.operationsDemoMapPrototype</code>、<code>frontend/ui.manifest.json</code> 和 <code>frontend/mock-data.json</code>，只组织页面顺序和角色视角，不运行命令、不变更状态、不上传交付包。</p>
+    <div class="pill-row">
+      <span class="pill">route=/operations/demo-map</span>
+      <span class="pill">GET /api/health</span>
+      <span class="pill">GET /api/review-task-summary</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/audit-events</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">页面地图总览</h2>
+          <p>demoSequences + roles + safeCommands + safety。</p>
+        </div>
+        <span class="pill strong">runCommandEnabled=false</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Sequences</span>
+          <strong>6</strong>
+        </div>
+        <div class="metric">
+          <span>Route Entries</span>
+          <strong>30</strong>
+        </div>
+        <div class="metric">
+          <span>Roles</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>Safe Commands</span>
+          <strong>9</strong>
+        </div>
+        <div class="metric">
+          <span>Mock Only</span>
+          <strong>true</strong>
+        </div>
+        <div class="metric">
+          <span>Real Calls</span>
+          <strong>0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="map-title">
+      <div class="section-head">
+        <div>
+          <h2 id="map-title">演示路径</h2>
+          <p>按这个顺序打开页面，可以从总览、审计、审核、生成、评分、运营复用一路讲完 Phase 1。</p>
+        </div>
+        <span class="pill">routeEntryTotal=30</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>Demo Sequences</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>entry_acceptance</span>
+                <span>/console → /operations/launchpad → /operations/demo-map → /operations/presenter → /operations/demo-script → /operations/runbook → /operations/acceptance → /delivery</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>real_llm_demo_evidence</span>
+                <span>/real-demo → /review-center → /grading/:id/report</span>
+                <strong class="status info">EVIDENCE</strong>
+              </div>
+              <div class="row">
+                <span>audit_observability</span>
+                <span>/audit → /audit/:id → /audit/incidents</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>review_tasks</span>
+                <span>/ai-tasks → /workflows → /review-center → /labs/:id/review → /exams/:id/review → /grading/:id/review → /ppt/:id/review</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>content_generation</span>
+                <span>/dashboard → /labs → /labs/generate → /exams → /exams/generate → /ppt</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>grading_environment</span>
+                <span>/grading → /grading/:id/report → /environments</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>operation_config</span>
+                <span>/skills → /settings/providers</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>白名单验证命令</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>打开页面地图</span>
+                <span class="command">start .\frontend\operations-demo-map.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开真实 Demo Evidence</span>
+                <span class="command">start .\frontend\real-demo.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开讲解台</span>
+                <span class="command">start .\frontend\operations-presenter.html</span>
+              </li>
+              <li>
+                <strong>Preview</strong>
+                <span class="command">start .\frontend\operations-signoff.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开演示首页</span>
+                <span class="command">start .\frontend\operations-launchpad.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开演示脚本</span>
+                <span class="command">start .\frontend\operations-demo-script.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开控制台</span>
+                <span class="command">start .\frontend\console.html</span>
+              </div>
+              <div class="row compact">
+                <span>Phase 1 自检</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+              </div>
+              <div class="row compact">
+                <span>导出交付包</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+              </div>
+              <div class="row compact">
+                <span>前端契约测试</span>
+                <span class="command">python -m pytest tests/test_frontend_manifest.py</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>角色视角</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>operator</span>
+                <span>运营：按顺序演示本地页面和交付验收。</span>
+                <strong class="status">ROLE</strong>
+              </div>
+              <div class="row">
+                <span>reviewer</span>
+                <span>审核员：查看 WAITING_REVIEW、审核门禁和审计记录。</span>
+                <strong class="status">ROLE</strong>
+              </div>
+              <div class="row">
+                <span>teacher</span>
+                <span>教师：查看 Lab / Exam / PPT / Grading DSL 预览。</span>
+                <strong class="status">ROLE</strong>
+              </div>
+              <div class="row">
+                <span>developer</span>
+                <span>研发：检查契约、测试、Provider / MCP Mock 边界。</span>
+                <strong class="status">ROLE</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Action Policy</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>openStaticPageEnabled=true</span>
+                <span>copyRouteEnabled=true · copySafeCommandEnabled=true</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row compact">
+                <span>runCommandEnabled=false</span>
+                <span class="muted">页面不执行命令。</span>
+              </div>
+              <div class="row compact">
+                <span>batchStateChangeEnabled=false</span>
+                <span class="muted">不批量变更任务状态。</span>
+              </div>
+              <div class="row compact">
+                <span>uploadPackageEnabled=false</span>
+                <span class="muted">不上传交付包。</span>
+              </div>
+              <div class="row compact">
+                <span>startRealAgentEnabled=false</span>
+                <span class="muted">不启动真实 Agent。</span>
+              </div>
+              <div class="row compact">
+                <span>enableRealProviderEnabled=false</span>
+                <span class="muted">不启用真实 Provider。</span>
+              </div>
+              <div class="row compact">
+                <span>callRealLlmEnabled=false</span>
+                <span class="muted">不调用真实大模型。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublishEnabled=false</span>
+                <span class="muted">不真实发布。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Phase 1 安全断言</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>realLlmCalled=false</span>
+                <span class="muted">真实大模型调用保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>realMcpServerStarted=false</span>
+                <span class="muted">真实 MCP Server 保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>realAgentStarted=false</span>
+                <span class="muted">真实智能体启动保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>realCloudResourceChanged=false</span>
+                <span class="muted">真实云资源变更保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>sandboxExecuted=false</span>
+                <span class="muted">真实沙箱执行保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>contestantCodeExecuted=false</span>
+                <span class="muted">选手代码执行保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>unknownShellExecuted=false</span>
+                <span class="muted">未知 Shell 执行保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>autoPublishAllowed=false</span>
+                <span class="muted">自动发布保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublish=false</span>
+                <span class="muted">真实发布保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>remoteUploadAllowed=false</span>
+                <span class="muted">远程上传保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>secretVisibleInFrontend=false</span>
+                <span class="muted">密钥展示保持禁用。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar" style="margin-top:16px">
+        <button class="primary">打开静态页面</button>
+        <button>复制路由</button>
+        <button>复制白名单命令</button>
+        <button>查看安全断言</button>
+        <button disabled>执行命令</button>
+        <button disabled>批量变更状态</button>
+        <button disabled>上传交付包</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>创建真实云资源</button>
+        <button disabled>运行真实沙箱</button>
+        <button disabled>执行选手代码</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+        <button disabled>显示密钥</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

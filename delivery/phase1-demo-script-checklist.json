@@ -1,0 +1,318 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "id": "phase1_demo_script_checklist",
+  "title": "Phase 1 Operator Demo Script Checklist",
+  "description": "Machine-testable checklist for an operator-led Phase 1 local mock demo. It defines the recommended speaking order, static preview pages, allowlisted validation commands, expected signals, and blocked actions.",
+  "inputs": [
+    {
+      "id": "project_rules",
+      "path": "AGENTS.md",
+      "required": true
+    },
+    {
+      "id": "development_guide",
+      "path": "docs/AI_PLATFORM_CODEX_FULL_GUIDE.md",
+      "required": true
+    },
+    {
+      "id": "operations_launchpad",
+      "path": "frontend/operations-launchpad.html",
+      "required": true
+    },
+    {
+      "id": "demo_map",
+      "path": "frontend/operations-demo-map.html",
+      "required": true
+    },
+    {
+      "id": "operations_demo_script_page",
+      "path": "frontend/operations-demo-script.html",
+      "required": true
+    },
+    {
+      "id": "operations_presenter_page",
+      "path": "frontend/operations-presenter.html",
+      "required": true
+    },
+    {
+      "id": "operations_signoff_page",
+      "path": "frontend/operations-signoff.html",
+      "required": true
+    },
+    {
+      "id": "demo_runbook",
+      "path": "scripts/phase1-demo.runbook.md",
+      "required": true
+    },
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "handoff_checklist",
+      "path": "delivery/HANDOFF.md",
+      "required": true
+    },
+    {
+      "id": "faq",
+      "path": "delivery/FAQ.md",
+      "required": true
+    },
+    {
+      "id": "mcp_tool_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "demo_script_checklist_markdown",
+      "path": "delivery/DEMO_SCRIPT_CHECKLIST.md",
+      "generated": false,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_backend_mock_api",
+    "test_cli",
+    "test_mcp_mock_tools",
+    "test_demo_script_checklist",
+    "test_scripts_manifest",
+    "test_delivery_package_contract",
+    "test_frontend_contract",
+    "test_all"
+  ],
+  "demoFlow": [
+    {
+      "id": "read_rules",
+      "order": 1,
+      "stage": "precheck",
+      "title": "Read project rules and Phase 1 boundary",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "AGENTS.md",
+      "expectedSignal": "Phase 1 allows docs, schemas, examples, CLI Mock, AI Task Mock, review flow, and tests only.",
+      "speakerCue": "Start by stating that this demo is MOCK_ONLY and follows DSL to CLI to Mock to Workflow to Operation."
+    },
+    {
+      "id": "open_launchpad",
+      "order": 2,
+      "stage": "entry",
+      "title": "Open Operations Launchpad",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\operations-launchpad.html",
+      "commandId": null,
+      "evidencePath": "frontend/operations-launchpad.html",
+      "expectedSignal": "Launchpad shows entry cards, validation commands, delivery readiness, and disabled real actions.",
+      "speakerCue": "Use Launchpad as the first screen for operators."
+    },
+    {
+      "id": "open_demo_map",
+      "order": 3,
+      "stage": "navigation",
+      "title": "Open Operations Demo Map",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\operations-demo-map.html",
+      "commandId": null,
+      "evidencePath": "frontend/operations-demo-map.html",
+      "expectedSignal": "Demo Map shows role-based static page order and safe commands.",
+      "speakerCue": "Explain the role paths before drilling into individual pages."
+    },
+    {
+      "id": "open_runbook",
+      "order": 4,
+      "stage": "runbook",
+      "title": "Open Operations Runbook",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\operations-runbook.html",
+      "commandId": null,
+      "evidencePath": "frontend/operations-runbook.html",
+      "expectedSignal": "Runbook references scripts/phase1-demo.runbook.json, scripts/manifest.json, and safety red lines.",
+      "speakerCue": "Clarify that manual preview commands are not automated scripts."
+    },
+    {
+      "id": "run_phase1_check",
+      "order": 5,
+      "stage": "validation",
+      "title": "Run Phase 1 self-check",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py phase1 check",
+      "commandId": "phase1_check",
+      "evidencePath": null,
+      "expectedSignal": "success=true, data.passed=true, and total checks remain 20.",
+      "speakerCue": "Show that DSL validation, review gate, MockProvider, workflow log, and safety checks pass."
+    },
+    {
+      "id": "export_delivery_package",
+      "order": 6,
+      "stage": "validation",
+      "title": "Export local delivery package",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json",
+      "commandId": "phase1_export",
+      "generatedEvidencePath": "examples/output/phase1-delivery-package.json",
+      "expectedSignal": "deliveryManifest.summary.missingRequired=0 and acceptanceSummary.passed=true.",
+      "speakerCue": "State that the package is local, reproducible, and not uploaded."
+    },
+    {
+      "id": "render_acceptance_report",
+      "order": 7,
+      "stage": "validation",
+      "title": "Render local acceptance report",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md",
+      "commandId": "phase1_report",
+      "generatedEvidencePath": "examples/output/phase1-acceptance-report.md",
+      "expectedSignal": "acceptancePassed=true and safetyAssertionsPassed=true.",
+      "speakerCue": "Use the report as a readable summary, not as a source of new generated content."
+    },
+    {
+      "id": "open_acceptance",
+      "order": 8,
+      "stage": "acceptance",
+      "title": "Open Operations Acceptance",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\operations-acceptance.html",
+      "commandId": null,
+      "evidencePath": "frontend/operations-acceptance.html",
+      "expectedSignal": "Acceptance page shows required items, linked pages, safe commands, and disabled uploads.",
+      "speakerCue": "Connect the CLI evidence to the static acceptance page."
+    },
+    {
+      "id": "open_delivery",
+      "order": 9,
+      "stage": "delivery",
+      "title": "Open Delivery Acceptance Preview",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\delivery.html",
+      "commandId": null,
+      "evidencePath": "frontend/delivery.html",
+      "expectedSignal": "Delivery page shows manifest ready count, acceptance checklist, Phase 1 check, and safety assertions.",
+      "speakerCue": "Use this page to verify the delivery package contract in a human-readable way."
+    },
+    {
+      "id": "open_incident_review",
+      "order": 10,
+      "stage": "audit",
+      "title": "Open Audit Incident Review",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\audit-incidents.html",
+      "commandId": null,
+      "evidencePath": "frontend/audit-incidents.html",
+      "expectedSignal": "Incident page shows failed mock records, rules, and safe recovery steps.",
+      "speakerCue": "Demonstrate how operators triage failures without retrying real calls."
+    },
+    {
+      "id": "validate_cli_review_priority_queue",
+      "order": 11,
+      "stage": "review",
+      "title": "Validate CLI review priority queue",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py review batch-summary",
+      "commandId": "test_cli",
+      "evidencePath": "tests/test_cli.py",
+      "expectedSignal": "review batch-summary exposes reviewPriorityQueue with priority, reasonCode, recommendedAction, autoApproveAllowed=false, and batchStateChangeAllowed=false.",
+      "speakerCue": "Show that operators can sort waiting review tasks without enabling batch approval or publish."
+    },
+    {
+      "id": "validate_backend_mcp_review_priority_queue",
+      "order": 12,
+      "stage": "review",
+      "title": "Validate Backend and MCP review priority queue",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py mcp call --tool get_review_task_summary --arguments \"{}\"",
+      "commandId": "test_backend_mock_api",
+      "secondaryCommandId": "test_mcp_mock_tools",
+      "evidencePath": "mcp-server/tools.manifest.json",
+      "expectedSignal": "GET /api/review-task-summary and MCP get_review_task_summary both expose data.reviewTaskSummary.reviewPriorityQueue for human triage only.",
+      "speakerCue": "Explain that CLI, Backend, and MCP read the same priority queue contract."
+    },
+    {
+      "id": "confirm_review_gate",
+      "order": 13,
+      "stage": "safety",
+      "title": "Confirm human review gate",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "delivery/HANDOFF.md",
+      "expectedSignal": "Generated Lab, Exam, Grading, and PPT DSL remain WAITING_REVIEW before approval.",
+      "speakerCue": "Say explicitly that generated content is never auto-published."
+    },
+    {
+      "id": "confirm_blocked_actions",
+      "order": 14,
+      "stage": "safety",
+      "title": "Confirm blocked actions",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "delivery/FAQ.md",
+      "expectedSignal": "Real LLM, real agent, real cloud, real sandbox, contestant execution, unknown Shell, remote upload, auto publish, and real publish stay disabled.",
+      "speakerCue": "Close the demo with the Phase 1 safety boundary."
+    }
+  ],
+  "acceptanceSignals": [
+    {
+      "id": "launchpad_first",
+      "expected": "frontend/operations-launchpad.html is the first static page opened."
+    },
+    {
+      "id": "phase1_check_passed",
+      "expected": "phase1 check returns success=true and data.passed=true."
+    },
+    {
+      "id": "delivery_manifest_ready",
+      "expected": "deliveryManifest.summary.missingRequired=0."
+    },
+    {
+      "id": "acceptance_report_ready",
+      "expected": "phase1 report returns acceptancePassed=true and safetyAssertionsPassed=true."
+    },
+    {
+      "id": "review_gate_visible",
+      "expected": "WAITING_REVIEW is visible in the review and delivery narrative."
+    },
+    {
+      "id": "review_priority_queue_visible",
+      "expected": "reviewPriorityQueue is visible through CLI, Backend, and MCP as human triage only."
+    },
+    {
+      "id": "real_actions_disabled",
+      "expected": "All real execution, upload, provider, agent, and publish actions remain disabled."
+    }
+  ],
+  "blockedActions": [
+    "Do not run unknown Shell scripts",
+    "Do not execute contestant code",
+    "Do not start a real agent",
+    "Do not call a real LLM provider",
+    "Do not create or delete real cloud resources",
+    "Do not upload delivery packages",
+    "Do not auto-publish or real-publish generated content",
+    "Do not show secrets or candidate-hidden answers"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "remoteUploadAllowed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false
+  }
+}

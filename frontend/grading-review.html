@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Grading Review Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    .metric,
+    .card,
+    .timeline,
+    .dsl-preview {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .content-grid > * {
+      min-width: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .kv {
+      display: grid;
+      gap: 7px;
+    }
+
+    .kv p {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #eef2f7;
+      padding-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .kv p:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .kv strong,
+    .mono {
+      color: var(--text);
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 0 0 8px 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .timeline ol {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 14px 14px 14px 34px;
+    }
+
+    .timeline li {
+      padding-left: 4px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.danger {
+      border-color: #fecaca;
+      color: var(--danger);
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger-text {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .detail-grid,
+      .content-grid,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Grading 审核详情 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">真实沙箱：禁用</span>
+      <span class="pill">选手代码执行：禁用</span>
+      <span class="pill">未知 Shell 执行：禁用</span>
+      <span class="pill">真实重评：禁用</span>
+      <span class="pill">qualitySignals：只读</span>
+      <span class="pill">reportDetail：只读</span>
+      <span class="pill">containerSandboxPlan：只读</span>
+      <span class="pill">真实发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="pill-row" aria-label="Review detail runtime data state">
+      <span class="pill strong" id="review-detail-api-status">STATIC_HTML_FALLBACK</span>
+      <span class="pill" id="review-detail-api-source">static HTML</span>
+      <span class="pill" id="review-detail-api-detail">api loader keeps actions read-only</span>
+      <span class="pill" id="review-detail-selected-task">task_grading_demo</span>
+    </div>
+
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">审核任务</h2>
+          <p>GET /api/review-tasks/{id}</p>
+        </div>
+        <span class="pill warn" id="review-detail-status">WAITING_REVIEW</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Task ID</span>
+          <strong id="review-detail-task-id">task_grading_demo</strong>
+        </div>
+        <div class="metric">
+          <span>Task Type</span>
+          <strong id="review-detail-task-type">GRADING_GENERATION</strong>
+        </div>
+        <div class="metric">
+          <span>Artifact</span>
+          <strong id="review-detail-artifact-total">2</strong>
+        </div>
+        <div class="metric">
+          <span>Sandbox Executed</span>
+          <strong class="danger-text">false</strong>
+        </div>
+        <div class="metric">
+          <span>Coverage</span>
+          <strong>MATCHED</strong>
+        </div>
+        <div class="metric">
+          <span>Publish</span>
+          <strong class="danger-text">blocked</strong>
+        </div>
+      </div>
+
+      <div class="detail-grid" aria-label="Review report detail summary">
+        <div class="card">
+          <h3>报告明细</h3>
+          <div class="kv">
+            <p><span>reportDetail.checkPlans</span><strong>3</strong></p>
+            <p><span>reviewDetail.assessmentPlan</span><strong>1</strong></p>
+            <p><span>containerSandboxPlan.mode</span><strong>CONTAINER_PLAN_ONLY</strong></p>
+            <p><span>resultPlaceholder.status</span><strong>NOT_EXECUTED</strong></p>
+            <p><span>inputSummary</span><strong>present</strong></p>
+            <p><span>mockEvidence</span><strong>MOCK_EVIDENCE_NOT_COLLECTED</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>沙箱策略</h3>
+          <div class="kv">
+            <p><span>sandboxPolicy.executorBoundary</span><strong>SandboxExecutor</strong></p>
+            <p><span>hostExecutionAllowed</span><strong>false</strong></p>
+            <p><span>networkAccess</span><strong>disabled_by_default</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>审核关注</h3>
+          <div class="kv">
+            <p><span>explainability.status</span><strong>EXPLAINABLE_MOCK_PLAN</strong></p>
+            <p><span>assessmentPlanAlignedWithChecks</span><strong>true</strong></p>
+            <p><span>requiredLimits</span><strong>timeout/cpu/memory/process</strong></p>
+            <p><span>realSandboxEvidenceRequired</span><strong>true</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>生成质量信号</h3>
+          <div class="kv">
+            <p><span>qualitySignals.coverage.gradingRefCoverage.status</span><strong>MATCHED</strong></p>
+            <p><span>qualitySignals.coverage.scoreCoverage.matched</span><strong>true</strong></p>
+            <p><span>qualitySignals.coverage.explainability.status</span><strong>EXPLAINABLE</strong></p>
+            <p><span>assessmentPlanHasReportDetailFields</span><strong>true</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="review-title">
+      <div class="section-head">
+        <div>
+          <h2 id="review-title"><span id="review-detail-title">Grading DSL 审核</span></h2>
+          <p id="review-detail-dsl-path">templates/grading/examples/python-pytest.yaml</p>
+        </div>
+        <span class="pill">trace_grading_demo</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3 id="review-detail-dsl-title">Grading DSL</h3>
+              <span class="pill warn" id="review-detail-dsl-status">WAITING_REVIEW</span>
+            </div>
+            <pre id="review-detail-dsl-preview">version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_demo"
+  title: "Python Pytest Mock 评分规则"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 100
+  timeoutSeconds: 30
+  assessmentPlan:
+    - checkId: "check_pytest"
+      type: "pytest"
+      runner: "PytestGrader"
+      score: 100
+      inputSummary: "Plan pytest check at tests/test_main.py"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "high"
+      sandboxRequiredBeforeRealExecution: true
+  checks:
+    - id: "check_pytest"
+      type: "pytest"
+      path: "tests/test_main.py"
+      score: 100
+sandboxExecuted: false
+contestantCodeExecuted: false
+unknownShellExecuted: false</pre>
+          </div>
+
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3>评分计划审核</h3>
+              <span class="pill strong">reviewDetail.assessmentPlan</span>
+            </div>
+            <pre>source: "reviewDetail.assessmentPlan.summary"
+fallbackSource: "templates/grading/examples/python-pytest.yaml.spec.assessmentPlan"
+planTotal: 1
+alignedWithChecks: true
+reviewFocus:
+  - checkId
+  - runner
+  - inputSummary
+  - executionPlan.requiredLimits
+  - mockEvidence.status
+  - riskLevel
+checkPlans:
+  - checkId: "check_pytest"
+    sourceField: "reviewDetail.assessmentPlan.items[0]"
+    runner: "PytestGrader"
+    riskLevel: "high"
+    executionPlan.strategy: "MOCK_PLAN_ONLY"
+    executionPlan.requiredLimits.network: "disabled_by_default"
+    containerSandboxPlan.mode: "CONTAINER_PLAN_ONLY"
+    containerSandboxPlan.containerPlan.image: "python:3.11-slim"
+    containerSandboxPlan.containerPlan.mounts[0].mode: "read_only"
+    containerSandboxPlan.resultPlaceholder.status: "NOT_EXECUTED"
+    mockEvidence.status: "MOCK_EVIDENCE_NOT_COLLECTED"
+    sandboxRequiredBeforeRealExecution: true</pre>
+          </div>
+
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3>AssessmentPlanManualReviewChecklist</h3>
+              <span class="pill warn">NEEDS_HUMAN_REVIEW</span>
+            </div>
+            <pre>source: "reviewCenterPrototype.nextManualReviewAction"
+taskId: "task_grading_demo"
+entryRoute: "/grading/:id/review?taskId=task_grading_demo"
+primaryReviewFocus: "review_assessment_plan_before_approval"
+checklist:
+  - id: "verify_assessment_plan_aligned_with_checks"
+    expected: "assessmentPlanAlignedWithChecks=true"
+    evidence:
+      - "reviewDetail.assessmentPlan.summary"
+      - "gradingReviewPrototype.assessmentPlanSummary"
+      - "dslPreviews.grading.spec.assessmentPlan"
+    status: "NEEDS_HUMAN_REVIEW"
+  - id: "confirm_mock_evidence_not_collected"
+    expected: "mockEvidence.status=MOCK_EVIDENCE_NOT_COLLECTED"
+    evidence:
+      - "gradingReviewPrototype.assessmentPlan[0].mockEvidence.status"
+      - "gradingReport.reportDetail.checkPlans[].mockEvidence.status"
+    status: "NEEDS_HUMAN_REVIEW"
+  - id: "confirm_real_sandbox_evidence_required_before_real_execution"
+    expected: "realSandboxEvidenceRequired=true"
+    evidence:
+      - "gradingReviewPrototype.assessmentPlanSummary.realSandboxEvidenceRequired"
+      - "gradingReviewPrototype.assessmentPlan[0].sandboxRequiredBeforeRealExecution"
+    status: "NEEDS_HUMAN_REVIEW"
+  - id: "verify_required_limits_present"
+    expected: "requiredLimits=timeout/cpu/memory/network/filesystem/process"
+    evidence:
+      - "gradingReviewPrototype.assessmentPlanSummary.requiredLimits"
+      - "gradingReviewPrototype.assessmentPlan[0].executionPlan.requiredLimits"
+    status: "NEEDS_HUMAN_REVIEW"
+  - id: "confirm_no_execution_or_publish"
+    expected: "sandboxExecuted=false, contestantCodeExecuted=false, realSandboxRunEnabled=false, realPublishAllowed=false"
+    evidence:
+      - "gradingReviewPrototype.safety.sandboxExecuted=false"
+      - "gradingReviewPrototype.safety.contestantCodeExecuted=false"
+      - "gradingReviewPrototype.actionPolicy.realSandboxRunEnabled=false"
+      - "gradingReviewPrototype.actionPolicy.realPublishEnabled=false"
+    status: "NEEDS_HUMAN_REVIEW"
+operatorDecision:
+  manualDecisionRequired: true
+  approveAllowedAfterChecklist: true
+  rejectRequiresReason: true
+  autoApproveAllowed: false
+  batchStateChangeAllowed: false
+  realSandboxRunEnabled: false
+  contestantCodeExecuted: false
+  realPublishAllowed: false</pre>
+          </div>
+
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3>GradingReportPanel</h3>
+              <span class="pill warn">MOCK_ONLY</span>
+            </div>
+            <pre>mode: "MOCK_ONLY"
+gradingId: "grading_demo"
+totalScore: 100
+earnedScore: 100
+passed: true
+reportDetail:
+  checkPlans: 3
+  sandboxPolicy.executorBoundary: "SandboxExecutor"
+  containerSandboxPlan.mode: "CONTAINER_PLAN_ONLY"
+  containerSandboxPlan.resultPlaceholder.status: "NOT_EXECUTED"
+  explainability.status: "EXPLAINABLE_MOCK_PLAN"
+  mockEvidence.status: "MOCK_EVIDENCE_NOT_COLLECTED"
+  requiredLimits: ["timeout", "cpu", "memory", "process"]
+sandboxExecuted: false
+contestantCodeExecuted: false
+logs: []</pre>
+          </div>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>审核策略</h3>
+            <p class="ok">reviewRequired=true</p>
+            <p class="ok">rejectRequiresReason=true</p>
+            <p class="ok">auditTrailRequired=true</p>
+            <p class="danger-text">autoPublishAllowed=false</p>
+            <p class="danger-text">realPublishAllowed=false</p>
+            <p class="danger-text">realRegradeEnabled=false</p>
+          </div>
+          <div class="card">
+            <h3>执行安全</h3>
+            <p class="danger-text">sandboxExecuted=false</p>
+            <p class="danger-text">contestantCodeExecuted=false</p>
+            <p class="danger-text">unknownShellExecuted=false</p>
+            <p class="danger-text">realSandboxRunEnabled=false</p>
+          </div>
+          <div class="card">
+            <h3>审核重点</h3>
+            <p>qualitySignals.coverage.gradingRefCoverage.matched=true</p>
+            <p>qualitySignals.coverage.scoreCoverage.status=MATCHED</p>
+            <p>qualitySignals.coverage.explainability.assessmentPlanAlignedWithChecks=true</p>
+            <p class="danger-text">评分计划可解释性只辅助人工审核，不执行真实沙箱</p>
+          </div>
+          <div class="card">
+            <h3>操作接口</h3>
+            <p>POST /api/ai-tasks/{id}/approve</p>
+            <p>POST /api/ai-tasks/{id}/reject</p>
+            <p>GET /api/audit-events</p>
+            <p class="danger-text">mockPublishEnabled=false</p>
+          </div>
+          <div class="card">
+            <h3>来源与产物</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span>examId</span>
+                <strong>exam_demo</strong>
+              </div>
+              <div class="field">
+                <span>gradingDslPath</span>
+                <strong>templates/grading/examples/python-pytest.yaml</strong>
+              </div>
+              <div class="field">
+                <span>reportRoute</span>
+                <strong>/grading/:id/report</strong>
+              </div>
+              <div class="field">
+                <span>reportId</span>
+                <strong>grading_report_demo</strong>
+              </div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="section-head">
+              <h3>AiTaskTimeline</h3>
+              <span class="pill">workflow_run_grading_demo</span>
+            </div>
+            <ol id="review-detail-timeline-list">
+              <li>AI Task created：WAITING_REVIEW</li>
+              <li>validate_grading_dsl：COMPLETED</li>
+              <li>Artifact GRADING_DSL：WAITING_REVIEW</li>
+              <li>Mock report preview：COMPLETED</li>
+            </ol>
+          </div>
+          <div class="card" aria-label="Manual review action panel">
+            <h3>ManualReviewAction</h3>
+            <p class="ok" id="review-action-status">ACTION_STATIC_FALLBACK</p>
+            <p id="review-action-detail">POST /api/ai-tasks/{id}/approve · POST /api/ai-tasks/{id}/reject · rejectRequiresReason=true</p>
+            <div class="field-grid">
+              <label class="field">
+                <span>reviewer</span>
+                <input id="review-action-reviewer" type="text" value="teacher_1" aria-label="reviewer">
+              </label>
+              <label class="field">
+                <span>reject reason</span>
+                <textarea id="review-action-reason" rows="3" aria-label="reject reason">请补充人工审核意见后再驳回</textarea>
+              </label>
+            </div>
+            <p class="danger-text">autoPublishAllowed=false · realPublishAllowed=false · realSandboxRunEnabled=false</p>
+          </div>
+          <div class="card" aria-label="Platform import preview action panel">
+            <h3>AgentImportPreviewAction</h3>
+            <p class="ok" id="agent-import-preview-status">IMPORT_PREVIEW_STATIC_FALLBACK</p>
+            <p id="agent-import-preview-detail">POST /api/grading/import-preview · requiresApprovedTask=true · sandboxExecuted=false</p>
+            <button id="agent-import-preview-button" type="button">生成 Grading 平台导入预览</button>
+            <p class="danger-text">databaseWritten=false · realAgentImport=false · realPublishAllowed=false · contestantCodeExecuted=false</p>
+          </div>
+          <div class="card" aria-label="Platform entity mock import action panel">
+            <h3>AgentEntityMockImportAction</h3>
+            <p class="ok" id="agent-mock-import-status">MOCK_IMPORT_STATIC_FALLBACK</p>
+            <p id="agent-mock-import-detail">POST /api/grading/mock-import · requiresImportPreview=true · mockStoreWritten=true</p>
+            <button id="agent-mock-import-button" type="button" disabled>Mock 入库 Grading 草稿</button>
+            <a class="pill strong" id="agent-mock-import-link" href="agent-entities.html?entityKind=grading">查看平台实体页</a>
+            <p class="danger-text">databaseWritten=false · realAgentImport=false · realPublish=false · contestantCodeExecuted=false</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button" title="Mock approve requires reviewer" data-review-action="approve">通过</button>
+        <button class="danger" type="button" title="Mock reject requires reviewer and reason" data-review-action="reject">驳回</button>
+        <button type="button">查看 Grading DSL</button>
+        <button type="button">打开评分报告</button>
+        <button type="button">查看审计事件</button>
+        <button type="button" disabled title="Phase 1 禁止真实沙箱">真实沙箱验证</button>
+        <button type="button" disabled title="Phase 1 不执行选手代码">执行选手代码</button>
+        <button type="button" disabled title="Phase 1 禁止真实重评">真实重评</button>
+        <button type="button" disabled title="Phase 1 禁止自动发布">自动发布</button>
+        <button type="button" disabled title="Phase 1 禁止真实发布">真实发布</button>
+      </div>
+    </section>
+  </main>
+  <script src="review-detail-data.js" data-review-kind="grading" data-default-task-id="task_grading_demo"></script>
+  <script src="review-action-data.js"></script>
+  <script src="review-import-preview-data.js" data-import-kind="grading"></script>
+</body>
+</html>

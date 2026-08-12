@@ -1,0 +1,149 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "workflowId": "phase2_ppt_generation",
+  "title": "Phase 2 Mock PPT / Document Generation Workflow",
+  "description": "Build a deterministic slide plan from local Markdown material, then generate PPT DSL through MockProvider. No real PPT file, LLM call, cloud resource, or agent is used.",
+  "entrypoints": {
+    "cliRun": "python lab_cli.py phase2 ppt-generate run --input examples/input/demo-source.md --reviewer teacher_1 --slide-plan-output examples/output/phase2-ppt-slide-plan.json --output examples/output/phase2-ppt-generation-report.json",
+    "cliReport": "python lab_cli.py phase2 ppt-generate report --file examples/output/phase2-ppt-generation-report.json",
+    "backendRun": "POST /api/phase2/workflows/ppt-generation/run",
+    "pythonHelper": "ai_workflows.ppt_generation_workflow.run_phase2_ppt_generation"
+  },
+  "inputs": [
+    {
+      "kind": "Markdown",
+      "path": "examples/input/demo-source.md",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "kind": "PromptManifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "kind": "PptSchema",
+      "path": "templates/ppt/ppt.schema.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "kind": "ProviderAdapterContract",
+      "path": "providers/provider-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "SlidePlan",
+      "path": "examples/output/phase2-ppt-slide-plan.json",
+      "generated": true,
+      "status": "COMPLETED",
+      "reviewRequired": true,
+      "artifactGenerated": false,
+      "pptFileGenerated": false
+    },
+    {
+      "kind": "PPT",
+      "path": "templates/ppt/examples/course-ppt.yaml",
+      "generated": false,
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "artifactGenerated": false,
+      "pptFileGenerated": false
+    },
+    {
+      "kind": "WorkflowReport",
+      "path": "examples/output/phase2-ppt-generation-report.json",
+      "generated": true,
+      "status": "COMPLETED",
+      "reviewRequired": true
+    }
+  ],
+  "steps": [
+    {
+      "name": "validate_input",
+      "description": "Ensure the source is an existing local Markdown file."
+    },
+    {
+      "name": "analyze_material",
+      "description": "Run static local material analysis without executing unknown scripts."
+    },
+    {
+      "name": "build_chapter_tree",
+      "description": "Derive a deterministic chapter tree from Markdown headings."
+    },
+    {
+      "name": "extract_key_points",
+      "description": "Derive deterministic teaching points from Markdown bullets and analysis summary."
+    },
+    {
+      "name": "build_slide_plan",
+      "description": "Save an intermediate slide plan JSON before PPT DSL generation."
+    },
+    {
+      "name": "generate_ppt_dsl",
+      "description": "Call MockProvider through the provider adapter to generate PPT DSL metadata."
+    },
+    {
+      "name": "assemble_ppt_review_bundle",
+      "description": "Create AI Task, provider audit, artifacts, and workflow report with review required."
+    }
+  ],
+  "documentPolicy": {
+    "directPdfToPptAllowed": false,
+    "markdownInputRequiredForCurrentMock": true,
+    "slidePlanRequiredBeforePpt": true,
+    "pptFileGenerated": false,
+    "artifactGenerated": false
+  },
+  "providerAdapter": {
+    "adapterId": "mock_provider_adapter",
+    "interfaceName": "LLMProvider",
+    "activeProvider": "mock",
+    "promptId": "ppt_generation_v0",
+    "outputKind": "PPT",
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false
+  },
+  "reviewGate": {
+    "defaultGeneratedStatus": "WAITING_REVIEW",
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "autoPublishAllowed": false
+  },
+  "audit": {
+    "providerCallAuditRequired": true,
+    "workflowRunRequired": true,
+    "artifactRecordsRequired": true,
+    "taskTypes": [
+      "PPT_GENERATION"
+    ]
+  },
+  "recommendedCommandIds": [
+    "phase2_ppt_generate_run",
+    "phase2_ppt_generate_report",
+    "test_phase2_ppt_generation_workflow",
+    "test_provider_adapter_workflow"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "reviewBypassed": false,
+    "realPptFileCreated": false
+  }
+}

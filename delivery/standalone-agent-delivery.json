@@ -1,0 +1,236 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 5",
+  "mode": "MOCK_ONLY",
+  "id": "phase5_standalone_agent_delivery",
+  "title": "Phase 5 Standalone Agent Delivery Package",
+  "description": "Machine-testable Mock delivery package for the standalone teaching agent. It documents goals, inputs, tool policy, state, validation, errors, audit evidence, and safety boundaries without starting a real Agent runtime, calling real LLMs, changing cloud resources, executing sandboxes, or publishing content.",
+  "runtimeTarget": {
+    "name": "standalone-agent",
+    "displayName": "独立智能体",
+    "connectionMode": "LOCAL_MOCK_ONLY",
+    "externalPlatformConnected": false,
+    "credentialsRequired": false,
+    "credentialsStored": false,
+    "deploymentPackageGenerated": false,
+    "realWebhookConfigured": false
+  },
+  "inputs": [
+    {
+      "id": "mcp_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    },
+    {
+      "id": "workflow_manifest",
+      "path": "ai-workflows/workflow.manifest.json",
+      "required": true
+    },
+    {
+      "id": "phase2_workflow_registry",
+      "path": "ai-workflows/phase2-workflow-registry.contract.json",
+      "required": true
+    },
+    {
+      "id": "operations_skill_pack",
+      "path": "skills/operations-skill-pack/SKILL.md",
+      "required": true
+    },
+    {
+      "id": "operations_manual",
+      "path": "delivery/OPERATIONS_MANUAL.md",
+      "required": true
+    },
+    {
+      "id": "final_signoff",
+      "path": "delivery/FINAL_SIGNOFF.md",
+      "required": true
+    },
+    {
+      "id": "high_risk_mcp_handoff",
+      "path": "delivery/HIGH_RISK_MCP_HANDOFF.md",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    },
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "standalone_agent_delivery_markdown",
+      "path": "delivery/STANDALONE_AGENT_DELIVERY.md",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    },
+    {
+      "id": "standalone_agent_delivery_contract",
+      "path": "delivery/standalone-agent-delivery.json",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    }
+  ],
+  "agentSpec": {
+    "id": "standalone_teaching_agent_mock",
+    "goal": "Convert local operator intent into a reviewable Mock workflow plan, call only allowlisted local Mock tools, return unified JSON, and keep all generated content behind WAITING_REVIEW.",
+    "trigger": "Local operator request; documentation and contract validation only in this phase.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["intent", "reviewer"],
+      "properties": {
+        "intent": {"type": "string"},
+        "localInputPath": {"type": "string"},
+        "targetKind": {"type": "string", "enum": ["Lab", "Exam", "Grading", "PPT", "Review", "Audit"]},
+        "taskId": {"type": "string"},
+        "reviewer": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": ["success", "code", "message", "traceId"],
+      "properties": {
+        "success": {"type": "boolean"},
+        "code": {"type": "string"},
+        "message": {"type": "string"},
+        "data": {"type": "object"},
+        "errors": {"type": "array"},
+        "traceId": {"type": "string"}
+      }
+    },
+    "stateModel": {
+      "requestState": ["intent", "localInputPath", "targetKind", "reviewer", "taskId"],
+      "persistentState": ["aiTasks", "workflowRuns", "artifacts"],
+      "auditState": ["providerAuditEvents", "mcpToolCallRecords", "operationAuditEvents"],
+      "conversationMemoryMayBeSoleState": false
+    },
+    "allowedToolNames": [
+      "analyze_material",
+      "workflow_demo",
+      "generate_lab_from_source",
+      "generate_exam_from_lab",
+      "generate_ppt",
+      "run_grading",
+      "list_ai_tasks",
+      "get_ai_task",
+      "list_review_tasks",
+      "get_review_task_summary",
+      "get_review_detail",
+      "list_workflows",
+      "get_workflow",
+      "list_workflow_runs",
+      "get_workflow_run",
+      "list_artifacts",
+      "get_artifact",
+      "list_operation_audit_events",
+      "list_provider_audit_events",
+      "list_mcp_tool_call_records"
+    ],
+    "blockedToolNames": [
+      "publish_lab",
+      "publish_exam",
+      "destroy_environment"
+    ],
+    "readOnlyHighRiskToolNames": [
+      "get_second_confirmation_status"
+    ],
+    "workflowIds": [
+      "phase1_main_demo",
+      "lab_generation_mock",
+      "exam_generation_mock",
+      "ppt_generation_mock",
+      "phase2_content_generation",
+      "phase2_exam_conversion",
+      "phase2_ppt_generation"
+    ],
+    "planningSteps": [
+      "understand_intent",
+      "select_mock_workflow_or_tool",
+      "validate_local_inputs",
+      "call_allowlisted_mock_tool",
+      "validate_schema_or_contract",
+      "record_audit_evidence",
+      "return_unified_json"
+    ],
+    "errorModes": [
+      "missing_required_input",
+      "unsupported_intent",
+      "non_local_input_path",
+      "schema_validation_failed",
+      "non_allowlisted_tool",
+      "high_risk_tool_requested",
+      "review_gate_bypass_attempted",
+      "candidate_answer_leak_attempted",
+      "real_execution_requested"
+    ]
+  },
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_standalone_agent_delivery",
+    "test_mcp_manifest",
+    "test_mcp_mock_tools",
+    "test_operations_skill_pack",
+    "test_operations_manual",
+    "test_final_signoff",
+    "test_high_risk_mcp_handoff",
+    "test_all"
+  ],
+  "validation": {
+    "deterministicChecks": [
+      "All input and output files exist locally.",
+      "Allowed tool names exist in mcp-server/tools.manifest.json.",
+      "Blocked high-risk tool names exist in mcp-server/tools.manifest.json and remain review-intent-only.",
+      "Workflow ids exist in ai-workflows/workflow.manifest.json or ai-workflows/phase2-workflow-registry.contract.json.",
+      "Recommended command ids are allowlisted in scripts/manifest.json.",
+      "Generated content defaults to WAITING_REVIEW.",
+      "Unified JSON output schema remains required.",
+      "No real external platform connection, real Agent runtime, real LLM, real MCP server, cloud resource, sandbox, unknown Shell, auto publish, or real publish is enabled."
+    ],
+    "successSignals": [
+      "tests/test_standalone_agent_delivery.py passes.",
+      "Delivery package includes standalone_agent_delivery_md and standalone_agent_delivery_contract.",
+      "Final signoff references the Standalone Agent delivery package.",
+      "All safety flags remain false for real execution."
+    ]
+  },
+  "reviewGate": {
+    "generatedContentDefaultStatus": "WAITING_REVIEW",
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "standardAnswerVisibleToCandidate": false,
+    "highRiskToolDirectExecutionAllowed": false,
+    "batchApproveAllowed": false
+  },
+  "safety": {
+    "manualOnly": true,
+    "readOnly": true,
+    "externalPlatformConnected": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "realProviderEnabled": false,
+    "realMcpServerStarted": false,
+    "networkAccess": false,
+    "realCloudResourceChanged": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false,
+    "highRiskToolDirectExecutionAllowed": false,
+    "promptMayBeEmbeddedInBusinessCode": false
+  }
+}

@@ -1,0 +1,52 @@
+version: "1.0"
+kind: "Lab"
+metadata:
+  id: "lab_demo"
+  title: "AI 工具应用入门实验"
+  category: "AI 工具应用"
+  difficulty: "beginner"
+  durationMinutes: 60
+  tags:
+    - "AI"
+    - "工具应用"
+status: "WAITING_REVIEW"
+spec:
+  objectives:
+    - "理解 AI 工具的基本用途"
+    - "掌握使用 AI 工具辅助完成实验任务的基本流程"
+    - "能够整理实验过程并提交可审核的结果说明"
+  targetUsers:
+    - "高职学生"
+  environment:
+    type: "ubuntu-vm"
+    image: "ubuntu-22.04"
+    resources:
+      cpu: 2
+      memoryGb: 4
+  materials:
+    - type: "markdown"
+      path: "examples/input/demo-source.md"
+  steps:
+    - id: "step_1"
+      title: "环境检查"
+      instruction: "检查 Python 环境是否可用，并记录版本信息。"
+      commands:
+        - "python --version"
+      expectedResult: "能正常输出 Python 版本号"
+    - id: "step_2"
+      title: "阅读实验资料"
+      instruction: "阅读输入素材，提炼本实验的学习目标、关键操作和最终产物。"
+      commands: []
+      expectedResult: "能够写出实验目标、操作要点和预期产物清单。"
+    - id: "step_3"
+      title: "使用 AI 工具辅助完成任务"
+      instruction: "根据素材要求向 AI 工具提出明确问题，整理 AI 建议，并选择可执行的方案。"
+      commands: []
+      expectedResult: "形成一份包含 AI 建议、人工判断和执行方案的实验记录。"
+    - id: "step_4"
+      title: "提交实验结果"
+      instruction: "汇总命令输出、关键截图或文字说明，提交给教师进行人工审核。"
+      commands: []
+      expectedResult: "提交内容能够证明实验过程完整、结果可复核。"
+  grading:
+    ref: "grading_demo"

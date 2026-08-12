@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Environment Management Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --line: #d8dee8;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --ok: #047857;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .card,
+    .env-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .env-card span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .env-card strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .env-list,
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .env-card {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .env-head,
+    .env-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .env-meta {
+      align-items: stretch;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .meta-cell {
+      min-height: 64px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .card {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .env-meta {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>环境管理 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实云资源：禁用</span>
+      <span class="pill">真实 VM / Notebook：禁用</span>
+      <span class="pill">真实沙箱：禁用</span>
+      <span class="pill">销毁真实资源：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">环境总览</h2>
+          <p>GET /api/environments + GET /api/audit-events</p>
+        </div>
+        <span class="pill strong">provider=mock</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Mock 环境</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>VM</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Notebook</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>真实云资源</span>
+          <strong class="danger">false</strong>
+        </div>
+        <div class="metric">
+          <span>审计事件</span>
+          <strong>1</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="env-title">
+      <div class="section-head">
+        <div>
+          <h2 id="env-title">环境实例</h2>
+          <p>所有操作只更新本地 Mock Store，不创建真实资源</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">POST /api/environments/vm</span>
+          <span class="pill">POST /api/environments/notebook</span>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="env-list" aria-label="Mock environment list">
+          <article class="env-card">
+            <div class="env-head">
+              <div>
+                <h3>Ubuntu VM</h3>
+                <p>env_vm_demo</p>
+              </div>
+              <span class="pill warn">CREATED</span>
+            </div>
+            <div class="env-meta">
+              <div class="meta-cell">
+                <span>类型</span>
+                <strong>vm</strong>
+              </div>
+              <div class="meta-cell">
+                <span>镜像</span>
+                <strong>ubuntu-22.04</strong>
+              </div>
+              <div class="meta-cell">
+                <span>CPU</span>
+                <strong>2</strong>
+              </div>
+              <div class="meta-cell">
+                <span>内存</span>
+                <strong>4 GB</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill strong">realCloudResourceCreated=false</span>
+              <span class="pill">realCloudResourceChanged=false</span>
+            </div>
+            <div class="action-bar">
+              <button class="primary" type="button">Mock 启动</button>
+              <button type="button" disabled title="CREATED 状态不能停止">Mock 停止</button>
+              <button type="button" disabled title="CREATED 状态不能重置">Mock 重置</button>
+              <button type="button" disabled title="Phase 1 禁止销毁真实资源">销毁</button>
+            </div>
+          </article>
+
+          <article class="env-card">
+            <div class="env-head">
+              <div>
+                <h3>Python Notebook</h3>
+                <p>env_notebook_demo</p>
+              </div>
+              <span class="pill strong">RUNNING</span>
+            </div>
+            <div class="env-meta">
+              <div class="meta-cell">
+                <span>类型</span>
+                <strong>notebook</strong>
+              </div>
+              <div class="meta-cell">
+                <span>镜像</span>
+                <strong>python-3.11</strong>
+              </div>
+              <div class="meta-cell">
+                <span>CPU</span>
+                <strong>2</strong>
+              </div>
+              <div class="meta-cell">
+                <span>内存</span>
+                <strong>4 GB</strong>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill strong">realCloudResourceCreated=false</span>
+              <span class="pill">realCloudResourceChanged=false</span>
+            </div>
+            <div class="action-bar">
+              <button type="button" disabled title="RUNNING 状态不能重复启动">Mock 启动</button>
+              <button class="primary" type="button">Mock 停止</button>
+              <button type="button">Mock 重置</button>
+              <button type="button" disabled title="Phase 1 禁止销毁真实资源">销毁</button>
+            </div>
+          </article>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>创建环境</h3>
+            <pre>{
+  "title": "Ubuntu VM",
+  "image": "ubuntu-22.04",
+  "resources": {"cpu": 2, "memoryGb": 4}
+}</pre>
+            <div class="pill-row">
+              <span class="pill">POST /api/environments/vm</span>
+              <span class="pill">POST /api/environments/notebook</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>状态流转</h3>
+            <ol class="timeline">
+              <li>CREATED -> RUNNING</li>
+              <li>RUNNING -> STOPPED</li>
+              <li>RUNNING -> RESETTING -> STOPPED</li>
+              <li>STOPPED -> RUNNING</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>操作审计</h3>
+            <p>op_audit_env_demo：ENV_CREATE</p>
+            <p class="ok">realLlmCalled=false</p>
+            <p class="ok">realCloudResourceChanged=false</p>
+            <p class="ok">contestantCodeExecuted=false</p>
+            <p class="ok">realPublish=false</p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="action-bar">
+        <button class="primary" type="button">创建 VM Mock</button>
+        <button type="button">创建 Notebook Mock</button>
+        <button type="button">查看审计事件</button>
+        <button type="button" disabled title="Phase 1 禁止创建真实云资源">创建真实云资源</button>
+        <button type="button" disabled title="Phase 1 禁止销毁真实资源">销毁真实资源</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

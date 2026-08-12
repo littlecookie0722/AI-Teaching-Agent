@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Phase 1 AI Task Center Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --blocked: #991b1b;
+      --code: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .section-head p {
+      overflow-wrap: anywhere;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .task-workspace {
+      display: grid;
+      gap: 14px;
+      margin: 0 16px 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .workspace-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .metric,
+    .task-card,
+    .side-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow-wrap: anywhere;
+    }
+
+    .metric {
+      min-height: 80px;
+      padding: 12px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 20px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .task-card[aria-current="true"] {
+      border-color: #5eead4;
+      background: #f0fdfa;
+    }
+
+    .task-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .side-card {
+      padding: 12px;
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .signal-item {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #111827;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .timeline {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 160px;
+      overflow: auto;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .blocked {
+      color: var(--blocked);
+      font-weight: 700;
+    }
+
+    .api-state {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 940px) {
+      header,
+      .layout,
+      .summary-grid,
+      .workspace-grid,
+      .task-meta {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>AI 任务中心 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+      <span class="pill">密钥展示：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">任务概览</h2>
+          <p>GET /api/ai-tasks 或 GET /api/backend/core-tasks?coreDbPath=... + GET /api/review-task-summary</p>
+        </div>
+        <span class="pill warn">WAITING_REVIEW</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>AI Task</span>
+          <strong id="ai-task-total">3</strong>
+        </div>
+        <div class="metric">
+          <span>待审核</span>
+          <strong id="ai-task-waiting-total">2</strong>
+        </div>
+        <div class="metric">
+          <span>Urgent</span>
+          <strong id="ai-task-urgent-total" class="blocked">1</strong>
+        </div>
+        <div class="metric">
+          <span>批量状态变更</span>
+          <strong id="ai-task-batch-state-change" class="blocked">false</strong>
+        </div>
+      </div>
+      <div class="task-workspace" aria-labelledby="task-workspace-title">
+        <div class="section-head">
+          <div>
+            <h2 id="task-workspace-title">TaskExecutionWorkspace</h2>
+            <p id="task-workspace-summary">source=GET /api/ai-tasks + GET /api/review-task-summary · readonly=true · selectedTask=task_grading_demo</p>
+          </div>
+          <span class="pill strong" id="task-workspace-selected">task_grading_demo</span>
+        </div>
+        <div class="workspace-grid">
+          <div class="metric">
+            <span>审核状态</span>
+            <strong id="task-workspace-review-state">WAITING_REVIEW</strong>
+          </div>
+          <div class="metric">
+            <span>产物</span>
+            <strong id="task-workspace-artifact">finalResultPath=templates/grading/examples/python-pytest.yaml</strong>
+          </div>
+          <div class="metric">
+            <span>安全预览</span>
+            <strong id="task-workspace-safety">answerVisibleToCandidate=false</strong>
+          </div>
+          <div class="metric">
+            <span>下一步</span>
+            <strong id="task-workspace-next-action">open_review_center</strong>
+          </div>
+        </div>
+        <div class="workspace-actions">
+          <a class="pill strong" id="task-workspace-review-link" href="review-center.html?taskId=task_grading_demo">打开审核中心</a>
+          <a class="pill" id="task-workspace-grading-report-link" href="grading-report.html?taskId=task_grading_demo">打开评分报告</a>
+          <a class="pill" id="task-workspace-grading-workspace-link" href="grading-workspace.html?taskId=task_grading_demo">打开评分工作台</a>
+          <a class="pill" id="task-workspace-import-preview-link" href="agent-entities.html?sourceTaskId=task_grading_demo&amp;entityKind=grading">打开导入预览</a>
+          <span class="pill" id="task-workspace-boundary">method=GET only · no approve/reject · no publish · no real platform API</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="tasks-title">
+      <div class="section-head">
+        <div>
+          <h2 id="tasks-title">任务列表</h2>
+          <p id="ai-task-list-filter">状态过滤：WAITING_REVIEW</p>
+        </div>
+        <span class="pill">GET /api/backend/core-tasks</span>
+      </div>
+      <div class="api-state" aria-live="polite">
+        <span id="ai-task-api-status">STATIC_HTML_FALLBACK</span>
+        · <span id="ai-task-api-source">frontend/mock-data.json + static HTML</span>
+        · <span id="ai-task-api-detail">readOnly=true · autoPublishAllowed=false</span>
+      </div>
+      <div class="layout">
+        <div id="ai-task-list" class="task-list">
+          <article class="task-card" aria-current="true">
+            <h3><span class="rank">3</span> Mock Lab DSL generation</h3>
+            <div class="task-meta">
+              <span class="pill">task_lab_demo</span>
+              <span class="pill">LAB_GENERATION</span>
+              <span class="pill strong">WAITING_REVIEW</span>
+            </div>
+            <p>priority=NORMAL · reasonCode=LAB_QUALITY_NEEDS_REVIEW · qualitySignalStatus=NEEDS_REVIEW</p>
+            <p>ProviderQualityTaskSignal: readyForReview=true, normalizationPatchCount=1, schemaRepairApplied=false, responseId=resp_demo_lab_quality</p>
+          </article>
+          <article class="task-card">
+            <h3><span class="rank">2</span> Mock Exam DSL generation</h3>
+            <div class="task-meta">
+              <span class="pill">task_exam_demo</span>
+              <span class="pill">EXAM_GENERATION</span>
+              <span class="pill strong">WAITING_REVIEW</span>
+            </div>
+            <p>templates/exam/examples/notebook-fill-blank.yaml</p>
+            <p>QualitySignalTaskSignal: candidateSafeExamPreview.answersRemoved=true, questionGradingRefCoverage.status=MATCHED, scoreCoverage.status=MATCHED, explainability.status=EXPLAINABLE</p>
+            <p>priority=HIGH · reasonCode=CANDIDATE_SAFE_EXAM_PREVIEW · recommendedAction=verify_candidate_preview_and_grading_refs</p>
+          </article>
+          <article class="task-card">
+            <h3><span class="rank">1</span> Mock Grading DSL generation</h3>
+            <div class="task-meta">
+              <span class="pill">task_grading_demo</span>
+              <span class="pill">GRADING_GENERATION</span>
+              <span class="pill strong">WAITING_REVIEW</span>
+            </div>
+            <p>templates/grading/examples/python-pytest.yaml</p>
+            <p>reviewDetail.assessmentPlan.summary: planTotal=1, alignedWithChecks=true, riskLevel=high</p>
+            <p>QualitySignalTaskSignal: gradingRefCoverage.status=MATCHED, scoreCoverage.status=MATCHED, explainability.status=EXPLAINABLE</p>
+            <p>priority=URGENT · reasonCode=HIGH_RISK_MOCK_EVIDENCE_REQUIRED · recommendedAction=review_assessment_plan_before_approval</p>
+            <p>MOCK_EVIDENCE_NOT_COLLECTED, realSandboxEvidenceRequired=true, sandboxRequiredBeforeRealExecution=true</p>
+          </article>
+        </div>
+
+        <aside class="side-stack">
+          <div class="side-card">
+            <h3>审核入口</h3>
+            <p>GET /api/review-tasks/{id}</p>
+            <p>rejectRequiresReason=true</p>
+            <p>publishBlockedUntilApproved=true</p>
+          </div>
+          <div class="side-card">
+            <h3>NextManualReviewAction</h3>
+            <div class="signal-list">
+              <div class="signal-item">
+                <p>source=reviewCenterPrototype.nextManualReviewAction</p>
+                <p>entryRoute=/review-center?taskId=task_grading_demo · entryApi=GET /api/review-tasks/{id}</p>
+                <p>checklistSource=reviewCenterPrototype.reviewPriorityQueue.items[0].manualReviewChecklistSummary · needsHumanReviewTotal=5</p>
+                <p>taskId=task_grading_demo · priority=URGENT · primaryReviewFocus=review_assessment_plan_before_approval</p>
+              </div>
+              <div class="signal-item">
+                <p>operatorChecklist=open_task_grading_demo_review_detail / verify_assessment_plan_aligned_with_checks / confirm_real_sandbox_evidence_required_before_real_execution</p>
+                <p>autoApproveAllowed=false · batchStateChangeAllowed=false · realPublishAllowed=false</p>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>Workflow Timeline</h3>
+            <ol class="timeline">
+              <li>generate_lab_dsl：COMPLETED</li>
+              <li>generate_exam_dsl：COMPLETED</li>
+              <li>generate_grading_dsl：COMPLETED</li>
+              <li>mock_grade_run：COMPLETED</li>
+            </ol>
+          </div>
+          <div class="side-card">
+            <h3>ReviewPrioritySignal</h3>
+            <div class="signal-list">
+              <div class="signal-item">
+                <p>source=reviewCenterPrototype.reviewPriorityQueue</p>
+                <p>defaultSort=priorityRankAsc · topPriorityTaskId=task_grading_demo</p>
+                <p>urgentTotal=1 · highTotal=1 · normalTotal=1 · manualReviewChecklistNeedsHumanReviewTotal=5 · autoApproveAllowed=false</p>
+              </div>
+              <div class="signal-item">
+                <p>1 / URGENT / task_grading_demo / HIGH_RISK_MOCK_EVIDENCE_REQUIRED</p>
+              </div>
+              <div class="signal-item">
+                <p>2 / HIGH / task_exam_demo / CANDIDATE_SAFE_EXAM_PREVIEW</p>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>ProviderQualityTaskSignal</h3>
+            <div class="signal-list">
+              <div class="signal-item">
+                <p>source=reviewDetail.reviewPage.providerSummary.qualitySummary</p>
+                <p>callSource=reviewDetail.reviewPage.providerSummary.calls[].qualitySummary</p>
+                <p>visibleForTaskTypes=LAB_GENERATION · taskId=task_lab_demo</p>
+              </div>
+              <div class="signal-item">
+                <p>readyForReview=true · realLlmCalled=true · providerAdapter=openai_responses_sdk_adapter</p>
+                <p>normalizationPatchCount=1 · normalizationPatches=set.metadata.category · schemaRepairApplied=false</p>
+                <p>apiSurface=chat.completions · responseId=resp_demo_lab_quality · totalTokens=1234</p>
+                <p>autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false</p>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>QualitySignalTaskSignal</h3>
+            <div class="signal-list">
+              <div class="signal-item">
+                <p>source=examReviewPrototype.qualitySignals + gradingReviewPrototype.qualitySignals</p>
+                <p>visibleForTaskTypes=EXAM_GENERATION/GRADING_GENERATION</p>
+                <p>matchedCoverageTotal=4 · explainablePlanTotal=2 · candidateSafeExamPreviewTotal=1</p>
+              </div>
+              <div class="signal-item">
+                <p>task_exam_demo · candidateSafeExamPreview.answersRemoved=true · questionGradingRefCoverage.status=MATCHED · scoreCoverage.status=MATCHED</p>
+              </div>
+              <div class="signal-item">
+                <p>task_grading_demo · gradingRefCoverage.status=MATCHED · scoreCoverage.status=MATCHED · assessmentPlanAlignedWithChecks=true</p>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>AssessmentPlanTaskSignal</h3>
+            <p>source=gradingReviewPrototype.assessmentPlanSummary</p>
+            <p>backend=GET /api/review-tasks/{id}.reviewDetail.assessmentPlan.summary</p>
+            <p>executionStrategy=MOCK_PLAN_ONLY</p>
+            <p>requiredLimits=timeout/cpu/memory/network/filesystem/process</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button id="ai-task-review-link" class="primary" type="button">查看审核详情</button>
+        <button type="button">查看 Workflow 日志</button>
+        <button type="button" disabled title="Phase 1 禁用自动发布">自动发布</button>
+        <button type="button" disabled title="Phase 1 禁用批量状态变更">批量通过</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="payload-title">
+      <div class="section-head">
+        <div>
+          <h2 id="payload-title">选中任务 JSON</h2>
+          <p class="blocked">审核通过前禁止发布</p>
+        </div>
+        <span class="pill">GET /api/backend/core-tasks/{id}</span>
+      </div>
+      <pre id="ai-task-selected-json">{
+  "id": "task_lab_demo",
+  "taskType": "LAB_GENERATION",
+  "status": "WAITING_REVIEW",
+  "promptVersion": "phase1-mock",
+  "reviewRequired": true,
+  "autoPublishAllowed": false,
+  "reviewPrioritySignal": {
+    "source": "reviewCenterPrototype.reviewPriorityQueue",
+    "defaultSort": "priorityRankAsc",
+    "topPriorityTaskId": "task_grading_demo",
+    "topPriorityReasonCode": "HIGH_RISK_MOCK_EVIDENCE_REQUIRED",
+    "urgentTotal": 1,
+    "highTotal": 1,
+    "normalTotal": 1,
+    "manualReviewChecklistNeedsHumanReviewTotal": 5,
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false
+  },
+  "nextManualReviewAction": {
+    "source": "reviewCenterPrototype.nextManualReviewAction",
+    "entryRoute": "/review-center?taskId=task_grading_demo",
+    "taskId": "task_grading_demo",
+    "priority": "URGENT",
+    "checklistSource": "reviewCenterPrototype.reviewPriorityQueue.items[0].manualReviewChecklistSummary",
+    "needsHumanReviewTotal": 5,
+    "primaryReviewFocus": "review_assessment_plan_before_approval",
+    "operatorChecklist": [
+      "open_task_grading_demo_review_detail",
+      "verify_assessment_plan_aligned_with_checks",
+      "confirm_real_sandbox_evidence_required_before_real_execution"
+    ],
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false,
+    "realPublishAllowed": false
+  },
+  "qualitySignalTaskSignal": {
+    "source": "examReviewPrototype.qualitySignals + gradingReviewPrototype.qualitySignals",
+    "matchedCoverageTotal": 4,
+    "explainablePlanTotal": 2,
+    "candidateSafeExamPreviewTotal": 1,
+    "exam": {
+      "candidateSafeExamPreviewAnswersRemoved": true,
+      "questionGradingRefCoverageStatus": "MATCHED",
+      "scoreCoverageStatus": "MATCHED"
+    },
+    "grading": {
+      "gradingRefCoverageStatus": "MATCHED",
+      "scoreCoverageStatus": "MATCHED",
+      "assessmentPlanAlignedWithChecks": true
+    }
+  },
+  "providerQualityTaskSignal": {
+    "source": "reviewDetail.reviewPage.providerSummary.qualitySummary",
+    "callSource": "reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+    "readyForReview": true,
+    "normalizationPatchCount": 1,
+    "schemaRepairApplied": false,
+    "responseId": "resp_demo_lab_quality",
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false
+  },
+  "assessmentPlanTaskSignal": {
+    "source": "reviewDetail.assessmentPlan.summary",
+    "planTotal": 1,
+    "alignedWithChecks": true,
+    "riskLevel": "high",
+    "mockEvidenceStatus": "MOCK_EVIDENCE_NOT_COLLECTED",
+    "requiredLimits": "timeout/cpu/memory/network/filesystem/process",
+    "realSandboxEvidenceRequired": true,
+    "sandboxRequiredBeforeRealExecution": true
+  },
+  "realLlmCalled": false,
+  "realPublish": false
+}</pre>
+    </section>
+  </main>
+  <script src="ai-tasks-data.js"></script>
+</body>
+</html>

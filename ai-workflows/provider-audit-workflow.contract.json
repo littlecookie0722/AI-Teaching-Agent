@@ -1,0 +1,93 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "id": "provider_audit_workflow_contract",
+  "title": "Workflow Provider Call Audit Contract",
+  "description": "Requires Lab, Exam, Grading, PPT, and phase1_main_demo workflow generation steps to write local providerCallAuditEvents while keeping the provider adapter helper side-effect free.",
+  "storeKey": "providerCallAuditEvents",
+  "workflowId": "phase1_main_demo",
+  "inputs": [
+    {
+      "id": "provider_adapter_workflow_helper",
+      "path": "ai_workflows/provider_adapter_workflow.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_audit_model",
+      "path": "cli/provider_audit.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "cli_mock",
+      "path": "cli/lab_cli.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "backend_mock_api",
+      "path": "backend/mock_api.py",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "auditedWorkflowSteps": [
+    {
+      "kind": "lab",
+      "stepName": "generate_lab_dsl",
+      "promptId": "lab_generation_v0",
+      "outputKind": "Lab"
+    },
+    {
+      "kind": "exam",
+      "stepName": "generate_exam_dsl",
+      "promptId": "exam_generation_v0",
+      "outputKind": "Exam"
+    },
+    {
+      "kind": "grading",
+      "stepName": "generate_grading_dsl",
+      "promptId": "grading_generation_v0",
+      "outputKind": "Grading"
+    },
+    {
+      "kind": "ppt",
+      "stepName": "generate_ppt_dsl",
+      "promptId": "ppt_generation_v0",
+      "outputKind": "PPT"
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py workflow demo --input examples/input/demo-source.md --reviewer teacher_1",
+      "auditQuery": "python lab_cli.py provider audit --operation generateJson"
+    },
+    {
+      "type": "api",
+      "method": "POST",
+      "path": "/api/workflow/demo",
+      "auditQuery": "GET /api/provider-audit-events?operation=generateJson"
+    }
+  ],
+  "expectedEventDetail": {
+    "source": "workflow_adapter",
+    "workflowId": "phase1_main_demo",
+    "workflowStepRequired": true,
+    "taskIdRequired": true,
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true
+  },
+  "recommendedCommandIds": ["test_provider_adapter_workflow", "test_cli", "test_backend_mock_api", "test_all"],
+  "safety": {
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "taskCreatedByProvider": false,
+    "reviewBypassed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

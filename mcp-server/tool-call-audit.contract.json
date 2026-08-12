@@ -1,0 +1,79 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "title": "MCP Tool Mock Call Audit Contract",
+  "storeKey": "mcpToolCallRecords",
+  "scope": [
+    "lab-cli mcp call",
+    "mcp_server.mock_tools.invoke_mcp_tool",
+    "GET /api/mcp-tool-call-records",
+    "lab-cli mcp audit",
+    "MCP Tool list_mcp_tool_call_records"
+  ],
+  "recordSchema": {
+    "required": [
+      "id",
+      "toolName",
+      "status",
+      "actor",
+      "backendMethod",
+      "backendPath",
+      "riskLevel",
+      "reviewRequired",
+      "argumentKeys",
+      "argumentPreview",
+      "backendCalled",
+      "mode",
+      "traceId",
+      "occurredAt"
+    ],
+    "statusValues": ["SUCCESS", "FAILED"],
+    "argumentPolicy": {
+      "storeRawArguments": false,
+      "storeArgumentKeys": true,
+      "storeRedactedPreview": true,
+      "redactedNameFragments": ["secret", "token", "password", "apikey", "api_key", "key"]
+    }
+  },
+  "entrypoints": {
+    "cliCall": "python lab_cli.py mcp call --tool analyze_material --arguments \"{\\\"input\\\":\\\"examples/input/demo-source.md\\\"}\"",
+    "cliAudit": "python lab_cli.py mcp audit --tool analyze_material",
+    "backendAudit": "GET /api/mcp-tool-call-records?toolName=analyze_material",
+    "mcpToolAudit": "list_mcp_tool_call_records"
+  },
+  "failureRules": [
+    {
+      "case": "manifest argument validation fails",
+      "status": "FAILED",
+      "backendCalled": false,
+      "responseCode": null,
+      "errorCode": "VALIDATION_ERROR"
+    },
+    {
+      "case": "Backend Mock returns a failure envelope",
+      "status": "FAILED",
+      "backendCalled": true,
+      "responseCode": "Backend response code",
+      "backendTraceId": "Backend response traceId"
+    }
+  ],
+  "safetyAssertions": {
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "recommendedCommandIds": [
+    "test_mcp_mock_tools",
+    "test_backend_mock_api",
+    "test_cli",
+    "test_all"
+  ]
+}

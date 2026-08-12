@@ -1,0 +1,185 @@
+{
+  "id": "real_sdk_dependency_install_change_proposal_contract",
+  "gateId": "real_sdk_dependency_install_change_proposal",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Reviewed real SDK dependency install change proposal. It may transform the redacted readonly dependency content preview into a JSON proposal and non-executable patch preview, but must not write dependency files, write patch files, apply patches, materialize or execute commands, install packages, resolve package metadata, import SDKs, check secrets, use network access, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_install_change_proposal_module",
+      "path": "providers/real_sdk_dependency_install_change_proposal.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_contract",
+      "path": "providers/real-sdk-dependency-install-change-proposal.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_module",
+      "path": "providers/real_sdk_dependency_content_read_readonly_execution.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+      "path": "providers/real-sdk-dependency-content-read-readonly-execution.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-change-proposal describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installChangeProposalOnly": true,
+        "installChangeProposalModelReady": false,
+        "dependencyFileChanged": false,
+        "patchGenerated": false,
+        "dependencyInstallExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-change-proposal propose --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "contentReadReadonlyExecutionModelReady": false,
+        "installChangeProposalModelReady": false,
+        "dependencyInstallPatchPlanGenerated": false,
+        "patchGenerated": false,
+        "commandExecuted": false,
+        "dependencyInstallExecuted": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW",
+    "proposalOnly": true,
+    "targetPackage": "openai",
+    "recommendedSpecifier": "openai>=1.0.0,<2.0.0",
+    "allowlistedFiles": [
+      "pyproject.toml",
+      "requirements.txt",
+      "uv.lock",
+      "poetry.lock",
+      "requirements.lock"
+    ]
+  },
+  "requiredContext": {
+    "contentReadReadonlyExecutionRequired": true,
+    "contentReadReadonlyExecutionModelReady": false,
+    "installChangeProposalOnly": true,
+    "installChangeProposalModelReady": false,
+    "readyForDependencyInstallPatchReview": false,
+    "dependencyInstallPatchPlanGenerated": false,
+    "nonExecutablePatchPreviewGenerated": false,
+    "dependencyFileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "dependencyPatchGenerated": false,
+    "patchGenerated": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecuted": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "write_patch_file",
+    "materialize_patch_file",
+    "apply_patch",
+    "materialize_install_command",
+    "execute_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_after_install_change_proposal",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_install_change_proposal",
+    "test_real_sdk_dependency_content_read_readonly_execution",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "readonlyReadRequiredBeforeProposal": true,
+    "installChangeProposalOnly": true,
+    "nonExecutablePatchPreviewAllowedAfterConfirmation": true,
+    "dependencyInstallPatchPlanGenerated": false,
+    "dependencyFileChanged": false,
+    "patchGenerated": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecuted": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

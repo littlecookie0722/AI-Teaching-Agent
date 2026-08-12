@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 PPT Review Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .card,
+    .timeline,
+    .dsl-preview {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .content-grid > * {
+      min-width: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 0 0 8px 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .timeline ol {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 14px 14px 14px 34px;
+    }
+
+    .timeline li {
+      padding-left: 4px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.danger {
+      border-color: #fecaca;
+      color: var(--danger);
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger-text {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>PPT 审核详情 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">真实 PPT 文件生成：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">真实发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+      <span class="pill">密钥展示：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="pill-row" aria-label="Review detail runtime data state">
+      <span class="pill strong" id="review-detail-api-status">STATIC_HTML_FALLBACK</span>
+      <span class="pill" id="review-detail-api-source">static HTML</span>
+      <span class="pill" id="review-detail-api-detail">api loader keeps actions read-only</span>
+      <span class="pill" id="review-detail-selected-task">task_ppt_demo</span>
+    </div>
+
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">审核任务</h2>
+          <p>GET /api/review-tasks/{id}</p>
+        </div>
+        <span class="pill warn" id="review-detail-status">WAITING_REVIEW</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Task ID</span>
+          <strong id="review-detail-task-id">task_ppt_demo</strong>
+        </div>
+        <div class="metric">
+          <span>Task Type</span>
+          <strong id="review-detail-task-type">PPT_GENERATION</strong>
+        </div>
+        <div class="metric">
+          <span>Slides</span>
+          <strong id="review-detail-artifact-total">2</strong>
+        </div>
+        <div class="metric">
+          <span>Artifact Generated</span>
+          <strong class="danger-text">false</strong>
+        </div>
+        <div class="metric">
+          <span>Publish</span>
+          <strong class="danger-text">blocked</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="review-title">
+      <div class="section-head">
+        <div>
+          <h2 id="review-title"><span id="review-detail-title">PPT DSL 审核</span></h2>
+          <p id="review-detail-dsl-path">templates/ppt/examples/course-ppt.yaml</p>
+        </div>
+        <span class="pill">trace_ppt_demo</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3 id="review-detail-dsl-title">PptDslPreview</h3>
+              <span class="pill warn" id="review-detail-dsl-status">WAITING_REVIEW</span>
+            </div>
+            <pre id="review-detail-dsl-preview">version: "1.0"
+kind: "PPT"
+metadata:
+  id: "ppt_demo"
+  title: "AI 工具应用课程"
+  audience: "学生"
+  durationMinutes: 45
+status: "WAITING_REVIEW"
+spec:
+  theme:
+    style: "modern"
+    language: "zh-CN"
+  slides:
+    - id: "slide_1"
+      type: "title"
+      title: "AI 工具应用课程"
+    - id: "slide_2"
+      type: "content"
+      title: "学习目标"
+artifactGenerated: false
+realPptFileGenerated: false</pre>
+          </div>
+
+          <div class="dsl-preview">
+            <div class="section-head">
+              <h3>Slide Plan</h3>
+              <span class="pill warn">MOCK_ONLY</span>
+            </div>
+            <pre>chapterTree:
+  - "AI 工具应用课程"
+knowledgePoints:
+  - "AI 工具的基本用途"
+  - "DSL 到 CLI 的基础流程"
+slides:
+  - order: 1
+    title: "AI 工具应用课程"
+  - order: 2
+    title: "学习目标"
+artifactGenerated: false
+realPptFileGenerated: false</pre>
+          </div>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>审核策略</h3>
+            <p class="ok">reviewRequired=true</p>
+            <p class="ok">rejectRequiresReason=true</p>
+            <p class="ok">auditTrailRequired=true</p>
+            <p class="danger-text">artifactGenerated=false</p>
+            <p class="danger-text">realPptFileGenerated=false</p>
+            <p class="ok">pptxArtifactGenerated=true</p>
+            <p class="danger-text">autoPublishAllowed=false</p>
+            <p class="danger-text">realPublishAllowed=false</p>
+          </div>
+          <div class="card">
+            <h3>PPTX Artifact</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span>kind</span>
+                <strong>PPTX_FILE</strong>
+              </div>
+              <div class="field">
+                <span>status</span>
+                <strong>WAITING_REVIEW</strong>
+              </div>
+              <div class="field">
+                <span>pptxPath</span>
+                <strong>examples/output/real-llm-demo-ppt-artifact.pptx</strong>
+              </div>
+              <div class="field">
+                <span>manifestPath</span>
+                <strong>examples/output/real-llm-demo-ppt-artifact-manifest.json</strong>
+              </div>
+              <div class="field">
+                <span>slideCount</span>
+                <strong>5</strong>
+              </div>
+              <div class="field">
+                <span>bytes</span>
+                <strong>26988</strong>
+              </div>
+              <div class="field">
+                <span>previewAvailable</span>
+                <strong>true</strong>
+              </div>
+              <div class="field">
+                <span>renderAttempted</span>
+                <strong>true</strong>
+              </div>
+              <div class="field">
+                <span>firstSlidePreview</span>
+                <strong>slide_1 · AI 工具应用课程 · imagePath=examples/output/real-llm-demo-ppt-artifact-slide-01.png</strong>
+              </div>
+              <div class="field">
+                <span>slidePreviewCount</span>
+                <strong>5</strong>
+              </div>
+              <div class="field">
+                <span>contactSheet</span>
+                <strong>examples/output/real-llm-demo-ppt-artifact-contact-sheet.png</strong>
+              </div>
+              <div class="field">
+                <span>publishPolicy</span>
+                <strong>autoPublishAllowed=false · realPublish=false</strong>
+              </div>
+            </div>
+            <img src="../examples/output/real-llm-demo-ppt-artifact-slide-01.png" alt="PPTX Artifact first slide preview" style="width: 100%; margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+            <img src="../examples/output/real-llm-demo-ppt-artifact-contact-sheet.png" alt="PPTX Artifact contact sheet" style="width: 100%; margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+          </div>
+          <div class="card">
+            <h3>PageReviewStatus</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span>summary</span>
+                <strong>status=NEEDS_REVIEW · total=5 · approved=2 · needsReview=2 · reviseRequired=1</strong>
+              </div>
+              <div class="field">
+                <span>qa</span>
+                <strong>qaSignalStatus=NEEDS_REVIEW · manualCommentTotal=3</strong>
+              </div>
+              <div class="field">
+                <span>page 01</span>
+                <strong>APPROVED · manualCommentRequired=false · qa.layout=PASS</strong>
+              </div>
+              <div class="field">
+                <span>page 02</span>
+                <strong>NEEDS_REVIEW · manualCommentRequired=true · reviewFocus=objectives</strong>
+              </div>
+              <div class="field">
+                <span>page 03</span>
+                <strong>NEEDS_REVIEW · manualCommentRequired=true · reviewFocus=terminology</strong>
+              </div>
+              <div class="field">
+                <span>page 04</span>
+                <strong>REVISE_REQUIRED · manualCommentRequired=true · qa.layout=NEEDS_REVIEW</strong>
+              </div>
+              <div class="field">
+                <span>page 05</span>
+                <strong>APPROVED · manualCommentRequired=false · qa.layout=PASS</strong>
+              </div>
+              <div class="field">
+                <span>publishPolicy</span>
+                <strong>autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false</strong>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>PptPageReviewUpdateAction</h3>
+            <p class="ok">POST /api/review-tasks/{id}/ppt-page-review-status</p>
+            <p class="ok">python lab_cli.py review ppt-page-update --task-id task_ppt_demo --slide-index 4 --review-status REVISE_REQUIRED --reviewer teacher_1 --comment "需要补充操作截图"</p>
+            <div class="field-grid">
+              <div class="field">
+                <span>target</span>
+                <strong>artifactKind=PPTX_FILE · slideIndex=4 · reviewStatus=REVISE_REQUIRED</strong>
+              </div>
+              <div class="field">
+                <span>validation</span>
+                <strong>reviewerRequired=true · reviseRequiresComment=true</strong>
+              </div>
+              <div class="field">
+                <span>audit</span>
+                <strong>writesOperationAudit=true · operationAuditAction=PPT_PAGE_REVIEW_UPDATE</strong>
+              </div>
+              <div class="field">
+                <span>result</span>
+                <strong>returnsPageReviewSummary=true · taskStatusChanged=false · artifactStatusChanged=false</strong>
+              </div>
+              <div class="field">
+                <span>publishPolicy</span>
+                <strong>autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false</strong>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>操作接口</h3>
+            <p>POST /api/ai-tasks/{id}/approve</p>
+            <p>POST /api/ai-tasks/{id}/reject</p>
+            <p>POST /api/review-tasks/{id}/ppt-page-review-status</p>
+            <p>GET /api/audit-events</p>
+            <p class="danger-text">mockPublishEnabled=false</p>
+            <p class="danger-text">generateRealPptFileEnabled=false</p>
+            <p class="ok">viewPptxArtifactEnabled=true</p>
+            <p class="ok">pageReviewUpdateEnabled=true</p>
+          </div>
+          <div class="card">
+            <h3>来源与产物</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span>inputRef</span>
+                <strong>examples/input/demo-source.md</strong>
+              </div>
+              <div class="field">
+                <span>pptDslPath</span>
+                <strong>templates/ppt/examples/course-ppt.yaml</strong>
+              </div>
+              <div class="field">
+                <span>audience</span>
+                <strong>学生</strong>
+              </div>
+              <div class="field">
+                <span>artifactKind</span>
+                <strong>PPT_DSL</strong>
+              </div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="section-head">
+              <h3>AiTaskTimeline</h3>
+              <span class="pill">workflow_run_ppt_demo</span>
+            </div>
+            <ol id="review-detail-timeline-list">
+              <li>AI Task created：WAITING_REVIEW</li>
+              <li>generate_ppt_dsl：COMPLETED</li>
+              <li>validate_ppt_dsl：COMPLETED</li>
+              <li>Artifact PPT_DSL：WAITING_REVIEW</li>
+              <li>realPptFileGenerated=false</li>
+            </ol>
+          </div>
+          <div class="card" aria-label="Manual review action panel">
+            <h3>ManualReviewAction</h3>
+            <p class="ok" id="review-action-status">ACTION_STATIC_FALLBACK</p>
+            <p id="review-action-detail">POST /api/ai-tasks/{id}/approve · POST /api/ai-tasks/{id}/reject · rejectRequiresReason=true</p>
+            <div class="field-grid">
+              <label class="field">
+                <span>reviewer</span>
+                <input id="review-action-reviewer" type="text" value="teacher_1" aria-label="reviewer">
+              </label>
+              <label class="field">
+                <span>reject reason</span>
+                <textarea id="review-action-reason" rows="3" aria-label="reject reason">请补充人工审核意见后再驳回</textarea>
+              </label>
+            </div>
+            <p class="danger-text">autoPublishAllowed=false · realPublishAllowed=false · realPptFileGenerated=false</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button" title="Mock approve requires reviewer" data-review-action="approve">通过</button>
+        <button class="danger" type="button" title="Mock reject requires reviewer and reason" data-review-action="reject">驳回</button>
+        <button type="button">查看 PPT DSL</button>
+        <button type="button">查看 Slide Plan</button>
+        <button type="button">查看 PPTX Artifact</button>
+        <button type="button" title="Mock page-level review update requires reviewer and comment">更新第 4 页审核</button>
+        <button type="button">查看审计事件</button>
+        <button type="button" disabled title="Phase 1 禁止生成真实 PPT 文件">生成真实 PPT 文件</button>
+        <button type="button" disabled title="Phase 1 禁止自动发布">自动发布</button>
+        <button type="button" disabled title="Phase 1 禁止真实发布">真实发布</button>
+        <button type="button" disabled title="Phase 1 禁止批量状态变更">批量审核</button>
+      </div>
+    </section>
+  </main>
+  <script src="review-detail-data.js" data-review-kind="ppt" data-default-task-id="task_ppt_demo"></script>
+  <script src="review-action-data.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_mixed_checks_demo"
+  title: "Mixed Check Mock Grading"
+  sourceExamId: "exam_demo"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 100
+  timeoutSeconds: 30
+  assessmentPlan:
+    - checkId: "check_result_file"
+      type: "file_exists"
+      runner: "FileExistsGrader"
+      score: 15
+      inputSummary: "Plan file existence check for result.csv"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_stdout_accuracy"
+      type: "stdout_contains"
+      runner: "StdoutContainsGrader"
+      score: 25
+      inputSummary: "Plan stdout check for command: python main.py"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "medium"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_pytest"
+      type: "pytest"
+      runner: "PytestGrader"
+      score: 25
+      inputSummary: "Plan pytest check at tests/test_main.py"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "high"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_notebook_accuracy"
+      type: "notebook_cell"
+      runner: "NotebookGrader"
+      score: 10
+      inputSummary: "Plan notebook cell output check for notebooks/analysis.ipynb cell 3"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "high"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_metrics_json"
+      type: "json_field"
+      runner: "JsonFieldGrader"
+      score: 15
+      inputSummary: "Plan JSON field check for metrics.json $.accuracy"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_training_log"
+      type: "log_keyword"
+      runner: "LogKeywordGrader"
+      score: 10
+      inputSummary: "Plan log keyword check for logs/train.log"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "medium"
+      sandboxRequiredBeforeRealExecution: true
+  checks:
+    - id: "check_result_file"
+      type: "file_exists"
+      path: "result.csv"
+      score: 15
+    - id: "check_stdout_accuracy"
+      type: "stdout_contains"
+      command: "python main.py"
+      expected:
+        - "accuracy"
+      score: 25
+    - id: "check_pytest"
+      type: "pytest"
+      path: "tests/test_main.py"
+      score: 25
+    - id: "check_notebook_accuracy"
+      type: "notebook_cell"
+      notebookPath: "notebooks/analysis.ipynb"
+      cellIndex: 3
+      expected:
+        - "accuracy"
+      score: 10
+    - id: "check_metrics_json"
+      type: "json_field"
+      path: "metrics.json"
+      jsonPath: "$.accuracy"
+      expectedValue: 0.9
+      score: 15
+    - id: "check_training_log"
+      type: "log_keyword"
+      path: "logs/train.log"
+      expected:
+        - "training complete"
+      score: 10

@@ -1,0 +1,314 @@
+{
+  "component": "AgentEntityImportDryRun",
+  "mode": "REAL_PLATFORM_IMPORT_DRY_RUN_ONLY",
+  "agentEntityId": "agent_entity_0b7c7101ba89",
+  "entityType": "lab_template",
+  "reviewer": "teacher_1",
+  "platformApiContract": {
+    "contractVersion": "platform-import-contract/v1",
+    "entityType": "lab_template",
+    "draftImportEndpoint": {
+      "method": "POST",
+      "path": "/open/staging/lab-template-draft-imports"
+    },
+    "statusPathTemplate": "/open/staging/lab-template-draft-imports/{platformDraftId}/state",
+    "draftIdResponseKeys": [
+      "draftImportId",
+      "draftId",
+      "id"
+    ],
+    "statusResponseKeys": [
+      "platformStatus",
+      "status",
+      "state"
+    ],
+    "statusMapping": {
+      "PENDING": "PENDING_MANUAL_PLATFORM_REVIEW",
+      "PENDING_MANUAL_PLATFORM_REVIEW": "PENDING_MANUAL_PLATFORM_REVIEW",
+      "WAITING_REVIEW": "PENDING_MANUAL_PLATFORM_REVIEW",
+      "IN_REVIEW": "PENDING_MANUAL_PLATFORM_REVIEW",
+      "ACCEPTED": "ACCEPTED_FOR_DRAFT",
+      "ACCEPTED_FOR_DRAFT": "ACCEPTED_FOR_DRAFT",
+      "DRAFT_ACCEPTED": "ACCEPTED_FOR_DRAFT",
+      "READY_FOR_DRAFT": "ACCEPTED_FOR_DRAFT",
+      "APPROVED": "ACCEPTED_FOR_DRAFT",
+      "REJECTED": "REJECTED_BY_PLATFORM",
+      "REJECTED_BY_PLATFORM": "REJECTED_BY_PLATFORM",
+      "REJECTED_FOR_DRAFT": "REJECTED_BY_PLATFORM",
+      "FAILED": "FAILED",
+      "ERROR": "FAILED",
+      "IMPORT_FAILED": "FAILED",
+      "QUEUED": "PENDING_MANUAL_PLATFORM_REVIEW",
+      "DONE": "ACCEPTED_FOR_DRAFT"
+    },
+    "requestBodyMapping": {
+      "mode": "CONFIGURED_FIELD_MAPPING",
+      "configured": true,
+      "fieldTotal": 21,
+      "requiredTargetFields": [
+        "source.agentEntityId",
+        "source.sourceTaskId",
+        "lab.title"
+      ]
+    },
+    "suggestedImportResultStatuses": [
+      "ACCEPTED_FOR_DRAFT",
+      "FAILED",
+      "PENDING_MANUAL_PLATFORM_REVIEW",
+      "REJECTED_BY_PLATFORM"
+    ],
+    "configApplied": true
+  },
+  "contractValidation": {
+    "component": "AgentApiContractValidation",
+    "contractVersion": "platform-import-contract/v1",
+    "valid": true,
+    "configApplied": true,
+    "checkedEntityTypes": [
+      "lab_template"
+    ],
+    "entityTotal": 1,
+    "configuredEntityOverrideTypes": [
+      "exam_question",
+      "grading_rule",
+      "lab_template",
+      "ppt_deck"
+    ],
+    "configuredEntityOverrideTotal": 4,
+    "unknownTopLevelKeys": [],
+    "entities": {
+      "lab_template": {
+        "entityType": "lab_template",
+        "draftImportEndpoint": {
+          "method": "POST",
+          "path": "/open/staging/lab-template-draft-imports"
+        },
+        "statusPathTemplate": "/open/staging/lab-template-draft-imports/{platformDraftId}/state",
+        "draftIdResponseKeys": [
+          "draftImportId",
+          "draftId",
+          "id"
+        ],
+        "statusResponseKeys": [
+          "platformStatus",
+          "status",
+          "state"
+        ],
+        "statusMappingTotal": 17,
+        "suggestedImportResultStatuses": [
+          "ACCEPTED_FOR_DRAFT",
+          "FAILED",
+          "PENDING_MANUAL_PLATFORM_REVIEW",
+          "REJECTED_BY_PLATFORM"
+        ],
+        "requestBodyMapping": {
+          "mode": "CONFIGURED_FIELD_MAPPING",
+          "configured": true,
+          "fieldTotal": 21,
+          "requiredTargetFields": [
+            "source.agentEntityId",
+            "source.sourceTaskId",
+            "lab.title"
+          ]
+        },
+        "requestBodySource": "requestBody",
+        "requestBodyMappingSampleValidated": true,
+        "requestBodyMappingResult": {
+          "component": "PlatformRequestBodyMapping",
+          "mode": "CONFIGURED_FIELD_MAPPING",
+          "applied": true,
+          "entityType": "lab_template",
+          "fieldTotal": 21,
+          "mappedTotal": 21,
+          "skippedOptionalTotal": 0,
+          "requiredMissingTotal": 0,
+          "targetFields": [
+            "workflow.idempotencyKey",
+            "workflow.operation",
+            "source.agentEntityId",
+            "source.sourceTaskId",
+            "source.sourcePreviewArtifactId",
+            "source.sourceArtifactKind",
+            "source.sourceDslPath",
+            "review.status",
+            "lab.externalId",
+            "lab.title",
+            "lab.category",
+            "lab.difficulty",
+            "lab.durationMinutes",
+            "lab.tags",
+            "lab.objectiveTotal",
+            "lab.stepTotal",
+            "lab.materialTotal",
+            "lab.environment.type",
+            "lab.environment.image",
+            "lab.environment.resources",
+            "lab.gradingRef"
+          ],
+          "skippedOptionalFields": [],
+          "requiredMissingFields": []
+        },
+        "requestBodySourcePathCoverage": "CHECKED_WITH_DRY_RUN_SAMPLE"
+      }
+    },
+    "summary": {
+      "requestBodyMappingConfiguredEntityTotal": 1,
+      "defaultInternalDtoEntityTotal": 0,
+      "sampleValidatedEntityTotal": 1,
+      "warningTotal": 0,
+      "errorTotal": 0
+    },
+    "warnings": [],
+    "errors": [],
+    "safety": {
+      "localConfigOnly": true,
+      "requestSent": false,
+      "networkAccess": false,
+      "secretsRead": false,
+      "secretValueReturned": false,
+      "databaseWritten": false,
+      "realAgentImport": false,
+      "realPublish": false
+    }
+  },
+  "targetEndpoint": {
+    "method": "POST",
+    "path": "/open/staging/lab-template-draft-imports"
+  },
+  "requestPreview": {
+    "apiVersion": "platform-import-dry-run/v1",
+    "entityType": "lab_template",
+    "operation": "create_or_update_draft",
+    "idempotencyKey": "dryrun:agent_entity_0b7c7101ba89",
+    "source": {
+      "agentEntityId": "agent_entity_0b7c7101ba89",
+      "sourceTaskId": "task_8bda83d21433",
+      "sourcePreviewArtifactId": "artifact_b01dd9bb23e2",
+      "sourceArtifactKind": "LAB_DSL",
+      "sourceDslPath": "examples/output/task_8bda83d21433-lab.json"
+    },
+    "payload": {
+      "externalId": "lab_demo",
+      "title": "AI 工具应用入门实验",
+      "category": "AI 工具应用",
+      "difficulty": "beginner",
+      "durationMinutes": 60,
+      "tags": [
+        "AI",
+        "工具应用"
+      ],
+      "objectiveTotal": 3,
+      "stepTotal": 4,
+      "materialTotal": 1,
+      "environment": {
+        "type": "ubuntu-vm",
+        "image": "ubuntu-22.04",
+        "resources": {
+          "cpu": 2,
+          "memoryGb": 4
+        }
+      },
+      "gradingRef": "grading_demo",
+      "reviewStatus": "PENDING_MANUAL_PLATFORM_REVIEW"
+    }
+  },
+  "requestBody": {
+    "workflow": {
+      "idempotencyKey": "dryrun:agent_entity_0b7c7101ba89",
+      "operation": "create_or_update_draft"
+    },
+    "source": {
+      "agentEntityId": "agent_entity_0b7c7101ba89",
+      "sourceTaskId": "task_8bda83d21433",
+      "sourcePreviewArtifactId": "artifact_b01dd9bb23e2",
+      "sourceArtifactKind": "LAB_DSL",
+      "sourceDslPath": "examples/output/task_8bda83d21433-lab.json"
+    },
+    "review": {
+      "status": "PENDING_MANUAL_PLATFORM_REVIEW"
+    },
+    "lab": {
+      "externalId": "lab_demo",
+      "title": "AI 工具应用入门实验",
+      "category": "AI 工具应用",
+      "difficulty": "beginner",
+      "durationMinutes": 60,
+      "tags": [
+        "AI",
+        "工具应用"
+      ],
+      "objectiveTotal": 3,
+      "stepTotal": 4,
+      "materialTotal": 1,
+      "environment": {
+        "type": "ubuntu-vm",
+        "image": "ubuntu-22.04",
+        "resources": {
+          "cpu": 2,
+          "memoryGb": 4
+        }
+      },
+      "gradingRef": "grading_demo"
+    }
+  },
+  "requestBodyMapping": {
+    "component": "PlatformRequestBodyMapping",
+    "mode": "CONFIGURED_FIELD_MAPPING",
+    "applied": true,
+    "entityType": "lab_template",
+    "fieldTotal": 21,
+    "mappedTotal": 21,
+    "skippedOptionalTotal": 0,
+    "requiredMissingTotal": 0,
+    "targetFields": [
+      "workflow.idempotencyKey",
+      "workflow.operation",
+      "source.agentEntityId",
+      "source.sourceTaskId",
+      "source.sourcePreviewArtifactId",
+      "source.sourceArtifactKind",
+      "source.sourceDslPath",
+      "review.status",
+      "lab.externalId",
+      "lab.title",
+      "lab.category",
+      "lab.difficulty",
+      "lab.durationMinutes",
+      "lab.tags",
+      "lab.objectiveTotal",
+      "lab.stepTotal",
+      "lab.materialTotal",
+      "lab.environment.type",
+      "lab.environment.image",
+      "lab.environment.resources",
+      "lab.gradingRef"
+    ],
+    "skippedOptionalFields": [],
+    "requiredMissingFields": []
+  },
+  "validation": {
+    "sourceMockImportRequired": true,
+    "sourceMockImportPresent": true,
+    "idempotencyKeyPresent": true,
+    "contractConfigValid": true,
+    "contractWarningTotal": 0,
+    "requestBodyMappingConfigured": true,
+    "requestBodyReady": true,
+    "manualPlatformReviewRequired": true,
+    "readyForRealApiImplementation": true,
+    "readyForRealApiCall": false
+  },
+  "safety": {
+    "dryRunOnly": true,
+    "requestSent": false,
+    "networkAccess": false,
+    "secretsRead": false,
+    "databaseWritten": false,
+    "realAgentImport": false,
+    "realPublish": false,
+    "autoPublishAllowed": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false
+  },
+  "traceId": "trace_4ba599ddc7df"
+}

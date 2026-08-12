@@ -1,0 +1,315 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "id": "phase1_delivery_faq",
+  "title": "Phase 1 Operation FAQ And Troubleshooting",
+  "description": "Machine-testable troubleshooting catalogue for Phase 1 local mock delivery. It documents safe recovery steps without connecting to real providers or executing unknown input scripts.",
+  "inputs": [
+    {
+      "id": "source_material",
+      "path": "examples/input/demo-source.md",
+      "required": true
+    },
+    {
+      "id": "delivery_package_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    },
+    {
+      "id": "demo_script_checklist",
+      "path": "delivery/DEMO_SCRIPT_CHECKLIST.md",
+      "required": true
+    },
+    {
+      "id": "demo_script_checklist_contract",
+      "path": "delivery/phase1-demo-script-checklist.json",
+      "required": true
+    },
+    {
+      "id": "runtime_example",
+      "path": ".env.example",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "faq_markdown",
+      "path": "delivery/FAQ.md",
+      "generated": false,
+      "localOnly": true
+    },
+    {
+      "id": "delivery_package",
+      "path": "examples/output/phase1-delivery-package.json",
+      "generated": true,
+      "localOnly": true
+    },
+    {
+      "id": "acceptance_report",
+      "path": "examples/output/phase1-acceptance-report.md",
+      "generated": true,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_delivery_faq",
+    "test_demo_script_checklist",
+    "test_delivery_index",
+    "test_delivery_package_contract",
+    "test_all"
+  ],
+  "categories": [
+    "cli",
+    "schema",
+    "review",
+    "security",
+    "delivery",
+    "provider",
+    "material",
+    "demo",
+    "test"
+  ],
+  "faqItems": [
+    {
+      "id": "missing_input",
+      "category": "cli",
+      "title": "CLI reports VALIDATION_ERROR because an input file is missing",
+      "symptom": "A command such as phase1 check or lab generate-from-source returns success=false with code=VALIDATION_ERROR and field=input.",
+      "likelyCause": "The input path does not exist or the command was run from outside the project root.",
+      "safeResolution": "Run commands from the project root and use the tracked demo file examples/input/demo-source.md, or create a local Phase 1 input file before invoking the command.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["examples/input/demo-source.md", "lab_cli.py"],
+      "blockedActions": ["Do not fetch remote material automatically", "Do not execute unknown input scripts"],
+      "phase1Safety": {
+        "realLlmCalled": false,
+        "remoteContentFetched": false,
+        "unknownShellExecuted": false
+      }
+    },
+    {
+      "id": "schema_validation_failed",
+      "category": "schema",
+      "title": "DSL schema validation fails",
+      "symptom": "dsl validate or phase1 check fails with schema-related errors.",
+      "likelyCause": "A Lab, Exam, Grading, or PPT DSL example is missing required fields, uses an unsupported enum, or no longer matches its JSON Schema.",
+      "safeResolution": "Compare the YAML with the matching schema under templates/*/*.schema.json and keep generated content in WAITING_REVIEW until validation passes.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": [
+        "templates/lab/lab.schema.json",
+        "templates/exam/exam.schema.json",
+        "templates/grading/grading.schema.json",
+        "templates/ppt/ppt.schema.json"
+      ],
+      "blockedActions": ["Do not bypass schema validation", "Do not publish invalid DSL"],
+      "phase1Safety": {
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "id": "review_reject_requires_reason",
+      "category": "review",
+      "title": "Reject fails because reason is missing",
+      "symptom": "review reject returns a validation or state error when --reason is omitted.",
+      "likelyCause": "Phase 1 audit policy requires every reject action to include a reviewer and a reason.",
+      "safeResolution": "Run review reject with --reviewer and --reason so the audit trail explains why the generated DSL was rejected.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["cli/ai_task.py", "cli/audit.py", "docs/10_OPERATIONS_GUIDE.md"],
+      "blockedActions": ["Do not reject without an audit reason", "Do not edit the local store to skip review"],
+      "phase1Safety": {
+        "reviewRequired": true,
+        "auditTrailRequired": true
+      }
+    },
+    {
+      "id": "unreviewed_publish_blocked",
+      "category": "review",
+      "title": "Publish is blocked before approval",
+      "symptom": "review publish returns STATE_TRANSITION_ERROR for a task still in WAITING_REVIEW.",
+      "likelyCause": "Generated Lab, Exam, Grading, and PPT outputs must be approved by a human before mock publish can move the task to COMPLETED.",
+      "safeResolution": "Inspect the task with review detail, then approve or reject it. Publish remains a MOCK_ONLY state change after approval.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["cli/ai_task.py", "docs/10_OPERATIONS_GUIDE.md"],
+      "blockedActions": ["Do not bypass WAITING_REVIEW", "Do not trigger real publish"],
+      "phase1Safety": {
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "publishBlockedUntilApproved": true
+      }
+    },
+    {
+      "id": "phase1_report_missing_package",
+      "category": "delivery",
+      "title": "phase1 report cannot find the delivery package",
+      "symptom": "phase1 report returns success=false with field=package.",
+      "likelyCause": "The generated examples/output/phase1-delivery-package.json file was cleaned or not exported yet.",
+      "safeResolution": "Run phase1 export first, then run phase1 report against the generated local package.",
+      "verifyCommandIds": ["phase1_export", "phase1_report"],
+      "relatedPaths": ["examples/output/README.md", "config/delivery-package.contract.json"],
+      "generatedRelatedPaths": ["examples/output/phase1-delivery-package.json", "examples/output/phase1-acceptance-report.md"],
+      "blockedActions": ["Do not upload the package to a remote service", "Do not recreate the package with non-allowlisted scripts"],
+      "phase1Safety": {
+        "remoteUploadAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "id": "phase1_report_rejects_non_mock",
+      "category": "delivery",
+      "title": "phase1 report rejects a non-MOCK_ONLY package",
+      "symptom": "phase1 report returns VALIDATION_ERROR for package.mode.",
+      "likelyCause": "The package was edited manually or came from a non-Phase-1 source.",
+      "safeResolution": "Regenerate the package with python lab_cli.py phase1 export and confirm mode=MOCK_ONLY before rendering the report.",
+      "verifyCommandIds": ["phase1_export", "phase1_report"],
+      "relatedPaths": ["config/delivery-package.contract.json", "delivery/phase1-delivery-index.json"],
+      "blockedActions": ["Do not accept REAL mode packages in Phase 1", "Do not call real providers to rebuild the report"],
+      "phase1Safety": {
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realAgentStarted": false
+      }
+    },
+    {
+      "id": "operations_launchpad_entry",
+      "category": "delivery",
+      "title": "Need a single static entry point for operator handoff",
+      "symptom": "An operator is unsure whether to open the console, delivery preview, runbook, or acceptance pages first.",
+      "likelyCause": "The Phase 1 package contains multiple static preview pages and documentation artifacts.",
+      "safeResolution": "Open frontend/operations-launchpad.html first. It links to the mock console, demo map, runbook, acceptance page, delivery page, audit, and review center without contacting real services.",
+      "verifyCommandIds": ["test_frontend_contract", "test_delivery_index"],
+      "relatedPaths": [
+        "frontend/operations-launchpad.html",
+        "frontend/console.html",
+        "frontend/delivery.html",
+        "delivery/phase1-delivery-index.json"
+      ],
+      "blockedActions": ["Do not start a backend service just to preview Phase 1 handoff", "Do not upload static previews to a remote service"],
+      "phase1Safety": {
+        "requiresNetwork": false,
+        "remoteUploadAllowed": false,
+        "realAgentStarted": false
+      }
+    },
+    {
+      "id": "demo_order_unclear",
+      "category": "demo",
+      "title": "Operator is unsure how to present the Phase 1 demo",
+      "symptom": "The demo has multiple static pages, CLI commands, and handoff documents, but the presenter needs one speaking order.",
+      "likelyCause": "Launchpad, Demo Map, Runbook, Acceptance, Delivery, Audit, FAQ, and Handoff each serve a different part of the local mock handoff.",
+      "safeResolution": "Follow delivery/DEMO_SCRIPT_CHECKLIST.md from Launchpad to Demo Map, Runbook, phase1 check/export/report, Acceptance, Delivery, Audit Incidents, review gate, and final safety boundary.",
+      "verifyCommandIds": ["test_demo_script_checklist"],
+      "relatedPaths": [
+        "delivery/DEMO_SCRIPT_CHECKLIST.md",
+        "delivery/phase1-demo-script-checklist.json",
+        "frontend/operations-launchpad.html",
+        "frontend/operations-demo-map.html",
+        "scripts/phase1-demo.runbook.md"
+      ],
+      "blockedActions": ["Do not improvise by running non-allowlisted commands", "Do not turn manual preview steps into an automated script"],
+      "phase1Safety": {
+        "manualOnly": true,
+        "unknownShellExecuted": false,
+        "realLlmCalled": false,
+        "realAgentStarted": false
+      }
+    },
+    {
+      "id": "real_provider_disabled",
+      "category": "provider",
+      "title": "Real provider health checks are disabled",
+      "symptom": "Provider settings show MockProvider active and real providers disabled.",
+      "likelyCause": "Phase 1 intentionally disables real OpenAI, Claude, local model, network access, and secret reads.",
+      "safeResolution": "Use provider list, provider health, or provider mock-generate only for MockProvider validation. Keep API keys in environment examples only.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["providers/provider.contract.json", "providers/README.md", ".env.example"],
+      "blockedActions": ["Do not enable real providers", "Do not read or print secrets", "Do not access the network"],
+      "phase1Safety": {
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false
+      }
+    },
+    {
+      "id": "unknown_shell_not_executed",
+      "category": "material",
+      "title": "Shell material is flagged but not executed",
+      "symptom": "material analyze marks shell-related risk and requires human review.",
+      "likelyCause": "Phase 1 performs static analysis only and treats shell scripts as review risks.",
+      "safeResolution": "Review the risk summary manually. Do not run the script on the host machine; later phases must route execution through a sandbox design.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["materials/analyzer.py", "docs/09_SECURITY_AND_SANDBOX.md"],
+      "blockedActions": ["Do not execute unknown Shell scripts", "Do not run contestant code on the host"],
+      "phase1Safety": {
+        "unknownShellExecuted": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      }
+    },
+    {
+      "id": "wrong_cli_entrypoint",
+      "category": "cli",
+      "title": "Running python cli/lab_cli.py causes import issues",
+      "symptom": "The CLI fails to import project modules when launched from cli/lab_cli.py directly.",
+      "likelyCause": "The supported project-root entrypoint is lab_cli.py, which imports cli.lab_cli with the expected module path.",
+      "safeResolution": "Run python lab_cli.py ... from the project root for all documented commands.",
+      "verifyCommandIds": ["phase1_check"],
+      "relatedPaths": ["lab_cli.py", "cli/lab_cli.py", "cli/README.md"],
+      "blockedActions": ["Do not create duplicate entrypoints", "Do not change public CLI command groups casually"],
+      "phase1Safety": {
+        "unifiedJsonRequired": true
+      }
+    },
+    {
+      "id": "generated_outputs_ignored",
+      "category": "delivery",
+      "title": "Generated outputs disappear after cleanup",
+      "symptom": "examples/output/phase1-delivery-package.json or phase1-acceptance-report.md is missing after validation cleanup.",
+      "likelyCause": "Generated reports and delivery packages are intentionally local, reproducible, and ignored by source tracking.",
+      "safeResolution": "Regenerate them with the allowlisted phase1 export and phase1 report commands whenever needed.",
+      "verifyCommandIds": ["phase1_export", "phase1_report"],
+      "relatedPaths": ["examples/output/README.md", "config/local-artifacts.contract.json"],
+      "generatedRelatedPaths": ["examples/output/phase1-delivery-package.json", "examples/output/phase1-acceptance-report.md"],
+      "blockedActions": ["Do not commit generated packages", "Do not archive local outputs as source of truth"],
+      "phase1Safety": {
+        "generatedPackageMustStayLocal": true,
+        "remoteUploadAllowed": false
+      }
+    },
+    {
+      "id": "pytest_dependency_missing",
+      "category": "test",
+      "title": "pytest or schema dependencies are missing",
+      "symptom": "python -m pytest fails before running tests because a dependency cannot be imported.",
+      "likelyCause": "The local Python environment has not installed requirements.txt.",
+      "safeResolution": "Install the declared local development dependencies with python -m pip install -r requirements.txt, then rerun the targeted test command.",
+      "verifyCommandIds": ["test_all"],
+      "relatedPaths": ["requirements.txt", "tests"],
+      "blockedActions": ["Do not skip tests after dependency setup fails", "Do not vendor secrets or production configuration into tests"],
+      "phase1Safety": {
+        "requiresNetworkForRuntime": false,
+        "productionAccessAllowed": false
+      }
+    }
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false
+  }
+}

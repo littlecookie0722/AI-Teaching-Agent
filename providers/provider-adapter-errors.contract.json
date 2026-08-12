@@ -1,0 +1,121 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "id": "provider_adapter_error_contract",
+  "title": "Provider Adapter Error Matrix",
+  "description": "Machine-testable Phase 1 error matrix for the mock-only Provider Adapter boundary. All listed errors must keep real LLMs, secrets, network access, generated content creation, task creation, and publishing disabled.",
+  "adapterId": "mock_provider_adapter",
+  "interfaceName": "LLMProvider",
+  "errorContextField": "providerErrorContext",
+  "inputs": [
+    {
+      "id": "provider_adapter",
+      "path": "providers/adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_adapter_contract",
+      "path": "providers/provider-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "mock_provider",
+      "path": "providers/mock_provider.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "errorCases": [
+    {
+      "id": "disabled_provider",
+      "operation": "generateJson",
+      "providerId": "openai",
+      "promptId": "lab_generation_v0",
+      "errorCode": "PROVIDER_DISABLED",
+      "field": "provider",
+      "taskCreated": false,
+      "generatedContentCreated": false
+    },
+    {
+      "id": "missing_prompt_id",
+      "operation": "generateJson",
+      "providerId": "mock",
+      "promptId": null,
+      "errorCode": "VALIDATION_ERROR",
+      "field": "promptId",
+      "taskCreated": false,
+      "generatedContentCreated": false
+    },
+    {
+      "id": "unknown_prompt",
+      "operation": "generateJson",
+      "providerId": "mock",
+      "promptId": "missing_prompt",
+      "errorCode": "NOT_FOUND",
+      "field": "promptId",
+      "taskCreated": false,
+      "generatedContentCreated": false
+    },
+    {
+      "id": "output_kind_mismatch",
+      "operation": "generateJson",
+      "providerId": "mock",
+      "promptId": "lab_generation_v0",
+      "outputKind": "Exam",
+      "errorCode": "VALIDATION_ERROR",
+      "field": "outputKind",
+      "taskCreated": false,
+      "generatedContentCreated": false
+    },
+    {
+      "id": "stream_generate_deferred",
+      "operation": "streamGenerate",
+      "providerId": "mock",
+      "promptId": "lab_generation_v0",
+      "errorCode": "UNSUPPORTED_OPERATION",
+      "field": "operation",
+      "taskCreated": false,
+      "generatedContentCreated": false
+    }
+  ],
+  "requiredErrorContext": {
+    "mode": "MOCK_ONLY",
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "recommendedCommandIds": [
+    "test_provider_adapter",
+    "test_provider_mock",
+    "test_provider_contract",
+    "test_all"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "id": "real_sdk_dependency_dry_run_evidence_contract",
+  "gateId": "real_sdk_dependency_dry_run_evidence",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled dry-run evidence model for future reviewed real SDK dependency install command review. It does not write evidence files, persist review records, materialize or execute commands, write dependency files, install packages, import SDKs, check secrets, use network access, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_module",
+      "path": "providers/real_sdk_dependency_dry_run_evidence.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_contract",
+      "path": "providers/real-sdk-dependency-dry-run-evidence.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_module",
+      "path": "providers/real_sdk_dependency_executor_disabled.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_contract",
+      "path": "providers/real-sdk-dependency-executor-disabled.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-dry-run-evidence describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "dryRunEvidenceOnly": true,
+        "dryRunEvidenceModelReady": false,
+        "readyForCommandReviewEvidence": false,
+        "dryRunExecuted": false,
+        "evidenceFileWritten": false,
+        "commandExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-dry-run-evidence record --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "executorModelReady": false,
+        "dryRunEvidenceModelReady": false,
+        "readyForCommandReviewEvidence": false,
+        "dryRunExecuted": false,
+        "commandMaterialized": false,
+        "dependencyInstallExecuted": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "executorModelRequired": true,
+    "executorModelReady": false,
+    "dryRunEvidenceOnly": true,
+    "dryRunEvidenceModelReady": false,
+    "readyForCommandReviewEvidence": false,
+    "executionApprovalGranted": false,
+    "executionTaskCreated": false,
+    "taskPersisted": false,
+    "taskQueued": false,
+    "executionDispatched": false,
+    "executorStarted": false,
+    "executorRunCreated": false,
+    "dryRunExecuted": false,
+    "installDryRunExecuted": false,
+    "evidenceFileWritten": false,
+    "commandReviewRecordPersisted": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecutionAuthorized": false,
+    "commandExecuted": false,
+    "dependencyFileMutationAuthorized": false,
+    "dependencyFileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallAfterEvidenceAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "write_dry_run_evidence_file",
+    "persist_command_review_record",
+    "materialize_install_command",
+    "execute_dry_run",
+    "execute_command",
+    "execute_install_command",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "mutate_dependency_manifest",
+    "mutate_dependency_lockfile",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_after_dry_run_evidence",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_dry_run_evidence",
+    "test_real_sdk_dependency_executor_disabled",
+    "test_real_sdk_dependency_execution_task_creation",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "dryRunEvidenceOnly": true,
+    "dryRunEvidenceModelReady": false,
+    "readyForCommandReviewEvidence": false,
+    "executionApprovalGranted": false,
+    "executionTaskCreated": false,
+    "taskPersisted": false,
+    "taskQueued": false,
+    "executionDispatched": false,
+    "executorStarted": false,
+    "executorRunCreated": false,
+    "dryRunExecuted": false,
+    "installDryRunExecuted": false,
+    "evidenceFileWritten": false,
+    "commandReviewRecordPersisted": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecutionAuthorized": false,
+    "commandExecuted": false,
+    "dependencyFileMutationAuthorized": false,
+    "dependencyFileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallAfterEvidenceAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

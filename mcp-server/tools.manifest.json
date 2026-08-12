@@ -1,0 +1,4729 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "protocol": "mcp-contract-draft",
+  "description": "Phase 1 MCP tool contract. This manifest does not start a real MCP server and every tool maps to local CLI or Backend Mock behavior.",
+  "outputSchema": {
+    "type": "object",
+    "required": [
+      "success",
+      "code",
+      "message",
+      "traceId"
+    ],
+    "properties": {
+      "success": {
+        "type": "boolean"
+      },
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object"
+      },
+      "errors": {
+        "type": "array"
+      },
+      "traceId": {
+        "type": "string"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_real_llm_runtime_config",
+      "description": "Return a redacted read-only summary of OpenAI-compatible real LLM runtime environment variables. It never returns API key values, imports SDKs, creates clients, sends requests, or creates artifacts.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/providers/real-llm-runtime-config"
+      },
+      "cli": "python lab_cli.py provider real-llm-runtime-config",
+      "safety": {
+        "mode": "REAL_LLM_RUNTIME_CONFIG_SUMMARY",
+        "readOnly": true,
+        "sdkImported": false,
+        "clientCreated": false,
+        "requestSent": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "secretValueReturned": false,
+        "secretValueLogged": false,
+        "taskCreated": false,
+        "artifactCreated": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realLlmRuntimeConfig",
+        "component": "RealLlmRuntimeConfigSummary",
+        "requiredFields": [
+          "component",
+          "mode",
+          "providerId",
+          "env",
+          "readyForRealLlmCommand",
+          "missingRequiredEnv",
+          "safety"
+        ],
+        "secretValueReturned": false,
+        "requestSent": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "autoPublishAllowed": false
+      }
+    },
+    {
+      "name": "analyze_material",
+      "description": "Statically analyze a local Markdown, text, or Shell material file before DSL generation. No shell commands are executed.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/materials/analyze"
+      },
+      "cli": "python lab_cli.py material analyze --input <input>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "remoteContentFetched": false,
+        "unknownShellExecuted": false,
+        "sandboxExecuted": false,
+        "requiresHumanReviewForRisks": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "workflow_demo",
+      "description": "Run the local Phase 1 mock main chain and create review tasks for generated DSL outputs.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/workflow/demo"
+      },
+      "cli": "python lab_cli.py workflow demo --input <input> --reviewer <reviewer>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "sandboxExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "input",
+          "reviewer"
+        ],
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_lab_from_source",
+      "description": "Generate a Lab DSL from a local source file using Backend Mock.",
+      "riskLevel": "low",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/labs/generate"
+      },
+      "cli": "python lab_cli.py lab generate-from-source --input <input>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_exam_from_lab",
+      "description": "Generate Exam and Grading DSL examples from a Lab id using Backend Mock.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/exams/generate-from-lab"
+      },
+      "cli": "python lab_cli.py exam generate-from-lab --lab-id <labId>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "answerVisibleToCandidate": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "labId"
+        ],
+        "properties": {
+          "labId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_ppt",
+      "description": "Generate a PPT DSL from a local source file using Backend Mock.",
+      "riskLevel": "low",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/ppt/generate"
+      },
+      "cli": "python lab_cli.py ppt generate --input <input>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "artifactGenerated": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "run_grading",
+      "description": "Run Phase 1 mock grading from a local Grading DSL file.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/run"
+      },
+      "cli": "python lab_cli.py grade run --grading <grading>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "grading"
+        ],
+        "properties": {
+          "grading": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "run_readonly_grading_evidence",
+      "description": "Run read-only grading evidence collection for low-risk file/json/notebook checks. It only inspects files inside a provided submission directory and does not execute commands, pytest, notebook kernels, shell scripts, or contestant code.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/readonly-evidence"
+      },
+      "cli": "python lab_cli.py grade sandbox-run --execution-mode readonly --grading <grading> --submission <submission> --output <output>",
+      "safety": {
+        "mode": "READONLY_REAL_SANDBOX_POC",
+        "readonlyOnly": true,
+        "sandboxExecuted": true,
+        "commandExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "grading",
+          "submission"
+        ],
+        "properties": {
+          "grading": {
+            "type": "string"
+          },
+          "submission": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.report",
+        "detailPath": "data.reportDetail",
+        "mode": "READONLY_REAL_SANDBOX_POC",
+        "requiredFields": [
+          "mode",
+          "gradingId",
+          "executionSummary",
+          "score",
+          "checks",
+          "safety"
+        ],
+        "readonlyOnly": true,
+        "commandExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "contestantCodeExecuted": false,
+        "networkEnabled": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "run_controlled_grading_evidence",
+      "description": "Run controlled Docker grading evidence for allowlisted stdout_contains and pytest checks. It executes contestant code only inside a local Docker container with network disabled, read-only submission mount, no image pull, no Notebook kernel, no host execution, no auto approval, and no publish.",
+      "riskLevel": "high",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/controlled-evidence"
+      },
+      "cli": "python lab_cli.py grade sandbox-run --execution-mode controlled-command --grading <grading> --submission <submission> --image <image> --output <output>",
+      "safety": {
+        "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+        "readonlyOnly": false,
+        "sandboxExecuted": true,
+        "commandExecuted": true,
+        "pytestExecuted": true,
+        "notebookExecuted": false,
+        "contestantCodeExecuted": true,
+        "unknownShellExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "grading",
+          "submission"
+        ],
+        "properties": {
+          "grading": {
+            "type": "string"
+          },
+          "submission": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.report",
+        "detailPath": "data.reportDetail",
+        "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+        "requiredFields": [
+          "mode",
+          "gradingId",
+          "executionSummary",
+          "score",
+          "checks",
+          "safety"
+        ],
+        "controlledDockerOnly": true,
+        "supportedCheckTypes": [
+          "stdout_contains",
+          "pytest"
+        ],
+        "deferredCheckTypesPath": "data.report.runner.deferredCheckTypes",
+        "safetyRequired": {
+          "sandboxExecuted": true,
+          "commandExecuted": true,
+          "contestantCodeExecuted": true,
+          "unknownShellExecuted": false,
+          "notebookExecuted": false,
+          "networkEnabled": false,
+          "hostExecutionAllowed": false,
+          "realPublish": false
+        }
+      }
+    },
+    {
+      "name": "merge_grading_evidence_reports",
+      "description": "Merge existing local grading evidence JSON reports into one auditable coverage report. This tool only reads report files and writes a merged report; it does not inspect submissions, start Docker, execute pytest, execute notebooks, run shell commands, call a real LLM, auto approve, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/evidence-merge"
+      },
+      "cli": "python lab_cli.py grade evidence-merge --report <report> --report <report> --output <output> --task-id <taskId>",
+      "safety": {
+        "mode": "GRADING_EVIDENCE_MERGE_REPORT",
+        "readExistingReportsOnly": true,
+        "mergeExecutedOnlyExistingReports": true,
+        "sandboxExecutedByTool": false,
+        "commandExecutedByTool": false,
+        "pytestExecutedByTool": false,
+        "notebookExecutedByTool": false,
+        "contestantCodeExecutedByTool": false,
+        "unknownShellExecutedByTool": false,
+        "networkAccess": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "reports",
+          "output"
+        ],
+        "properties": {
+          "reports": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "output": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.report",
+        "mode": "GRADING_EVIDENCE_MERGE_REPORT",
+        "requiredFields": [
+          "mode",
+          "sourceReportTotal",
+          "sourceReports",
+          "summary",
+          "evidenceCoverage",
+          "checks",
+          "mergeWarnings",
+          "safety",
+          "operationAuditEvent",
+          "artifact"
+        ],
+        "sourceReportsPath": "data.report.sourceReports",
+        "summaryPath": "data.report.summary",
+        "coveragePath": "data.report.evidenceCoverage",
+        "safetyPath": "data.report.safety",
+        "artifactPath": "data.artifact",
+        "readExistingReportsOnly": true,
+        "mergeExecutedOnlyExistingReports": true,
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false,
+        "toolExecutionSafety": {
+          "sandboxExecutedByTool": false,
+          "commandExecutedByTool": false,
+          "pytestExecutedByTool": false,
+          "notebookExecutedByTool": false,
+          "contestantCodeExecutedByTool": false,
+          "networkAccess": false,
+          "realPublish": false
+        },
+        "sourceEvidenceSafetyMayInclude": [
+          "sandboxExecuted",
+          "commandExecuted",
+          "pytestExecuted",
+          "contestantCodeExecuted"
+        ]
+      }
+    },
+    {
+      "name": "run_grading_evidence_auto",
+      "description": "Run automatic grading evidence orchestration. It always collects read-only evidence first, optionally collects controlled Docker command evidence when explicitly requested, then writes one GRADING_EVIDENCE_AUTO_REPORT for human review. By default it does not execute contestant commands, call a real LLM, auto approve, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/evidence-auto"
+      },
+      "cli": "python lab_cli.py grade evidence-auto --grading <grading> --submission <submission> --output <output> --include-controlled-command <optional>",
+      "safety": {
+        "mode": "GRADING_EVIDENCE_AUTO_REPORT",
+        "sourceMode": "EVIDENCE_AUTO",
+        "readonlyAlwaysRunsFirst": true,
+        "controlledCommandRequiresExplicitFlag": true,
+        "controlledCommandDefaultEnabled": false,
+        "defaultContestantCodeExecuted": false,
+        "defaultCommandExecuted": false,
+        "controlledCommandMayExecuteWhenExplicitlyRequested": true,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "grading",
+          "submission",
+          "output"
+        ],
+        "properties": {
+          "grading": {
+            "type": "string"
+          },
+          "submission": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "includeControlledCommand": {
+            "type": "boolean"
+          },
+          "failOnControlledUnavailable": {
+            "type": "boolean"
+          },
+          "image": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.report",
+        "mode": "GRADING_EVIDENCE_AUTO_REPORT",
+        "sourceMode": "EVIDENCE_AUTO",
+        "requiredFields": [
+          "mode",
+          "sourceMode",
+          "sourceReportTotal",
+          "sourceReports",
+          "summary",
+          "evidenceCoverage",
+          "checks",
+          "steps",
+          "warnings",
+          "executionMatrix",
+          "nextCoreAction",
+          "safety",
+          "operationAuditEvent",
+          "artifact"
+        ],
+        "stepsPath": "data.report.steps",
+        "warningsPath": "data.report.warnings",
+        "executionMatrixPath": "data.report.executionMatrix",
+        "nextCoreActionPath": "data.report.nextCoreAction",
+        "summaryPath": "data.report.summary",
+        "coveragePath": "data.report.evidenceCoverage",
+        "safetyPath": "data.report.safety",
+        "artifactPath": "data.artifact",
+        "readonlyAlwaysRunsFirst": true,
+        "controlledCommandRequiresExplicitFlag": true,
+        "controlledCommandDefaultEnabled": false,
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false,
+        "defaultToolExecutionSafety": {
+          "commandExecuted": false,
+          "contestantCodeExecuted": false,
+          "networkAccess": false,
+          "realPublish": false
+        },
+        "controlledCommandSafetyWhenExplicit": {
+          "mayExecuteCommandInControlledDocker": true,
+          "hostExecutionAllowed": false,
+          "networkEnabled": false
+        }
+      }
+    },
+    {
+      "name": "create_grading_job",
+      "description": "Create one local GradingJob staging item from a Grading DSL and submission directory. It only queues local work for the current MVP, writes no production queue or database, and does not execute contestant code by itself.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/jobs"
+      },
+      "cli": "python lab_cli.py grade job-create --grading <grading> --submission <submission> --output <output> --submission-id <submissionId>",
+      "safety": {
+        "mode": "LOCAL_GRADING_JOB",
+        "localStagingOnly": true,
+        "jobCreated": true,
+        "jobStatus": "QUEUED",
+        "sandboxExecutedByCreate": false,
+        "contestantCodeExecutedByCreate": false,
+        "queuePersistedToProduction": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realAgentImport": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "grading",
+          "submission",
+          "output",
+          "submissionId"
+        ],
+        "properties": {
+          "grading": {
+            "type": "string"
+          },
+          "submission": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "includeControlledCommand": {
+            "type": "boolean"
+          },
+          "failOnControlledUnavailable": {
+            "type": "boolean"
+          },
+          "image": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingJob",
+        "component": "GradingJob",
+        "mode": "LOCAL_GRADING_JOB or LOCAL_SQLITE_GRADING_JOB",
+        "newJobStatus": "QUEUED",
+        "operationAuditEventPath": "data.operationAuditEvent",
+        "localSqliteOptional": true,
+        "queuePersistedToProduction": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "sandboxExecutedByCreate": false,
+        "contestantCodeExecutedByCreate": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "list_grading_jobs",
+      "description": "List local GradingJob staging items from JSON store or optional local SQLite dbPath. This is a read-only task-flow inspection tool for reviewers and agents.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/jobs"
+      },
+      "cli": "python lab_cli.py grade job-list --task-id <optional> --db-path <optional>",
+      "safety": {
+        "mode": "LOCAL_GRADING_JOB_READ_ONLY",
+        "readOnly": true,
+        "localSqliteReadOptional": true,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.items",
+        "component": "GradingJobList",
+        "summaryPath": "data.total",
+        "filtersPath": "data.filters",
+        "localSqliteReadOptional": true,
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_grading_job",
+      "description": "Get one local GradingJob staging item by id from JSON store or optional local SQLite dbPath.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/jobs/{id}"
+      },
+      "cli": "python lab_cli.py grade job-get --id <id> --db-path <optional>",
+      "safety": {
+        "mode": "LOCAL_GRADING_JOB_READ_ONLY",
+        "readOnly": true,
+        "localSqliteReadOptional": true,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingJob",
+        "component": "GradingJob",
+        "localSqliteReadOptional": true,
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "run_grading_job",
+      "description": "Run one local GradingJob synchronously through the existing evidence-auto path and create a GradingRecord for human review. It may execute controlled Docker evidence only if the job was explicitly configured for controlled command evidence; it never auto-approves or publishes.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/jobs/{id}/run"
+      },
+      "cli": "python lab_cli.py grade job-run --id <id> --db-path <optional>",
+      "safety": {
+        "mode": "LOCAL_GRADING_JOB_SYNC_RUN",
+        "localJobRunOnly": true,
+        "usesEvidenceAuto": true,
+        "createsGradingRecord": true,
+        "newRecordReviewState": "WAITING_REVIEW_OR_NEEDS_EVIDENCE",
+        "controlledCommandMayExecuteIfJobConfigured": true,
+        "controlledCommandDefaultEnabled": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "queuePersistedToProduction": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realAgentImport": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "leaseSeconds": {
+            "type": "integer"
+          },
+          "maxAttempts": {
+            "type": "integer"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingJob",
+        "component": "GradingJobRun",
+        "mode": "LOCAL_GRADING_JOB_SYNC_RUN or LOCAL_SQLITE_GRADING_WORKER_ONCE",
+        "recordPath": "data.gradingRecord",
+        "reportPath": "data.report",
+        "operationAuditEventPath": "data.operationAuditEvent",
+        "newJobStatus": "WAITING_REVIEW",
+        "newRecordReviewState": "WAITING_REVIEW_OR_NEEDS_EVIDENCE",
+        "manualRecordReviewRequired": true,
+        "queuePersistedToProduction": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_grading_record",
+      "description": "Create one local GradingRecord from an existing grading evidence report. It reads an existing report only, starts no sandbox, changes no AI Task status, and waits for human record review.",
+      "riskLevel": "medium",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/records"
+      },
+      "cli": "python lab_cli.py grade record-create --report <report> --submission-id <submissionId>",
+      "safety": {
+        "mode": "LOCAL_GRADING_RECORD",
+        "readsExistingReportOnly": true,
+        "recordCreatesNewExecution": false,
+        "newRecordReviewState": "WAITING_REVIEW_OR_NEEDS_EVIDENCE",
+        "taskStatusChanged": false,
+        "sandboxExecutedByRecordCreate": false,
+        "contestantCodeExecutedByRecordCreate": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realAgentImport": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "report",
+          "submissionId"
+        ],
+        "properties": {
+          "report": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingRecord",
+        "component": "GradingRecord",
+        "mode": "LOCAL_GRADING_RECORD or LOCAL_SQLITE_GRADING_RECORD",
+        "newRecordReviewState": "WAITING_REVIEW_OR_NEEDS_EVIDENCE",
+        "operationAuditEventPath": "data.operationAuditEvent",
+        "recordCreatesNewExecution": false,
+        "taskStatusChanged": false,
+        "manualRecordReviewRequired": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "list_grading_records",
+      "description": "List local GradingRecord items from JSON store or optional local SQLite dbPath. This is read-only and is used by reviewers and agents to find records waiting for manual review.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/records"
+      },
+      "cli": "python lab_cli.py grade record-list --task-id <optional> --db-path <optional>",
+      "safety": {
+        "mode": "LOCAL_GRADING_RECORD_READ_ONLY",
+        "readOnly": true,
+        "localSqliteReadOptional": true,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "submissionId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.items",
+        "component": "GradingRecordList",
+        "summaryPath": "data.total",
+        "filtersPath": "data.filters",
+        "localSqliteReadOptional": true,
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_grading_record",
+      "description": "Get one local GradingRecord by id from JSON store or optional local SQLite dbPath.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/records/{id}"
+      },
+      "cli": "python lab_cli.py grade record-get --id <id> --db-path <optional>",
+      "safety": {
+        "mode": "LOCAL_GRADING_RECORD_READ_ONLY",
+        "readOnly": true,
+        "localSqliteReadOptional": true,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingRecord",
+        "component": "GradingRecord",
+        "localSqliteReadOptional": true,
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "sandboxExecutedByRead": false,
+        "contestantCodeExecutedByRead": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "review_grading_record",
+      "description": "Record a human review decision for one local GradingRecord. It changes only the record review status, never changes AI Task status, never reruns grading, never imports, and never publishes.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/records/{id}/review"
+      },
+      "cli": "python lab_cli.py grade record-review --id <id> --reviewer <reviewer> --decision <approve-ready|needs-evidence|needs-revision>",
+      "safety": {
+        "mode": "LOCAL_GRADING_RECORD_REVIEW",
+        "recordReviewOnly": true,
+        "taskStatusChanged": false,
+        "recordCreatesNewExecution": false,
+        "sandboxExecutedByRecordReview": false,
+        "contestantCodeExecutedByRecordReview": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realAgentImport": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer",
+          "decision"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve-ready",
+              "needs-evidence",
+              "needs-revision"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "dbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingRecord",
+        "component": "GradingRecordReview",
+        "mode": "LOCAL_GRADING_RECORD_REVIEW or LOCAL_SQLITE_GRADING_RECORD_REVIEW",
+        "operationAuditEventPath": "data.operationAuditEvent",
+        "allowedDecisions": [
+          "approve-ready",
+          "needs-evidence",
+          "needs-revision"
+        ],
+        "taskStatusChanged": false,
+        "recordCreatesNewExecution": false,
+        "sandboxExecutedByRecordReview": false,
+        "contestantCodeExecutedByRecordReview": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "record_review_decision_note",
+      "description": "Record a local human review decision note for a grading review task after evidence review. It writes only REVIEW_DECISION_NOTE artifacts and audit records; it does not change task status, auto approve, execute sandbox code, call a real LLM, import, or publish anything.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review-tasks/{taskId}/decision-note"
+      },
+      "cli": "python lab_cli.py review decision-note --task-id <taskId> --reviewer <reviewer> --decision <approve-ready|needs-revision|needs-evidence> --reason <reason> --output <output>",
+      "safety": {
+        "mode": "LOCAL_REVIEW_DECISION_NOTE_RECORD",
+        "requiresHumanReview": true,
+        "taskStatusChanged": false,
+        "autoApproveAllowed": false,
+        "batchStateChangeAllowed": false,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "sandboxExecutedByDecisionNote": false,
+        "contestantCodeExecuted": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer",
+          "decision"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve-ready",
+              "needs-revision",
+              "needs-evidence"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.decisionNote",
+        "requiredFields": [
+          "id",
+          "component",
+          "taskId",
+          "reviewer",
+          "decision",
+          "taskStatusBefore",
+          "taskStatusAfter",
+          "statusChanged",
+          "safety",
+          "artifact"
+        ],
+        "component": "ReviewDecisionNote",
+        "artifactKind": "REVIEW_DECISION_NOTE",
+        "taskStatusChanged": false,
+        "autoApproveAllowed": false,
+        "batchStateChangeAllowed": false,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "sandboxExecutedByDecisionNote": false,
+        "contestantCodeExecuted": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "list_ai_tasks",
+      "description": "List local AI Task records from the mock store.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/ai-tasks"
+      },
+      "cli": "python lab_cli.py ai-task list",
+      "safety": {
+        "mode": "MOCK_ONLY"
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_ai_task",
+      "description": "Get one local AI Task record by id.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/ai-tasks/{id}"
+      },
+      "cli": "python lab_cli.py ai-task get --id <id>",
+      "safety": {
+        "mode": "MOCK_ONLY"
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_review_tasks",
+      "description": "List local AI Task records that are waiting for human review.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-tasks"
+      },
+      "cli": "python lab_cli.py review list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultStatusFilter": "WAITING_REVIEW"
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_grading_result_preview",
+      "description": "Read an existing local grading report and return a candidate-safe grading result preview. It does not run grading, start Docker, execute contestant code, call a real LLM, auto approve, or publish.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/result-preview"
+      },
+      "cli": "python lab_cli.py grade result-preview --report <report> --task-id <taskId>",
+      "safety": {
+        "mode": "READ_EXISTING_GRADING_REPORT_ONLY",
+        "readOnly": true,
+        "sourceReportModified": false,
+        "sandboxExecutedByPreview": false,
+        "contestantCodeExecutedByPreview": false,
+        "commandExecutedByPreview": false,
+        "networkAccessByPreview": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "report"
+        ],
+        "properties": {
+          "report": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "maxItems": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingResultPreview",
+        "component": "GradingResultPreview",
+        "mode": "READ_EXISTING_GRADING_REPORT_ONLY",
+        "requiredFields": [
+          "component",
+          "mode",
+          "reportPath",
+          "reportType",
+          "summary",
+          "score",
+          "resultStatus",
+          "evidencePreview",
+          "reviewHints",
+          "safety"
+        ],
+        "candidateSafe": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_grading_evidence_readiness",
+      "description": "Read one or more existing grading evidence reports and return a machine-readable readiness summary for human review. It does not run Docker, pytest, notebooks, contestant code, real LLM calls, auto approval, or publish.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/grading/evidence-readiness"
+      },
+      "cli": "python lab_cli.py grade evidence-readiness --report <report>",
+      "safety": {
+        "mode": "GRADING_EVIDENCE_READINESS",
+        "readExistingReportsOnly": true,
+        "sandboxExecutedByReadiness": false,
+        "contestantCodeExecutedByReadiness": false,
+        "commandExecutedByReadiness": false,
+        "pytestExecutedByReadiness": false,
+        "notebookExecutedByReadiness": false,
+        "networkAccessByReadiness": false,
+        "autoApproveAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "report"
+        ],
+        "properties": {
+          "report": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingEvidenceReadiness",
+        "mode": "GRADING_EVIDENCE_READINESS",
+        "requiredFields": [
+          "mode",
+          "sourceReportTotal",
+          "sourceReports",
+          "summary",
+          "items",
+          "nextActions",
+          "safety"
+        ],
+        "summaryPath": "data.gradingEvidenceReadiness.summary",
+        "itemsPath": "data.gradingEvidenceReadiness.items",
+        "nextActionsPath": "data.gradingEvidenceReadiness.nextActions",
+        "readExistingReportsOnly": true,
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_review_task_summary",
+      "description": "Get a Phase 1 review queue batch summary for human triage. It does not approve, reject, or publish tasks.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-task-summary"
+      },
+      "cli": "python lab_cli.py review batch-summary",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "batchApproveAllowed": false,
+        "batchRejectAllowed": false,
+        "batchPublishAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.reviewTaskSummary",
+        "requiredFields": [
+          "mode",
+          "filters",
+          "items",
+          "total",
+          "queueSummary",
+          "reviewPriorityQueue",
+          "providerQualityTaskSignal",
+          "preApproveReviewCheckSignal",
+          "gradingEvidenceReadinessSignal",
+          "realDemoReviewQueue",
+          "controlledDockerEvidenceReviewSignal",
+          "mergedGradingEvidenceReviewSignal",
+          "notebookEvidenceReviewPlan",
+          "batchActionPolicy",
+          "safety"
+        ],
+        "reviewPriorityQueue": {
+          "dataPath": "data.reviewTaskSummary.reviewPriorityQueue",
+          "requiredFields": [
+            "enabled",
+            "source",
+            "sortPolicy",
+            "summary",
+            "items"
+          ],
+          "itemFields": [
+            "rank",
+            "taskId",
+            "taskType",
+            "priority",
+            "reasonCode",
+            "recommendedAction",
+            "providerQualitySummary",
+            "manualReviewChecklistSummary",
+            "controlledGradingEvidenceSummary",
+            "mergedGradingEvidenceSummary",
+            "gradingEvidenceReadinessSummary",
+            "preApproveReviewCheck"
+          ],
+          "summaryFields": [
+            "queueTotal",
+            "urgentTotal",
+            "highTotal",
+            "normalTotal",
+            "lowTotal",
+            "manualReviewChecklistTaskTotal",
+            "manualReviewChecklistNeedsHumanReviewTotal",
+            "providerQualityAvailableTotal",
+            "providerQualityReadyForReviewTotal",
+            "preApproveReviewCheckTaskTotal",
+            "preApproveReviewCheckWarningTotal",
+            "gradingEvidenceReadinessTaskTotal",
+            "gradingEvidenceReadyTotal",
+            "gradingEvidenceMissingTotal",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed"
+          ],
+          "providerQualitySummary": {
+            "source": "reviewDetail.reviewPage.providerSummary.qualitySummary",
+            "callSource": "reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+            "purpose": "show_real_llm_generation_quality_for_human_triage",
+            "itemFields": [
+              "available",
+              "realLlmCalled",
+              "providerAdapters",
+              "models",
+              "apiSurfaces",
+              "responseIds",
+              "requestCount",
+              "totalTokens",
+              "readyForReview",
+              "normalizationPatchCount",
+              "schemaRepairApplied",
+              "issueCount"
+            ],
+            "autoApproveAllowed": false,
+            "batchStateChangeAllowed": false,
+            "autoPublishAllowed": false,
+            "realPublishAllowed": false
+          },
+          "manualReviewChecklistSummary": {
+            "source": "reviewDetail.assessmentPlan.manualReviewChecklist",
+            "purpose": "show_next_human_review_checklist_items",
+            "itemFields": [
+              "enabled",
+              "status",
+              "checklistTotal",
+              "matchedTotal",
+              "needsHumanReviewTotal",
+              "checklistIds",
+              "nextReviewChecklistIds",
+              "operatorDecision"
+            ],
+            "autoApproveAllowed": false,
+            "batchStateChangeAllowed": false,
+            "realSandboxRunEnabled": false,
+            "realPublishAllowed": false
+          },
+          "controlledGradingEvidenceSummary": {
+            "source": "reviewDetail.controlledGradingEvidence",
+            "purpose": "show_controlled_docker_evidence_summary_for_grading_human_triage",
+            "itemFields": [
+              "available",
+              "status",
+              "planTotal",
+              "reportTotal",
+              "coveredCheckIds",
+              "coveredCheckTypes",
+              "executed",
+              "passed",
+              "earnedScore",
+              "totalControlledScore",
+              "sandboxExecuted",
+              "contestantCodeExecuted",
+              "commandExecuted",
+              "pytestExecuted"
+            ],
+            "autoApproveAllowed": false,
+            "batchStateChangeAllowed": false,
+            "realPublishAllowed": false
+          },
+          "mergedGradingEvidenceSummary": {
+            "source": "reviewDetail.mergedGradingEvidence",
+            "purpose": "show_merged_grading_evidence_coverage_for_grading_human_triage",
+            "itemFields": [
+              "available",
+              "status",
+              "reportTotal",
+              "reportPath",
+              "sourceReportTotal",
+              "coveredCheckIds",
+              "controlledDockerCheckTotal",
+              "readonlyStaticCheckTotal",
+              "executed",
+              "passedCheckTotal",
+              "failedCheckTotal",
+              "deferredCheckTotal",
+              "earnedScore",
+              "totalScore",
+              "coverageRatio",
+              "checkEvidenceReviewItemTotal",
+              "manualCheckReviewTotal",
+              "checkEvidenceReviewItems",
+              "mergeExecutedOnlyExistingReports"
+            ],
+            "checkEvidenceReviewItems": {
+              "source": "reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems",
+              "purpose": "show_check_level_evidence_source_status_score_and_manual_action",
+              "maxPreviewItems": 6,
+              "itemFields": [
+                "checkId",
+                "checkType",
+                "status",
+                "passed",
+                "score",
+                "earnedScore",
+                "evidenceSourceKind",
+                "recommendedAction",
+                "manualReviewRequired"
+              ],
+              "autoApproveAllowed": false,
+              "realPublishAllowed": false
+            },
+            "autoApproveAllowed": false,
+            "batchStateChangeAllowed": false,
+            "realPublishAllowed": false
+          },
+          "preApproveReviewCheck": {
+            "source": "reviewDetail.mergedGradingEvidence + reviewDetail.reviewDecisionNotes",
+            "purpose": "show_readonly_grading_approval_warnings_before_human_approve",
+            "itemFields": [
+              "component",
+              "applicable",
+              "status",
+              "approvalStillAllowed",
+              "summary.evidenceReady",
+              "summary.reviewDecisionNoteRecorded",
+              "summary.approveReadyDecision",
+              "summary.warningTotal",
+              "summary.recommendedWarnings",
+              "summary.mergedEvidenceReportTotal",
+              "summary.checkEvidenceReviewItemTotal",
+              "summary.latestDecision"
+            ],
+            "blocking": false,
+            "approvalStillAllowed": true,
+            "autoApproveAllowed": false,
+            "batchStateChangeAllowed": false,
+            "realPublishAllowed": false
+          },
+          "purpose": "human_triage_only",
+          "batchStateChangeAllowed": false,
+          "autoApproveAllowed": false
+        },
+        "preApproveReviewCheckSignal": {
+          "dataPath": "data.reviewTaskSummary.preApproveReviewCheckSignal",
+          "source": "reviewTaskSummary.reviewPriorityQueue.items[].preApproveReviewCheck",
+          "purpose": "summarize_readonly_grading_approval_warnings_before_human_approve",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "taskTotal",
+            "applicableTotal",
+            "readyForHumanApproveTotal",
+            "approveAllowedWithWarningsTotal",
+            "evidenceReadyTotal",
+            "reviewDecisionNoteRecordedTotal",
+            "warningTotal",
+            "items",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "realPublishAllowed",
+            "safety"
+          ],
+          "blocking": false,
+          "approvalStillAllowed": true,
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false
+        },
+        "gradingEvidenceReadinessSignal": {
+          "dataPath": "data.reviewTaskSummary.gradingEvidenceReadinessSignal",
+          "source": "reviewTaskSummary.reviewPriorityQueue.items[].gradingEvidenceReadinessSummary",
+          "purpose": "summarize_grading_evidence_ready_and_missing_checks_for_human_triage",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "mode",
+            "taskTotal",
+            "availableTotal",
+            "evidenceReadyTotal",
+            "missingEvidenceTotal",
+            "controlledCommandMissingTotal",
+            "readonlyStaticMissingTotal",
+            "readyForApprovalRecommendationTotal",
+            "items",
+            "items[].actionGuide",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "realPublishAllowed",
+            "safety"
+          ],
+          "readExistingReportsOnly": true,
+          "actionGuide": {
+            "component": "GradingEvidenceActionGuide",
+            "api": "POST /api/grading/evidence-auto",
+            "cli": "python lab_cli.py grade evidence-auto --task-id <taskId> --include-controlled-command false",
+            "followUp": [
+              "open_latest_grading_report",
+              "verify_grading_evidence_readiness",
+              "record_review_decision_note_before_manual_approve"
+            ]
+          },
+          "sandboxExecutedByReadiness": false,
+          "contestantCodeExecutedByReadiness": false,
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false
+        },
+        "providerQualityTaskSignal": {
+          "dataPath": "data.reviewTaskSummary.providerQualityTaskSignal",
+          "source": "reviewDetail.reviewPage.providerSummary.qualitySummary",
+          "callSource": "reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+          "purpose": "summarize_real_llm_generation_quality_across_review_tasks",
+          "requiredFields": [
+            "enabled",
+            "source",
+            "taskTotal",
+            "availableTotal",
+            "realLlmCalledTotal",
+            "readyForReviewTotal",
+            "normalizationPatchTotal",
+            "schemaRepairAppliedTotal",
+            "items",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "autoPublishAllowed",
+            "realPublishAllowed"
+          ],
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "autoPublishAllowed": false,
+          "realPublishAllowed": false
+        },
+        "realDemoReviewQueue": {
+          "dataPath": "data.reviewTaskSummary.realDemoReviewQueue",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "route",
+            "taskTotal",
+            "waitingReviewTotal",
+            "schemaValidatedTotal",
+            "readonlyEvidenceReportDetailSource",
+            "readonlyEvidenceCollectedTotal",
+            "items",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "realPublishAllowed"
+          ],
+          "itemFields": [
+            "rank",
+            "taskId",
+            "taskType",
+            "artifactKind",
+            "status",
+            "path",
+            "recommendedAction",
+            "entryRoute"
+          ],
+          "purpose": "real_llm_demo_human_review_entry_only",
+          "readonlyEvidenceReportDetailSource": "realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+          "taskTotal": 4,
+          "waitingReviewTotal": 4,
+          "schemaValidatedTotal": 4,
+          "readonlyEvidenceCollectedTotal": 2,
+          "answerVisibleToCandidate": false,
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false
+        },
+        "controlledDockerEvidenceReviewSignal": {
+          "dataPath": "data.reviewTaskSummary.controlledDockerEvidenceReviewSignal",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "route",
+            "taskId",
+            "mode",
+            "taskTotal",
+            "status",
+            "controlledPlanPath",
+            "controlledReportPath",
+            "coveredCheckIds",
+            "coveredCheckTypes",
+            "executed",
+            "passed",
+            "earnedScore",
+            "totalControlledScore",
+            "remainingCheckIds",
+            "recommendedAction",
+            "manualReviewRequired",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "realPublishAllowed",
+            "safety"
+          ],
+          "purpose": "show_controlled_docker_evidence_coverage_for_human_review_only",
+          "source": "reviewDetail.controlledGradingEvidence or realDemoPrototype.controlledDockerEvidenceDemo",
+          "dynamicSource": "reviewDetail.controlledGradingEvidence",
+          "fallbackSource": "realDemoPrototype.controlledDockerEvidenceDemo",
+          "coveredCheckIds": [
+            "check_q1",
+            "check_q4"
+          ],
+          "coveredCheckTypes": [
+            "stdout_contains",
+            "pytest"
+          ],
+          "earnedScore": 40,
+          "totalControlledScore": 40,
+          "remainingCheckIds": [
+            "check_q2",
+            "check_q3"
+          ],
+          "remainingCheckTypes": [
+            "notebook_cell"
+          ],
+          "remainingStatus": "STATIC_NOTEBOOK_EVIDENCE_READY_FOR_REVIEW",
+          "notebookEvidenceReviewPlanSource": "reviewTaskSummary.notebookEvidenceReviewPlan",
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false,
+          "hostExecutionAllowed": false,
+          "networkAllowed": false,
+          "remainingReviewPlanStatus": "NOTEBOOK_STATIC_EVIDENCE_COLLECTED",
+          "recommendedAction": "review_container_and_static_notebook_evidence_before_approval"
+        },
+        "mergedGradingEvidenceReviewSignal": {
+          "dataPath": "data.reviewTaskSummary.mergedGradingEvidenceReviewSignal",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "dynamicSource",
+            "sourceMode",
+            "route",
+            "taskTotal",
+            "available",
+            "reportTotal",
+            "status",
+            "coveredCheckIds",
+            "controlledDockerCheckTotal",
+            "readonlyStaticCheckTotal",
+            "executed",
+            "passedCheckTotal",
+            "failedCheckTotal",
+            "deferredCheckTotal",
+            "earnedScore",
+            "totalScore",
+            "coverageRatio",
+            "checkEvidenceReviewItemTotal",
+            "manualCheckReviewTotal",
+            "items",
+            "recommendedAction",
+            "manualReviewRequired",
+            "autoApproveAllowed",
+            "batchStateChangeAllowed",
+            "realPublishAllowed",
+            "safety"
+          ],
+          "purpose": "show_merged_readonly_and_controlled_grading_evidence_coverage_for_human_review_only",
+          "source": "reviewDetail.mergedGradingEvidence",
+          "dynamicSource": "reviewDetail.mergedGradingEvidence",
+          "fallbackSource": null,
+          "noReportSourceMode": "NO_MERGED_EVIDENCE_REPORT",
+          "dynamicSourceMode": "DYNAMIC_MERGED_GRADING_EVIDENCE",
+          "recommendedActionWhenMissing": "run_grade_evidence_merge_before_final_grading_review",
+          "recommendedActionWhenAvailable": "review_merged_grading_evidence_before_approval",
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false,
+          "mergeExecutedOnlyExistingReports": true,
+          "hostExecutionAllowed": false,
+          "networkAllowed": false
+        },
+        "notebookEvidenceReviewPlan": {
+          "dataPath": "data.reviewTaskSummary.notebookEvidenceReviewPlan",
+          "requiredFields": [
+            "enabled",
+            "component",
+            "source",
+            "route",
+            "taskId",
+            "status",
+            "remainingCheckIds",
+            "checkTypes",
+            "checkTotal",
+            "scoreTotal",
+            "evidenceStatus",
+            "reviewStrategy",
+            "requiredReviewerActions",
+            "items",
+            "safety"
+          ],
+          "purpose": "show_notebook_cell_evidence_review_plan_without_execution",
+          "source": "realDemoPrototype.generatedDsl.grading.spec.assessmentPlan + reviewTaskSummary.controlledDockerEvidenceReviewSignal",
+          "remainingCheckIds": [
+            "check_q2",
+            "check_q3"
+          ],
+          "checkTypes": [
+            "notebook_cell"
+          ],
+          "checkTotal": 2,
+          "scoreTotal": 60,
+          "evidenceStatus": "STATIC_NOTEBOOK_EVIDENCE_COLLECTED",
+          "reviewStrategy": "STATIC_NOTEBOOK_JSON_PARSE_REVIEW",
+          "notebookKernelStarted": false,
+          "notebookExecuted": false,
+          "contestantCodeExecuted": false,
+          "autoApproveAllowed": false,
+          "batchStateChangeAllowed": false,
+          "realPublishAllowed": false,
+          "status": "NOTEBOOK_STATIC_EVIDENCE_COLLECTED",
+          "staticEvidencePlanPath": "examples/output/mimo-real-demo-notebook-static-plan.json",
+          "staticEvidenceReportPath": "examples/output/mimo-real-demo-notebook-static-report.json",
+          "staticEvidenceSubmissionPath": "examples/submissions/real-demo-notebook",
+          "executionMode": "readonly",
+          "sandboxMode": "READONLY_REAL_SANDBOX_POC",
+          "executed": 2,
+          "passed": 2,
+          "earnedScore": 60,
+          "totalStaticNotebookScore": 60,
+          "staticEvidenceMethod": "STATIC_NOTEBOOK_JSON_PARSE"
+        }
+      }
+    },
+    {
+      "name": "get_real_dsl_review_preview",
+      "description": "Get a read-only review preview for local real LLM generated Lab, Exam, Grading, and PPT DSL artifacts. It validates local DSL files and does not send a new LLM request.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review/real-dsl-preview"
+      },
+      "cli": "python lab_cli.py review real-dsl-preview",
+      "safety": {
+        "mode": "STATIC_REAL_LLM_DSL_REVIEW_PREVIEW",
+        "readOnly": true,
+        "newLlmRequestSent": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "teacherOnlyGradingRefVisibleInReview": true,
+        "commandExecutedFromPage": false,
+        "realSandboxRunEnabled": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "lab": {
+            "type": "string"
+          },
+          "exam": {
+            "type": "string"
+          },
+          "grading": {
+            "type": "string"
+          },
+          "ppt": {
+            "type": "string"
+          },
+          "candidatePreview": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslReviewPreview",
+        "requiredFields": [
+          "component",
+          "mode",
+          "summary",
+          "qualitySignals",
+          "reviewIssues",
+          "revisionSuggestions",
+          "labReview",
+          "examReview",
+          "gradingReview",
+          "pptReview",
+          "safety"
+        ],
+        "summaryFields": [
+          "labStepTotal",
+          "examQuestionTotal",
+          "gradingPlanTotal",
+          "gradingCheckTotal",
+          "pptSlideTotal",
+          "qualityStatus",
+          "qualityIssueTotal",
+          "blockingIssueTotal",
+          "revisionSuggestionTotal",
+          "manualReviewRequired",
+          "allDslWaitingReview"
+        ],
+        "purpose": "real_llm_demo_dsl_content_review_only",
+        "component": "RealDslReviewPreview",
+        "mode": "STATIC_REAL_LLM_DSL_REVIEW_PREVIEW",
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "teacherOnlyGradingRefVisibleInReview": true,
+        "commandExecutedFromPage": false,
+        "realSandboxRunEnabled": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_real_dsl_revision_draft",
+      "description": "Create a WAITING_REVIEW revision draft for a real LLM generated DSL file from human review feedback. Default providerMode=local is deterministic; optional providerMode=real-llm sends one explicit OpenAI-compatible revision request and still does not publish anything.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review/real-dsl-revision"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision --kind <kind> --reviewer <reviewer> --comment <comment>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_DRAFT",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reviewer",
+          "comment"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "lab",
+              "exam",
+              "grading",
+              "ppt"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "targetSections": {
+            "type": "array"
+          },
+          "requestedChanges": {
+            "type": "array"
+          },
+          "output": {
+            "type": "string"
+          },
+          "reportOutput": {
+            "type": "string"
+          },
+          "providerMode": {
+            "type": "string",
+            "enum": [
+              "local",
+              "real-llm"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "timeoutSeconds": {
+            "type": "integer"
+          },
+          "maxOutputTokens": {
+            "type": "integer"
+          },
+          "explicitRealCallOptIn": {
+            "type": "boolean"
+          },
+          "confirmWaitingReview": {
+            "type": "boolean"
+          },
+          "confirmNoAutoPublish": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslRevisionDraft",
+        "requiredFields": [
+          "component",
+          "mode",
+          "kind",
+          "sourcePath",
+          "outputPath",
+          "reportOutputPath",
+          "sourceDslId",
+          "revisedDslId",
+          "revisedStatus",
+          "changedFields",
+          "schemaValidated",
+          "manualReviewRequired",
+          "safety"
+        ],
+        "component": "RealDslRevisionDraft",
+        "mode": "LOCAL_REAL_DSL_REVISION_DRAFT or REAL_LLM_DSL_REVISION_DRAFT",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "newLlmRequestSentWhenProviderModeRealLlm": true,
+        "realLlmCalled": false,
+        "realLlmCalledWhenProviderModeRealLlm": true,
+        "secretsRead": false,
+        "secretsReadWhenProviderModeRealLlm": true,
+        "networkAccess": false,
+        "networkAccessWhenProviderModeRealLlm": true,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_real_dsl_revision_batch_from_preview",
+      "description": "Create local WAITING_REVIEW revision drafts from RealDslReviewPreview.revisionSuggestions. It consumes an existing local review preview and does not send a new LLM request.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review/real-dsl-revision-batch"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision-batch --preview <preview> --reviewer <reviewer>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_BATCH",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "reviewer"
+        ],
+        "properties": {
+          "preview": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "outputDir": {
+            "type": "string"
+          },
+          "reportOutput": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslRevisionBatch",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourcePreviewPath",
+          "reportOutputPath",
+          "reviewer",
+          "draftTotal",
+          "draftKinds",
+          "drafts",
+          "schemaValidatedTotal",
+          "allDraftsWaitingReview",
+          "manualReviewRequired",
+          "safety"
+        ],
+        "component": "RealDslRevisionBatch",
+        "mode": "LOCAL_REAL_DSL_REVISION_BATCH",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_real_dsl_revision_diff_preview",
+      "description": "Get a read-only diff preview for local WAITING_REVIEW real DSL revision drafts created by create_real_dsl_revision_batch_from_preview. It compares source DSL files with revised DSL drafts and does not send a new LLM request.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review/real-dsl-revision-diff-preview"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision-diff-preview --batch-report <batchReport>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_DIFF_PREVIEW",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "readOnly": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "batchReport": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslRevisionDiffPreview",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceBatchReportPath",
+          "summary",
+          "draftDiffs",
+          "safety"
+        ],
+        "summaryFields": [
+          "draftTotal",
+          "diffTotal",
+          "allDraftsWaitingReview",
+          "manualReviewRequired"
+        ],
+        "component": "RealDslRevisionDiffPreview",
+        "mode": "LOCAL_REAL_DSL_REVISION_DIFF_PREVIEW",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_real_dsl_revision_decision",
+      "description": "Record a human review decision for one real DSL revision draft from RealDslRevisionDiffPreview. The decision report is local and auditable; it does not merge, auto-approve, publish, or send a new LLM request.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review/real-dsl-revision-decision"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision-decision --suggestion-id <suggestionId> --reviewer <reviewer> --decision <approve|reject|request-change>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_DECISION",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": true,
+        "sourceDslModified": false,
+        "revisedDslModified": false,
+        "manualMergeRequired": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "suggestionId",
+          "reviewer",
+          "decision"
+        ],
+        "properties": {
+          "diffPreview": {
+            "type": "string"
+          },
+          "suggestionId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject",
+              "request-change"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslRevisionDecision",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceDiffPreviewPath",
+          "suggestionId",
+          "decision",
+          "decisionStatus",
+          "manualMergeRequired",
+          "safety"
+        ],
+        "component": "RealDslRevisionDecision",
+        "mode": "LOCAL_REAL_DSL_REVISION_DECISION",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "sourceDslModified": false,
+        "revisedDslModified": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "promote_real_dsl_revision_candidate",
+      "description": "Promote an approved real DSL revision decision into a new local WAITING_REVIEW candidate DSL. It copies the revised DSL to a candidate file and does not merge into the source, auto-approve, publish, execute sandbox code, or send a new LLM request.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review/real-dsl-revision-promote"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision-promote --decision-report <decisionReport> --reviewer <reviewer>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_PROMOTION",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": false,
+        "artifactCreated": true,
+        "sourceDslModified": false,
+        "revisedDslModified": false,
+        "promotedCandidateWritten": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "reviewer"
+        ],
+        "properties": {
+          "decisionReport": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "reportOutput": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.realDslRevisionPromotion",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceDecisionReportPath",
+          "suggestionId",
+          "promotedPath",
+          "promotedStatus",
+          "schemaValidated",
+          "safety"
+        ],
+        "component": "RealDslRevisionPromotion",
+        "mode": "LOCAL_REAL_DSL_REVISION_PROMOTION",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "sourceDslModified": false,
+        "revisedDslModified": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "enqueue_real_dsl_revision_candidate_review",
+      "description": "Create a local WAITING_REVIEW AI Task and DSL Artifact from a promoted real DSL revision candidate so the existing review queue and review detail tools can handle it. It does not approve, publish, execute code, or send a new LLM request.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review/real-dsl-revision-enqueue"
+      },
+      "cli": "python lab_cli.py review real-dsl-revision-enqueue --promotion-report <promotionReport> --reviewer <reviewer>",
+      "safety": {
+        "mode": "LOCAL_REAL_DSL_REVISION_PROMOTION_REVIEW_QUEUE",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewRequired": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "taskCreated": true,
+        "artifactCreated": true,
+        "sourceDslModified": false,
+        "revisedDslModified": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "reviewer"
+        ],
+        "properties": {
+          "promotionReport": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.promotionReviewQueueItem",
+        "requiredFields": [
+          "component",
+          "mode",
+          "taskId",
+          "taskStatus",
+          "artifactKind",
+          "artifactStatus",
+          "schemaValidated",
+          "safety"
+        ],
+        "component": "RealDslRevisionPromotionReviewQueueItem",
+        "mode": "LOCAL_REAL_DSL_REVISION_PROMOTION_REVIEW_QUEUE",
+        "newTaskStatus": "WAITING_REVIEW",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_lab_template_import_preview",
+      "description": "Create a local LabTemplateImportPreview from an APPROVED Lab DSL review task. It writes only a local preview JSON, artifact, and audit event; it does not import to the real agent service or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/labs/import-preview"
+      },
+      "cli": "python lab_cli.py lab import-preview --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "requiresApprovedTask": true,
+        "sourceArtifactKind": "LAB_DSL",
+        "schemaValidated": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.labTemplateImportPreview",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceTaskStatus",
+          "sourceArtifactKind",
+          "schemaValidated",
+          "labTemplateDraft",
+          "importPlan",
+          "safety"
+        ],
+        "component": "LabTemplateImportPreview",
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "lab_template",
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_exam_question_import_preview",
+      "description": "Create a local ExamQuestionImportPreview from an APPROVED Exam DSL review task. It writes only a local preview JSON, artifact, and audit event; it does not import to the real agent service or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/exams/import-preview"
+      },
+      "cli": "python lab_cli.py exam import-preview --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "requiresApprovedTask": true,
+        "sourceArtifactKind": "EXAM_DSL",
+        "schemaValidated": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "answerVisibleToCandidate": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.examQuestionImportPreview",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceTaskStatus",
+          "sourceArtifactKind",
+          "schemaValidated",
+          "examQuestionDraft",
+          "importPlan",
+          "safety"
+        ],
+        "component": "ExamQuestionImportPreview",
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "exam_question",
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_grading_rule_import_preview",
+      "description": "Create a local GradingRuleImportPreview from an APPROVED Grading DSL review task. It writes only a local preview JSON, artifact, and audit event; it does not import to the real agent service, execute sandbox code, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/import-preview"
+      },
+      "cli": "python lab_cli.py grade import-preview --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "requiresApprovedTask": true,
+        "sourceArtifactKind": "GRADING_DSL",
+        "schemaValidated": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "answerVisibleToCandidate": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.gradingRuleImportPreview",
+        "requiredFields": [
+          "component",
+          "mode",
+          "sourceTaskStatus",
+          "sourceArtifactKind",
+          "schemaValidated",
+          "gradingRuleDraft",
+          "importPlan",
+          "safety"
+        ],
+        "component": "GradingRuleImportPreview",
+        "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "grading_rule",
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_lab_template_mock_import",
+      "description": "Write a LabTemplateImportPreview draft into the local mock agent entity store after the source task is APPROVED and an import preview exists. It does not write the real database, call the real agent service import API, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/labs/mock-import"
+      },
+      "cli": "python lab_cli.py lab mock-import --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "requiresApprovedTask": true,
+        "requiresImportPreview": true,
+        "agentEntity": "lab_template",
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityMockImport",
+        "requiredFields": [
+          "component",
+          "mode",
+          "taskId",
+          "taskStatus",
+          "agentEntity",
+          "agentEntityRecord",
+          "sourcePreview",
+          "safety"
+        ],
+        "component": "LabTemplateMockImport",
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "lab_template",
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "create_exam_question_mock_import",
+      "description": "Write an ExamQuestionImportPreview draft into the local mock agent entity store after the source task is APPROVED and an import preview exists. Candidate-facing answers remain hidden; no real database import or publish is performed.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/exams/mock-import"
+      },
+      "cli": "python lab_cli.py exam mock-import --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "requiresApprovedTask": true,
+        "requiresImportPreview": true,
+        "agentEntity": "exam_question",
+        "answerVisibleToCandidate": false,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityMockImport",
+        "requiredFields": [
+          "component",
+          "mode",
+          "taskId",
+          "taskStatus",
+          "agentEntity",
+          "agentEntityRecord",
+          "sourcePreview",
+          "safety"
+        ],
+        "component": "ExamQuestionMockImport",
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "exam_question",
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "create_grading_rule_mock_import",
+      "description": "Write a GradingRuleImportPreview draft into the local mock agent entity store after the source task is APPROVED and an import preview exists. It does not execute a sandbox, run contestant code, write a real database, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/grading/mock-import"
+      },
+      "cli": "python lab_cli.py grade mock-import --task-id <taskId> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "requiresApprovedTask": true,
+        "requiresImportPreview": true,
+        "agentEntity": "grading_rule",
+        "sandboxRequiredBeforeRealExecution": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityMockImport",
+        "requiredFields": [
+          "component",
+          "mode",
+          "taskId",
+          "taskStatus",
+          "agentEntity",
+          "agentEntityRecord",
+          "sourcePreview",
+          "safety"
+        ],
+        "component": "GradingRuleMockImport",
+        "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+        "sourceTaskStatus": "APPROVED",
+        "agentEntity": "grading_rule",
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "get_review_detail",
+      "description": "Get one review detail view that joins an AI Task, artifacts, workflow steps, review audit events, operation audit events, and publish gating policy.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-tasks/{taskId}"
+      },
+      "cli": "python lab_cli.py review detail --task-id <taskId>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "rejectRequiresReason": true,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "answerVisibleToCandidate": false,
+        "includesReviewPageModel": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_agent_entities",
+      "description": "List local mock agent entity drafts created by local mock-import actions. It can read Backend Core SQLite when coreDbPath is provided, but it does not write a real database, call the real agent service API, or publish.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/platform-entities"
+      },
+      "cli": "python lab_cli.py platform-entity list",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_READONLY",
+        "readOnly": true,
+        "localCoreReadOnlyWhenCoreDbPathProvided": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "entityType": {
+            "type": "string"
+          },
+          "sourceTaskId": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "coreDbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.items",
+        "modeMayBe": [
+          "MOCK_ONLY",
+          "LOCAL_SQLITE_BACKEND_CORE_READONLY"
+        ],
+        "requiredFields": [
+          "items",
+          "total",
+          "filters",
+          "mode"
+        ],
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "get_agent_entity",
+      "description": "Get one local mock agent entity draft and its local import activity. It can read Backend Core SQLite when coreDbPath is provided, but it does not send a real platform request or publish.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/platform-entities/{id}"
+      },
+      "cli": "python lab_cli.py platform-entity get --id <id>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_READONLY",
+        "readOnly": true,
+        "localCoreReadOnlyWhenCoreDbPathProvided": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "coreDbPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityRecord",
+        "activityPath": "data.agentEntityImportActivity",
+        "requiredFields": [
+          "agentEntityRecord",
+          "agentEntityImportActivity",
+          "mode"
+        ],
+        "readOnly": true,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "validate_agent_entity_contract",
+      "description": "Validate the local platform contract mapping file used by import-dry-run. This is local config validation only; it never reads platform tokens, sends network requests, or imports into a real platform.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/contract-validate"
+      },
+      "cli": "python lab_cli.py platform-entity contract-validate --contract-config <contractConfig>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_API_CONTRACT_VALIDATION",
+        "readOnly": true,
+        "localConfigOnly": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "networkAccess": false,
+        "requestSent": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "contractConfig"
+        ],
+        "properties": {
+          "contractConfig": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.platformApiContractValidation",
+        "mode": "LOCAL_PLATFORM_API_CONTRACT_VALIDATION",
+        "requiredFields": [
+          "platformApiContractValidation",
+          "mode",
+          "contractConfigPath"
+        ],
+        "localConfigOnly": true,
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "databaseWritten": false,
+        "productionDatabaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "get_agent_entity_readiness_report",
+      "description": "Read the local platform entity readiness report for Lab, Exam, and Grading mock imports. It only checks local import previews and mock platform entity records; it does not write a real database, call the real agent service import API, or publish.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/platform-entities/readiness-report"
+      },
+      "cli": "python lab_cli.py platform-entity readiness-report --source-task-id <sourceTaskId>",
+      "safety": {
+        "mode": "LOCAL_AGENT_ENTITY_READINESS_REPORT",
+        "readOnly": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "sourceTaskId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityReadinessReport",
+        "requiredFields": [
+          "component",
+          "mode",
+          "items",
+          "summary",
+          "safety"
+        ],
+        "component": "AgentEntityReadinessReport",
+        "mode": "LOCAL_AGENT_ENTITY_READINESS_REPORT",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "readOnly": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "summaryFields": [
+          "agentEntitySignoffReadyTotal",
+          "agentEntitySignoffRecordedTotal",
+          "allPlatformEntitiesReadyForSignoff",
+          "allPlatformEntitiesSignoffRecorded",
+          "postSignoffPrePublishReadyTotal",
+          "allPostSignoffPrePublishReady"
+        ],
+        "itemFields": [
+          "signoffState",
+          "readyForAgentEntitySignoff",
+          "signoffRecorded",
+          "latestSignoffArtifactId",
+          "postSignoffPrePublishChecklist"
+        ],
+        "signoffReadyMeans": "ready for manual signoff action and not yet signed",
+        "signoffRecordedMeans": "local AgentEntitySignoffRecord already exists",
+        "postSignoffPrePublishChecklistMeans": "read-only final human review checklist before any real publish planning"
+      }
+    },
+    {
+      "name": "get_core_workflow_readiness",
+      "description": "Read the single-task core workflow readiness report that joins review status, content-quality readiness, platform entity readiness, Grading evidence readiness, and pre-approve decision-note signals. When generated DSL content must be revised before import preview, the report recommends a manual revision request before approve/import steps. It does not approve, import, publish, call a real LLM, execute a sandbox, or access secrets.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-tasks/{taskId}/core-readiness"
+      },
+      "cli": "python lab_cli.py review core-readiness --task-id <taskId>",
+      "safety": {
+        "mode": "CORE_WORKFLOW_READINESS_READ_ONLY",
+        "readOnly": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "sandboxExecutedByReport": false,
+        "contestantCodeExecutedByReport": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "AI Task id to summarize."
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.coreWorkflowReadinessReport",
+        "component": "CoreWorkflowReadinessReport",
+        "mode": "CORE_WORKFLOW_READINESS_READ_ONLY",
+        "requiredFields": [
+          "component",
+          "mode",
+          "taskId",
+          "taskStatus",
+          "status",
+          "ready",
+          "recommendedNextAction",
+          "summary",
+          "steps",
+          "blockedSteps",
+          "platformImportPreviewActionSummary",
+          "nextToolRecommendation",
+          "safety"
+        ],
+        "summaryPath": "data.coreWorkflowReadinessReport.summary",
+        "finalReviewStatePath": "data.coreWorkflowReadinessReport.summary.finalReviewState",
+        "stepsPath": "data.coreWorkflowReadinessReport.steps",
+        "blockedStepsPath": "data.coreWorkflowReadinessReport.blockedSteps",
+        "platformImportPreviewActionSummaryPath": "data.coreWorkflowReadinessReport.platformImportPreviewActionSummary",
+        "platformImportPreviewActionSummaryFields": [
+          "pendingPreviewTotal",
+          "pendingPlatformEntities",
+          "pendingPreviewComponents",
+          "pendingCliCommands",
+          "pendingNextRequiredActions",
+          "contentQualityReadyTotal",
+          "contentQualityBlockedTotal"
+        ],
+        "nextToolRecommendationPath": "data.coreWorkflowReadinessReport.nextToolRecommendation",
+        "nextToolRecommendationFields": [
+          "reasonCode",
+          "actionType",
+          "recommendedNextAction",
+          "finalReviewState",
+          "toolName",
+          "toolAvailable",
+          "autoExecuteAllowed",
+          "autoApproveAllowed",
+          "autoPublishAllowed",
+          "realPublishAllowed"
+        ],
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "create_agent_entity_import_dry_run",
+      "description": "Build a dry-run DTO for a future real platform draft import API call from a local mock agent entity record. It writes only a local report and audit event; it does not send the request, read secrets, write a real database, or publish.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/import-dry-run"
+      },
+      "cli": "python lab_cli.py platform-entity import-dry-run --id <id> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "REAL_PLATFORM_IMPORT_DRY_RUN_ONLY",
+        "requiresMockImport": true,
+        "manualPlatformReviewRequired": true,
+        "dryRunOnly": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "requestSent": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "contractConfig": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityImportDryRun",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "targetEndpoint",
+          "requestPreview",
+          "validation",
+          "safety"
+        ],
+        "component": "AgentEntityImportDryRun",
+        "mode": "REAL_PLATFORM_IMPORT_DRY_RUN_ONLY",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "dryRunOnly": true,
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "agent_internal_publish_request",
+      "description": "Send one reviewed platform entity import dry-run payload to a configured real platform draft import API endpoint. It requires explicit confirmation flags, reads the platform token only from the environment, never returns token values, and still requires platform-side manual review before publishing.",
+      "riskLevel": "high",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/import-send"
+      },
+      "cli": "python lab_cli.py platform-entity import-send --id <id> --reviewer <reviewer> --dry-run <dryRun> --output <output> --explicit-platform-call-opt-in --confirm-dry-run-reviewed --confirm-manual-platform-review --confirm-no-auto-publish",
+      "safety": {
+        "mode": "REAL_PLATFORM_IMPORT_REQUEST_SENT",
+        "requiresMockImport": true,
+        "requiresDryRun": true,
+        "requiresExplicitPlatformCallOptIn": true,
+        "confirmDryRunReviewed": true,
+        "manualPlatformReviewRequired": true,
+        "requestSent": true,
+        "networkAccess": true,
+        "secretsRead": true,
+        "secretValueReturned": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer",
+          "dryRun",
+          "explicitPlatformCallOptIn",
+          "confirmDryRunReviewed",
+          "confirmManualPlatformReview",
+          "confirmNoAutoPublish"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "dryRun": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "timeoutSeconds": {
+            "type": "integer"
+          },
+          "maxRetries": {
+            "type": "integer"
+          },
+          "createDryRunIfMissing": {
+            "type": "boolean"
+          },
+          "dryRunOutput": {
+            "type": "string"
+          },
+          "contractConfig": {
+            "type": "string"
+          },
+          "explicitPlatformCallOptIn": {
+            "type": "boolean"
+          },
+          "confirmDryRunReviewed": {
+            "type": "boolean"
+          },
+          "confirmManualPlatformReview": {
+            "type": "boolean"
+          },
+          "confirmNoAutoPublish": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityImportSendResult",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "targetEndpoint",
+          "request",
+          "response",
+          "env",
+          "safety"
+        ],
+        "component": "AgentEntityImportSendResult",
+        "mode": "REAL_PLATFORM_IMPORT_REQUEST_SENT",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "requestSent": true,
+        "networkAccess": true,
+        "secretsRead": true,
+        "secretValueReturned": false,
+        "databaseWrittenByLocalSystem": false,
+        "manualPlatformReviewRequired": true,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "record_agent_entity_publish_result",
+      "description": "Record a human-reviewed platform-side draft import result after a platform entity import request has been sent. It only writes local audit/result records, does not query the platform, does not return secrets, and does not publish anything.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/import-result"
+      },
+      "cli": "python lab_cli.py platform-entity import-result --id <id> --reviewer <reviewer> --send-result <sendResult> --platform-status <status> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_IMPORT_RESULT_RECORD",
+        "requiresSentImportRequest": true,
+        "manualPlatformReviewRequired": true,
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "mockStoreUpdated": true,
+        "databaseWrittenByLocalSystem": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer",
+          "sendResult",
+          "agentStatus"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "sendResult": {
+            "type": "string"
+          },
+          "agentStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING_MANUAL_PLATFORM_REVIEW",
+              "ACCEPTED_FOR_DRAFT",
+              "REJECTED_BY_PLATFORM",
+              "FAILED"
+            ]
+          },
+          "agentDraftId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityImportResultRecord",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "agentStatus",
+          "localEntityStatus",
+          "summary",
+          "safety"
+        ],
+        "component": "AgentEntityImportResultRecord",
+        "mode": "LOCAL_PLATFORM_IMPORT_RESULT_RECORD",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "mockStoreUpdated": true,
+        "databaseWrittenByLocalSystem": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "query_agent_publish_status",
+      "description": "Read the platform-side status for one previously sent draft import request. It sends one read-only GET request to the configured platform API, reads the platform token only from the environment, never returns token values, does not mutate local entity status, and still requires a separate human result record step.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/import-status"
+      },
+      "cli": "python lab_cli.py platform-entity import-status --id <id> --reviewer <reviewer> --send-result <sendResult> --output <output> --explicit-platform-query-opt-in",
+      "safety": {
+        "mode": "REAL_PLATFORM_IMPORT_STATUS_QUERY",
+        "requiresSentImportRequest": true,
+        "readOnlyToPlatform": true,
+        "requestSent": true,
+        "networkAccess": true,
+        "secretsRead": true,
+        "secretValueReturned": false,
+        "mockStoreUpdated": false,
+        "databaseWrittenByLocalSystem": false,
+        "manualResultRecordRequired": true,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer",
+          "sendResult",
+          "explicitPlatformQueryOptIn"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "sendResult": {
+            "type": "string"
+          },
+          "agentDraftId": {
+            "type": "string"
+          },
+          "statusPathTemplate": {
+            "type": "string"
+          },
+          "contractConfig": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "timeoutSeconds": {
+            "type": "integer"
+          },
+          "maxRetries": {
+            "type": "integer"
+          },
+          "output": {
+            "type": "string"
+          },
+          "explicitPlatformQueryOptIn": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntityImportStatusQuery",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "agentDraftId",
+          "agentStatus",
+          "suggestedImportResultStatus",
+          "request",
+          "response",
+          "summary",
+          "safety"
+        ],
+        "component": "AgentEntityImportStatusQuery",
+        "mode": "REAL_PLATFORM_IMPORT_STATUS_QUERY",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "requestSent": true,
+        "networkAccess": true,
+        "secretsRead": true,
+        "secretValueReturned": false,
+        "mockStoreUpdated": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "record_agent_entity_signoff",
+      "description": "Record a local human signoff for a platform entity after draft import result review. It writes only local signoff artifacts and audit records; it does not call the platform, approve generated content, or publish anything.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/signoff"
+      },
+      "cli": "python lab_cli.py platform-entity signoff --id <id> --reviewer <reviewer> --output <output>",
+      "safety": {
+        "mode": "LOCAL_PLATFORM_ENTITY_SIGNOFF_RECORD",
+        "requiresAgentEntityReadyForSignoff": true,
+        "manualPlatformReviewRequired": true,
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "mockStoreUpdated": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.agentEntitySignoffRecord",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "signoffState",
+          "manualSignoffChecklist",
+          "summary",
+          "safety"
+        ],
+        "component": "AgentEntitySignoffRecord",
+        "mode": "LOCAL_PLATFORM_ENTITY_SIGNOFF_RECORD",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "name": "record_final_publish_review_decision",
+      "description": "Record a local final human review decision after platform entity signoff. It does not execute or authorize real publish; it only writes a local final-review artifact and audit event.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/platform-entities/{id}/final-publish-review-decision"
+      },
+      "cli": "python lab_cli.py platform-entity final-publish-review-decision --id <id> --reviewer <reviewer> --decision <decision> --output <output> --confirm-no-auto-publish --confirm-no-real-publish --confirm-final-human-review",
+      "safety": {
+        "mode": "LOCAL_FINAL_HUMAN_PUBLISH_REVIEW_DECISION",
+        "requiresAgentEntitySignoff": true,
+        "requiresFinalHumanReview": true,
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "publishExecuted": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id",
+          "reviewer",
+          "decision",
+          "confirmNoAutoPublish",
+          "confirmNoRealPublish",
+          "confirmFinalHumanReview"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVED_FOR_PUBLISH_PLANNING",
+              "NEEDS_REVISION"
+            ]
+          },
+          "comment": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "confirmNoAutoPublish": {
+            "type": "boolean"
+          },
+          "confirmNoRealPublish": {
+            "type": "boolean"
+          },
+          "confirmFinalHumanReview": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.finalPublishReviewDecision",
+        "requiredFields": [
+          "component",
+          "mode",
+          "agentEntityId",
+          "entityType",
+          "decision",
+          "postSignoffPrePublishStatus",
+          "summary",
+          "safety"
+        ],
+        "component": "FinalPublishReviewDecision",
+        "mode": "LOCAL_FINAL_HUMAN_PUBLISH_REVIEW_DECISION",
+        "agentEntities": [
+          "lab_template",
+          "exam_question",
+          "grading_rule",
+          "ppt_deck"
+        ],
+        "requestSent": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretValueReturned": false,
+        "databaseWrittenByLocalSystem": false,
+        "autoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "publishExecuted": false
+      }
+    },
+    {
+      "name": "request_review_revision",
+      "description": "Record reviewer feedback requesting revisions for a WAITING_REVIEW task. It does not change task status, call a real LLM, or publish anything.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review-tasks/{taskId}/revision-request"
+      },
+      "cli": "python lab_cli.py review revision-request --task-id <taskId> --reviewer <reviewer> --comment <comment>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "requiresWaitingReviewTask": true,
+        "taskStatusChanged": false,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "bypassReviewEnabled": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer",
+          "comment"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "HIGH"
+            ]
+          },
+          "targetSections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requestedChanges": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data",
+        "requiredFields": [
+          "task",
+          "revisionRequest",
+          "operationAuditEvent",
+          "safety"
+        ],
+        "revisionRequestFields": [
+          "id",
+          "taskId",
+          "reviewer",
+          "comment",
+          "priority",
+          "targetSections",
+          "requestedChanges",
+          "taskStatusChanged",
+          "newLlmRequestSent"
+        ],
+        "statusChangeAllowed": false,
+        "realLlmCallAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "regenerate_from_revision_mock",
+      "description": "Create a new WAITING_REVIEW mock revision task from the latest or selected review revision request. It reuses local DSL artifacts and does not call a real LLM.",
+      "riskLevel": "medium",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/review-tasks/{taskId}/regenerate-mock"
+      },
+      "cli": "python lab_cli.py review regenerate-mock --task-id <taskId> --reviewer <reviewer>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "sourceTaskStatusChanged": false,
+        "newTaskCreated": true,
+        "newLlmRequestSent": false,
+        "realLlmCalled": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "bypassReviewEnabled": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "reviewer"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "revisionRequestId": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": {
+        "dataPath": "data.mockRegeneration",
+        "requiredFields": [
+          "sourceTask",
+          "newTask",
+          "revisionRequest",
+          "artifact",
+          "workflowRun",
+          "operationAuditEvent",
+          "dsl",
+          "dslPath",
+          "safety"
+        ],
+        "newTaskStatus": "WAITING_REVIEW",
+        "sourceTaskStatusUnchanged": true,
+        "artifactStatus": "WAITING_REVIEW",
+        "realLlmCallAllowed": false,
+        "realPublishAllowed": false
+      }
+    },
+    {
+      "name": "get_second_confirmation_status",
+      "description": "Read the mock second-confirmation status for a critical high-risk MCP review intent. It does not confirm or execute anything.",
+      "riskLevel": "critical",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-tasks/{taskId}/second-confirmation-status"
+      },
+      "cli": "python lab_cli.py review second-confirmation-status --task-id <taskId>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "readOnly": true,
+        "reviewIntentOnly": true,
+        "requiresSecondConfirmation": true,
+        "secondConfirmationSatisfied": false,
+        "confirmationActionAvailable": false,
+        "confirmationEndpointEnabled": false,
+        "executeRealActionAllowed": false,
+        "destroyRealEnvironmentEnabled": false,
+        "environmentDestroyed": false,
+        "realCloudResourceChanged": false,
+        "realActionExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "bypassReviewEnabled": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_review_audit_events",
+      "description": "List local review audit events for approve, reject, and mock publish actions.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-audit-events"
+      },
+      "cli": "python lab_cli.py review audit",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_operation_audit_events",
+      "description": "List local operation audit events for review, environment, and mock grading actions.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/audit-events"
+      },
+      "cli": "python lab_cli.py audit list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "resourceType": {
+            "type": "string"
+          },
+          "resourceId": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_workflow_runs",
+      "description": "List local Phase 1 workflow run logs with step-level trace details.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/workflow-runs"
+      },
+      "cli": "python lab_cli.py workflow list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "workflowId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_artifacts",
+      "description": "List local Phase 1 artifact manifest records for material analysis, DSL outputs, and mock reports.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/artifacts"
+      },
+      "cli": "python lab_cli.py artifact list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "workflowRunId": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_artifact",
+      "description": "Get one local Phase 1 artifact manifest record by id.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/artifacts/{id}"
+      },
+      "cli": "python lab_cli.py artifact get --id <id>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_workflow_run",
+      "description": "Get one local Phase 1 workflow run log by id.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/workflow-runs/{id}"
+      },
+      "cli": "python lab_cli.py workflow get --id <id>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_workflows",
+      "description": "List Phase 2 Mock workflow capabilities from the local registry. This only discovers workflows and does not execute them.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/workflow-registry"
+      },
+      "cli": "python lab_cli.py workflow registry list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "workflowExecuted": false,
+        "taskCreated": false,
+        "artifactCreated": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "category": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_workflow",
+      "description": "Get one Phase 2 Mock workflow capability and its contract from the local registry. This only discovers the workflow and does not execute it.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/workflow-registry/{workflowId}"
+      },
+      "cli": "python lab_cli.py workflow registry get --workflow-id <workflowId>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "workflowExecuted": false,
+        "taskCreated": false,
+        "artifactCreated": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "workflowId"
+        ],
+        "properties": {
+          "workflowId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_providers",
+      "description": "List Phase 1 provider registry. Only the deterministic MockProvider is enabled.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/providers"
+      },
+      "cli": "python lab_cli.py provider list",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "activeProvider": "mock",
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_provider_health",
+      "description": "Read MockProvider health without contacting a real model provider.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/providers/mock/health"
+      },
+      "cli": "python lab_cli.py provider health --provider mock",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "activeProvider": "mock",
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "provider": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "mock_provider_generate",
+      "description": "Generate a deterministic local DSL reference through MockProvider. The result stays WAITING_REVIEW.",
+      "riskLevel": "low",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/providers/mock/generate"
+      },
+      "cli": "python lab_cli.py provider mock-generate --prompt-id <promptId>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "promptId"
+        ],
+        "properties": {
+          "promptId": {
+            "type": "string"
+          },
+          "outputKind": {
+            "type": "string"
+          },
+          "inputRef": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_provider_audit_events",
+      "description": "List local Provider Adapter call audit events for registry, health, direct mock generate, and workflow generation steps.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/provider-audit-events"
+      },
+      "cli": "python lab_cli.py provider audit",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "providerId": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "promptId": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_mcp_tool_call_records",
+      "description": "List local MCP Tool mock call records for success, validation failure, and Backend Mock failure paths.",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "backend": {
+        "method": "GET",
+        "path": "/api/mcp-tool-call-records"
+      },
+      "cli": "python lab_cli.py mcp audit",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "argumentPreviewRedactsSecrets": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "toolName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "backendPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "create_vm_environment",
+      "description": "Create a local mock VM environment record. No cloud resource is created.",
+      "riskLevel": "high",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/environments/vm"
+      },
+      "cli": "python lab_cli.py env create --type vm --title <title> --image <image>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realCloudResourceCreated": false,
+        "futureRealActionRequiresReview": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "title",
+          "image"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "create_notebook_environment",
+      "description": "Create a local mock Notebook environment record. No cloud resource is created.",
+      "riskLevel": "high",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/environments/notebook"
+      },
+      "cli": "python lab_cli.py env create --type notebook --title <title> --image <image>",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "realCloudResourceCreated": false,
+        "futureRealActionRequiresReview": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "title",
+          "image"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "publish_lab",
+      "description": "Create a high-risk review intent for publishing a Lab. It does not publish anything.",
+      "riskLevel": "high",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/publish-lab"
+      },
+      "cli": "python lab_cli.py mcp call --tool publish_lab --arguments {\"labId\":\"<labId>\",\"reason\":\"<reason>\"}",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "labId",
+          "reason"
+        ],
+        "properties": {
+          "labId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "publish_exam",
+      "description": "Create a high-risk review intent for publishing an Exam. It does not publish anything.",
+      "riskLevel": "high",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/publish-exam"
+      },
+      "cli": "python lab_cli.py mcp call --tool publish_exam --arguments {\"examId\":\"<examId>\",\"reason\":\"<reason>\"}",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "examId",
+          "reason"
+        ],
+        "properties": {
+          "examId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "destroy_environment",
+      "description": "Create a critical review intent for destroying an environment. It does not destroy any resource.",
+      "riskLevel": "critical",
+      "reviewRequired": true,
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/destroy-environment"
+      },
+      "cli": "python lab_cli.py mcp call --tool destroy_environment --arguments {\"environmentId\":\"<environmentId>\",\"reason\":\"<reason>\"}",
+      "safety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": true,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false,
+        "realCloudResourceChanged": false,
+        "environmentDestroyed": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "environmentId",
+          "reason"
+        ],
+        "properties": {
+          "environmentId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}

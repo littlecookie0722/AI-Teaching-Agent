@@ -1,0 +1,60 @@
+version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_controlled_command_sandbox_demo"
+  title: "Controlled Command Sandbox Demo Grading"
+  sourceExamId: "exam_demo"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 100
+  timeoutSeconds: 30
+  assessmentPlan:
+    - checkId: "check_stdout_accuracy"
+      type: "stdout_contains"
+      runner: "StdoutContainsGrader"
+      score: 40
+      inputSummary: "Run python main.py in a controlled Docker sandbox and match stdout"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "medium"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_pytest"
+      type: "pytest"
+      runner: "PytestGrader"
+      score: 60
+      inputSummary: "Run pytest checks/check_main.py in a controlled Docker sandbox"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "medium"
+      sandboxRequiredBeforeRealExecution: true
+  checks:
+    - id: "check_stdout_accuracy"
+      type: "stdout_contains"
+      command: "python main.py"
+      expected:
+        - "accuracy=0.90"
+      score: 40
+    - id: "check_pytest"
+      type: "pytest"
+      path: "checks/check_main.py"
+      score: 60

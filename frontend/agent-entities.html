@@ -1,0 +1,2084 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Platform Entity Mock Store</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --line: #d8dee9;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .section-head p {
+      overflow-wrap: anywhere;
+    }
+
+    .pill-row,
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill,
+    button {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .pill.strong,
+    button[aria-pressed="true"] {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    button {
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      min-height: 34px;
+      padding: 7px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f3f4f6;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .readiness-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .import-stepper-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metric,
+    .readiness-card,
+    .step-card,
+    .entity-row,
+    .detail-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric,
+    .readiness-card,
+    .step-card {
+      min-height: 82px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .readiness-card span,
+    .step-card span,
+    .entity-row span,
+    .detail-card span {
+      display: block;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .metric strong,
+    .readiness-card strong,
+    .step-card strong,
+    .entity-row strong,
+    .detail-card strong {
+      display: block;
+      min-width: 0;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .content-grid > * {
+      min-width: 0;
+    }
+
+    .entity-list,
+    .detail-stack {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .detail-stack > *,
+    .detail-card > *,
+    .pill-row > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .entity-row {
+      box-sizing: border-box;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(140px, 0.55fr) minmax(140px, 0.55fr);
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+      white-space: normal;
+    }
+
+    .entity-row span,
+    .entity-row strong {
+      max-width: 100%;
+      white-space: normal;
+    }
+
+    .entity-row:hover,
+    .entity-row[aria-current="true"] {
+      border-color: #5eead4;
+      background: #f0fdfa;
+    }
+
+    .detail-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      overflow-x: hidden;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 260px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    @media (max-width: 960px) {
+      header,
+      .section-head {
+        display: grid;
+      }
+
+      .summary-grid,
+      .content-grid,
+      .import-stepper-grid,
+      .entity-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>平台实体草稿 Mock Store</h1>
+      <p>只读查看 Lab / Exam / Grading 本地草稿，不写真实数据库、不调用真实平台导入、不发布。</p>
+    </div>
+    <div class="pill-row" aria-label="安全边界">
+      <span class="pill strong" id="platform-entity-api-status">STATIC_HTML_FALLBACK</span>
+      <span class="pill">GET /api/platform-entities</span>
+      <span class="pill">GET /api/platform-entities/{id}</span>
+      <span class="pill">GET /api/platform-entities/readiness-report</span>
+      <span class="pill">POST /api/platform-entities/contract-validate</span>
+      <span class="pill blocked">realAgentImport=false</span>
+      <span class="pill blocked">realPublish=false</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">实体草稿概览</h2>
+          <p id="platform-entity-api-source">source=frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary</p>
+        </div>
+        <div class="filters" aria-label="实体类型筛选">
+          <button type="button" data-entity-filter="all" aria-pressed="true">全部</button>
+          <button type="button" data-entity-filter="lab_template" aria-pressed="false">Lab</button>
+          <button type="button" data-entity-filter="exam_question" aria-pressed="false">Exam</button>
+          <button type="button" data-entity-filter="grading_rule" aria-pressed="false">Grading</button>
+          <button type="button" data-entity-filter="ppt_deck" aria-pressed="false">PPT</button>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>草稿总数</span>
+          <strong id="platform-entity-total">0</strong>
+        </div>
+        <div class="metric">
+          <span>Lab Template</span>
+          <strong id="platform-entity-lab-total">0</strong>
+        </div>
+        <div class="metric">
+          <span>Exam Question</span>
+          <strong id="platform-entity-exam-total">0</strong>
+        </div>
+        <div class="metric">
+          <span>Grading Rule</span>
+          <strong id="platform-entity-grading-total">0</strong>
+        </div>
+        <div class="metric">
+          <span>PPT Deck</span>
+          <strong id="platform-entity-ppt-total">0</strong>
+        </div>
+        <div class="metric">
+          <span>真实发布</span>
+          <strong id="platform-entity-real-publish">false</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="readiness-title">
+      <div class="section-head">
+        <div>
+          <h2 id="readiness-title">平台导入核查报告</h2>
+          <p id="platform-entity-readiness-source">source=GET /api/platform-entities/readiness-report · waiting for read-only readiness report</p>
+        </div>
+        <span class="pill strong" id="platform-entity-readiness-summary">ready=0/4</span>
+      </div>
+      <div class="readiness-grid" id="platform-entity-readiness-items">
+        <div class="readiness-card">
+          <span>waiting for readiness report</span>
+          <strong>readOnly=true</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="prepare-demo-title">
+      <div class="section-head">
+        <div>
+          <h2 id="prepare-demo-title">准备演示草稿</h2>
+          <p id="platform-demo-prepare-summary">AgentEntityDemoDataPrepareAction · import-preview -> mock-import -> import-dry-run · requires APPROVED task</p>
+        </div>
+        <span class="pill strong" id="platform-demo-prepare-status">WAITING_INPUT</span>
+      </div>
+      <div class="content-grid">
+        <div class="detail-stack">
+          <div class="detail-card">
+            <h3>从已审核任务生成本地草稿</h3>
+            <span>entityKind</span>
+            <select id="platform-demo-prepare-kind" aria-label="prepare demo entity kind">
+              <option value="lab">Lab Template</option>
+              <option value="exam">Exam Question</option>
+              <option value="grading">Grading Rule</option>
+            </select>
+            <span>approvedTaskCandidate</span>
+            <select id="platform-demo-prepare-task-select" aria-label="approved task candidate">
+              <option value="">load approved tasks first</option>
+            </select>
+            <span>taskId</span>
+            <input id="platform-demo-prepare-task-id" type="text" value="" placeholder="approved task id, optional from sourceTaskId query" aria-label="approved source task id">
+            <span>reviewer</span>
+            <input id="platform-demo-prepare-reviewer" type="text" value="teacher_ui" aria-label="prepare demo reviewer">
+            <div class="pill-row">
+              <span class="pill">GET /api/ai-tasks?status=APPROVED&amp;taskType={taskType}</span>
+              <span class="pill">POST /api/labs/import-preview</span>
+              <span class="pill">POST /api/labs/mock-import</span>
+              <span class="pill">POST /api/exams/import-preview</span>
+              <span class="pill">POST /api/exams/mock-import</span>
+              <span class="pill">POST /api/grading/import-preview</span>
+              <span class="pill">POST /api/grading/mock-import</span>
+              <span class="pill blocked">autoApproveAllowed=false</span>
+              <span class="pill blocked">realPublish=false</span>
+            </div>
+            <button type="button" id="platform-demo-load-approved-tasks-button">加载已审核任务</button>
+            <button type="button" id="platform-demo-prepare-button">准备预览、Mock 入库与 Dry-run</button>
+          </div>
+        </div>
+        <pre id="platform-demo-prepare-preview">choose an approved task, then prepare local platform draft demo data</pre>
+      </div>
+    </section>
+
+    <section aria-labelledby="entities-title">
+      <div class="section-head">
+        <div>
+          <h2 id="entities-title">本地实体草稿</h2>
+          <p id="platform-entity-list-summary">waiting for read-only entity list</p>
+        </div>
+        <span class="pill strong" id="platform-entity-selected-id">selected=none</span>
+      </div>
+      <div class="content-grid">
+        <div class="entity-list" id="platform-entity-list">
+          <button type="button" class="entity-row">
+            <strong>waiting for platform entity records</strong>
+            <span>entityType=none</span>
+            <span>status=none</span>
+          </button>
+        </div>
+        <div class="detail-stack">
+          <div class="detail-card">
+            <h3>详情摘要</h3>
+            <p id="platform-entity-detail-summary">source=GET /api/platform-entities/{id} · waiting for selection</p>
+            <div class="pill-row" id="platform-entity-detail-pills">
+              <span class="pill">mockStoreWritten=false</span>
+              <span class="pill blocked">databaseWritten=false</span>
+              <span class="pill blocked">realAgentImport=false</span>
+            </div>
+          </div>
+          <div class="detail-card" id="platform-paused-backend-handoff-panel">
+            <h3>AgentEntityPausedBackendHandoffNotice</h3>
+            <p id="platform-paused-backend-handoff-summary">selected=none · local_core_mvp_stop_line=import-dry-run</p>
+            <div class="pill-row" id="platform-paused-backend-handoff-pills">
+              <span class="pill strong">localOnly=true</span>
+              <span class="pill blocked">platformBackendRequired=false</span>
+              <span class="pill blocked">realPublish=false</span>
+            </div>
+            <pre id="platform-paused-backend-handoff-detail">真实平台发送、状态查询、平台侧签收和最终发布当前暂停；本页只做本地预览、mock-import 和 import-dry-run。</pre>
+          </div>
+          <pre id="platform-entity-payload-preview">payload preview will appear here</pre>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button type="button" disabled title="真实导入请求必须先通过 CLI/API dry-run 和显式确认">导入真实平台</button>
+        <button type="button" disabled title="必须人工审核并接入真实平台边界后才允许发布">发布实体</button>
+        <a class="pill strong" id="platform-review-center-return-link" href="review-center.html">返回审核中心</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="platform-import-title">
+      <div class="section-head">
+        <div>
+          <h2 id="platform-import-title">本地导入预览与暂停项</h2>
+          <p id="platform-import-action-summary">POST /api/platform-entities/contract-validate · POST /api/platform-entities/{id}/import-dry-run · platform backend handoff paused · secretVisibleInFrontend=false</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">PlatformApiContractValidateAction</span>
+          <span class="pill">AgentEntityImportDryRunAction</span>
+          <span class="pill blocked">AgentEntityPausedBackendHandoffNotice</span>
+          <span class="pill strong" id="platform-import-action-status">WAITING_ENTITY_SELECTION</span>
+        </div>
+      </div>
+      <div class="import-stepper-grid" id="platform-import-stepper">
+        <div class="step-card">
+          <span>1 · mock-import</span>
+          <strong>WAITING_ENTITY_SELECTION</strong>
+          <span>mockStoreWritten=true · databaseWritten=false</span>
+        </div>
+        <div class="step-card">
+          <span>2 · dry-run</span>
+          <strong>NOT_STARTED</strong>
+          <span>requestSent=false</span>
+        </div>
+        <div class="step-card">
+          <span>3 · review-return</span>
+          <strong>WAITING_DRY_RUN</strong>
+          <span>refreshReviewCenter=true</span>
+        </div>
+        <div class="step-card">
+          <span>4 · future-platform-handoff</span>
+          <strong>PAUSED</strong>
+          <span>agentApiRequired=false</span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="detail-stack">
+          <div class="detail-card">
+            <h3>本地平台契约校验</h3>
+            <span>contractConfig</span>
+            <input id="platform-contract-config" type="text" value="examples/input/platform-contract.json" aria-label="platform contract config path">
+            <div class="pill-row">
+              <span class="pill strong">localConfigOnly=true</span>
+              <span class="pill blocked">requestSent=false</span>
+              <span class="pill blocked">secretsRead=false</span>
+            </div>
+            <button type="button" id="platform-contract-validate-button">校验平台契约配置</button>
+          </div>
+          <div class="detail-card">
+            <h3>生成导入 Dry-run</h3>
+            <span>dryRunOutput</span>
+            <input id="platform-import-dry-run-output" type="text" value="examples/output/platform-entity-import-dry-run.json" aria-label="dry run output path">
+            <input id="platform-import-dry-run" type="hidden" value="examples/output/platform-entity-import-dry-run.json" aria-label="dry run path">
+            <span>reviewer</span>
+            <input id="platform-import-reviewer" type="text" value="teacher_ui" aria-label="reviewer">
+            <div class="pill-row">
+              <span class="pill strong">dryRunOnly=true</span>
+              <span class="pill">contractConfig=examples/input/platform-contract.json</span>
+              <span class="pill blocked">requestSent=false</span>
+              <span class="pill blocked">realAgentImport=false</span>
+            </div>
+            <button type="button" id="platform-import-dry-run-button">生成导入 Dry-run</button>
+          </div>
+          <div class="detail-card">
+            <h3>真实平台对接暂停</h3>
+            <div class="pill-row">
+              <span class="pill blocked">importSendEnabled=false</span>
+              <span class="pill blocked">importStatusQueryEnabled=false</span>
+              <span class="pill blocked">platformSignoffEnabled=false</span>
+              <span class="pill blocked">finalPublishEnabled=false</span>
+              <span class="pill blocked">secretInputInFrontend=false</span>
+            </div>
+            <p>当前停止线是本地 mock-import 和 import-dry-run DTO。真实平台 API base URL、平台 token、平台状态查询、平台侧签收和真实发布由后续对接团队处理。</p>
+          </div>
+        </div>
+        <pre id="platform-import-action-preview">select an entity, then validate contract or create local import dry-run</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var state = {
+        filter: "all",
+        entities: [],
+        selectedId: "",
+        selectedEntity: null,
+        requestedEntityId: "",
+        requestedSourceTaskId: "",
+        requestedEntityKind: "",
+        requestedAction: "",
+        coreDbPath: "",
+        gradingDbPath: "",
+        agentReport: "",
+        readinessReport: null,
+        approvedTaskCandidates: [],
+        latestStatusQuery: null,
+        latestContractValidation: null,
+        loadedFromFallback: false
+      };
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function setText(id, value) {
+        var node = byId(id);
+        if (node) {
+          node.textContent = String(value);
+        }
+      }
+
+      function boolText(value) {
+        return value === true ? "true" : "false";
+      }
+
+      function safeFetchJson(url) {
+        return fetch(url, {
+          method: "GET",
+          headers: { "Accept": "application/json" },
+          credentials: "same-origin"
+        }).then(function (response) {
+          if (!response.ok) {
+            throw new Error("HTTP_" + response.status);
+          }
+          return response.json();
+        });
+      }
+
+      function safePostJson(url, body) {
+        return fetch(url, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          credentials: "same-origin",
+          body: JSON.stringify(body || {})
+        }).then(function (response) {
+          return response.json().then(function (payload) {
+            if (!response.ok || !payload.success) {
+              var error = new Error(payload.message || ("HTTP_" + response.status));
+              error.payload = payload;
+              throw error;
+            }
+            return payload;
+          });
+        });
+      }
+
+      function appendQuery(url, values) {
+        var query = [];
+        Object.keys(values || {}).forEach(function (key) {
+          var value = values[key];
+          if (value !== undefined && value !== null && String(value) !== "") {
+            query.push(encodeURIComponent(key) + "=" + encodeURIComponent(String(value)));
+          }
+        });
+        if (!query.length) {
+          return url;
+        }
+        return url + (url.indexOf("?") >= 0 ? "&" : "?") + query.join("&");
+      }
+
+      function withCoreDbQuery(url) {
+        return appendQuery(url, { coreDbPath: state.coreDbPath });
+      }
+
+      function withReadinessQuery(url) {
+        return appendQuery(url, {
+          sourceTaskId: state.requestedSourceTaskId,
+          coreDbPath: state.coreDbPath,
+          gradingDbPath: state.gradingDbPath
+        });
+      }
+
+      function withCoreDbBody(body) {
+        var next = Object.assign({}, body || {});
+        if (state.coreDbPath) {
+          next.coreDbPath = state.coreDbPath;
+        }
+        return next;
+      }
+
+      function fieldValue(id) {
+        var node = byId(id);
+        return node ? String(node.value || "").trim() : "";
+      }
+
+      function setFieldValue(id, value) {
+        var node = byId(id);
+        if (node) {
+          node.value = value || "";
+        }
+      }
+
+      function readQuerySelection() {
+        var params = new URLSearchParams(window.location.search);
+        state.requestedEntityId = params.get("entityId") || "";
+        state.requestedSourceTaskId = params.get("sourceTaskId") || "";
+        state.requestedEntityKind = params.get("entityKind") || "";
+        state.requestedAction = params.get("action") || "";
+        state.coreDbPath = params.get("coreDbPath") || "";
+        state.gradingDbPath = params.get("gradingDbPath") || params.get("dbPath") || "";
+        state.agentReport = params.get("agentReport") || "";
+        if (state.requestedEntityId) {
+          state.selectedId = state.requestedEntityId;
+        }
+        if (state.requestedEntityKind) {
+          setFieldValue("platform-demo-prepare-kind", demoKindFromEntityKind(state.requestedEntityKind) || state.requestedEntityKind);
+        }
+        if (state.requestedSourceTaskId) {
+          setFieldValue("platform-demo-prepare-task-id", state.requestedSourceTaskId);
+        }
+        if (state.requestedAction) {
+          setText("platform-import-action-status", "PLATFORM_BACKEND_ACTION_PAUSED");
+          setText(
+            "platform-import-action-preview",
+            "requestedAction=" + state.requestedAction + " · pausedByLocalCoreMvp=true · autoPost=false · realPublish=false"
+          );
+        }
+      }
+
+      function demoPrepareConfig(kind) {
+        var configs = {
+          lab: {
+            previewApi: "/api/labs/import-preview",
+            mockImportApi: "/api/labs/mock-import",
+            previewOutput: "examples/output/lab-template-import-preview.json",
+            mockImportOutput: "examples/output/lab-template-mock-import.json",
+            dryRunOutput: "examples/output/platform-entity-lab-import-dry-run.json"
+          },
+          exam: {
+            previewApi: "/api/exams/import-preview",
+            mockImportApi: "/api/exams/mock-import",
+            previewOutput: "examples/output/exam-question-import-preview.json",
+            mockImportOutput: "examples/output/exam-question-mock-import.json",
+            dryRunOutput: "examples/output/platform-entity-exam-import-dry-run.json"
+          },
+          grading: {
+            previewApi: "/api/grading/import-preview",
+            mockImportApi: "/api/grading/mock-import",
+            previewOutput: "examples/output/grading-rule-import-preview.json",
+            mockImportOutput: "examples/output/grading-rule-mock-import.json",
+            dryRunOutput: "examples/output/platform-entity-grading-import-dry-run.json"
+          }
+        };
+        return configs[kind] || configs.lab;
+      }
+
+      function demoPrepareTaskType(kind) {
+        var types = {
+          lab: "LAB_GENERATION",
+          exam: "EXAM_GENERATION",
+          grading: "GRADING_GENERATION"
+        };
+        return types[kind] || types.lab;
+      }
+
+      function demoKindFromEntityKind(value) {
+        var kinds = {
+          lab: "lab",
+          lab_template: "lab",
+          exam: "exam",
+          exam_question: "exam",
+          grading: "grading",
+          grading_rule: "grading",
+          ppt: "ppt",
+          ppt_deck: "ppt"
+        };
+        return kinds[String(value || "").trim()] || "";
+      }
+
+      function entityTypeFromKind(value) {
+        var types = {
+          lab: "lab_template",
+          lab_template: "lab_template",
+          exam: "exam_question",
+          exam_question: "exam_question",
+          grading: "grading_rule",
+          grading_rule: "grading_rule",
+          ppt: "ppt_deck",
+          ppt_deck: "ppt_deck"
+        };
+        return types[String(value || "").trim()] || "";
+      }
+
+      function requestedEntityType() {
+        return entityTypeFromKind(state.requestedEntityKind);
+      }
+
+      function findRequestedContextEntity(items) {
+        var requestedType = requestedEntityType();
+        if (state.requestedEntityId) {
+          return items.find(function (item) {
+            return item.id === state.requestedEntityId;
+          }) || null;
+        }
+        if (state.requestedSourceTaskId) {
+          return items.find(function (item) {
+            var sourceMatched = item.sourceTaskId === state.requestedSourceTaskId;
+            var typeMatched = !requestedType || item.entityType === requestedType;
+            return sourceMatched && typeMatched;
+          }) || null;
+        }
+        if (requestedType) {
+          return items.find(function (item) {
+            return item.entityType === requestedType;
+          }) || null;
+        }
+        return null;
+      }
+
+      function requestedContextNeedsPlaceholder() {
+        return Boolean(state.requestedEntityId || state.requestedSourceTaskId);
+      }
+
+      function buildRequestedContextPlaceholderEntity() {
+        var entityType = requestedEntityType() || "agent_entity";
+        return {
+          component: "RequestedEntityPlaceholder",
+          id: "requested_entity_not_prepared",
+          entityType: entityType,
+          title: "本次任务的本地实体草稿尚未准备",
+          status: "LOCAL_ENTITY_NOT_PREPARED",
+          sourceTaskId: state.requestedSourceTaskId || "none",
+          sourceDslPath: "none",
+          sourcePreviewArtifactId: "none",
+          reviewer: "none",
+          payload: {
+            component: "RequestedEntityPlaceholder",
+            requestedEntityId: state.requestedEntityId || null,
+            requestedSourceTaskId: state.requestedSourceTaskId || null,
+            requestedEntityKind: state.requestedEntityKind || null,
+            requestedEntityType: entityType,
+            nextLocalAction: "prepare_demo_draft_or_run_mock_import",
+            note: "no matching local platform entity found for current URL context",
+            safety: {
+              databaseWritten: false,
+              realAgentImport: false,
+              requestSent: false,
+              realPublish: false
+            }
+          },
+          mockStoreWritten: false,
+          databaseWritten: false,
+          realAgentImport: false,
+          realPublishAllowed: false,
+          realPublish: false,
+          agentEntityImportActivity: null
+        };
+      }
+
+      function isRequestedContextPlaceholder(item) {
+        return Boolean(
+          item
+            && (
+              item.id === "requested_entity_not_prepared"
+              || item.status === "LOCAL_ENTITY_NOT_PREPARED"
+            )
+        );
+      }
+
+      function renderRequestedContextPlaceholder() {
+        state.selectedId = "";
+        Array.prototype.forEach.call(document.querySelectorAll("[data-entity-id]"), function (node) {
+          node.setAttribute("aria-current", "false");
+        });
+        renderDetail(buildRequestedContextPlaceholderEntity());
+      }
+
+      function renderApprovedTaskCandidates(items, sourceLabel) {
+        var select = byId("platform-demo-prepare-task-select");
+        if (!select) {
+          return;
+        }
+        select.innerHTML = "";
+        if (!items.length) {
+          var empty = document.createElement("option");
+          empty.value = "";
+          empty.textContent = "no approved tasks found";
+          select.appendChild(empty);
+          setText(
+            "platform-demo-prepare-summary",
+            sourceLabel + " · approvedTaskTotal=0 · manualTaskIdInputAllowed=true"
+          );
+          return;
+        }
+        var placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "select approved task";
+        select.appendChild(placeholder);
+        items.forEach(function (task) {
+          var option = document.createElement("option");
+          option.value = task.id || "";
+          option.textContent = (task.id || "task")
+            + " · " + (task.taskType || "TASK")
+            + " · " + (task.title || "untitled");
+          select.appendChild(option);
+        });
+        setText(
+          "platform-demo-prepare-summary",
+          sourceLabel
+            + " · approvedTaskTotal=" + items.length
+            + " · autoApproveAllowed=false"
+            + " · realPublish=false"
+        );
+      }
+
+      function handleApprovedTaskSelect() {
+        var value = fieldValue("platform-demo-prepare-task-select");
+        if (value) {
+          setFieldValue("platform-demo-prepare-task-id", value);
+        }
+      }
+
+      function loadApprovedTaskCandidates() {
+        var kind = fieldValue("platform-demo-prepare-kind") || "lab";
+        var taskType = demoPrepareTaskType(kind);
+        var url = appendQuery(
+          "/api/ai-tasks?status=APPROVED&taskType=" + encodeURIComponent(taskType),
+          { coreDbPath: state.coreDbPath }
+        );
+        var sourceLabel = "source=GET /api/ai-tasks?status=APPROVED&taskType=" + taskType
+          + (state.coreDbPath ? "&coreDbPath={path}" : "");
+        setText("platform-demo-prepare-status", "LOADING_APPROVED_TASKS");
+        return safeFetchJson(url)
+          .then(function (payload) {
+            var items = payload && payload.data && Array.isArray(payload.data.items) ? payload.data.items : [];
+            state.approvedTaskCandidates = items;
+            renderApprovedTaskCandidates(items, sourceLabel);
+            setText("platform-demo-prepare-status", items.length ? "APPROVED_TASKS_LOADED" : "NO_APPROVED_TASKS");
+            if (state.requestedSourceTaskId) {
+              setFieldValue("platform-demo-prepare-task-id", state.requestedSourceTaskId);
+            }
+          })
+          .catch(function (error) {
+            state.approvedTaskCandidates = [];
+            renderApprovedTaskCandidates([], sourceLabel + " · loadFailed=true");
+            setText("platform-demo-prepare-status", "APPROVED_TASKS_LOAD_FAILED");
+            setText("platform-demo-prepare-preview", JSON.stringify(error.payload || {
+              success: false,
+              message: error.message,
+              api: "GET /api/ai-tasks?status=APPROVED&taskType={taskType}",
+              safety: {
+                autoApproveAllowed: false,
+                realAgentImport: false,
+                realPublish: false
+              }
+            }, null, 2));
+          });
+      }
+
+      function appendPrepareStep(steps, name, payload) {
+        steps.push({
+          step: name,
+          success: payload && payload.success === true,
+          code: payload ? payload.code : "UNKNOWN",
+          traceId: payload ? payload.traceId : null,
+          dataKeys: payload && payload.data ? Object.keys(payload.data) : []
+        });
+      }
+
+      function handleDemoPrepare() {
+        var kind = fieldValue("platform-demo-prepare-kind") || "lab";
+        var taskId = fieldValue("platform-demo-prepare-task-id") || state.requestedSourceTaskId;
+        var reviewer = fieldValue("platform-demo-prepare-reviewer") || "teacher_ui";
+        var contractConfig = fieldValue("platform-contract-config") || "examples/input/platform-contract.json";
+        var config = demoPrepareConfig(kind);
+        var steps = [];
+        if (!taskId) {
+          setText("platform-demo-prepare-status", "TASK_ID_REQUIRED");
+          setText("platform-demo-prepare-preview", JSON.stringify({
+            success: false,
+            code: "TASK_ID_REQUIRED",
+            message: "需要填写已 APPROVED 的 AI Task ID",
+            safety: {
+              autoApproveAllowed: false,
+              realAgentImport: false,
+              realPublish: false
+            }
+          }, null, 2));
+          return;
+        }
+        setText("platform-demo-prepare-status", "CREATING_IMPORT_PREVIEW");
+        safePostJson(config.previewApi, withCoreDbBody({
+          taskId: taskId,
+          reviewer: reviewer,
+          output: config.previewOutput
+        }))
+          .then(function (previewPayload) {
+            appendPrepareStep(steps, "import-preview", previewPayload);
+            setText("platform-demo-prepare-status", "CREATING_MOCK_IMPORT");
+            return safePostJson(config.mockImportApi, withCoreDbBody({
+              taskId: taskId,
+              reviewer: reviewer,
+              output: config.mockImportOutput
+            }));
+          })
+          .then(function (mockImportPayload) {
+            appendPrepareStep(steps, "mock-import", mockImportPayload);
+            var record = mockImportPayload.data ? mockImportPayload.data.agentEntityRecord : null;
+            if (!record || !record.id) {
+              throw new Error("PLATFORM_ENTITY_RECORD_MISSING");
+            }
+            state.selectedId = record.id;
+            setText("platform-demo-prepare-status", "CREATING_DRY_RUN");
+            return safePostJson("/api/platform-entities/" + encodeURIComponent(record.id) + "/import-dry-run", withCoreDbBody({
+              reviewer: reviewer,
+              contractConfig: contractConfig,
+              output: config.dryRunOutput
+            })).then(function (dryRunPayload) {
+              return {
+                dryRunPayload: dryRunPayload,
+                record: record
+              };
+            });
+          })
+          .then(function (result) {
+            appendPrepareStep(steps, "import-dry-run", result.dryRunPayload);
+            setText("platform-demo-prepare-status", "DEMO_DRAFT_READY");
+            setText("platform-demo-prepare-preview", JSON.stringify({
+              kind: kind,
+              sourceTaskId: taskId,
+              selectedEntityId: result.record.id,
+              previewOutput: config.previewOutput,
+              mockImportOutput: config.mockImportOutput,
+              dryRunOutput: config.dryRunOutput,
+              contractConfig: contractConfig,
+              repositoryContext: {
+                coreDbPath: state.coreDbPath || null,
+                gradingDbPath: state.gradingDbPath || null,
+                agentReport: state.agentReport || null
+              },
+              steps: steps,
+              safety: {
+                autoApproveAllowed: false,
+                databaseWritten: false,
+                realAgentImport: false,
+                requestSent: false,
+                realPublish: false,
+                secretVisibleInFrontend: false
+              }
+            }, null, 2));
+            setFieldValue("platform-import-dry-run-output", config.dryRunOutput);
+            setFieldValue("platform-import-dry-run", config.dryRunOutput);
+            loadEntities();
+          })
+          .catch(function (error) {
+            setText("platform-demo-prepare-status", "DEMO_PREPARE_FAILED");
+            setText("platform-demo-prepare-preview", JSON.stringify(error.payload || {
+              success: false,
+              message: error.message,
+              steps: steps,
+              safety: {
+                autoApproveAllowed: false,
+                realAgentImport: false,
+                realPublish: false
+              }
+            }, null, 2));
+          });
+      }
+
+      function normalizeFromSummary(summary) {
+        var items = Array.isArray(summary.items) ? summary.items : [];
+        return items.map(function (item, index) {
+          return {
+            id: item.id || "static_entity_" + (index + 1),
+            entityType: item.entityType || "agent_entity",
+            title: item.title || item.entityType || "Local draft",
+            status: item.status || "LOCAL_DRAFT_IMPORTED",
+            sourceTaskId: item.sourceTaskId || "none",
+            sourceDslPath: item.sourceDslPath || "none",
+            sourcePreviewArtifactId: item.sourcePreviewArtifactId || "none",
+            reviewer: item.reviewer || "none",
+            payload: item.payload || item,
+            mockStoreWritten: item.mockStoreWritten === true,
+            databaseWritten: item.databaseWritten === true,
+            realAgentImport: item.realAgentImport === true,
+            realPublishAllowed: item.realPublishAllowed === true,
+            realPublish: item.realPublish === true,
+            agentEntityImportActivity: item.agentEntityImportActivity || null
+          };
+        });
+      }
+
+      function countByType(items, type) {
+        return items.filter(function (item) {
+          return item.entityType === type;
+        }).length;
+      }
+
+      function updateSummary(items) {
+        setText("platform-entity-total", items.length);
+        setText("platform-entity-lab-total", countByType(items, "lab_template"));
+        setText("platform-entity-exam-total", countByType(items, "exam_question"));
+        setText("platform-entity-grading-total", countByType(items, "grading_rule"));
+        setText("platform-entity-ppt-total", countByType(items, "ppt_deck"));
+        setText("platform-entity-real-publish", "false");
+        setText(
+          "platform-entity-list-summary",
+          "source=GET /api/platform-entities"
+            + " · total=" + items.length
+            + " · filter=" + state.filter
+            + " · mockStoreWritten=true"
+            + " · databaseWritten=false"
+            + " · realAgentImport=false"
+            + " · realPublish=false"
+        );
+      }
+
+      function filteredEntities() {
+        if (state.filter === "all") {
+          return state.entities;
+        }
+        return state.entities.filter(function (item) {
+          return item.entityType === state.filter;
+        });
+      }
+
+      function buildPostSignoffPrePublishChecklist(entityType, signoffRecorded, activitySummary) {
+        var acceptedForDraft = Boolean(activitySummary && activitySummary.acceptedForDraft);
+        var checks = [
+          {
+            id: "confirm_agent_entity_signoff_recorded",
+            label: "确认平台实体人工签收已记录",
+            matched: Boolean(signoffRecorded)
+          },
+          {
+            id: "confirm_local_preview_and_mock_import_preserved",
+            label: "确认本地预览与 mock-import 草稿仍可追溯",
+            matched: true
+          },
+          {
+            id: "confirm_platform_result_accepted_for_draft",
+            label: "确认平台结果仅为草稿接收",
+            matched: acceptedForDraft
+          },
+          {
+            id: "confirm_no_auto_publish_or_real_publish",
+            label: "确认没有自动发布或真实发布",
+            matched: true
+          },
+          {
+            id: "confirm_local_system_did_not_write_real_database",
+            label: "确认本地系统未写真实平台数据库",
+            matched: true
+          },
+          {
+            id: "confirm_final_human_publish_review_required",
+            label: "确认真实发布前仍需最终人工复核",
+            matched: Boolean(signoffRecorded)
+          }
+        ];
+        var matchedTotal = checks.filter(function (check) { return check.matched === true; }).length;
+        var ready = Boolean(signoffRecorded) && matchedTotal === checks.length;
+        var entitySpecificReviewFocus = buildEntitySpecificReviewFocus(entityType, signoffRecorded, activitySummary);
+        return {
+          component: "AgentEntityPostSignoffPrePublishChecklist",
+          mode: "LOCAL_POST_SIGNOFF_PRE_PUBLISH_REVIEW",
+          agentEntity: entityType || null,
+          visible: Boolean(signoffRecorded),
+          status: ready ? "READY_FOR_FINAL_HUMAN_PUBLISH_REVIEW" : "NEEDS_SIGNOFF_BEFORE_PRE_PUBLISH_REVIEW",
+          checks: checks,
+          matchedTotal: matchedTotal,
+          total: checks.length,
+          entitySpecificReviewFocus: entitySpecificReviewFocus,
+          nextRequiredAction: "final_human_publish_review_before_any_real_publish",
+          safety: {
+            readOnly: true,
+            databaseWritten: false,
+            realAgentImport: false,
+            autoPublishAllowed: false,
+            realPublish: false,
+            requiresFinalHumanReview: true
+          }
+        };
+      }
+
+      function buildEntitySpecificReviewFocus(entityType, signoffRecorded, activitySummary) {
+        var realPublish = Boolean(activitySummary && activitySummary.realPublish);
+        var focusByEntity = {
+          lab_template: {
+            primaryReviewFocus: "review_lab_objectives_environment_and_grading_ref_before_publish",
+            checks: [
+              { id: "verify_lab_objectives_and_steps_publishable", label: "复核实验目标、步骤和预期结果适合发布" },
+              { id: "verify_lab_environment_and_materials_resolved", label: "复核实验环境、素材路径和依赖说明可被平台承载" },
+              { id: "confirm_lab_grading_ref_and_duration_reasonable", label: "复核实验评分引用、时长和难度设置合理" }
+            ]
+          },
+          exam_question: {
+            primaryReviewFocus: "review_candidate_safe_exam_preview_and_scoring_before_publish",
+            checks: [
+              { id: "confirm_candidate_preview_hides_answers", label: "复核选手预览不展示标准答案、gradingRef 或教师专用信息" },
+              { id: "verify_question_score_and_grading_ref_coverage", label: "复核题目分值、gradingRef 覆盖和总分一致" },
+              { id: "confirm_exam_source_lab_traceable", label: "复核试题来源实验和导入草稿可追溯" }
+            ]
+          },
+          grading_rule: {
+            primaryReviewFocus: "review_grading_plan_sandbox_limits_and_evidence_before_publish",
+            checks: [
+              { id: "verify_assessment_plan_aligned_with_checks", label: "复核评分计划与 checks、分值和解释性信号一致" },
+              { id: "confirm_sandbox_limits_and_evidence_requirements", label: "复核沙箱限制、证据要求和真实执行前置条件" },
+              { id: "confirm_no_contestant_code_execution_before_publish", label: "确认发布前没有绕过沙箱执行选手代码" }
+            ]
+          },
+          ppt_deck: {
+            primaryReviewFocus: "review_ppt_deck_content_artifact_and_classroom_readiness_before_publish",
+            checks: [
+              { id: "verify_ppt_slide_plan_and_titles_publishable", label: "复核 PPT slide plan、标题和课堂讲授顺序适合发布" },
+              { id: "confirm_pptx_artifact_generated_and_reviewed", label: "确认 PPTX Artifact 已生成并完成页级人工审核" },
+              { id: "confirm_ppt_deck_not_auto_published", label: "确认课件草稿未自动发布且仍需最终人工复核" }
+            ]
+          }
+        };
+        var focus = focusByEntity[entityType] || {
+          primaryReviewFocus: "review_agent_entity_before_publish",
+          checks: [
+            { id: "review_agent_entity_payload_before_publish", label: "复核平台实体草稿内容后再进入发布评审" }
+          ]
+        };
+        var checks = focus.checks.map(function (check) {
+          var matched = Boolean(signoffRecorded) && !realPublish;
+          return Object.assign({}, check, {
+            matched: matched,
+            status: matched ? "READY_FOR_FINAL_HUMAN_REVIEW" : "WAITING_SIGNOFF"
+          });
+        });
+        var matchedTotal = checks.filter(function (check) { return check.matched === true; }).length;
+        return {
+          component: "AgentEntitySpecificPrePublishReviewFocus",
+          mode: "LOCAL_ENTITY_SPECIFIC_PRE_PUBLISH_REVIEW",
+          agentEntity: entityType,
+          primaryReviewFocus: focus.primaryReviewFocus,
+          status: matchedTotal === checks.length ? "READY_FOR_FINAL_HUMAN_REVIEW" : "WAITING_SIGNOFF",
+          total: checks.length,
+          matchedTotal: matchedTotal,
+          checks: checks,
+          safety: {
+            readOnly: true,
+            answerVisibleToCandidate: false,
+            contestantCodeExecuted: false,
+            autoPublishAllowed: false,
+            realPublish: false,
+            requiresFinalHumanReview: true
+          }
+        };
+      }
+
+      function postSignoffChecklistSummary(item) {
+        var checklist = item && item.postSignoffPrePublishChecklist ? item.postSignoffPrePublishChecklist : null;
+        if (!checklist) {
+          return "postSignoffPrePublishChecklist=none";
+        }
+        var safety = checklist.safety || {};
+        var focus = checklist.entitySpecificReviewFocus || {};
+        return "postSignoffPrePublishChecklist=" + (checklist.status || "UNKNOWN")
+          + " · component=" + (checklist.component || "AgentEntityPostSignoffPrePublishChecklist")
+          + " · nextRequiredAction=" + (checklist.nextRequiredAction || "final_human_publish_review_before_any_real_publish")
+          + " · postSignoffMatched=" + (checklist.matchedTotal || 0) + "/" + (checklist.total || 0)
+          + " · entitySpecificReviewFocus=" + (focus.primaryReviewFocus || "none")
+          + " · entitySpecificMatched=" + (focus.matchedTotal || 0) + "/" + (focus.total || 0)
+          + " · finalHumanReviewRequired=" + boolText(safety.requiresFinalHumanReview === true)
+          + " · realPublish=" + boolText(safety.realPublish === true);
+      }
+
+      function buildFallbackReadinessReport(items) {
+        var requirements = [
+          { agentEntity: "lab_template", sourceArtifactKind: "LAB_DSL", previewComponent: "LabTemplateImportPreview", mockImportComponent: "LabTemplateMockImport" },
+          { agentEntity: "exam_question", sourceArtifactKind: "EXAM_DSL", previewComponent: "ExamQuestionImportPreview", mockImportComponent: "ExamQuestionMockImport" },
+          { agentEntity: "grading_rule", sourceArtifactKind: "GRADING_DSL", previewComponent: "GradingRuleImportPreview", mockImportComponent: "GradingRuleMockImport" },
+          { agentEntity: "ppt_deck", sourceArtifactKind: "PPT_DSL", previewComponent: "PptDeckImportPreview", mockImportComponent: "PptDeckMockImport" }
+        ];
+        var reportItems = requirements.map(function (requirement) {
+          var entity = items.find(function (item) {
+            return item.entityType === requirement.agentEntity;
+          });
+          var ready = Boolean(entity);
+          var activitySummary = entity && entity.agentEntityImportActivity && entity.agentEntityImportActivity.summary
+            ? entity.agentEntityImportActivity.summary
+            : {};
+          var signoffRecorded = Boolean(activitySummary.signoffRecorded);
+          var postSignoffChecklist = buildPostSignoffPrePublishChecklist(requirement.agentEntity, signoffRecorded, activitySummary);
+          return Object.assign({}, requirement, {
+            component: "AgentEntityReadinessItem",
+            previewCreated: ready,
+            mockImportCreated: ready,
+            agentEntityId: entity ? entity.id : null,
+            agentEntityStatus: entity ? entity.status : null,
+            importActivity: entity ? entity.agentEntityImportActivity || null : null,
+            dryRunPrepared: Boolean(activitySummary.dryRunPrepared),
+            requestSent: Boolean(activitySummary.requestSent),
+            statusQueried: Boolean(activitySummary.statusQueried),
+            resultRecorded: Boolean(activitySummary.resultRecorded),
+            latestPlatformStatus: activitySummary.latestPlatformStatus || null,
+            latestQueriedPlatformStatus: activitySummary.latestQueriedPlatformStatus || null,
+            signoffRecorded: signoffRecorded,
+            signoffState: "WAITING_PLATFORM_ENTITY_IMPORT_ACTIVITY",
+            readyForAgentEntitySignoff: false,
+            manualSignoffChecklist: [],
+            postSignoffPrePublishChecklist: postSignoffChecklist,
+            sourceTaskId: entity ? entity.sourceTaskId : state.requestedSourceTaskId || null,
+            readyForManualAgentReview: ready,
+            blockers: ready ? [] : ["IMPORT_PREVIEW_MISSING", "MOCK_IMPORT_ENTITY_MISSING"],
+            safety: {
+              readOnly: true,
+              mockStoreWritten: ready,
+              databaseWritten: false,
+              realAgentImport: false,
+              autoPublishAllowed: false,
+              realPublish: false
+            }
+          });
+        });
+        var readyTotal = reportItems.filter(function (item) {
+          return item.readyForManualAgentReview;
+        }).length;
+        return {
+          component: "AgentEntityReadinessReport",
+          mode: "LOCAL_AGENT_ENTITY_READINESS_REPORT",
+          sourceTaskId: state.requestedSourceTaskId || null,
+          items: reportItems,
+          summary: {
+            requiredTotal: reportItems.length,
+            previewCreatedTotal: readyTotal,
+            mockImportCreatedTotal: readyTotal,
+            readyForManualAgentReviewTotal: readyTotal,
+            missingPreviewTotal: reportItems.length - readyTotal,
+            missingMockImportTotal: reportItems.length - readyTotal,
+            dryRunPreparedTotal: reportItems.filter(function (item) { return item.dryRunPrepared; }).length,
+            requestSentTotal: reportItems.filter(function (item) { return item.requestSent; }).length,
+            statusQueriedTotal: reportItems.filter(function (item) { return item.statusQueried; }).length,
+            resultRecordedTotal: reportItems.filter(function (item) { return item.resultRecorded; }).length,
+            agentEntitySignoffReadyTotal: reportItems.filter(function (item) { return item.readyForAgentEntitySignoff; }).length,
+            agentEntitySignoffRecordedTotal: reportItems.filter(function (item) { return item.signoffRecorded; }).length,
+            postSignoffPrePublishReadyTotal: reportItems.filter(function (item) {
+              return item.postSignoffPrePublishChecklist && item.postSignoffPrePublishChecklist.status === "READY_FOR_FINAL_HUMAN_PUBLISH_REVIEW";
+            }).length,
+            allPlatformEntitiesReadyForSignoff: reportItems.every(function (item) { return item.readyForAgentEntitySignoff; }),
+            allPlatformEntitiesSignoffRecorded: reportItems.every(function (item) { return item.signoffRecorded; }),
+            allPostSignoffPrePublishReady: reportItems.length > 0 && reportItems.every(function (item) {
+              return item.postSignoffPrePublishChecklist && item.postSignoffPrePublishChecklist.status === "READY_FOR_FINAL_HUMAN_PUBLISH_REVIEW";
+            }),
+            allReadyForManualPlatformReview: readyTotal === reportItems.length
+          },
+          safety: {
+            readOnly: true,
+            databaseWritten: false,
+            realAgentImport: false,
+            autoPublishAllowed: false,
+            realPublish: false
+          }
+        };
+      }
+
+      function renderReadiness(report, sourceLabel) {
+        var container = byId("platform-entity-readiness-items");
+        var summary = report && report.summary ? report.summary : {};
+        var items = report && Array.isArray(report.items) ? report.items : [];
+        var readyTotal = summary.readyForManualAgentReviewTotal || 0;
+        var requiredTotal = summary.requiredTotal || items.length || 3;
+        state.readinessReport = report || null;
+        setText(
+          "platform-entity-readiness-source",
+          sourceLabel
+            + " · readOnly=true"
+            + " · databaseWritten=false"
+            + " · realAgentImport=false"
+            + " · realPublish=false"
+        );
+        setText(
+          "platform-entity-readiness-summary",
+          "ready=" + readyTotal + "/" + requiredTotal
+            + " · dryRun=" + (summary.dryRunPreparedTotal || 0)
+            + " · requestSent=" + (summary.requestSentTotal || 0)
+            + " · resultRecorded=" + (summary.resultRecordedTotal || 0)
+            + " · signoffReady=" + (summary.agentEntitySignoffReadyTotal || 0)
+            + " · signoffRecorded=" + (summary.agentEntitySignoffRecordedTotal || 0)
+            + " · postSignoffPrePublishReady=" + (summary.postSignoffPrePublishReadyTotal || 0)
+            + " · allPostSignoffPrePublishReady=" + boolText(summary.allPostSignoffPrePublishReady === true)
+        );
+        if (!container) {
+          return;
+        }
+        container.innerHTML = "";
+        if (!items.length) {
+          var empty = document.createElement("div");
+          empty.className = "readiness-card";
+          empty.innerHTML = "<span>no readiness items</span><strong>readOnly=true</strong>";
+          container.appendChild(empty);
+          return;
+        }
+        items.forEach(function (item) {
+          var ready = item.readyForManualAgentReview === true;
+          var postSignoffChecklist = item.postSignoffPrePublishChecklist || {};
+          var entitySpecificFocus = postSignoffChecklist.entitySpecificReviewFocus || {};
+          var postSignoffSafety = postSignoffChecklist.safety || {};
+          var blockers = Array.isArray(item.blockers) && item.blockers.length
+            ? item.blockers.join(",")
+            : "none";
+          var card = document.createElement("div");
+          card.className = "readiness-card";
+          card.innerHTML = ""
+            + "<span>" + item.agentEntity + " · " + item.sourceArtifactKind + "</span>"
+            + "<strong>" + (ready ? "READY_FOR_MANUAL_PLATFORM_REVIEW" : "NEEDS_PREVIEW_OR_MOCK_IMPORT") + "</strong>"
+            + "<div class=\"pill-row\">"
+            + "<span class=\"pill " + (item.previewCreated ? "strong" : "blocked") + "\">previewCreated=" + boolText(item.previewCreated) + "</span>"
+            + "<span class=\"pill " + (item.mockImportCreated ? "strong" : "blocked") + "\">mockImportCreated=" + boolText(item.mockImportCreated) + "</span>"
+            + "<span class=\"pill " + (item.dryRunPrepared ? "strong" : "blocked") + "\">dryRunPrepared=" + boolText(item.dryRunPrepared) + "</span>"
+            + "<span class=\"pill " + (item.requestSent ? "strong" : "blocked") + "\">requestSent=" + boolText(item.requestSent) + "</span>"
+            + "<span class=\"pill " + (item.resultRecorded ? "strong" : "blocked") + "\">resultRecorded=" + boolText(item.resultRecorded) + "</span>"
+            + "<span class=\"pill " + (item.readyForAgentEntitySignoff ? "strong" : "blocked") + "\">signoffState=" + (item.signoffState || "WAITING_PLATFORM_ENTITY_IMPORT_ACTIVITY") + "</span>"
+            + "<span class=\"pill " + (item.signoffRecorded ? "strong" : "blocked") + "\">signoffRecorded=" + boolText(item.signoffRecorded) + "</span>"
+            + "<span class=\"pill " + (postSignoffChecklist.status === "READY_FOR_FINAL_HUMAN_PUBLISH_REVIEW" ? "strong" : "blocked") + "\">postSignoffPrePublish=" + (postSignoffChecklist.status || "none") + "</span>"
+            + "<span class=\"pill " + (entitySpecificFocus.status === "READY_FOR_FINAL_HUMAN_REVIEW" ? "strong" : "blocked") + "\">entitySpecificReviewFocus=" + (entitySpecificFocus.primaryReviewFocus || "none") + "</span>"
+            + "<span class=\"pill " + (postSignoffSafety.requiresFinalHumanReview ? "strong" : "blocked") + "\">finalHumanReviewRequired=" + boolText(postSignoffSafety.requiresFinalHumanReview === true) + "</span>"
+            + "<span class=\"pill blocked\">databaseWritten=false</span>"
+            + "</div>"
+            + "<span>sourceTaskId=" + (item.sourceTaskId || "none") + " · latestPlatformStatus=" + (item.latestPlatformStatus || item.latestQueriedPlatformStatus || "none") + " · manualSignoffChecklist=" + (Array.isArray(item.manualSignoffChecklist) ? item.manualSignoffChecklist.map(function (check) { return check.id + ':' + boolText(check.matched === true); }).join(',') : "none") + " · " + postSignoffChecklistSummary(item) + " · blockers=" + blockers + "</span>";
+          container.appendChild(card);
+        });
+      }
+
+      function renderList() {
+        var list = byId("platform-entity-list");
+        var items = filteredEntities();
+        if (!list) {
+          return;
+        }
+        list.innerHTML = "";
+        if (!items.length) {
+          var empty = document.createElement("button");
+          empty.type = "button";
+          empty.className = "entity-row";
+          empty.disabled = true;
+          empty.innerHTML = "<strong>没有匹配的本地实体草稿</strong><span>filter=" + state.filter + "</span><span>realPublish=false</span>";
+          list.appendChild(empty);
+          if (requestedContextNeedsPlaceholder()) {
+            renderRequestedContextPlaceholder();
+          } else {
+            renderDetail(null);
+          }
+          return;
+        }
+        var requested = findRequestedContextEntity(items);
+        var missingRequestedContext = requestedContextNeedsPlaceholder() && !requested;
+        if (requested) {
+          state.selectedId = requested.id;
+        } else if (missingRequestedContext) {
+          state.selectedId = "";
+        } else if (!state.selectedId || !items.some(function (item) { return item.id === state.selectedId; })) {
+          state.selectedId = items[0].id;
+        }
+        items.forEach(function (item) {
+          var row = document.createElement("button");
+          row.type = "button";
+          row.className = "entity-row";
+          row.setAttribute("data-entity-id", item.id);
+          row.setAttribute("aria-current", item.id === state.selectedId ? "true" : "false");
+          row.innerHTML = ""
+            + "<strong>" + item.title + "</strong>"
+            + "<span>entityType=" + item.entityType + "<br>sourceTaskId=" + item.sourceTaskId + "</span>"
+            + "<span>status=" + item.status + "<br>databaseWritten=false</span>";
+          row.addEventListener("click", function () {
+            selectEntity(item.id);
+          });
+          list.appendChild(row);
+        });
+        if (requested) {
+          selectEntity(requested.id);
+          return;
+        }
+        if (missingRequestedContext) {
+          renderRequestedContextPlaceholder();
+          return;
+        }
+        if (state.selectedId) {
+          selectEntity(state.selectedId);
+        }
+      }
+
+      function renderDetail(item) {
+        var pills = byId("platform-entity-detail-pills");
+        state.selectedEntity = item || null;
+        updateReviewCenterReturnLink(item);
+        renderImportActivity(item);
+        renderPausedBackendHandoffPanel(item);
+        setText("platform-entity-selected-id", "selected=" + (item ? item.id : "none"));
+        if (!item) {
+          setText("platform-entity-detail-summary", "source=GET /api/platform-entities/{id} · selected=none");
+          setText("platform-entity-payload-preview", "payload preview will appear here");
+          if (pills) {
+            pills.innerHTML = '<span class="pill">mockStoreWritten=false</span><span class="pill blocked">databaseWritten=false</span><span class="pill blocked">realAgentImport=false</span>';
+          }
+          return;
+        }
+        setText(
+          "platform-entity-detail-summary",
+          "source=GET /api/platform-entities/" + item.id
+            + " · entityType=" + item.entityType
+            + " · sourceTaskId=" + item.sourceTaskId
+            + " · sourcePreviewArtifactId=" + item.sourcePreviewArtifactId
+            + " · reviewer=" + item.reviewer
+        );
+        if (pills) {
+          pills.innerHTML = "";
+          [
+            "mockStoreWritten=" + boolText(item.mockStoreWritten),
+            "databaseWritten=" + boolText(item.databaseWritten),
+            "realAgentImport=" + boolText(item.realAgentImport),
+            "realPublishAllowed=" + boolText(item.realPublishAllowed),
+            "realPublish=" + boolText(item.realPublish),
+            "statusQueryTotal=" + (((item.agentEntityImportActivity || {}).statusQueryTotal) || 0),
+            "resultTotal=" + (((item.agentEntityImportActivity || {}).resultTotal) || 0)
+          ].forEach(function (value, index) {
+            var pill = document.createElement("span");
+            pill.className = index === 0 ? "pill strong" : "pill blocked";
+            pill.textContent = value;
+            pills.appendChild(pill);
+          });
+        }
+        setText("platform-entity-payload-preview", JSON.stringify({
+          id: item.id,
+          entityType: item.entityType,
+          title: item.title,
+          status: item.status,
+          sourceTaskId: item.sourceTaskId,
+          sourceDslPath: item.sourceDslPath,
+          payload: item.payload,
+          safety: {
+            mockStoreWritten: item.mockStoreWritten,
+            databaseWritten: item.databaseWritten,
+            realAgentImport: item.realAgentImport,
+            realPublish: item.realPublish
+          },
+          agentEntityImportActivity: item.agentEntityImportActivity || null
+        }, null, 2));
+      }
+
+      function findReadinessItemForEntity(item) {
+        var report = state.readinessReport || {};
+        var items = Array.isArray(report.items) ? report.items : [];
+        if (!item) {
+          return null;
+        }
+        return items.find(function (entry) {
+          return entry.agentEntityId === item.id || entry.agentEntity === item.entityType;
+        }) || null;
+      }
+
+      function renderPausedBackendHandoffPanel(item) {
+        var readinessItem = findReadinessItemForEntity(item);
+        var payload = item ? item.payload || {} : {};
+        var payloadSummary = item ? {
+          id: item.id,
+          entityType: item.entityType,
+          title: item.title,
+          sourceTaskId: item.sourceTaskId,
+          sourceDslPath: item.sourceDslPath,
+          payloadKeys: Object.keys(payload).slice(0, 12),
+          dryRunPrepared: readinessItem ? readinessItem.dryRunPrepared === true : false,
+          localMockImportReady: item.mockStoreWritten === true,
+          safety: {
+            readOnly: true,
+            answerVisibleToCandidate: false,
+            contestantCodeExecuted: false,
+            databaseWritten: false,
+            realAgentImport: false,
+            platformBackendRequired: false,
+            autoPublishAllowed: false,
+            realPublish: false
+          },
+          localCoreMvpStopLine: "mock-import + import-dry-run DTO",
+          pausedFutureHandoff: [
+            "platform import request send",
+            "platform import status query",
+            "platform-side signoff",
+            "final publish"
+          ]
+        } : {
+          selected: "none",
+          localCoreMvpStopLine: "mock-import + import-dry-run DTO",
+          platformBackendRequired: false,
+          realPublish: false
+        };
+        setText(
+          "platform-paused-backend-handoff-summary",
+          item
+            ? "AgentEntityPausedBackendHandoffNotice"
+              + " · entityType=" + item.entityType
+              + " · dryRunPrepared=" + boolText(readinessItem ? readinessItem.dryRunPrepared === true : false)
+              + " · localStopLine=import-dry-run"
+              + " · platformBackendRequired=false"
+            : "selected=none · local_core_mvp_stop_line=import-dry-run"
+        );
+        var pillContainer = byId("platform-paused-backend-handoff-pills");
+        if (pillContainer) {
+          pillContainer.innerHTML = "";
+          [
+            "component=AgentEntityPausedBackendHandoffNotice",
+            "localOnly=true",
+            "platformBackendRequired=false",
+            "answerVisibleToCandidate=false",
+            "contestantCodeExecuted=false",
+            "autoPublishAllowed=false",
+            "realPublish=false"
+          ].forEach(function (value, index) {
+            var pill = document.createElement("span");
+            pill.className = index <= 1 ? "pill strong" : "pill blocked";
+            pill.textContent = value;
+            pillContainer.appendChild(pill);
+          });
+        }
+        setText("platform-paused-backend-handoff-detail", JSON.stringify(payloadSummary, null, 2));
+      }
+
+      function reviewCenterReturnRoute(item) {
+        var sourceTaskId = state.requestedSourceTaskId || (item && item.sourceTaskId);
+        if (!sourceTaskId || sourceTaskId === "none") {
+          return "review-center.html";
+        }
+        return appendQuery("review-center.html", {
+          taskId: sourceTaskId,
+          agentEntityRefresh: "1",
+          coreDbPath: state.coreDbPath,
+          gradingDbPath: state.gradingDbPath,
+          agentReport: state.agentReport
+        });
+      }
+
+      function updateReviewCenterReturnLink(item) {
+        var link = byId("platform-review-center-return-link");
+        if (!link) {
+          return;
+        }
+        var route = reviewCenterReturnRoute(item);
+        link.href = route;
+        link.textContent = (state.requestedSourceTaskId || (item && item.sourceTaskId)) ? "返回审核中心任务" : "返回审核中心";
+        link.title = "reload review readiness after signoff · autoPost=false · route=" + route;
+      }
+
+      function renderImportActivity(item) {
+        var placeholder = isRequestedContextPlaceholder(item);
+        var activity = item && item.agentEntityImportActivity ? item.agentEntityImportActivity : null;
+        var summary = activity && activity.summary ? activity.summary : {};
+        var latestStatusQuery = activity ? activity.latestStatusQuery : null;
+        var latestResult = activity ? activity.latestResult : null;
+        var queryTotal = activity ? activity.statusQueryTotal || 0 : 0;
+        var resultTotal = activity ? activity.resultTotal || 0 : 0;
+        var selected = item ? item.id : "none";
+        if (placeholder) {
+          setText(
+            "platform-import-action-summary",
+            "LOCAL_ENTITY_NOT_PREPARED · sourceTaskId=" + (item.sourceTaskId || state.requestedSourceTaskId || "none")
+              + " · nextLocalAction=prepare_demo_draft_or_run_mock_import"
+              + " · platformBackendRequired=false"
+          );
+          setText(
+            "platform-import-action-preview",
+            JSON.stringify({
+              code: "LOCAL_ENTITY_NOT_PREPARED",
+              component: "RequestedEntityPlaceholder",
+              selectedEntityId: selected,
+              sourceTaskId: item.sourceTaskId || state.requestedSourceTaskId || null,
+              entityType: item.entityType || requestedEntityType() || null,
+              nextLocalAction: "prepare_demo_draft_or_run_mock_import",
+              recommendedAction: "use AgentEntityDemoDataPrepareAction or run import-preview -> mock-import first",
+              safety: {
+                requestSent: false,
+                networkAccess: false,
+                secretsRead: false,
+                databaseWritten: false,
+                realAgentImport: false,
+                realPublish: false
+              }
+            }, null, 2)
+          );
+          setText("platform-import-action-status", "LOCAL_ENTITY_NOT_PREPARED");
+          renderImportStepper(item, activity);
+          return;
+        }
+        setText(
+          "platform-import-action-summary",
+          "selected=" + selected
+            + " · statusQueryTotal=" + queryTotal
+            + " · resultTotal=" + resultTotal
+            + " · latestQueriedPlatformStatus=" + (summary.latestQueriedPlatformStatus || "none")
+            + " · latestSuggestedImportResultStatus=" + (summary.latestSuggestedImportResultStatus || "none")
+        );
+        setText(
+          "platform-import-action-preview",
+          JSON.stringify({
+            selectedEntityId: selected,
+            latestStatusQuery: latestStatusQuery,
+            latestResult: latestResult,
+            safety: activity ? activity.safety : {
+              secretVisibleInFrontend: false,
+              autoPublishAllowed: false,
+              realPublish: false
+            }
+          }, null, 2)
+        );
+        setText("platform-import-action-status", item ? "READY_FOR_MANUAL_ACTION" : "WAITING_ENTITY_SELECTION");
+        if (summary.latestSuggestedImportResultStatus) {
+          var resultStatus = byId("platform-import-result-status");
+          if (resultStatus) {
+            resultStatus.value = summary.latestSuggestedImportResultStatus;
+          }
+        }
+        renderImportStepper(item, activity);
+        if (item && state.requestedAction) {
+          showPausedRequestedAction();
+        }
+      }
+
+      function showPausedRequestedAction() {
+        setText(
+          "platform-import-action-status",
+          state.selectedId ? "PLATFORM_BACKEND_ACTION_PAUSED" : "PAUSED_ACTION_REQUESTED"
+        );
+        setText(
+          "platform-import-action-preview",
+          "requestedAction=" + state.requestedAction + " · local page stops at import-dry-run · no platform POST will be sent"
+        );
+      }
+
+      function renderImportStepper(item, activity) {
+        var container = byId("platform-import-stepper");
+        if (!container) {
+          return;
+        }
+        var summary = activity && activity.summary ? activity.summary : {};
+        var placeholder = isRequestedContextPlaceholder(item);
+        var steps = [
+          {
+            id: "mock-import",
+            label: "1 · mock-import",
+            status: placeholder ? "NEEDS_LOCAL_DRAFT" : (item ? "DONE" : "WAITING_ENTITY_SELECTION"),
+            detail: placeholder
+              ? "run import-preview -> mock-import before dry-run"
+              : item
+              ? "entityStatus=" + item.status + " · mockStoreWritten=" + boolText(item.mockStoreWritten)
+              : "select a platform entity"
+          },
+          {
+            id: "dry-run",
+            label: "2 · dry-run",
+            status: summary.dryRunPrepared ? "DONE" : "NOT_STARTED",
+            detail: activity && activity.latestDryRun
+              ? "artifact=" + (activity.latestDryRun.artifactId || "none") + " · output=" + (activity.latestDryRun.outputPath || "none")
+              : "create_agent_entity_import_dry_run"
+          },
+          {
+            id: "review-return",
+            label: "3 · review-return",
+            status: summary.dryRunPrepared ? "READY" : "WAITING_DRY_RUN",
+            detail: "return_to_review_center_after_local_dry_run"
+          },
+          {
+            id: "future-platform-handoff",
+            label: "4 · future-platform-handoff",
+            status: "PAUSED",
+            detail: "real platform send/status/signoff/final publish are outside current local MVP"
+          }
+        ];
+        container.innerHTML = "";
+        steps.forEach(function (step) {
+          var card = document.createElement("div");
+          var done = step.status === "DONE";
+          var ready = step.status === "READY";
+          card.className = "step-card";
+          card.innerHTML = ""
+            + "<span>" + step.label + "</span>"
+            + "<strong>" + step.status + "</strong>"
+            + "<div class=\"pill-row\">"
+            + "<span class=\"pill " + (done || ready ? "strong" : "blocked") + "\">" + step.id + "</span>"
+            + "<span class=\"pill blocked\">autoPublishAllowed=false</span>"
+            + "</div>"
+            + "<span>" + step.detail + "</span>";
+          container.appendChild(card);
+        });
+      }
+
+      function selectEntity(id) {
+        var item = state.entities.find(function (entry) {
+          return entry.id === id;
+        }) || null;
+        state.selectedId = item ? item.id : "";
+        Array.prototype.forEach.call(document.querySelectorAll("[data-entity-id]"), function (node) {
+          node.setAttribute("aria-current", node.getAttribute("data-entity-id") === state.selectedId ? "true" : "false");
+        });
+        if (!item) {
+          renderDetail(null);
+          return;
+        }
+        if (state.loadedFromFallback) {
+          renderDetail(item);
+          return;
+        }
+        safeFetchJson(withCoreDbQuery("/api/platform-entities/" + encodeURIComponent(item.id)))
+          .then(function (payload) {
+            var record = payload && payload.data ? payload.data.agentEntityRecord : null;
+            var activity = payload && payload.data ? payload.data.agentEntityImportActivity : null;
+            if (record) {
+              renderDetail(Object.assign({}, item, record, {
+                agentEntityImportActivity: activity || item.agentEntityImportActivity || null
+              }));
+            } else {
+              renderDetail(item);
+            }
+          })
+          .catch(function () {
+            renderDetail(item);
+          });
+      }
+
+      function refreshSelectedEntity() {
+        if (!state.selectedId) {
+          return Promise.resolve(null);
+        }
+        var refreshedRecord = null;
+        return safeFetchJson(withCoreDbQuery("/api/platform-entities/" + encodeURIComponent(state.selectedId)))
+          .then(function (payload) {
+            var record = payload && payload.data ? payload.data.agentEntityRecord : null;
+            var activity = payload && payload.data ? payload.data.agentEntityImportActivity : null;
+            if (record) {
+              var index = state.entities.findIndex(function (entry) {
+                return entry.id === record.id;
+              });
+              var mergedRecord = Object.assign({}, record, {
+                agentEntityImportActivity: activity || null
+              });
+              if (index >= 0) {
+                state.entities[index] = Object.assign({}, state.entities[index], mergedRecord);
+              }
+              refreshedRecord = Object.assign({}, state.entities[index] || {}, mergedRecord);
+              renderDetail(refreshedRecord);
+            }
+            return record;
+          })
+          .then(function (record) {
+            return loadReadiness()
+              .then(function () {
+                if (refreshedRecord) {
+                  renderDetail(refreshedRecord);
+                }
+                setText(
+                  "platform-entity-readiness-source",
+                  (byId("platform-entity-readiness-source") ? byId("platform-entity-readiness-source").textContent : "")
+                    + " · readinessUpdated=true"
+                );
+                return record;
+              })
+              .catch(function () {
+                return record;
+              });
+          });
+      }
+
+      function handleImportDryRun() {
+        if (!state.selectedId) {
+          setText("platform-import-action-status", "NO_ENTITY_SELECTED");
+          return;
+        }
+        if (isRequestedContextPlaceholder(state.selectedEntity)) {
+          setText("platform-import-action-status", "LOCAL_ENTITY_NOT_PREPARED");
+          setText("platform-import-action-preview", JSON.stringify({
+            code: "LOCAL_ENTITY_NOT_PREPARED",
+            component: "RequestedEntityPlaceholder",
+            sourceTaskId: state.requestedSourceTaskId || null,
+            entityKind: state.requestedEntityKind || null,
+            nextLocalAction: "prepare_demo_draft_or_run_mock_import",
+            blockedAction: "POST /api/platform-entities/{id}/import-dry-run",
+            safety: {
+              requestSent: false,
+              networkAccess: false,
+              realAgentImport: false,
+              realPublish: false
+            }
+          }, null, 2));
+          return;
+        }
+        var output = fieldValue("platform-import-dry-run-output") || "examples/output/platform-entity-import-dry-run.json";
+        var contractConfig = fieldValue("platform-contract-config") || "examples/input/platform-contract.json";
+        setText("platform-import-action-status", "CREATING_DRY_RUN");
+        safePostJson("/api/platform-entities/" + encodeURIComponent(state.selectedId) + "/import-dry-run", withCoreDbBody({
+          reviewer: fieldValue("platform-import-reviewer"),
+          contractConfig: contractConfig,
+          output: output
+        }))
+          .then(function (payload) {
+            var result = payload.data ? payload.data.agentEntityImportDryRun : null;
+            var dryRunInput = byId("platform-import-dry-run");
+            if (dryRunInput) {
+              dryRunInput.value = output;
+            }
+            setText("platform-import-action-status", "DRY_RUN_WRITTEN");
+            setText("platform-import-action-preview", JSON.stringify({
+              api: "POST /api/platform-entities/{id}/import-dry-run",
+              contractConfig: contractConfig,
+              result: result,
+              safety: result ? result.safety : null
+            }, null, 2));
+            return refreshSelectedEntity();
+          })
+          .catch(function (error) {
+            setText("platform-import-action-status", "DRY_RUN_FAILED");
+            setText("platform-import-action-preview", JSON.stringify(error.payload || {
+              success: false,
+              message: error.message
+            }, null, 2));
+          });
+      }
+
+      function handlePausedPlatformBackendAction(actionName) {
+        setText("platform-import-action-status", "PLATFORM_BACKEND_ACTION_PAUSED");
+        setText("platform-import-action-preview", JSON.stringify({
+          action: actionName,
+          localCoreMvpStopLine: "mock-import + import-dry-run DTO",
+          platformBackendRequired: false,
+          platformApiTokenRequired: false,
+          requestSent: false,
+          realAgentImport: false,
+          realPublish: false,
+          nextAction: "continue local review center or grading report flow"
+        }, null, 2));
+      }
+
+      function handleContractValidate() {
+        var contractConfig = fieldValue("platform-contract-config") || "examples/input/platform-contract.json";
+        setText("platform-import-action-status", "VALIDATING_PLATFORM_CONTRACT");
+        safePostJson("/api/platform-entities/contract-validate", {
+          contractConfig: contractConfig
+        })
+          .then(function (payload) {
+            var validation = payload.data ? payload.data.platformApiContractValidation : null;
+            state.latestContractValidation = validation;
+            setText(
+              "platform-import-action-status",
+              validation && validation.valid ? "CONTRACT_VALIDATED_LOCALLY" : "CONTRACT_VALIDATION_UNKNOWN"
+            );
+            setText("platform-import-action-preview", JSON.stringify({
+              api: "POST /api/platform-entities/contract-validate",
+              contractConfig: contractConfig,
+              summary: validation ? validation.summary : null,
+              checkedEntityTypes: validation ? validation.checkedEntityTypes : [],
+              safety: validation ? validation.safety : null
+            }, null, 2));
+          })
+          .catch(function (error) {
+            setText("platform-import-action-status", "CONTRACT_VALIDATION_FAILED");
+            setText("platform-import-action-preview", JSON.stringify(error.payload || {
+              success: false,
+              message: error.message
+            }, null, 2));
+          });
+      }
+
+      function setFilter(value) {
+        state.filter = value;
+        Array.prototype.forEach.call(document.querySelectorAll("[data-entity-filter]"), function (button) {
+          button.setAttribute("aria-pressed", button.getAttribute("data-entity-filter") === value ? "true" : "false");
+        });
+        updateSummary(filteredEntities());
+        renderList();
+      }
+
+      function loadFallback() {
+        return safeFetchJson("mock-data.json").then(function (payload) {
+          var summary = payload.reviewCenterPrototype && payload.reviewCenterPrototype.agentEntityMockImportSummary
+            ? payload.reviewCenterPrototype.agentEntityMockImportSummary
+            : {};
+          state.entities = normalizeFromSummary(summary);
+          state.loadedFromFallback = true;
+          setText("platform-entity-api-status", "STATIC_HTML_FALLBACK");
+          setText("platform-entity-api-source", "source=frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary");
+          updateSummary(state.entities);
+          renderList();
+          renderReadiness(
+            payload.agentEntitiesPrototype && payload.agentEntitiesPrototype.readinessReport
+              ? payload.agentEntitiesPrototype.readinessReport
+              : buildFallbackReadinessReport(state.entities),
+            "source=frontend/mock-data.json.agentEntitiesPrototype.readinessReport"
+          );
+        });
+      }
+
+      function loadReadiness() {
+        var url = withReadinessQuery("/api/platform-entities/readiness-report");
+        return safeFetchJson(url)
+          .then(function (payload) {
+            var report = payload && payload.data ? payload.data.agentEntityReadinessReport : null;
+            if (!report) {
+              throw new Error("READINESS_REPORT_MISSING");
+            }
+            renderReadiness(
+              report,
+              "source=GET /api/platform-entities/readiness-report"
+                + (state.coreDbPath ? "?coreDbPath={path}" : "")
+                + (state.gradingDbPath ? (state.coreDbPath ? "&" : "?") + "gradingDbPath={path}" : "")
+            );
+          })
+          .catch(function () {
+            return safeFetchJson("mock-data.json").then(function (payload) {
+              renderReadiness(
+                payload.agentEntitiesPrototype && payload.agentEntitiesPrototype.readinessReport
+                  ? payload.agentEntitiesPrototype.readinessReport
+                  : buildFallbackReadinessReport(state.entities),
+                "source=frontend/mock-data.json.agentEntitiesPrototype.readinessReport"
+              );
+            }).catch(function () {
+              renderReadiness(buildFallbackReadinessReport(state.entities), "source=local fallback readiness builder");
+            });
+          });
+      }
+
+      function loadEntities() {
+        if (!window.fetch) {
+          return;
+        }
+        safeFetchJson(withCoreDbQuery("/api/platform-entities"))
+          .then(function (payload) {
+            var items = payload && payload.data && Array.isArray(payload.data.items) ? payload.data.items : [];
+            state.entities = normalizeFromSummary({ items: items });
+            state.loadedFromFallback = false;
+            setText("platform-entity-api-status", "API_READONLY_LOADED");
+            setText(
+              "platform-entity-api-source",
+              "source=GET /api/platform-entities"
+                + (state.coreDbPath ? "?coreDbPath={path}" : "")
+                + " · detail=GET /api/platform-entities/{id}"
+                + (state.coreDbPath ? "?coreDbPath={path}" : "")
+            );
+            updateSummary(state.entities);
+            renderList();
+            if (!state.entities.length) {
+              return loadFallback();
+            }
+            loadReadiness();
+            return null;
+          })
+          .catch(function () {
+            loadFallback();
+          });
+      }
+
+      readQuerySelection();
+
+      Array.prototype.forEach.call(document.querySelectorAll("[data-entity-filter]"), function (button) {
+        button.addEventListener("click", function () {
+          setFilter(button.getAttribute("data-entity-filter") || "all");
+        });
+      });
+
+      var contractValidateButton = byId("platform-contract-validate-button");
+      if (contractValidateButton) {
+        contractValidateButton.addEventListener("click", handleContractValidate);
+      }
+      var importDryRunButton = byId("platform-import-dry-run-button");
+      if (importDryRunButton) {
+        importDryRunButton.addEventListener("click", handleImportDryRun);
+      }
+      var demoPrepareButton = byId("platform-demo-prepare-button");
+      if (demoPrepareButton) {
+        demoPrepareButton.addEventListener("click", handleDemoPrepare);
+      }
+      var loadApprovedTasksButton = byId("platform-demo-load-approved-tasks-button");
+      if (loadApprovedTasksButton) {
+        loadApprovedTasksButton.addEventListener("click", loadApprovedTaskCandidates);
+      }
+      var demoPrepareTaskSelect = byId("platform-demo-prepare-task-select");
+      if (demoPrepareTaskSelect) {
+        demoPrepareTaskSelect.addEventListener("change", handleApprovedTaskSelect);
+      }
+      var demoPrepareKindSelect = byId("platform-demo-prepare-kind");
+      if (demoPrepareKindSelect) {
+        demoPrepareKindSelect.addEventListener("change", loadApprovedTaskCandidates);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+          loadEntities();
+          loadApprovedTaskCandidates();
+        });
+      } else {
+        loadEntities();
+        loadApprovedTaskCandidates();
+      }
+    }());
+  </script>
+</body>
+</html>

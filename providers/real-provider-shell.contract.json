@@ -1,0 +1,183 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_provider_shell_contract",
+  "title": "Disabled Real Provider Shell Contract",
+  "description": "Machine-testable contract for disabled OpenAI, Anthropic, and local model provider shells. The shells reserve implementation classes without importing SDKs, reading secret values, opening network connections, or producing generated content.",
+  "inputs": [
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate",
+      "path": "providers/real_provider_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell",
+      "path": "providers/real_provider_shell.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "env_example",
+      "path": ".env.example",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-shell list",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-shell health --provider openai",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-shell generate-json --provider openai",
+      "expectedCode": "REAL_PROVIDER_OPT_IN_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-shell generate-json --provider openai --explicit-opt-in",
+      "expectedCode": "REAL_PROVIDER_DISABLED"
+    }
+  ],
+  "providerClasses": [
+    {
+      "providerId": "openai",
+      "className": "OpenAIProvider",
+      "sdkPackage": "openai",
+      "enabled": false,
+      "secretEnv": "OPENAI_API_KEY"
+    },
+    {
+      "providerId": "anthropic",
+      "className": "AnthropicProvider",
+      "sdkPackage": "anthropic",
+      "enabled": false,
+      "secretEnv": "ANTHROPIC_API_KEY"
+    },
+    {
+      "providerId": "local",
+      "className": "LocalModelProvider",
+      "sdkPackage": "local_http",
+      "enabled": false,
+      "secretEnv": null,
+      "endpointEnv": "LOCAL_MODEL_ENDPOINT"
+    }
+  ],
+  "operations": [
+    {
+      "id": "health",
+      "enabled": true,
+      "returns": "disabled_descriptor",
+      "readsSecretValue": false,
+      "performsNetworkCall": false
+    },
+    {
+      "id": "generateText",
+      "enabled": false,
+      "errorCode": "REAL_PROVIDER_SHELL_DISABLED",
+      "readsSecretValue": false,
+      "performsNetworkCall": false
+    },
+    {
+      "id": "generateJson",
+      "enabled": false,
+      "requiresPreflight": true,
+      "errorCodes": [
+        "REAL_PROVIDER_OPT_IN_REQUIRED",
+        "REAL_PROVIDER_DISABLED",
+        "MISSING_PROVIDER_SECRET",
+        "REAL_PROVIDER_SHELL_DISABLED"
+      ],
+      "readsSecretValue": false,
+      "performsNetworkCall": false,
+      "generatedStatus": "WAITING_REVIEW"
+    },
+    {
+      "id": "streamGenerate",
+      "enabled": false,
+      "errorCode": "UNSUPPORTED_OPERATION",
+      "readsSecretValue": false,
+      "performsNetworkCall": false
+    }
+  ],
+  "requiredContext": {
+    "mode": "MOCK_ONLY",
+    "defaultProvider": "mock",
+    "readyForRealProvider": false,
+    "enabled": false,
+    "shellImplementationStatus": "disabled_shell",
+    "sdkImported": false,
+    "clientCreated": false,
+    "generationOperationsEnabled": false,
+    "realProviderRoutingAllowed": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "secretValueReturned": false
+  },
+  "blockedOperations": [
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_provider_shell",
+    "test_real_provider_gate",
+    "test_provider_adapter",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

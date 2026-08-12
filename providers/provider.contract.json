@@ -1,0 +1,96 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Phase 1 provider contract. Only the deterministic MockProvider is enabled; real model providers remain disabled placeholders.",
+  "activeProvider": "mock",
+  "providerInterface": ["generateText", "generateJson", "health"],
+  "providers": [
+    {
+      "id": "mock",
+      "displayName": "Mock Provider",
+      "type": "mock",
+      "enabled": true,
+      "default": true,
+      "phase1Allowed": true,
+      "requiresApiKey": false,
+      "secretEnv": null,
+      "networkAccess": false,
+      "realLlmCalled": false,
+      "implementationStatus": "implemented"
+    },
+    {
+      "id": "openai",
+      "displayName": "OpenAI Provider",
+      "type": "llm",
+      "enabled": false,
+      "default": false,
+      "phase1Allowed": false,
+      "requiresApiKey": true,
+      "secretEnv": "OPENAI_API_KEY",
+      "networkAccess": false,
+      "realLlmCalled": false,
+      "implementationStatus": "placeholder"
+    },
+    {
+      "id": "anthropic",
+      "displayName": "Anthropic Provider",
+      "type": "llm",
+      "enabled": false,
+      "default": false,
+      "phase1Allowed": false,
+      "requiresApiKey": true,
+      "secretEnv": "ANTHROPIC_API_KEY",
+      "networkAccess": false,
+      "realLlmCalled": false,
+      "implementationStatus": "placeholder"
+    },
+    {
+      "id": "local",
+      "displayName": "Local Model Provider",
+      "type": "llm",
+      "enabled": false,
+      "default": false,
+      "phase1Allowed": false,
+      "requiresApiKey": false,
+      "secretEnv": null,
+      "networkAccess": false,
+      "realLlmCalled": false,
+      "implementationStatus": "placeholder"
+    }
+  ],
+  "rules": {
+    "onlyMockProviderEnabled": true,
+    "realProviderInstantiationBlocked": true,
+    "apiKeysNotReadInPhase1": true,
+    "promptMustLoadFromPrompts": true,
+    "businessCodeMayEmbedPrompts": false,
+    "outputMustBeDsl": true,
+    "generatedContentDefaultStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "networkAccessAllowed": false,
+    "secretVisibleInFrontend": false
+  },
+  "supportedMockOutputs": [
+    {
+      "promptId": "lab_generation_v0",
+      "outputKind": "Lab",
+      "dslPath": "templates/lab/examples/basic-lab.yaml"
+    },
+    {
+      "promptId": "exam_generation_v0",
+      "outputKind": "Exam",
+      "dslPath": "templates/exam/examples/notebook-fill-blank.yaml"
+    },
+    {
+      "promptId": "grading_generation_v0",
+      "outputKind": "Grading",
+      "dslPath": "templates/grading/examples/python-pytest.yaml"
+    },
+    {
+      "promptId": "ppt_generation_v0",
+      "outputKind": "PPT",
+      "dslPath": "templates/ppt/examples/course-ppt.yaml"
+    }
+  ]
+}

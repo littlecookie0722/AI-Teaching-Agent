@@ -1,0 +1,150 @@
+{
+  "version": "0.1.0",
+  "id": "real_demo_quick_commands",
+  "phase": "Phase 2 Demo",
+  "mode": "REAL_LLM_DEMO_REPLAY_STATIC",
+  "title": "Real Demo Quick Commands",
+  "description": "Copyable local commands for replaying the real LLM demo evidence and showing the MCP review revision loop without sending new model requests or publishing content.",
+  "inputs": [
+    {
+      "id": "demo_source",
+      "path": "examples/input/demo-source.md",
+      "required": true
+    },
+    {
+      "id": "real_demo_bundle",
+      "path": "examples/output/real-llm-demo-bundle.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_acceptance_summary",
+      "path": "examples/output/real-llm-demo-acceptance-summary.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_page",
+      "path": "frontend/real-demo.html",
+      "required": true
+    },
+    {
+      "id": "mcp_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "quick_commands_markdown",
+      "path": "delivery/REAL_DEMO_QUICK_COMMANDS.md",
+      "generated": false,
+      "localOnly": true
+    },
+    {
+      "id": "real_demo_checklist",
+      "path": "examples/output/real-llm-demo-checklist.json",
+      "generated": true,
+      "localOnly": true
+    },
+    {
+      "id": "mock_revision_dsl",
+      "path": "examples/output/demo-quick-lab-revision.json",
+      "generated": true,
+      "localOnly": true
+    }
+  ],
+  "commands": [
+    {
+      "id": "set_isolated_store",
+      "order": 1,
+      "command": "$env:LAB_CLI_STORE=\"examples/output/real-demo-quick-store.json\"",
+      "purpose": "Keep quick-demo state separate from the default local store.",
+      "requiresManualCopy": true,
+      "writesLocalState": false
+    },
+    {
+      "id": "open_real_demo_page",
+      "order": 2,
+      "command": "start .\\frontend\\real-demo.html",
+      "purpose": "Open the read-only real demo evidence page.",
+      "requiresManualCopy": true,
+      "writesLocalState": false
+    },
+    {
+      "id": "rebuild_checklist",
+      "order": 3,
+      "command": "python lab_cli.py phase2 demo-bundle checklist --bundle examples/output/real-llm-demo-bundle.json --acceptance-summary examples/output/real-llm-demo-acceptance-summary.json --output examples/output/real-llm-demo-checklist.json",
+      "purpose": "Regenerate the local one-click checklist from existing files only.",
+      "requiresManualCopy": true,
+      "writesLocalState": true,
+      "expected": "success=true and demoChecklist.summary.readyForDemo=true"
+    },
+    {
+      "id": "create_waiting_review_lab_task",
+      "order": 4,
+      "command": "python lab_cli.py lab generate-from-source --input examples/input/demo-source.md",
+      "purpose": "Create a local WAITING_REVIEW Lab task for the MCP revision loop.",
+      "requiresManualCopy": true,
+      "writesLocalState": true,
+      "capture": {
+        "field": "data.task.id",
+        "as": "TASK_ID"
+      }
+    },
+    {
+      "id": "request_review_revision",
+      "order": 5,
+      "command": "python lab_cli.py mcp call --tool request_review_revision --arguments \"{\\\"taskId\\\":\\\"<TASK_ID>\\\",\\\"reviewer\\\":\\\"teacher_1\\\",\\\"comment\\\":\\\"补充步骤截图验收标准。\\\",\\\"priority\\\":\\\"HIGH\\\",\\\"targetSections\\\":[\\\"steps\\\"]}\"",
+      "purpose": "Record reviewer feedback through the MCP tool.",
+      "requiresManualCopy": true,
+      "writesLocalState": true,
+      "capture": {
+        "field": "data.response.data.revisionRequest.id",
+        "as": "REVISION_REQUEST_ID"
+      }
+    },
+    {
+      "id": "regenerate_from_revision_mock",
+      "order": 6,
+      "command": "python lab_cli.py mcp call --tool regenerate_from_revision_mock --arguments \"{\\\"taskId\\\":\\\"<TASK_ID>\\\",\\\"reviewer\\\":\\\"teacher_1\\\",\\\"revisionRequestId\\\":\\\"<REVISION_REQUEST_ID>\\\",\\\"output\\\":\\\"examples/output/demo-quick-lab-revision.json\\\"}\"",
+      "purpose": "Create a new WAITING_REVIEW mock revision task from the feedback.",
+      "requiresManualCopy": true,
+      "writesLocalState": true,
+      "expected": "sourceTask.status=WAITING_REVIEW and newTask.status=WAITING_REVIEW"
+    },
+    {
+      "id": "inspect_mcp_revision_audit",
+      "order": 7,
+      "command": "python lab_cli.py mcp audit --tool regenerate_from_revision_mock",
+      "purpose": "Show the MCP call audit record for the mock regeneration tool.",
+      "requiresManualCopy": true,
+      "writesLocalState": false
+    }
+  ],
+  "safety": {
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecutedByCommands": false,
+    "contestantCodeExecutedByCommands": false,
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "sourceTaskStatusUnchanged": true,
+    "newTaskWaitingReview": true,
+    "secretVisibleInCommands": false
+  },
+  "blockedCommandFragments": [
+    "--provider-mode real-llm-demo",
+    "--explicit-real-call-opt-in",
+    "OPENAI_API_KEY",
+    "OPENAI_BASE_URL",
+    "docker run",
+    "pytest ",
+    "review publish"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "REAL_LLM_REQUEST_REVIEW_PACKAGE_ONLY",
+  "description": "Real LLM first request review package. It builds a redacted request shape and manual review checklist for a future first real LLM call, but must not import SDKs, construct clients, check or read secrets, send requests, access network, create generated content, create tasks, or publish content.",
+  "supportedProvider": "openai",
+  "operation": "generateJson",
+  "promptId": "lab_generation_v0",
+  "outputKind": "Lab",
+  "schemaRef": "templates/lab/lab.schema.json",
+  "secretEnv": "OPENAI_API_KEY",
+  "allowedOperations": [
+    "request_shape_construction",
+    "payload_redaction_preview",
+    "review_checklist_generation"
+  ],
+  "blockedOperations": [
+    "sdk_import",
+    "client_construction",
+    "secret_presence_check",
+    "secret_value_read",
+    "request_send",
+    "network_request",
+    "real_llm_call",
+    "generated_content_creation",
+    "task_creation",
+    "auto_publish"
+  ],
+  "rules": {
+    "requiresExplicitRequestReviewOptIn": true,
+    "requiresClientBoundaryConfirmation": true,
+    "requiresPromptScopeConfirmation": true,
+    "requiresSchemaValidationConfirmation": true,
+    "requiresAuditRedactionConfirmation": true,
+    "requiresHumanReviewPolicyConfirmation": true,
+    "requiresNoRequestSendConfirmation": true,
+    "requiresNoNetworkConfirmation": true,
+    "requiresNoRealLlmCallConfirmation": true,
+    "manualApprovalRequiredBeforeSend": true,
+    "realCallAuthorized": false,
+    "generatedContentDefaultStatus": "WAITING_REVIEW"
+  },
+  "assertions": {
+    "requestShapeBuilt": true,
+    "requestReviewPackageBuilt": true,
+    "requestReviewPackageReady": true,
+    "readyForManualRequestReview": true,
+    "readyForFirstRealCallApproval": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "secretValueLogged": false,
+    "requestSent": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

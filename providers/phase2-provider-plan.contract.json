@@ -1,0 +1,656 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "phase2_provider_plan",
+  "title": "Phase 2 MockProvider-first Provider Integration Plan",
+  "description": "Planning contract for the next provider integration step. It preserves Phase 1 safety limits while documenting the interface and gates needed before any real model provider can be enabled.",
+  "inputs": [
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "mock_provider",
+      "path": "providers/mock_provider.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_adapter_errors",
+      "path": "providers/provider-adapter-errors.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_audit",
+      "path": "providers/provider-audit.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "env_example",
+      "path": ".env.example",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "readiness_gate",
+      "path": "delivery/phase2-readiness-gate.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate",
+      "path": "providers/real_provider_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell",
+      "path": "providers/real_provider_shell.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell_contract",
+      "path": "providers/real-provider-shell.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_dry_run_plan",
+      "path": "providers/real_llm_dry_run_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_dry_run_plan_contract",
+      "path": "providers/real-llm-dry-run-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_approval_gate",
+      "path": "providers/real_llm_approval_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_approval_gate_contract",
+      "path": "providers/real-llm-approval-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "path": "providers/real_llm_sdk_task_blueprint.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_contract",
+      "path": "providers/real-llm-sdk-task-blueprint.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_sdk_poc",
+      "path": "providers/real_provider_sdk_poc.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_sdk_poc_contract",
+      "path": "providers/real-provider-sdk-poc.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement",
+      "path": "providers/real_sdk_enablement.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement_contract",
+      "path": "providers/real-sdk-enablement.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_minimal_impl",
+      "path": "providers/real_sdk_minimal_impl.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_contract",
+      "path": "providers/real-sdk-minimal-impl.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate",
+      "path": "providers/real_sdk_dependency_env_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_contract",
+      "path": "providers/real-sdk-dependency-env-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan",
+      "path": "providers/real_sdk_dependency_install_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_contract",
+      "path": "providers/real-sdk-dependency-install-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit",
+      "path": "providers/real_sdk_dependency_installer_audit.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_contract",
+      "path": "providers/real-sdk-dependency-installer-audit.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "provider_plan_markdown",
+      "path": "providers/PHASE2_PROVIDER_PLAN.md",
+      "generated": false,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "test_phase2_provider_plan",
+    "test_real_provider_gate",
+    "test_real_provider_shell",
+    "test_provider_runtime_guard",
+    "test_real_llm_poc_adapter",
+    "test_real_llm_dry_run_plan",
+    "test_real_llm_approval_gate",
+    "test_real_llm_sdk_task_blueprint",
+    "test_real_provider_sdk_poc",
+    "test_real_sdk_enablement",
+    "test_real_sdk_minimal_impl",
+    "test_real_sdk_dependency_env_gate",
+    "test_real_sdk_dependency_install_plan",
+    "test_real_sdk_dependency_installer_audit",
+    "test_provider_adapter_workflow",
+    "test_phase2_readiness",
+    "test_provider_contract",
+    "test_provider_mock",
+    "test_all"
+  ],
+  "providerPrinciples": [
+    {
+      "id": "mock_provider_first",
+      "required": true,
+      "description": "MockProvider remains the default implementation and acceptance path."
+    },
+    {
+      "id": "real_provider_requires_explicit_task",
+      "required": true,
+      "description": "OpenAI, Anthropic, or local model providers require a separate approved task before implementation."
+    },
+    {
+      "id": "schema_validation_required",
+      "required": true,
+      "description": "generateJson output must validate against the declared DSL schema before creating an AI Task."
+    },
+    {
+      "id": "safe_error_matrix_required",
+      "required": true,
+      "description": "Provider Adapter error paths must return safe mock-only context without creating tasks or generated content."
+    },
+    {
+      "id": "provider_call_audit_required",
+      "required": true,
+      "description": "Provider registry, health, and generateJson success or failure paths must write local mock audit events."
+    },
+    {
+      "id": "prompt_manifest_only",
+      "required": true,
+      "description": "Business code references prompt ids and the prompt manifest instead of embedding prompts inline."
+    },
+    {
+      "id": "secrets_from_env_only",
+      "required": true,
+      "description": "Secrets and endpoints come from runtime configuration or environment variables only."
+    },
+    {
+      "id": "logs_redact_secrets",
+      "required": true,
+      "description": "Provider logs must redact secrets, tokens, candidate-hidden answers, and raw credentials."
+    },
+    {
+      "id": "timeouts_retries_configured",
+      "required": true,
+      "description": "Timeout, retry, and concurrency limits must be configured before any real provider is enabled."
+    },
+    {
+      "id": "network_disabled_until_enabled",
+      "required": true,
+      "description": "Network access remains disabled until a future explicit provider task changes the runtime gate."
+    },
+    {
+      "id": "review_gate_required",
+      "required": true,
+      "description": "Generated Lab, Exam, Grading, and PPT DSL output defaults to WAITING_REVIEW."
+    },
+    {
+      "id": "real_provider_preflight_gate",
+      "required": true,
+      "description": "Real Provider PoC must pass a disabled-by-default local preflight gate before any implementation can route to a real SDK."
+    },
+    {
+      "id": "real_provider_shell_disabled",
+      "required": true,
+      "description": "OpenAI, Anthropic, and local model provider classes may exist only as disabled shells until a future real provider task enables routing."
+    },
+    {
+      "id": "provider_runtime_guard_required",
+      "required": true,
+      "description": "Timeout, retry, concurrency, redaction, schema, audit, and review guards must pass locally before any future real provider call."
+    },
+    {
+      "id": "real_llm_poc_adapter_disabled",
+      "required": true,
+      "description": "Real LLM PoC adapter may wire runtime guard and preflight only while keeping SDK calls, generated content, AI task creation, and publish disabled."
+    },
+    {
+      "id": "real_llm_dry_run_plan_required",
+      "required": true,
+      "description": "A local dry-run plan must pass for the first Lab DSL scope before any future real LLM call is enabled."
+    },
+    {
+      "id": "real_llm_approval_gate_required",
+      "required": true,
+      "description": "A local pre-implementation approval gate must pass before any future task may change runtime/provider contracts for real LLM SDK work."
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_required",
+      "required": true,
+      "description": "A local implementation blueprint must define future SDK scope, proposed changes, tests, rollback, and blocking conditions before any real SDK code task starts."
+    },
+    {
+      "id": "real_provider_sdk_poc_disabled",
+      "required": true,
+      "description": "A default-disabled SDK PoC harness may require the blueprint before reaching the disabled adapter, but it must still block SDK imports, secret checks, network calls, generated content, and AI task creation."
+    },
+    {
+      "id": "real_sdk_enablement_switch_required",
+      "required": true,
+      "description": "A final enablement switch design gate must pass before any future task may review runtime/provider contract changes for real SDK work."
+    },
+    {
+      "id": "real_sdk_minimal_impl_disabled",
+      "required": true,
+      "description": "A first implementation-shaped SDK shell may exist only when it remains default-disabled and blocks SDK imports, secret checks, network calls, generated content, and AI task creation."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_required",
+      "required": true,
+      "description": "Real SDK dependency and environment-variable changes require a separate design-only gate before any dependency installation or secret presence check."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_required",
+      "required": true,
+      "description": "Real SDK dependency installation requires a draft-only install plan review before any future package install, version resolution, hash verification, or lockfile change."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_required",
+      "required": true,
+      "description": "A disabled installer audit must pass before any future SDK dependency installation implementation task can materialize commands or file changes."
+    }
+  ],
+  "interfaceDesign": {
+    "interfaceName": "LLMProvider",
+    "methods": [
+      {
+        "name": "generateText",
+        "returns": "ProviderResult",
+        "requiresSchemaValidation": false
+      },
+      {
+        "name": "generateJson",
+        "returns": "ProviderJsonResult",
+        "requiresSchemaValidation": true
+      },
+      {
+        "name": "streamGenerate",
+        "returns": "ProviderStreamResult",
+        "requiresSchemaValidation": false,
+        "deferred": true
+      }
+    ],
+    "resultFields": [
+      "providerId",
+      "mode",
+      "promptId",
+      "promptVersion",
+      "generatedStatus",
+      "realLlmCalled",
+      "secretsRead",
+      "networkAccess",
+      "traceId"
+    ]
+  },
+  "realProviderPlaceholders": [
+    {
+      "id": "openai",
+      "displayName": "OpenAI Provider",
+      "enabled": false,
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "realLlmCalled": false,
+      "networkAccess": false,
+      "runtimeGuardRequired": true,
+      "timeoutConfigured": true,
+      "retryConfigured": true,
+      "concurrencyLimitConfigured": true,
+      "redactionRequired": true
+    },
+    {
+      "id": "anthropic",
+      "displayName": "Anthropic Claude Provider",
+      "enabled": false,
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "realLlmCalled": false,
+      "networkAccess": false,
+      "runtimeGuardRequired": true,
+      "timeoutConfigured": true,
+      "retryConfigured": true,
+      "concurrencyLimitConfigured": true,
+      "redactionRequired": true
+    },
+    {
+      "id": "local",
+      "displayName": "Local Model Provider",
+      "enabled": false,
+      "apiKeyEnv": "LOCAL_MODEL_ENDPOINT",
+      "realLlmCalled": false,
+      "networkAccess": false,
+      "runtimeGuardRequired": true,
+      "timeoutConfigured": true,
+      "retryConfigured": true,
+      "concurrencyLimitConfigured": true,
+      "redactionRequired": true
+    }
+  ],
+  "phase2AllowedWork": [
+    {
+      "id": "extend_mock_provider_tests",
+      "allowed": true,
+      "description": "Add more deterministic MockProvider outputs and schema validation tests."
+    },
+    {
+      "id": "define_provider_interface_adapter",
+      "allowed": true,
+      "description": "Introduce an interface or adapter boundary while keeping the active implementation mock-only."
+    },
+    {
+      "id": "document_provider_config",
+      "allowed": true,
+      "description": "Document runtime keys, timeout, retry, and logging policies without reading real secrets."
+    },
+    {
+      "id": "define_real_provider_gate",
+      "allowed": true,
+      "description": "Define local preflight checks for real providers while keeping real calls disabled."
+    },
+    {
+      "id": "define_real_provider_shell",
+      "allowed": true,
+      "description": "Define disabled implementation shells for real providers without SDK imports, secret reads, network calls, or generated content."
+    },
+    {
+      "id": "define_provider_runtime_guard",
+      "allowed": true,
+      "description": "Define local runtime guard checks for future real providers without SDK imports, secret reads, network calls, or generated content."
+    },
+    {
+      "id": "define_real_llm_poc_adapter_shell",
+      "allowed": true,
+      "description": "Define a disabled real LLM PoC adapter shell that composes runtime guard, preflight, and disabled provider shell without SDK imports, secret reads, network calls, or generated content."
+    },
+    {
+      "id": "define_real_llm_dry_run_plan",
+      "allowed": true,
+      "description": "Define a local real LLM dry-run plan that checks scope and runtime guards while keeping SDK imports, secret reads, network calls, generated content, and AI task creation disabled."
+    },
+    {
+      "id": "define_real_llm_approval_gate",
+      "allowed": true,
+      "description": "Define a local approval checklist gate before real SDK implementation while keeping real calls unauthorized."
+    },
+    {
+      "id": "define_real_llm_sdk_task_blueprint",
+      "allowed": true,
+      "description": "Define a local blueprint for a future minimal real LLM SDK implementation task while keeping SDK dependencies, contract changes, secret checks, network calls, generated content, and AI task creation disabled."
+    },
+    {
+      "id": "define_real_provider_sdk_poc_harness",
+      "allowed": true,
+      "description": "Define a default-disabled SDK PoC harness that composes the task blueprint and disabled adapter without installing SDKs, checking secrets, opening network, generating content, or creating AI tasks."
+    },
+    {
+      "id": "define_real_sdk_enablement_switch",
+      "allowed": true,
+      "description": "Define the final local enablement switch checklist without applying runtime/provider contract changes, installing SDKs, checking secrets, opening network, or authorizing real calls."
+    },
+    {
+      "id": "define_real_sdk_minimal_impl_shell",
+      "allowed": true,
+      "description": "Define a default-disabled real SDK minimal implementation shell after enablement without installing SDKs, importing SDKs, checking secrets, opening network, generating content, or creating AI tasks."
+    },
+    {
+      "id": "define_real_sdk_dependency_env_gate",
+      "allowed": true,
+      "description": "Define a design-only dependency and environment gate without installing SDKs, resolving package versions, checking secret presence, reading secrets, opening network, generating content, or creating AI tasks."
+    },
+    {
+      "id": "define_real_sdk_dependency_install_plan",
+      "allowed": true,
+      "description": "Define a draft-only dependency install plan without generating install commands, installing SDKs, resolving package versions or hashes, modifying lockfiles, checking secrets, opening network, generating content, or creating AI tasks."
+    },
+    {
+      "id": "define_real_sdk_dependency_installer_audit",
+      "allowed": true,
+      "description": "Define a disabled installer audit shell without generating executable commands, installing dependencies, resolving packages, modifying files, checking secrets, opening network, or creating AI tasks."
+    }
+  ],
+  "blockedWork": [
+    "enable_real_llm",
+    "read_real_secret",
+    "network_call",
+    "bypass_schema",
+    "bypass_review",
+    "log_secret",
+    "auto_publish",
+    "runtime_guard_bypass",
+    "real_llm_poc_adapter_bypass",
+    "real_llm_dry_run_plan_bypass",
+    "real_llm_approval_gate_bypass",
+    "real_llm_sdk_task_blueprint_bypass",
+    "real_provider_sdk_poc_bypass",
+    "missing_timeout_retry_concurrency_guard",
+    "unredacted_provider_payload",
+    "real_sdk_enablement_bypass",
+    "real_sdk_minimal_impl_bypass",
+    "real_sdk_dependency_env_gate_bypass",
+    "install_sdk_dependency_without_gate",
+    "secret_presence_check_without_gate",
+    "lockfile_change_from_plan_draft",
+    "modify_lockfile_from_audit",
+    "execute_install_command_from_audit",
+    "materialize_install_command_from_audit",
+    "real_sdk_dependency_installer_audit_bypass",
+    "install_sdk_dependency_from_plan_draft",
+    "real_sdk_dependency_install_plan_bypass"
+  ],
+  "acceptanceSignals": [
+    {
+      "id": "provider_plan_contract_test_passes",
+      "commandId": "test_phase2_provider_plan",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "phase2_readiness_gate_passes",
+      "commandId": "test_phase2_readiness",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "provider_adapter_workflow_helper_passes",
+      "commandId": "test_provider_adapter_workflow",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "provider_adapter_error_matrix_passes",
+      "commandId": "test_provider_adapter",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "mock_provider_contracts_pass",
+      "commandId": "test_provider_contract",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_provider_gate_passes",
+      "commandId": "test_real_provider_gate",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_provider_shell_passes",
+      "commandId": "test_real_provider_shell",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "provider_runtime_guard_passes",
+      "commandId": "test_provider_runtime_guard",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_llm_poc_adapter_passes",
+      "commandId": "test_real_llm_poc_adapter",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_llm_dry_run_plan_passes",
+      "commandId": "test_real_llm_dry_run_plan",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_llm_approval_gate_passes",
+      "commandId": "test_real_llm_approval_gate",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_passes",
+      "commandId": "test_real_llm_sdk_task_blueprint",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_provider_sdk_poc_passes",
+      "commandId": "test_real_provider_sdk_poc",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_sdk_enablement_passes",
+      "commandId": "test_real_sdk_enablement",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_sdk_minimal_impl_passes",
+      "commandId": "test_real_sdk_minimal_impl",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_passes",
+      "commandId": "test_real_sdk_dependency_env_gate",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_passes",
+      "commandId": "test_real_sdk_dependency_install_plan",
+      "expected": "pytest passed"
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_passes",
+      "commandId": "test_real_sdk_dependency_installer_audit",
+      "expected": "pytest passed"
+    }
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

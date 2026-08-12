@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地 PPT 生成工作台</title>
+  <style>
+    :root { --bg:#f5f7fa; --panel:#fff; --line:#d7dde6; --text:#1f2937; --muted:#667085; --accent:#0f766e; --soft:#ecfdf5; --warn:#b45309; --danger:#991b1b; --code:#101828; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:"Microsoft YaHei","Segoe UI",Arial,sans-serif; }
+    header { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:18px 28px; border-bottom:1px solid var(--line); background:var(--panel); }
+    main { display:grid; gap:18px; padding:18px; max-width:1280px; margin:0 auto; }
+    section { min-width:0; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+    h1,h2,h3,p { margin:0; } h1 { font-size:24px; } h2 { font-size:18px; } h3 { font-size:15px; }
+    .section-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:16px; border-bottom:1px solid var(--line); }
+    .pill-row,.actions,.links { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .pill,.api-state { display:inline-flex; align-items:center; min-height:28px; padding:4px 10px; border:1px solid var(--line); border-radius:8px; color:var(--muted); background:#f9fafb; font-size:13px; }
+    .pill.strong { color:var(--accent); border-color:#99f6e4; background:var(--soft); font-weight:700; }.pill.warn { color:var(--warn); border-color:#fed7aa; background:#fff7ed; font-weight:700; }
+    .api-state { margin:16px; }.api-state.pending { color:var(--warn); border-color:#fed7aa; }.api-state.error { color:var(--danger); border-color:#fecaca; background:#fef2f2; }
+    .form-grid,.summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px; }.form-grid { grid-template-columns:minmax(0,1fr) minmax(260px,.75fr); }
+    label,.card,.metric { display:grid; gap:8px; min-width:0; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fbfcfd; }.metric span { color:var(--muted); font-size:12px; }.metric strong { overflow-wrap:anywhere; font-size:15px; }
+    input,textarea { width:100%; min-height:38px; padding:8px 10px; border:1px solid var(--line); border-radius:6px; color:var(--text); font:inherit; } textarea { min-height:90px; resize:vertical; } label.confirmation { display:flex; align-items:center; gap:8px; } input[type="checkbox"] { width:18px; min-width:18px; min-height:18px; margin:0; padding:0; }
+    .actions { padding:0 16px 16px; } button,.action-link { min-height:36px; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--text); font:inherit; text-decoration:none; cursor:pointer; } button.primary { background:var(--accent); border-color:var(--accent); color:#fff; } button:disabled { color:#9ca3af; border-color:#e5e7eb; background:#f3f4f6; cursor:not-allowed; }
+    .result-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.55fr); gap:16px; padding:16px; } pre { min-height:320px; margin:0; overflow:auto; padding:14px; border-radius:6px; background:var(--code); color:#d1fae5; font-size:13px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .next { margin:0 16px 16px; border:1px solid var(--line); border-radius:8px; overflow:hidden; }.next .section-head { padding:12px; }.next .summary-grid { padding:12px; }.links { padding:0 12px 12px; }.links .pill { text-decoration:none; }
+    @media (max-width:760px) { header { padding:14px; align-items:flex-start; flex-direction:column; } main { padding:12px; }.form-grid,.summary-grid,.result-grid { grid-template-columns:1fr; }.section-head { flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>PPT 生成工作台</h1><p class="pill strong">LOCAL_CORE_MVP</p></div>
+    <div class="pill-row" aria-label="安全状态"><span class="pill">真实 LLM：同源后端显式接入</span><span class="pill">真实 PPT 文件：禁用</span><span class="pill">自动发布：禁用</span></div>
+  </header>
+  <main>
+    <section aria-labelledby="ppt-generate-input-title">
+      <div class="section-head"><div><h2 id="ppt-generate-input-title">本地素材</h2><p>从本地 Markdown 创建待审核 PPT DSL。</p></div><span class="pill">POST /api/ppt/generate</span></div>
+      <div class="form-grid">
+        <label>素材路径<input id="ppt-generate-input" value="examples/input/demo-source.md"></label>
+        <label>生成模式<select id="ppt-generate-provider-mode"><option value="mock" selected>本地 Mock</option><option value="real-llm">真实 LLM</option></select></label>
+        <label>模型（真实 LLM 可选）<input id="ppt-generate-model" placeholder="留空使用 OPENAI_MODEL"></label>
+        <label>Base URL（真实 LLM 可选）<input id="ppt-generate-base-url" placeholder="留空使用 OPENAI_BASE_URL"></label>
+        <label class="confirmation"><input id="ppt-generate-explicit-real-call" type="checkbox">已确认真实请求仅生成 DSL，并进入 WAITING_REVIEW</label>
+        <label>生成说明<textarea readonly>默认调用同源 Backend Mock。选择真实 LLM 后由同源后端读取环境变量中的密钥；前端不读取或保存 API Key。</textarea></label>
+      </div>
+      <div class="actions"><button id="ppt-generate-run" class="primary" type="button">生成 PPT DSL</button><button type="button" disabled title="当前本地工作台不生成真实 PPT 文件">生成真实 PPT 文件</button><button type="button" disabled title="审核通过前禁止发布">发布</button></div>
+    </section>
+    <section aria-labelledby="ppt-generate-result-title">
+      <div class="section-head"><div><h2 id="ppt-generate-result-title">生成结果</h2><p>成功后任务固定进入 WAITING_REVIEW。</p></div><span id="ppt-generate-api-state" class="api-state">STATIC_HTML_FALLBACK</span></div>
+      <div class="next"><div class="section-head"><div><h3>下一步人工动作</h3><p>审核 DSL 后再决定后续本地流程。</p></div><span id="ppt-generate-next-status" class="pill warn">WAITING_REVIEW</span></div><div class="summary-grid"><div class="metric"><span>任务</span><strong id="ppt-generate-next-task">task=not_created</strong></div><div class="metric"><span>产物</span><strong id="ppt-generate-next-artifact">pptDslPath=none</strong></div><div class="metric"><span>边界</span><strong id="ppt-generate-next-boundary">artifactGenerated=false · autoPublishAllowed=false</strong></div></div><div class="links"><a id="ppt-generate-review-center-link" class="pill strong" href="review-center.html">打开审核中心</a><a id="ppt-generate-review-page-link" class="pill" href="ppt-review.html">打开 PPT 审核页</a><a id="ppt-generate-list-link" class="pill" href="ppt.html">返回 PPT 清单</a></div></div>
+      <div class="result-grid"><pre id="ppt-generate-result-json">{
+  "api": "/api/ppt/generate",
+  "status": "STATIC_HTML_FALLBACK",
+  "review": { "generatedStatus": "WAITING_REVIEW", "autoPublishAllowed": false, "realPublish": false }
+}</pre><div class="card"><h3>安全摘要</h3><p>frontendDirectRealLlmCall=false</p><p>secretVisibleInFrontend=false</p><p>artifactGenerated=false</p><p>realPublish=false</p></div></div>
+      <div class="actions"><button id="ppt-generate-review-link" type="button">查看审核详情</button></div>
+    </section>
+  </main>
+  <script src="ppt-generate-data.js"></script>
+</body>
+</html>

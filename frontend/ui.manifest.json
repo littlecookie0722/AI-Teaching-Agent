@@ -1,0 +1,3912 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Frontend 2.0 information architecture contract for Phase 1. No real web app is started by this manifest.",
+  "globalRules": {
+    "realBackendRequired": false,
+    "realLlmCalled": false,
+    "realCloudResourceCreated": false,
+    "autoPublishAllowed": false,
+    "answerVisibleToCandidate": false,
+    "secretVisibleInFrontend": false
+  },
+  "staticPrototypes": [
+    {
+      "route": "/access",
+      "title": "Access Entrypoints Mock",
+      "path": "frontend/access.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.accessEntrypointsPrototype",
+        "delivery/access-entrypoints.json",
+        "delivery/ACCESS_ENTRYPOINTS.md"
+      ],
+      "blockedActions": [
+        "startRealHttpServer",
+        "bindExternalIp",
+        "openLanAccess",
+        "generatePublicUrl",
+        "configureTls",
+        "configureReverseProxy",
+        "deployPackage",
+        "startRealAgent",
+        "realMcpServerStart",
+        "realLlmCall",
+        "remoteUpload",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realHttpServerStarted": false,
+        "portListening": false,
+        "externalIpBound": false,
+        "lanAccessEnabled": false,
+        "publicUrlGenerated": false,
+        "networkAccess": false,
+        "tlsConfigured": false,
+        "reverseProxyConfigured": false,
+        "deploymentPackageGenerated": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/labs/generate",
+      "title": "Lab Generation Local Core",
+      "path": "frontend/lab-generate.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.labGeneratePrototype",
+        "frontend/mock-data.json.materialAnalysis",
+        "frontend/mock-data.json.providerSettings.mockGeneration",
+        "frontend/mock-data.json.dslPreviews.lab",
+        "frontend/lab-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "LabGenerationCloseLoopAction",
+        "frontendDirectRealLlmCall=false",
+        "backendRealLlmRequestViaExplicitOptIn=true",
+        "providerMode=mock|real-llm",
+        "realLlmResultCanEnterViaCliOrBackend=true",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/labs/generate.task",
+        "POST /api/labs/generate.dsl",
+        "POST /api/labs/generate.materialAnalysis",
+        "POST /api/labs/generate.providerGeneration",
+        "POST /api/labs/generate.closeLoopAction",
+        "LabGenerationCloseLoopAction.initialContextLinks",
+        "POST /api/labs/generate body.coreDbPath",
+        "review-center.html?taskId={taskId}",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "lab-review.html?taskId={taskId}",
+        "lab-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=lab",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=lab&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "blockedActions": [
+        "frontendDirectRealLlmGenerate",
+        "remoteMaterialFetch",
+        "unknownShellExecute",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "apiMockGenerationEnabled": true,
+        "localCoreGenerationWorkspace": true,
+        "frontendDirectRealLlmCall": false,
+        "backendRealLlmRequestViaExplicitOptIn": true,
+        "realLlmResultCanEnterViaCliOrBackend": true,
+        "realLlmCalled": false,
+        "remoteContentFetched": false,
+        "unknownShellExecuted": false,
+        "sandboxExecuted": false,
+        "autoPublishAllowed": false,
+        "generatedStatus": "WAITING_REVIEW",
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/labs",
+      "title": "Labs Management Mock",
+      "path": "frontend/labs.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.labsPrototype",
+        "frontend/mock-data.json.labs",
+        "frontend/mock-data.json.reviewTaskSummary",
+        "frontend/mock-data.json.dslPreviews.lab"
+      ],
+      "blockedActions": [
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish",
+        "realLlmCall",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "answerVisibleToCandidate": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ppt/generate",
+      "title": "PPT Generation Local Core",
+      "path": "frontend/ppt-generate.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.pptPrototype",
+        "frontend/ppt-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "frontendDirectRealLlmCall=false",
+        "backendRealLlmRequestViaExplicitOptIn=true",
+        "providerMode=mock|real-llm",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/ppt/generate.task",
+        "POST /api/ppt/generate.pptDsl",
+        "review-center.html?taskId={taskId}"
+      ],
+      "blockedActions": [
+        "frontendDirectRealLlmGenerate",
+        "realPptFileGenerate",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "frontendDirectRealLlmCall": false,
+        "backendRealLlmRequestViaExplicitOptIn": true,
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ppt",
+      "title": "PPT Management Mock",
+      "path": "frontend/ppt.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.pptPrototype",
+        "frontend/mock-data.json.ppts",
+        "frontend/mock-data.json.dslPreviews.ppt",
+        "frontend/mock-data.json.reviewTaskSummary"
+      ],
+      "blockedActions": [
+        "realLlmCall",
+        "realPptFileGenerate",
+        "autoPublish",
+        "realPublish",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "realPptFileGenerated": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ppt/:id/review",
+      "title": "PPT Review Mock",
+      "path": "frontend/ppt-review.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.pptReviewPrototype",
+        "frontend/mock-data.json.ppts",
+        "frontend/mock-data.json.dslPreviews.ppt",
+        "frontend/mock-data.json.pptReviewPrototype.pptxArtifact",
+        "frontend/mock-data.json.pptReviewPrototype.pageReviewUpdateAction",
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "examples/output/real-llm-demo-ppt-artifact.pptx",
+        "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+        "frontend/mock-data.json.operationAuditEvents"
+      ],
+      "blockedActions": [
+        "realLlmCall",
+        "realPptFileGenerate",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "realPptFileGenerated": false,
+        "pptxArtifactGenerated": true,
+        "pptxArtifactAutoPublishAllowed": false,
+        "pageReviewUpdateTaskStatusChanged": false,
+        "pageReviewUpdateAutoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/labs/:id/review",
+      "title": "Lab Review Mock",
+      "path": "frontend/lab-review.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.labReviewPrototype",
+        "frontend/mock-data.json.reviewDetail",
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "POST /api/labs/import-preview",
+        "POST /api/labs/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=lab",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "frontend/mock-data.json.reviewDetail.reviewPage.generationProfile",
+        "frontend/mock-data.json.reviewDetail.reviewPage.qualitySignals",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.qualitySummary",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+        "examples/review-detail/lab-review-detail.json"
+      ],
+      "blockedActions": [
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish",
+        "answerRevealToCandidate"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "answerVisibleToCandidate": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/grading",
+      "title": "Grading Management Mock",
+      "path": "frontend/grading.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.gradingPrototype",
+        "frontend/mock-data.json.gradings",
+        "frontend/mock-data.json.gradingReport",
+        "frontend/mock-data.json.operationAuditEvents"
+      ],
+      "blockedActions": [
+        "realSandboxRun",
+        "contestantCodeExecute",
+        "unknownShellExecute",
+        "realRegrade",
+        "realCloudResourceChange",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "realCloudResourceChanged": false,
+        "realRegradeEnabled": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/grading/:id/review",
+      "title": "Grading Review Mock",
+      "path": "frontend/grading-review.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.gradingReviewPrototype",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanManualReviewChecklist",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}.reviewDetail.assessmentPlan",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.assessmentPlan",
+        "frontend/mock-data.json.gradings",
+        "frontend/mock-data.json.gradingReport",
+        "frontend/mock-data.json.operationAuditEvents"
+      ],
+      "blockedActions": [
+        "realSandboxRun",
+        "contestantCodeExecute",
+        "unknownShellExecute",
+        "realRegrade",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "realCloudResourceChanged": false,
+        "realRegradeEnabled": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/grading/:id/report",
+      "title": "Grading Report Local Core",
+      "path": "frontend/grading-report.html",
+      "mode": "LOCAL_CORE_MVP",
+      "dataSources": [
+        "frontend/mock-data.json.gradingReportPrototype",
+        "frontend/mock-data.json.gradingReport",
+        "frontend/mock-data.json.gradingReport.assessmentPlanSummary",
+        "frontend/mock-data.json.gradingReport.reportDetail.assessmentPlanSummary",
+        "frontend/mock-data.json.realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+        "frontend/mock-data.json.realDemoPrototype.controlledDockerEvidenceDemo",
+        "local grading evidence reports (readonly)",
+        "ReviewerReportWorkspace",
+        "ReviewerSafetySummary",
+        "ReviewerReportWorkspace.noHorizontalOverflow",
+        "query: coreDbPath",
+        "query: gradingDbPath",
+        "query: agentReport",
+        "review-center.html?taskId={taskId}&decision={decision}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/report?file={file}.ReviewerReportWorkspace",
+        "GET /api/grading/report?file={file}.report.reviewerSafetySummary",
+        "GET /api/grading/evidence-readiness?report={file}.ReviewerReportWorkspace",
+        "GET /api/grading/records?taskId={id}.ReviewerReportWorkspace",
+        "GET /api/grading/records?taskId={id}.latest.reportPathFallback",
+        "GET /api/grading/report?file={file}&taskId={id}.mergedGradingEvidence",
+        "GET /api/grading/result-preview?report={file}&taskId={id}.gradingResultPreview",
+        "GET /api/grading/evidence-readiness?report={file}&taskId={id}.gradingEvidenceReadiness",
+        "GET /api/grading/report?file={file}&taskId={id}.mergedGradingEvidenceCheckItems",
+        "GET /api/grading/report?file={file}&taskId={id}.reviewDecisionNotes",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewDecisionNotes",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems[].recommendedAction",
+        "GET /api/grading/report?file={file}&taskId={id}.mergedGradingEvidenceCheckItems[].recommendedAction",
+        "GET /api/grading/records?taskId={id}.items",
+        "GET /api/grading/records?taskId={id}.GradingRecordReviewIntegration",
+        "SQLite/JSON staging source is visible in GradingRecordReviewSummary",
+        "frontend/mock-data.json.operationAuditEvents",
+        "sandbox/grade-runner.contract.json",
+        "templates/grading/examples/mixed-checks.yaml"
+      ],
+      "blockedActions": [
+        "realSandboxRun",
+        "contestantCodeExecute",
+        "unknownShellExecute",
+        "commandExecute",
+        "realPytestRun",
+        "realCloudResourceChange",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "localCoreGradingReportReadOnly": true,
+        "frontendDirectGradingExecution": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "commandExecuted": false,
+        "realSandboxRunEnabled": false,
+        "realPytestRun": false,
+        "hostExecutionAllowed": false,
+        "realCloudResourceChanged": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/grading/workspace",
+      "title": "Local Grading Workspace",
+      "path": "frontend/grading-workspace.html",
+      "mode": "LOCAL_CORE_MVP",
+      "dataSources": [
+        "frontend/grading-workspace-data.js",
+        "query: taskId, coreDbPath, gradingDbPath, agentReport",
+        "POST /api/grading/jobs",
+        "POST /api/grading/jobs/{id}/run",
+        "GET /api/grading/records?taskId={id}",
+        "POST /api/grading/records/{id}/review",
+        "grading-report.html?taskId={taskId}&file={reportPath}",
+        "review-center.html?taskId={taskId}",
+        "ai-tasks.html?taskId={taskId}"
+      ],
+      "blockedActions": [
+        "hostExecution",
+        "unknownShellExecute",
+        "autoApprove",
+        "autoPublish",
+        "realPublish",
+        "realAgentImport",
+        "secretDisplay"
+      ],
+      "safety": {
+        "localStagingOnly": true,
+        "controlledDockerOptional": true,
+        "autoApproveAllowed": false,
+        "realAgentImport": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/ai-tasks",
+      "title": "AI Task Center Mock",
+      "path": "frontend/ai-tasks.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.aiTaskCenterPrototype",
+        "frontend/mock-data.json.aiTasks",
+        "frontend/mock-data.json.reviewTaskSummary",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.reviewDetail",
+        "frontend/mock-data.json.aiTaskCenterPrototype.qualitySignalTaskSignal",
+        "frontend/mock-data.json.aiTaskCenterPrototype.providerQualityTaskSignal",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.qualitySummary",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+        "frontend/mock-data.json.aiTaskCenterPrototype.reviewPrioritySignal",
+        "frontend/mock-data.json.reviewCenterPrototype.reviewPriorityQueue",
+        "frontend/mock-data.json.reviewCenterPrototype.assessmentPlanManualReviewQueueSignal",
+        "frontend/mock-data.json.examReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.examReviewPrototype.dslPreview.candidateSafeExamPreview",
+        "frontend/mock-data.json.gradingReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanSummary",
+        "AiTaskExecutionWorkspace",
+        "AiTaskExecutionWorkspace.staticFallbackContextLinks",
+        "AiTaskExecutionWorkspace.noHorizontalOverflow",
+        "frontend/ai-tasks-data.js",
+        "query: coreDbPath",
+        "query: gradingDbPath",
+        "query: agentReport",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/records?taskId={taskId}&dbPath={path}.latest.reportPath",
+        "latest GradingRecord source: LOCAL_SQLITE_GRADING_RECORD or JSON staging",
+        "requested taskId not found -> visible fallback selected task",
+        "grading-report.html?taskId={taskId}&file={reportPath}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind={kind}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/backend/core-tasks?coreDbPath={path}",
+        "GET /api/backend/core-tasks?coreDbPath={path}&status=WAITING_REVIEW",
+        "GET /api/backend/core-tasks/{id}.taskExecutionWorkspace",
+        "GET /api/backend/core-tasks/{id}.task",
+        "GET /api/ai-tasks?status=WAITING_REVIEW",
+        "GET /api/ai-tasks/{id}.taskExecutionWorkspace",
+        "GET /api/ai-tasks/{id}.task",
+        "GET /api/review-task-summary.taskExecutionWorkspace",
+        "GET /api/review-task-summary.reviewTaskSummary.reviewPriorityQueue",
+        "GET /api/review-tasks/{id}.reviewDetail.assessmentPlan.summary"
+      ],
+      "blockedActions": [
+        "autoPublish",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "realAgentRun",
+        "realLlmCall",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realAgentStarted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/review-center",
+      "title": "Review Center Local Core",
+      "path": "frontend/review-center.html",
+      "mode": "LOCAL_CORE_MVP",
+      "dataSources": [
+        "frontend/mock-data.json.reviewCenterPrototype",
+        "frontend/mock-data.json.reviewTaskSummary",
+        "frontend/mock-data.json.reviewDetail",
+        "frontend/mock-data.json.reviewCenterPrototype.qualitySignalQueueSummary",
+        "frontend/mock-data.json.reviewCenterPrototype.reviewPriorityQueue",
+        "frontend/mock-data.json.reviewCenterPrototype.realDemoReviewQueue",
+        "MvpReviewWorkspace",
+        "MvpReviewWorkspace.staticFallbackContextLinks",
+        "MvpReviewWorkspace.noHorizontalOverflow",
+        "GET /api/review-task-summary.mvpReviewWorkspace",
+        "GET /api/review-tasks/{id}.mvpReviewWorkspace",
+        "GET /api/review-tasks/{id}/core-readiness.mvpReviewWorkspace",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.qualitySummary",
+        "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary.calls[].qualitySummary",
+        "frontend/mock-data.json.reviewDetail.contentQualitySummary",
+        "query: agentReport",
+        "realLlmArtifacts=readonly-via-agentReport",
+        "frontendDirectRealLlmCall=false",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "grading-report.html?file={file}&taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/records?taskId={id}&dbPath={path}.latest.reportPath",
+        "GET /api/review-tasks/{id}?coreDbPath={path}&gradingDbPath={path}.gradingRecords",
+        "GET /api/review-task-summary?detailMode=light&agentReport={workflowReport}.reviewTaskSummary.realDemoReviewQueue",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail.reviewPage.artifactGroups",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail.reviewPage.dslPreview.candidateSafety",
+        "query: coreDbPath",
+        "GET /api/review-tasks/{id}?coreDbPath={path}",
+        "GET /api/backend/core-tasks/{id}?coreDbPath={path}",
+        "GET /api/backend/core-tasks/{id}?coreDbPath={path}.task",
+        "GET /api/review-tasks/{id}.reviewDetail.contentQualitySummary",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.contentQualitySummary",
+        "frontend/review-center-data.js",
+        "GET /api/review-tasks/{id}.reviewDetail.controlledGradingEvidence",
+        "frontend/mock-data.json.reviewDetail.controlledGradingEvidence",
+        "frontend/mock-data.json.reviewCenterPrototype.controlledDockerEvidenceReviewSignal",
+        "frontend/mock-data.json.reviewCenterPrototype.notebookEvidenceReviewPlan",
+        "frontend/mock-data.json.realDemoPrototype.realDslReviewPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDiffPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDecision",
+        "examples/output/real-llm-demo-real-dsl-review-preview.json",
+        "examples/output/real-llm-demo-revision-diff-preview.json",
+        "examples/output/real-llm-demo-revision-decision-report.json",
+        "frontend/mock-data.json.reviewRevisionPrototype",
+        "frontend/mock-data.json.reviewDetail.reviewPage.revisionRequests",
+        "frontend/mock-data.json.reviewDetail.reviewPage.actionBar.requestRevision",
+        "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+        "frontend/mock-data.json.realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+        "frontend/mock-data.json.realDemoPrototype.controlledDockerEvidenceDemo",
+        "frontend/mock-data.json.reviewCenterPrototype.realDemoReviewQueue.items[].entryHref",
+        "review-center.html -> lab-review.html?taskId={id}",
+        "review-center.html -> exam-review.html?taskId={id}",
+        "review-center.html -> ppt-review.html?taskId={id}",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.summary.latestReportPath",
+        "review-center.html -> grading-report.html?file={file}&taskId={id}",
+        "POST /api/grading/evidence-auto",
+        "examples/output/grading-evidence-auto.json",
+        "frontend/mock-data.json.realDemoPrototype.realDslReviewPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDiffPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDecision",
+        "examples/output/real-llm-demo-real-dsl-review-preview.json",
+        "examples/output/real-llm-demo-revision-diff-preview.json",
+        "examples/output/real-llm-demo-revision-decision-report.json",
+        "frontend/mock-data.json.reviewCenterPrototype.assessmentPlanManualReviewQueueSignal",
+        "frontend/mock-data.json.examReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.examReviewPrototype.dslPreview.candidateSafeExamPreview",
+        "frontend/mock-data.json.gradingReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanSummary",
+        "GET /api/review-tasks/{id}.reviewDetail.assessmentPlan.summary",
+        "frontend/mock-data.json.pptReviewPrototype.pageReviewUpdateAction",
+        "frontend/mock-data.json.highRiskMcpIntentPrototype",
+        "frontend/mock-data.json.secondConfirmationStatusPrototype",
+        "frontend/mock-data.json.reviewAuditEvents",
+        "POST /api/review-tasks/{id}/revision-request",
+        "GET /api/review-tasks/{id}/revision-requests",
+        "POST /api/review-tasks/{id}/regenerate-mock",
+        "POST /api/review-tasks/{id}/decision-note",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewDecisionNotes",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.reviewDecisionNotes",
+        "GET /api/review-tasks/{id}.reviewDetail.preApproveReviewCheck",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.preApproveReviewCheck",
+        "GET /api/review-tasks/{id}.reviewDetail.preApproveReviewCheck.summary.scorePreviewStatus",
+        "GET /api/review-tasks/{id}.reviewDetail.preApproveReviewCheck.summary.scorePreviewReadyForDecisionNote",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotion",
+        "examples/output/real-llm-demo-revision-promotion-report.json",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotionReviewQueueItem",
+        "frontend/mock-data.json.reviewCenterPrototype.realDslRevisionPromotionReviewQueueSignal",
+        "POST /api/review/real-dsl-revision-enqueue",
+        "GET /api/review-tasks/{id}",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotionReviewDisposition",
+        "frontend/mock-data.json.realDemoPrototype.labTemplateImportPreview",
+        "frontend/mock-data.json.reviewCenterPrototype.labTemplateImportPreviewSignal",
+        "frontend/mock-data.json.reviewCenterPrototype.examQuestionImportPreviewSignal",
+        "frontend/mock-data.json.reviewCenterPrototype.gradingRuleImportPreviewSignal",
+        "frontend/mock-data.json.reviewCenterPrototype.platformImportPreviewActions",
+        "frontend/mock-data.json.reviewCenterPrototype.platformImportPreviewSummary",
+        "frontend/mock-data.json.reviewCenterPrototype.platformImportPreviewSignoffChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityReadinessReport",
+        "frontend/mock-data.json.reviewCenterPrototype.mergedGradingEvidenceReviewSignal",
+        "GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewActions",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.platformImportPreviewActions",
+        "GET /api/review-tasks/{id}.reviewDetail.platformImportPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.platformImportPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewSignoff",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.platformImportPreviewSignoff",
+        "GET /api/review-tasks/{id}.reviewDetail.agentEntityMockImport",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.agentEntityMockImport",
+        "GET /api/review-tasks/{id}.reviewDetail.agentEntityReadinessReport",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.agentEntityReadinessReport",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence",
+        "GET /api/review-task-summary.reviewTaskSummary.mergedGradingEvidenceReviewSignal",
+        "GET /api/review-task-summary.reviewTaskSummary.gradingEvidenceReadinessSignal",
+        "GET /api/review-task-summary.reviewTaskSummary.reviewPriorityQueue.items[].gradingEvidenceReadinessSummary",
+        "GET /api/review-task-summary.reviewTaskSummary.reviewPriorityQueue.items[].gradingEvidenceReadinessSummary.actionGuide",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems -> GradingEvidenceReadiness",
+        "GET /api/review-tasks/{id}/core-readiness",
+        "GET /api/review-tasks/{id}/core-readiness.coreWorkflowReadinessReport",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingManualReviewChecklistStatus",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingScorePreviewStatus",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingScorePreviewReadyForDecisionNote",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingDecisionNoteRecommendation",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingNextDecisionNoteAction",
+        "GET /api/workflow/report?file={agentReport}.agentCoreNextToolExecution",
+        "GET /api/workflow/report?file={agentReport}.postExecutionCoreNextToolPlan",
+        "GET /api/workflow/report?file={agentReport}.nextSingleStepActionGuide",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}",
+        "query: agentEntityRefresh=1",
+        "POST /api/labs/import-preview",
+        "POST /api/exams/import-preview",
+        "POST /api/grading/import-preview",
+        "mcp-server/tools.manifest.json.create_lab_template_import_preview",
+        "mcp-server/tools.manifest.json.create_exam_question_import_preview",
+        "mcp-server/tools.manifest.json.create_grading_rule_import_preview",
+        "examples/output/lab-template-import-preview.json",
+        "GET /api/platform-entities/readiness-report.items[].postSignoffPrePublishChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityReadinessReport.items[].postSignoffPrePublishChecklist",
+        "GET /api/platform-entities/readiness-report.items[].postSignoffPrePublishChecklist.entitySpecificReviewFocus"
+      ],
+      "blockedActions": [
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish",
+        "executeRealPublish",
+        "destroyRealEnvironment",
+        "confirmSecondFactor",
+        "autoApproveAfterRevision",
+        "realLlmRevisionRequest",
+        "secretDisplay",
+        "answerRevealToCandidate"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "environmentDestroyed": false,
+        "secondConfirmationStatusReadOnly": true,
+        "confirmationEndpointEnabled": false,
+        "highRiskIntentExecutionAllowed": false,
+        "revisionSourceTaskStatusUnchanged": true,
+        "revisionMockRegenerationEnabled": true,
+        "revisionRealLlmCallEnabled": false,
+        "realLlmArtifactsReadOnly": true,
+        "frontendDirectRealLlmCall": false,
+        "answerVisibleToCandidate": false,
+        "secretVisibleInFrontend": false
+      },
+      "components": [
+        "RealDslRevisionPromotion",
+        "RealDslRevisionPromotionReviewQueueItem",
+        "RealDslRevisionPromotionReviewDisposition",
+        "AgentImportPreviewActionPanel",
+        "AgentImportPreviewSummary",
+        "AgentImportPreviewSignoffChecklist",
+        "AgentEntityReadinessReport",
+        "CoreWorkflowReadiness",
+        "LabTemplateImportPreview",
+        "ExamQuestionImportPreview",
+        "GradingRuleImportPreview",
+        "ReviewCenterDataLoader",
+        "GradingEvidenceReadiness",
+        "GradingEvidenceActionGuide",
+        "AgentEntityPostSignoffPrePublishChecklist",
+        "AgentEntitySpecificPrePublishReviewFocus"
+      ]
+    },
+    {
+      "route": "/platform-entities",
+      "title": "Platform Entity Mock Store",
+      "path": "frontend/agent-entities.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "query: entityId, sourceTaskId, entityKind, coreDbPath, gradingDbPath, agentReport",
+        "query: action is accepted only as paused future handoff context",
+        "GET /api/platform-entities",
+        "GET /api/platform-entities?coreDbPath={path}",
+        "GET /api/platform-entities/{id}",
+        "GET /api/platform-entities/{id}?coreDbPath={path}",
+        "GET /api/platform-entities/{id}.agentEntityImportActivity",
+        "GET /api/platform-entities/readiness-report",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}&coreDbPath={path}",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}&coreDbPath={path}&gradingDbPath={path}",
+        "GET /api/ai-tasks?status=APPROVED&taskType={taskType}",
+        "POST /api/platform-entities/contract-validate",
+        "examples/input/platform-contract.json",
+        "POST /api/labs/import-preview",
+        "POST /api/labs/import-preview body.coreDbPath",
+        "POST /api/labs/mock-import",
+        "POST /api/labs/mock-import body.coreDbPath",
+        "POST /api/exams/import-preview",
+        "POST /api/exams/import-preview body.coreDbPath",
+        "POST /api/exams/mock-import",
+        "POST /api/exams/mock-import body.coreDbPath",
+        "POST /api/grading/import-preview",
+        "POST /api/grading/import-preview body.coreDbPath",
+        "POST /api/grading/mock-import",
+        "POST /api/grading/mock-import body.coreDbPath",
+        "POST /api/platform-entities/{id}/import-dry-run",
+        "POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
+        "POST /api/platform-entities/{id}/import-dry-run body.contractConfig",
+        "RequestedEntityPlaceholder",
+        "LOCAL_ENTITY_NOT_PREPARED",
+        "requested_entity_not_prepared",
+        "nextLocalAction=prepare_demo_draft_or_run_mock_import",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1&coreDbPath={path}",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "LocalAgentEntityList.noHorizontalOverflow",
+        "frontend/mock-data.json.agentEntitiesPrototype",
+        "frontend/mock-data.json.agentEntitiesPrototype.readinessReport",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary",
+        "future handoff paused: import-send, import-status, import-result, platform signoff, final publish"
+      ],
+      "blockedActions": [
+        "realDatabaseWrite",
+        "realAgentImport",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "candidateAnswerReveal"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "localPlatformApiContractValidationEnabled": true,
+        "realAgentImportDryRunEnabled": true,
+        "realAgentImportSendEnabled": false,
+        "realAgentImportStatusQueryEnabled": false,
+        "manualImportResultRecordEnabled": false,
+        "manualAgentEntitySignoffEnabled": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false,
+        "requiresFinalHumanReviewBeforePublish": false,
+        "manualFinalPublishReviewDecisionEnabled": false,
+        "platformBackendRequired": false,
+        "pausedPlatformBackendHandoff": true,
+        "publishExecuted": false
+      },
+      "components": [
+        "AgentEntityMockStore",
+        "AgentEntityReadinessReport",
+        "AgentEntityDraftList",
+        "AgentEntityDraftDetail",
+        "PlatformApiContractValidateAction",
+        "AgentEntityDemoDataPrepareAction",
+        "AgentEntityImportStepper",
+        "AgentEntityImportDryRunAction",
+        "RequestedEntityPlaceholder",
+        "AgentEntityPausedBackendHandoffNotice"
+      ],
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/platform-entities/contract-validate"
+        },
+        {
+          "method": "POST",
+          "path": "/api/platform-entities/{id}/import-dry-run"
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "title": "Dashboard Mock",
+      "path": "frontend/dashboard.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.dashboardPrototype",
+        "frontend/mock-data.json.dashboard",
+        "frontend/mock-data.json.reviewTaskSummary",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.artifacts",
+        "frontend/mock-data.json.operationAuditEvents",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanSummary",
+        "GET /api/review-tasks/{id}.reviewDetail.assessmentPlan.summary"
+      ],
+      "blockedActions": [
+        "autoPublish",
+        "batchApprove",
+        "batchPublish",
+        "realLlmCall",
+        "realCloudResourceChange",
+        "realSandboxRun",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/console",
+      "title": "Phase 1 Mock Console",
+      "path": "frontend/console.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.consolePrototype",
+        "frontend/mock-data.json.dashboardPrototype",
+        "frontend/mock-data.json.auditObservabilityPrototype",
+        "frontend/mock-data.json.auditDetailPrototype",
+        "frontend/mock-data.json.auditIncidentReviewPrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.reviewTaskSummary",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.artifacts",
+        "frontend/mock-data.json.providerSettings",
+        "frontend/mock-data.json.providerCallAuditEvents",
+        "frontend/mock-data.json.mcpToolCallRecords",
+        "frontend/mock-data.json.workflowRegistryPrototype"
+      ],
+      "blockedActions": [
+        "realAgentStart",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "autoPublish",
+        "realPublish",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "secretDisplay",
+        "standardAnswerRevealToCandidate"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "standardAnswerRevealToCandidate": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/workflows",
+      "title": "Workflow Registry Mock",
+      "path": "frontend/workflows.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.workflowRegistryPrototype",
+        "ai-workflows/phase2-workflow-registry.contract.json",
+        "mcp-server/tools.manifest.json"
+      ],
+      "blockedActions": [
+        "runWorkflow",
+        "startRealMcpServer",
+        "startRealAgent",
+        "realLlmCall",
+        "createAiTask",
+        "createArtifact",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "workflowExecuted": false,
+        "taskCreated": false,
+        "artifactCreated": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/real-demo",
+      "title": "Real LLM Demo Evidence Mock",
+      "path": "frontend/real-demo.html",
+      "mode": "REAL_LLM_DEMO_REPLAY_STATIC",
+      "dataSources": [
+        "frontend/mock-data.json.realDemoPrototype",
+        "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+        "frontend/mock-data.json.realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+        "frontend/mock-data.json.realDemoPrototype.controlledDockerEvidenceDemo",
+        "frontend/mock-data.json.realDemoPrototype.realDemoAcceptanceSummary",
+        "frontend/mock-data.json.realDemoPrototype.realDslReviewPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDiffPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDecision",
+        "examples/output/real-llm-demo-real-dsl-review-preview.json",
+        "examples/output/real-llm-demo-revision-diff-preview.json",
+        "examples/output/real-llm-demo-revision-decision-report.json",
+        "examples/output/real-llm-demo-checklist.json",
+        "frontend/mock-data.json.realDemoPrototype.oneClickDemoChecklist",
+        "examples/output/real-llm-demo-bundle.json",
+        "examples/output/real-llm-demo-acceptance-summary.json",
+        "examples/output/real-llm-demo-readonly-evidence-report.json",
+        "examples/output/mimo-real-demo-controlled-plan.json",
+        "examples/output/mimo-real-demo-controlled-sandbox-report.json",
+        "examples/output/grading-sandbox-image-verify.json",
+        "docs/21_REAL_LLM_DEMO_BUNDLE.md",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotion",
+        "examples/output/real-llm-demo-revision-promotion-report.json",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotionReviewQueueItem",
+        "POST /api/review/real-dsl-revision-enqueue",
+        "GET /api/review-tasks/{id}",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotionReviewDisposition",
+        "frontend/mock-data.json.realDemoPrototype.labTemplateImportPreview",
+        "frontend/mock-data.json.reviewCenterPrototype.labTemplateImportPreviewSignal",
+        "POST /api/labs/import-preview",
+        "mcp-server/tools.manifest.json.create_lab_template_import_preview",
+        "examples/output/lab-template-import-preview.json"
+      ],
+      "blockedActions": [
+        "newRealLlmRequest",
+        "secretRead",
+        "networkAccess",
+        "executeGradingCommand",
+        "runRealPytest",
+        "executeNotebook",
+        "executeContestantCode",
+        "standardAnswerRevealToCandidate",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": true,
+        "newLlmRequestSent": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "pptxArtifactGenerated": true,
+        "pptxArtifactAutoPublishAllowed": false,
+        "readonlyEvidenceDemoExecuted": true,
+        "sourceGradingModified": false,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      },
+      "components": [
+        "RealDslRevisionPromotion",
+        "RealDslRevisionPromotionReviewQueueItem",
+        "RealDslRevisionPromotionReviewDisposition"
+      ]
+    },
+    {
+      "route": "/audit",
+      "title": "Audit Observability Mock",
+      "path": "frontend/audit.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.auditObservabilityPrototype",
+        "frontend/mock-data.json.providerCallAuditEvents",
+        "frontend/mock-data.json.mcpToolCallRecords",
+        "frontend/mock-data.json.highRiskMcpIntentPrototype",
+        "frontend/mock-data.json.secondConfirmationStatusPrototype",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.operationAuditEvents",
+        "frontend/mock-data.json.operationAuditEvents.detail.assessmentPlanSummary",
+        "frontend/mock-data.json.operationAuditEvents.detail.checkPlans[].assessmentPlanSourceField",
+        "frontend/mock-data.json.gradingReport.assessmentPlanSummary",
+        "frontend/mock-data.json.reviewAuditEvents"
+      ],
+      "blockedActions": [
+        "exportAudit",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "networkAccess",
+        "secretDisplay",
+        "realCloudResourceChange",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "confirmSecondFactor",
+        "executeHighRiskIntent",
+        "destroyRealEnvironment",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "secondConfirmationStatusReadOnly": true,
+        "confirmationEndpointEnabled": false,
+        "highRiskIntentExecutionAllowed": false,
+        "environmentDestroyed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/audit/:id",
+      "title": "Audit Detail Mock",
+      "path": "frontend/audit-detail.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.auditDetailPrototype",
+        "frontend/mock-data.json.providerCallAuditEvents",
+        "frontend/mock-data.json.mcpToolCallRecords",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.operationAuditEvents",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanManualReviewChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.nextManualReviewAction"
+      ],
+      "blockedActions": [
+        "retryRealCall",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "readSecret",
+        "networkAccess",
+        "secretDisplay",
+        "realCloudResourceChange",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/audit/incidents",
+      "title": "Audit Incident Review Mock",
+      "path": "frontend/audit-incidents.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.auditIncidentReviewPrototype",
+        "frontend/mock-data.json.providerCallAuditEvents",
+        "frontend/mock-data.json.mcpToolCallRecords",
+        "frontend/mock-data.json.auditDetailPrototype",
+        "frontend/mock-data.json.workflowRuns"
+      ],
+      "blockedActions": [
+        "exportIncidentReport",
+        "autoFix",
+        "retryRealCall",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "readSecret",
+        "networkAccess",
+        "secretDisplay",
+        "realCloudResourceChange",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/runbook",
+      "title": "Operations Runbook Mock",
+      "path": "frontend/operations-runbook.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "frontend/mock-data.json.consolePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.auditIncidentReviewPrototype",
+        "scripts/phase1-demo.runbook.json",
+        "scripts/manifest.json"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "batchStateChange",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/acceptance",
+      "title": "Operations Acceptance Mock",
+      "path": "frontend/operations-acceptance.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "config/delivery-package.contract.json",
+        "delivery/FAQ.md",
+        "delivery/HANDOFF.md",
+        "delivery/PHASE2_READINESS.md",
+        "frontend/mock-data.json.auditObservabilityPrototype.assessmentPlanAuditSignal",
+        "frontend/mock-data.json.gradingReport.assessmentPlanSummary",
+        "frontend/mock-data.json.operationAuditEvents.detail.assessmentPlanSummary",
+        "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+        "frontend/mock-data.json.realDemoPrototype.realDemoAcceptanceSummary",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/demo-map",
+      "title": "Operations Demo Map Mock",
+      "path": "frontend/operations-demo-map.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsDemoMapPrototype",
+        "frontend/mock-data.json.operationsPresenterPrototype",
+        "frontend/mock-data.json.consolePrototype",
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/ui.manifest.json",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "batchStateChange",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/presenter",
+      "title": "Operations Presenter View Mock",
+      "path": "frontend/operations-presenter.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsPresenterPrototype",
+        "frontend/mock-data.json.operationsDemoScriptPrototype",
+        "delivery/phase1-demo-script-checklist.json",
+        "delivery/DEMO_SCRIPT_CHECKLIST.md",
+        "frontend/mock-data.json.operationsLaunchpadPrototype",
+        "frontend/mock-data.json.operationsDemoMapPrototype",
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.auditObservabilityPrototype.assessmentPlanAuditSignal",
+        "frontend/mock-data.json.gradingReport.assessmentPlanSummary",
+        "frontend/mock-data.json.operationAuditEvents.detail.assessmentPlanSummary",
+        "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+        "frontend/mock-data.json.realDemoPrototype.realDemoAcceptanceSummary",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "batchStateChange",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/signoff",
+      "title": "Operations Signoff Dashboard Mock",
+      "path": "frontend/operations-signoff.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsSignoffPrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.reviewCenterPrototype.reviewPriorityQueue",
+        "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+        "frontend/mock-data.json.realDemoPrototype.realDemoAcceptanceSummary",
+        "GET /api/review-task-summary",
+        "mcp-server/tools.manifest.json.get_review_task_summary.outputContract",
+        "config/delivery-package.contract.json",
+        "delivery/phase1-delivery-index.json",
+        "delivery/HANDOFF.md",
+        "scripts/phase1-demo.runbook.json"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "batchStateChange",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/demo-script",
+      "title": "Operations Demo Script Mock",
+      "path": "frontend/operations-demo-script.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsDemoScriptPrototype",
+        "frontend/mock-data.json.operationsPresenterPrototype",
+        "delivery/phase1-demo-script-checklist.json",
+        "delivery/DEMO_SCRIPT_CHECKLIST.md",
+        "frontend/mock-data.json.operationsLaunchpadPrototype",
+        "frontend/mock-data.json.operationsDemoMapPrototype",
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/mock-data.json.auditObservabilityPrototype.assessmentPlanAuditSignal",
+        "frontend/mock-data.json.gradingReport.assessmentPlanSummary",
+        "frontend/mock-data.json.operationAuditEvents.detail.assessmentPlanSummary",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "batchStateChange",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/launchpad",
+      "title": "Operations Launchpad Mock",
+      "path": "frontend/operations-launchpad.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.operationsLaunchpadPrototype",
+        "frontend/mock-data.json.consolePrototype",
+        "frontend/mock-data.json.operationsDemoMapPrototype",
+        "frontend/mock-data.json.operationsPresenterPrototype",
+        "frontend/mock-data.json.operationsRunbookPrototype",
+        "frontend/mock-data.json.operationsAcceptancePrototype",
+        "frontend/mock-data.json.deliveryPrototype",
+        "frontend/ui.manifest.json",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "runCommand",
+        "uploadPackage",
+        "batchStateChange",
+        "startRealAgent",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceCreate",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay",
+        "remoteUpload"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/delivery",
+      "title": "Delivery Acceptance Mock",
+      "path": "frontend/delivery.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.deliveryPrototype",
+        "config/delivery-package.contract.json",
+        "frontend/mock-data.json.workflowRuns",
+        "frontend/mock-data.json.artifacts",
+        "frontend/mock-data.json.operationsSignoffPrototype"
+      ],
+      "blockedActions": [
+        "realPublish",
+        "remoteUpload",
+        "realProviderEnable",
+        "realLlmCall",
+        "realCloudResourceChange",
+        "realSandboxRun",
+        "contestantCodeExecution",
+        "unknownShellExecution",
+        "autoPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/exams",
+      "title": "Exams Management Mock",
+      "path": "frontend/exams.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.examsPrototype",
+        "frontend/mock-data.json.exams",
+        "frontend/mock-data.json.dslPreviews.exam",
+        "frontend/mock-data.json.dslPreviews.grading"
+      ],
+      "blockedActions": [
+        "standardAnswerRevealToCandidate",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish",
+        "realSandboxRun",
+        "realLlmCall"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "answerVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/exams/:id/review",
+      "title": "Exam Review Mock",
+      "path": "frontend/exam-review.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.examReviewPrototype",
+        "frontend/mock-data.json.exams",
+        "frontend/mock-data.json.dslPreviews.exam",
+        "frontend/mock-data.json.dslPreviews.grading",
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "POST /api/exams/import-preview",
+        "POST /api/exams/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=exam",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "frontend/mock-data.json.examReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.examReviewPrototype.dslPreview.candidateSafeExamPreview"
+      ],
+      "blockedActions": [
+        "standardAnswerRevealToCandidate",
+        "realSandboxRun",
+        "batchApprove",
+        "batchReject",
+        "batchPublish",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "answerVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/exams/generate",
+      "title": "Exam Generation Local Core",
+      "path": "frontend/exam-generate.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.examGeneratePrototype",
+        "frontend/mock-data.json.dslPreviews.lab",
+        "frontend/mock-data.json.dslPreviews.exam",
+        "frontend/mock-data.json.dslPreviews.grading",
+        "frontend/exam-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "ExamGenerationCloseLoopAction",
+        "frontendDirectRealLlmCall=false",
+        "backendRealLlmRequestViaExplicitOptIn=true",
+        "providerMode=mock|real-llm",
+        "realLlmResultCanEnterViaCliOrBackend=true",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/exams/generate-from-lab.task",
+        "POST /api/exams/generate-from-lab.examDsl",
+        "POST /api/exams/generate-from-lab.gradingDsl",
+        "POST /api/exams/generate-from-lab.providerGenerations",
+        "POST /api/exams/generate-from-lab.closeLoopAction",
+        "ExamGenerationCloseLoopAction.initialContextLinks",
+        "POST /api/exams/generate-from-lab body.coreDbPath",
+        "review-center.html?taskId={taskId}",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "exam-review.html?taskId={taskId}",
+        "exam-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "grading-review.html?taskId={taskId}",
+        "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=exam",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=exam&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=grading",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=grading&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "blockedActions": [
+        "frontendDirectRealLlmGenerate",
+        "standardAnswerRevealToCandidate",
+        "realSandboxRun",
+        "autoPublish",
+        "realPublish"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "apiMockGenerationEnabled": true,
+        "localCoreGenerationWorkspace": true,
+        "frontendDirectRealLlmCall": false,
+        "backendRealLlmRequestViaExplicitOptIn": true,
+        "realLlmResultCanEnterViaCliOrBackend": true,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "generatedStatus": "WAITING_REVIEW",
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/environments",
+      "title": "Environment Management Mock",
+      "path": "frontend/environments.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.environmentManagementPrototype",
+        "frontend/mock-data.json.environments",
+        "frontend/mock-data.json.operationAuditEvents"
+      ],
+      "blockedActions": [
+        "realCloudResourceCreate",
+        "realCloudResourceStart",
+        "realCloudResourceStop",
+        "realCloudResourceReset",
+        "realCloudResourceDestroy",
+        "realSandboxRun",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "destroyRealResourceAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/skills",
+      "title": "Skills Management Mock",
+      "path": "frontend/skills.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.skillManagementPrototype",
+        "frontend/mock-data.json.skills",
+        "skills/manifest.json",
+        "prompts/manifest.json",
+        "ai-workflows/workflow.manifest.json"
+      ],
+      "blockedActions": [
+        "realAgentStart",
+        "realLlmCall",
+        "promptEmbedInBusinessCode",
+        "autoPublish",
+        "realPublish",
+        "secretDisplay"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "businessCodeMayEmbedPrompts": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/settings/providers",
+      "title": "Provider Settings Mock",
+      "path": "frontend/provider-settings.html",
+      "mode": "MOCK_ONLY",
+      "dataSources": [
+        "frontend/mock-data.json.providerSettingsPrototype",
+        "frontend/mock-data.json.providerSettings",
+        "providers/provider.contract.json",
+        "config/runtime.contract.json"
+      ],
+      "blockedActions": [
+        "realProviderEnable",
+        "realLlmCall",
+        "networkAccess",
+        "secretDisplay",
+        "apiKeyPersist",
+        "promptEmbedInBusinessCode"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "secretVisibleInFrontend": false,
+        "realProviderEnabled": false,
+        "apiKeysFromEnvOnly": true,
+        "businessCodeMayEmbedPrompts": false
+      }
+    }
+  ],
+  "components": [
+    "AiTaskStatusBadge",
+    "AiTaskTimeline",
+    "AiTaskExecutionWorkspace",
+    "LocalCoreGenerationWorkspace",
+    "LabGenerationCloseLoopAction",
+    "ExamGenerationCloseLoopAction",
+    "ReviewerReportWorkspace",
+    "ReviewerSafetySummary",
+    "LabDslPreview",
+    "ExamDslPreview",
+    "PptDslPreview",
+    "GradingReportPanel",
+    "GradingResultPreview",
+    "ReadonlyEvidenceReportDetail",
+    "EvidenceAutoSummary",
+    "EvidenceAutoExecutionMatrix",
+    "EvidenceAutoScorePreview",
+    "ReviewDecisionOutcome",
+    "GradingRecordReviewSummary",
+    "LocalGradingWorkspace",
+    "GradingWorkspaceDataLoader",
+    "MergedEvidenceSourceChain",
+    "ManualReviewActionChecklist",
+    "EnvironmentStatusCard",
+    "MaterialAnalysisPanel",
+    "LabGenerateDataLoader",
+    "ExamGenerateDataLoader",
+    "PptGenerationCloseLoopAction",
+    "PptGenerateDataLoader",
+    "ReviewActionBar",
+    "ReviewCenterDataLoader",
+    "AiTaskCenterDataLoader",
+    "ReviewDetailDataLoader",
+    "ReviewActionDataLoader",
+    "ReviewImportPreviewDataLoader",
+    "AgentEntityMockImportActionPanel",
+    "ReviewRevisionLoopPanel",
+    "PptPageReviewUpdateAction",
+    "PromptVersionSelector",
+    "SkillCard",
+    "WorkflowLogViewer",
+    "AuditTrailPanel",
+    "AssessmentPlanManualReviewTrace",
+    "DeliveryChecklistPanel",
+    "ConsoleNavPanel",
+    "CoreBusinessDemoPath",
+    "RealDemoAcceptanceSummary",
+    "RealDemoOneClickChecklist",
+    "RealDemoMcpRevisionLoop",
+    "RealDslReviewPreview",
+    "RealDslContentQualityDecision",
+    "RealDslRevisionDiffPreview",
+    "RealDslRevisionDecision",
+    "MvpReviewWorkspace",
+    "RealDemoReviewQueue",
+    "ControlledDockerEvidenceReviewSignal",
+    "GradingEvidenceReadiness",
+    "GradingEvidenceActionGuide",
+    "GradingEvidenceAutoAction",
+    "CoreWorkflowReadiness",
+    "NotebookEvidenceReviewPlan",
+    "ControlledDockerEvidenceDemo",
+    "RealDslRevisionPromotion",
+    "RealDslRevisionPromotionReviewQueueItem",
+    "RealDslRevisionPromotionReviewDisposition",
+    "AgentImportPreviewActionPanel",
+    "AgentImportPreviewSummary",
+    "AgentImportPreviewSignoffChecklist",
+    "AgentEntityPostSignoffPrePublishChecklist",
+    "AgentEntitySpecificPrePublishReviewFocus",
+    "ExamQuestionImportPreview",
+    "GradingRuleImportPreview",
+    "LabTemplateImportPreview",
+    "AgentEntityMockStore",
+    "AgentEntityReadinessReport",
+    "AgentEntityDraftList",
+    "AgentEntityDraftDetail",
+    "PlatformApiContractValidateAction",
+    "AgentEntityDemoDataPrepareAction",
+    "AgentEntityImportStepper",
+    "AgentEntityImportDryRunAction",
+    "AgentEntityPausedBackendHandoffNotice"
+  ],
+  "pages": [
+    {
+      "route": "/ppt/generate",
+      "title": "PPT Generation",
+      "priority": 2,
+      "purpose": "Generate a local Mock PPT DSL from a local Markdown source, keep the task review-gated, and route it to review without exposing provider credentials.",
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/ppt/generate"
+        }
+      ],
+      "components": [
+        "PptDslPreview",
+        "LocalCoreGenerationWorkspace",
+        "PptGenerationCloseLoopAction",
+        "PptGenerateDataLoader"
+      ],
+      "dataSources": [
+        "frontend/ppt-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "frontendDirectRealLlmCall=false",
+        "realLlmResultCanEnterViaCliOrBackend=true",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/ppt/generate.task",
+        "POST /api/ppt/generate.pptDsl",
+        "POST /api/ppt/generate.providerGeneration",
+        "POST /api/ppt/generate body.coreDbPath",
+        "review-center.html?taskId={taskId}",
+        "ppt-review.html?taskId={taskId}"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/ppt-generate.html",
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "apiMockGenerationEnabled": true,
+        "localCoreGenerationWorkspace": true,
+        "frontendDirectRealLlmCall": false,
+        "realLlmResultCanEnterViaCliOrBackend": true,
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/access",
+      "title": "Access Entrypoints",
+      "priority": 1,
+      "purpose": "Read-only local access entrypoint page that documents static previews and disabled IP plus port placeholders without starting a real server.",
+      "apiDependencies": [],
+      "components": [
+        "ConsoleNavPanel",
+        "DeliveryChecklistPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/access.html",
+      "safety": {
+        "readOnly": true,
+        "realHttpServerStarted": false,
+        "portListening": false,
+        "externalIpBound": false,
+        "lanAccessEnabled": false,
+        "publicUrlGenerated": false,
+        "networkAccess": false,
+        "tlsConfigured": false,
+        "reverseProxyConfigured": false,
+        "deploymentPackageGenerated": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/dashboard",
+      "title": "Dashboard",
+      "priority": 1,
+      "purpose": "Show Phase 1 mock project status and review pressure.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}.reviewDetail.assessmentPlan.summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}.reviewDetail.qualitySignals"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "AiTaskStatusBadge",
+        "WorkflowLogViewer"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/dashboard.html",
+      "safety": {
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realLlmCalled": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/console",
+      "title": "Mock Console",
+      "priority": 1,
+      "purpose": "Static Phase 1 console entry for navigating all mock pages, checking delivery readiness, and surfacing safety guardrails without starting a real frontend, agent, provider, cloud resource, sandbox, or publish action.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/providers"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-registry"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "AiTaskStatusBadge",
+        "WorkflowLogViewer",
+        "DeliveryChecklistPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/console.html",
+      "safety": {
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "standardAnswerRevealToCandidate": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/workflows",
+      "title": "Workflow Registry",
+      "priority": 1,
+      "purpose": "Read-only Phase 2 Mock workflow capability catalog for selecting workflow definitions and MCP mock tools without executing workflows, creating AI tasks, writing artifacts, starting a real MCP server, or calling a real LLM.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/workflow-registry"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-registry/{workflowId}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/mcp-tool-call-records"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "WorkflowLogViewer",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/workflows.html",
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "workflowExecuted": false,
+        "taskCreated": false,
+        "artifactCreated": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/real-demo",
+      "title": "Real LLM Demo Evidence",
+      "priority": 1,
+      "purpose": "Show the replayed real LLM demo bundle, safe candidate preview, readonly evidence scoring result, and blocked actions without sending a new LLM request, reading secrets, executing contestant code, or publishing generated content.",
+      "apiDependencies": [],
+      "components": [
+        "ConsoleNavPanel",
+        "CoreBusinessDemoPath",
+        "RealDemoOneClickChecklist",
+        "RealDemoMcpRevisionLoop",
+        "RealDslReviewPreview",
+        "RealDslRevisionDiffPreview",
+        "RealDslRevisionDecision",
+        "LabDslPreview",
+        "ExamDslPreview",
+        "GradingReportPanel",
+        "ReadonlyEvidenceReportDetail",
+        "AuditTrailPanel",
+        "RealDslRevisionPromotion",
+        "RealDslRevisionPromotionReviewQueueItem",
+        "RealDslRevisionPromotionReviewDisposition",
+        "AgentImportPreviewActionPanel",
+        "AgentImportPreviewSummary",
+        "AgentImportPreviewSignoffChecklist",
+        "LabTemplateImportPreview",
+        "ExamQuestionImportPreview",
+        "GradingRuleImportPreview"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/real-demo.html",
+      "dataSources": [
+        "frontend/mock-data.json.realDemoPrototype",
+        "frontend/mock-data.json.realDemoPrototype.realDslReviewPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDiffPreview",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionDecision",
+        "frontend/mock-data.json.realDemoPrototype.mcpRevisionLoop",
+        "mcp-server/tools.manifest.json.request_review_revision",
+        "mcp-server/tools.manifest.json.regenerate_from_revision_mock",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotion",
+        "examples/output/real-llm-demo-revision-promotion-report.json",
+        "frontend/mock-data.json.realDemoPrototype.labTemplateImportPreview",
+        "frontend/mock-data.json.reviewCenterPrototype.labTemplateImportPreviewSignal",
+        "POST /api/labs/import-preview",
+        "mcp-server/tools.manifest.json.create_lab_template_import_preview"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": true,
+        "newLlmRequestSent": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "readonlyEvidenceDemoExecuted": true,
+        "sourceGradingModified": false,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/audit",
+      "title": "Audit Observability",
+      "priority": 1,
+      "purpose": "Read-only static Phase 1 audit observability page for Provider, MCP Tool, Workflow, Operation, and Review mock records without real providers, MCP servers, agents, cloud resources, sandbox execution, or publishing.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/provider-audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/mcp-tool-call-records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-audit-events"
+        }
+      ],
+      "components": [
+        "AuditTrailPanel",
+        "WorkflowLogViewer",
+        "AssessmentPlanManualReviewTrace"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/audit.html",
+      "safety": {
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "highRiskIntentExecutionAllowed": false,
+        "environmentDestroyed": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/audit/:id",
+      "title": "Audit Detail",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 drilldown for one Provider or MCP audit record, including trace correlation, redacted argument preview, error context, and linked Workflow Run without retrying real calls.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/provider-audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/mcp-tool-call-records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "AuditTrailPanel",
+        "WorkflowLogViewer",
+        "AssessmentPlanManualReviewTrace"
+      ],
+      "dataSources": [
+        "frontend/mock-data.json.auditDetailPrototype",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanManualReviewChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.nextManualReviewAction",
+        "frontend/mock-data.json.operationAuditEvents"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/audit-detail.html",
+      "safety": {
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/audit/incidents",
+      "title": "Audit Incident Review",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 incident review page that classifies failed Provider and MCP audit records into local operational suggestions without auto-fixing, retrying real calls, or starting agents.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/provider-audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/mcp-tool-call-records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "AuditTrailPanel",
+        "WorkflowLogViewer"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/audit-incidents.html",
+      "safety": {
+        "readOnly": true,
+        "autoFixEnabled": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/runbook",
+      "title": "Operations Runbook",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 operations workbench that gathers local preview entries, whitelisted validation commands, audit review links, and guardrails without running commands or starting real services.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/provider-audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/mcp-tool-call-records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "AuditTrailPanel",
+        "DeliveryChecklistPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-runbook.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/acceptance",
+      "title": "Operations Acceptance",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 acceptance workbench that summarizes delivery readiness, runbook, FAQ, handoff checklist, readiness gate, and safe verification commands without uploading, publishing, or running commands.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "DeliveryChecklistPanel",
+        "ConsoleNavPanel",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-acceptance.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "uploadPackageEnabled": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/demo-map",
+      "title": "Operations Demo Map",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 demo path map that organizes all static mock pages by role and sequence without running commands, changing state, uploading packages, or publishing real content.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "CoreBusinessDemoPath",
+        "RealDemoAcceptanceSummary",
+        "DeliveryChecklistPanel",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-demo-map.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "uploadPackageEnabled": false,
+        "batchStateChangeAllowed": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/operations/presenter",
+      "title": "Operations Presenter View",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 presenter view that condenses the operator demo script into speaker cues, validation signals, safe commands, and blocked actions without running commands, uploading packages, starting agents, or publishing real content.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "CoreBusinessDemoPath",
+        "RealDemoAcceptanceSummary",
+        "DeliveryChecklistPanel",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-presenter.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "uploadPackageEnabled": false,
+        "batchStateChangeAllowed": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/signoff",
+      "title": "Operations Signoff Dashboard",
+      "priority": 1,
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-signoff.html",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "CoreBusinessDemoPath",
+        "RealDemoAcceptanceSummary",
+        "DeliveryChecklistPanel",
+        "AuditTrailPanel"
+      ],
+      "safety": {
+        "realBackendRequired": false,
+        "readOnly": true,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/demo-script",
+      "title": "Operations Demo Script",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 operator demo script page that mirrors the local checklist, safe commands, acceptance signals, and blocked actions without running commands, uploading packages, or publishing real content.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "DeliveryChecklistPanel",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-demo-script.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "uploadPackageEnabled": false,
+        "batchStateChangeAllowed": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/operations/launchpad",
+      "title": "Operations Launchpad",
+      "priority": 1,
+      "purpose": "Read-only Phase 1 operator entry page that links local static mock pages, validation commands, handoff notes, and safety boundaries without running commands, uploading packages, or publishing real content.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "ConsoleNavPanel",
+        "DeliveryChecklistPanel",
+        "AuditTrailPanel"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/operations-launchpad.html",
+      "safety": {
+        "readOnly": true,
+        "runCommandEnabled": false,
+        "uploadPackageEnabled": false,
+        "batchStateChangeAllowed": false,
+        "realLlmCalled": false,
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/delivery",
+      "title": "Delivery",
+      "priority": 1,
+      "purpose": "Show local Phase 1 delivery package readiness, acceptance checklist, phase1 check results, and safety assertions without exporting, uploading, or publishing real content.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/health"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        }
+      ],
+      "components": [
+        "DeliveryChecklistPanel",
+        "WorkflowLogViewer"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/delivery.html",
+      "safety": {
+        "realLlmCalled": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "remoteUploadAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ai-tasks",
+      "title": "AI Task Center",
+      "priority": 1,
+      "purpose": "List AI tasks and inspect statuses.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/ai-tasks"
+        },
+        {
+          "method": "GET",
+          "path": "/api/ai-tasks/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/backend/core-tasks"
+        },
+        {
+          "method": "GET",
+          "path": "/api/backend/core-tasks/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}.reviewDetail.qualitySignals"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}.reviewDetail.assessmentPlan.summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/workflow-runs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-audit-events"
+        }
+      ],
+      "components": [
+        "AiTaskStatusBadge",
+        "AiTaskTimeline",
+        "AiTaskExecutionWorkspace",
+        "AiTaskCenterDataLoader"
+      ],
+      "dataSources": [
+        "frontend/ai-tasks-data.js",
+        "AiTaskExecutionWorkspace.staticFallbackContextLinks",
+        "AiTaskExecutionWorkspace.noHorizontalOverflow",
+        "query: coreDbPath",
+        "query: gradingDbPath",
+        "query: agentReport",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/records?taskId={taskId}&dbPath={path}.latest.reportPath",
+        "requested taskId not found -> visible fallback selected task",
+        "grading-report.html?taskId={taskId}&file={reportPath}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind={kind}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/backend/core-tasks?coreDbPath={path}",
+        "GET /api/backend/core-tasks?coreDbPath={path}&status=WAITING_REVIEW",
+        "GET /api/backend/core-tasks/{id}.taskExecutionWorkspace",
+        "GET /api/backend/core-tasks/{id}.task",
+        "GET /api/ai-tasks",
+        "GET /api/ai-tasks?status=WAITING_REVIEW",
+        "GET /api/ai-tasks/{id}.taskExecutionWorkspace",
+        "GET /api/ai-tasks/{id}.task",
+        "GET /api/review-task-summary.taskExecutionWorkspace",
+        "GET /api/review-task-summary.reviewTaskSummary.reviewPriorityQueue"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/ai-tasks.html",
+      "safety": {
+        "readOnly": true,
+        "apiReadonlyEnhancement": true,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/review-center",
+      "title": "Review Center",
+      "priority": 1,
+      "purpose": "Review local mock AI outputs and high-risk MCP intents without batch approval, real publishing, or second-factor confirmation.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/backend/core-tasks/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/platform-entities/readiness-report"
+        },
+        {
+          "method": "POST",
+          "path": "/api/review-tasks/{id}/ppt-page-review-status"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/evidence-auto"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-audit-events"
+        }
+      ],
+      "components": [
+        "AiTaskStatusBadge",
+        "AiTaskTimeline",
+        "MvpReviewWorkspace",
+        "ReviewCenterDataLoader",
+        "RealDslContentQualityDecision",
+        "RealDemoReviewQueue",
+        "ControlledDockerEvidenceReviewSignal",
+        "GradingEvidenceReadiness",
+        "GradingEvidenceActionGuide",
+        "NotebookEvidenceReviewPlan",
+        "CoreBusinessDemoPath",
+        "RealDslRevisionDiffPreview",
+        "RealDslRevisionDecision",
+        "ReviewActionBar",
+        "AuditTrailPanel",
+        "RealDslRevisionPromotion",
+        "RealDslRevisionPromotionReviewQueueItem",
+        "RealDslRevisionPromotionReviewDisposition",
+        "AgentImportPreviewActionPanel",
+        "AgentImportPreviewSummary",
+        "AgentImportPreviewSignoffChecklist",
+        "AgentEntityReadinessReport",
+        "LabTemplateImportPreview",
+        "ExamQuestionImportPreview",
+        "GradingRuleImportPreview",
+        "GradingEvidenceAutoAction",
+        "AgentEntityPostSignoffPrePublishChecklist",
+        "AgentEntitySpecificPrePublishReviewFocus"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/review-center.html",
+    "safety": {
+      "autoPublishAllowed": false,
+      "batchStateChangeAllowed": false,
+      "realPublishAllowed": false,
+      "realPublish": false,
+      "realLlmArtifactsReadOnly": true,
+      "frontendDirectRealLlmCall": false,
+      "secondConfirmationStatusReadOnly": true,
+        "confirmationEndpointEnabled": false,
+        "highRiskIntentExecutionAllowed": false,
+        "environmentDestroyed": false,
+        "answerVisibleToCandidate": false,
+        "secretVisibleInFrontend": false
+      },
+      "dataSources": [
+        "frontend/review-center-data.js",
+        "MvpReviewWorkspace.staticFallbackContextLinks",
+        "MvpReviewWorkspace.noHorizontalOverflow",
+        "GET /api/review-task-summary.mvpReviewWorkspace",
+        "GET /api/review-tasks/{id}.mvpReviewWorkspace",
+        "GET /api/review-tasks/{id}/core-readiness.mvpReviewWorkspace",
+        "GET /api/review-task-summary",
+      "GET /api/review-tasks/{id}",
+      "query: coreDbPath",
+      "query: gradingDbPath",
+      "query: agentReport",
+      "realLlmArtifacts=readonly-via-agentReport",
+      "frontendDirectRealLlmCall=false",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "grading-report.html?file={file}&taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/records?taskId={id}&dbPath={path}.latest.reportPath",
+        "GET /api/review-tasks/{id}?coreDbPath={path}",
+        "GET /api/backend/core-tasks/{id}?coreDbPath={path}",
+        "GET /api/backend/core-tasks/{id}?coreDbPath={path}.task",
+        "GET /api/review-tasks/{id}.reviewDetail.contentQualitySummary",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.contentQualitySummary",
+        "frontend/mock-data.json.realDemoPrototype.realDslRevisionPromotion",
+        "examples/output/real-llm-demo-revision-promotion-report.json",
+        "frontend/mock-data.json.realDemoPrototype.labTemplateImportPreview",
+        "frontend/mock-data.json.reviewCenterPrototype.labTemplateImportPreviewSignal",
+        "frontend/mock-data.json.reviewCenterPrototype.platformImportPreviewActions",
+        "frontend/mock-data.json.reviewCenterPrototype.platformImportPreviewSignoffChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityReadinessReport",
+        "GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewActions",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.platformImportPreviewActions",
+        "GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewSignoff",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.platformImportPreviewSignoff",
+        "GET /api/review-tasks/{id}.reviewDetail.agentEntityMockImport",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.agentEntityMockImport",
+        "GET /api/review-tasks/{id}.reviewDetail.agentEntityReadinessReport",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.agentEntityReadinessReport",
+        "GET /api/review-tasks/{id}/core-readiness",
+        "GET /api/review-tasks/{id}/core-readiness.coreWorkflowReadinessReport",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingManualReviewChecklistStatus",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingScorePreviewStatus",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingScorePreviewReadyForDecisionNote",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingDecisionNoteRecommendation",
+        "GET /api/review-tasks/{id}/core-readiness.summary.gradingNextDecisionNoteAction",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}",
+        "query: agentEntityRefresh=1",
+        "POST /api/labs/import-preview",
+        "POST /api/grading/evidence-auto",
+        "examples/output/grading-evidence-auto.json",
+        "mcp-server/tools.manifest.json.create_lab_template_import_preview",
+        "GET /api/platform-entities/readiness-report.items[].postSignoffPrePublishChecklist",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityReadinessReport.items[].postSignoffPrePublishChecklist",
+        "GET /api/platform-entities/readiness-report.items[].postSignoffPrePublishChecklist.entitySpecificReviewFocus"
+      ]
+    },
+    {
+      "route": "/platform-entities",
+      "title": "Platform Entity Mock Store",
+      "priority": 1,
+      "purpose": "Read local mock platform entity drafts created by lab/exam/grading mock-import without real database writes, real platform import, or publishing.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/platform-entities"
+        },
+        {
+          "method": "GET",
+          "path": "/api/platform-entities/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/platform-entities/readiness-report"
+        },
+        {
+          "method": "POST",
+          "path": "/api/platform-entities/contract-validate"
+        },
+        {
+          "method": "POST",
+          "path": "/api/labs/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/labs/mock-import"
+        },
+        {
+          "method": "POST",
+          "path": "/api/exams/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/exams/mock-import"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/mock-import"
+        },
+        {
+          "method": "POST",
+          "path": "/api/platform-entities/{id}/import-dry-run"
+        }
+      ],
+      "components": [
+        "AgentEntityMockStore",
+        "AgentEntityReadinessReport",
+        "AgentEntityDraftList",
+        "AgentEntityDraftDetail",
+        "PlatformApiContractValidateAction",
+        "AgentEntityDemoDataPrepareAction",
+        "AgentEntityImportStepper",
+        "AgentEntityImportDryRunAction",
+        "AgentEntityPausedBackendHandoffNotice"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/agent-entities.html",
+      "safety": {
+        "readOnly": true,
+        "mockStoreWritten": true,
+        "databaseWritten": false,
+        "realAgentImport": false,
+        "localPlatformApiContractValidationEnabled": true,
+        "demoDataPrepareEnabled": true,
+        "realAgentImportDryRunEnabled": true,
+        "realAgentImportSendEnabled": false,
+        "realAgentImportStatusQueryEnabled": false,
+        "manualImportResultRecordEnabled": false,
+        "manualAgentEntitySignoffEnabled": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false,
+        "requiresFinalHumanReviewBeforePublish": false,
+        "manualFinalPublishReviewDecisionEnabled": false,
+        "platformBackendRequired": false,
+        "pausedPlatformBackendHandoff": true,
+        "publishExecuted": false
+      },
+      "dataSources": [
+        "query: entityId, sourceTaskId, entityKind, coreDbPath, gradingDbPath, agentReport",
+        "query: action is accepted only as paused future handoff context",
+        "GET /api/platform-entities",
+        "GET /api/platform-entities?coreDbPath={path}",
+        "GET /api/platform-entities/{id}",
+        "GET /api/platform-entities/{id}?coreDbPath={path}",
+        "GET /api/platform-entities/{id}.agentEntityImportActivity",
+        "GET /api/platform-entities/readiness-report",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}&coreDbPath={path}",
+        "GET /api/platform-entities/readiness-report?sourceTaskId={id}&coreDbPath={path}&gradingDbPath={path}",
+        "GET /api/ai-tasks?status=APPROVED&taskType={taskType}",
+        "POST /api/platform-entities/contract-validate",
+        "examples/input/platform-contract.json",
+        "POST /api/labs/import-preview",
+        "POST /api/labs/import-preview body.coreDbPath",
+        "POST /api/labs/mock-import",
+        "POST /api/labs/mock-import body.coreDbPath",
+        "POST /api/exams/import-preview",
+        "POST /api/exams/import-preview body.coreDbPath",
+        "POST /api/exams/mock-import",
+        "POST /api/exams/mock-import body.coreDbPath",
+        "POST /api/grading/import-preview",
+        "POST /api/grading/import-preview body.coreDbPath",
+        "POST /api/grading/mock-import",
+        "POST /api/grading/mock-import body.coreDbPath",
+        "POST /api/platform-entities/{id}/import-dry-run",
+        "POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
+        "POST /api/platform-entities/{id}/import-dry-run body.contractConfig",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1&coreDbPath={path}",
+        "review-center.html?taskId={sourceTaskId}&agentEntityRefresh=1&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "LocalAgentEntityList.noHorizontalOverflow",
+        "frontend/mock-data.json.agentEntitiesPrototype",
+        "frontend/mock-data.json.agentEntitiesPrototype.readinessReport",
+        "frontend/mock-data.json.reviewCenterPrototype.agentEntityMockImportSummary",
+        "future handoff paused: import-send, import-status, import-result, platform signoff, final publish"
+      ]
+    },
+    {
+      "route": "/labs",
+      "title": "Labs",
+      "priority": 1,
+      "purpose": "List local mock Lab records and route users to generation or human review without batch publishing.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/labs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/artifacts"
+        }
+      ],
+      "components": [
+        "AiTaskStatusBadge",
+        "LabDslPreview",
+        "ReviewActionBar"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/labs.html",
+      "safety": {
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "realLlmCalled": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/labs/generate",
+      "title": "Lab Generation",
+      "priority": 1,
+      "purpose": "Start local core Lab DSL generation from Markdown and route the generated WAITING_REVIEW task into review and local import preview.",
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/materials/analyze"
+        },
+        {
+          "method": "POST",
+          "path": "/api/labs/generate"
+        }
+      ],
+      "components": [
+        "MaterialAnalysisPanel",
+        "LabDslPreview",
+        "PromptVersionSelector",
+        "LocalCoreGenerationWorkspace",
+        "LabGenerationCloseLoopAction",
+        "LabGenerateDataLoader"
+      ],
+      "dataSources": [
+        "frontend/lab-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "frontendDirectRealLlmCall=false",
+        "realLlmResultCanEnterViaCliOrBackend=true",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/labs/generate.task",
+        "POST /api/labs/generate.dsl",
+        "POST /api/labs/generate.materialAnalysis",
+        "POST /api/labs/generate.providerGeneration",
+        "POST /api/labs/generate.closeLoopAction",
+        "LabGenerationCloseLoopAction.initialContextLinks",
+        "POST /api/labs/generate body.coreDbPath",
+        "review-center.html?taskId={taskId}",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "lab-review.html?taskId={taskId}",
+        "lab-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=lab",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=lab&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/lab-generate.html",
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "apiMockGenerationEnabled": true,
+        "localCoreGenerationWorkspace": true,
+        "frontendDirectRealLlmCall": false,
+        "realLlmResultCanEnterViaCliOrBackend": true,
+        "realLlmCalled": false,
+        "remoteContentFetched": false,
+        "unknownShellExecuted": false,
+        "sandboxExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/labs/:id/review",
+      "title": "Lab Review",
+      "priority": 1,
+      "purpose": "Approve or reject generated DSL after human review.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/approve"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/reject"
+        },
+        {
+          "method": "POST",
+          "path": "/api/review-tasks/{id}/revision-request"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}/revision-requests"
+        },
+        {
+          "method": "POST",
+          "path": "/api/review-tasks/{id}/regenerate-mock"
+        },
+        {
+          "method": "POST",
+          "path": "/api/labs/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/labs/mock-import"
+        }
+      ],
+      "components": [
+        "LabDslPreview",
+        "ReviewActionBar",
+        "ReviewDetailDataLoader",
+        "ReviewActionDataLoader",
+        "AgentImportPreviewActionPanel",
+        "AgentEntityMockImportActionPanel",
+        "ReviewCenterDataLoader",
+        "ReviewRevisionLoopPanel",
+        "AiTaskTimeline"
+      ],
+      "dataSources": [
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "POST /api/ai-tasks/{id}/approve",
+        "POST /api/ai-tasks/{id}/reject",
+        "POST /api/labs/import-preview",
+        "POST /api/labs/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=lab",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.providerSummary"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/lab-review.html",
+      "safety": {
+        "rejectRequiresReason": true,
+        "auditTrailRequired": true,
+        "revisionRequestAllowed": true,
+        "mockRegenerationAllowed": true,
+        "revisionSourceTaskStatusUnchanged": true,
+        "revisionRealLlmCallEnabled": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/grading",
+      "title": "Grading",
+      "priority": 1,
+      "purpose": "List local mock Grading DSL records and link to deterministic mock reports without executing contestant code.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/grading"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/run"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/report"
+        },
+        {
+          "method": "POST",
+          "path": "/api/phase2/workflows/grading-generation/run"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "GradingReportPanel",
+        "ReadonlyEvidenceReportDetail"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/grading.html",
+      "safety": {
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "realCloudResourceChanged": false,
+        "realRegradeEnabled": false,
+        "realPublish": false
+      }
+    },
+    {
+      "route": "/grading/:id/review",
+      "title": "Grading Review",
+      "priority": 1,
+      "purpose": "Review generated Grading DSL and mock report preview without running sandbox or contestant code.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/approve"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/reject"
+        },
+        {
+        "method": "POST",
+        "path": "/api/grading/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/mock-import"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "GradingReportPanel",
+        "ReviewActionBar",
+        "ReviewDetailDataLoader",
+        "ReviewActionDataLoader",
+        "AgentImportPreviewActionPanel",
+        "AgentEntityMockImportActionPanel",
+        "AiTaskTimeline"
+      ],
+      "dataSources": [
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "frontend/mock-data.json.gradingReviewPrototype",
+        "frontend/mock-data.json.gradingReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.gradingReviewPrototype.assessmentPlanManualReviewChecklist",
+        "POST /api/grading/import-preview",
+        "POST /api/grading/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=grading",
+        "GET /api/review-tasks/{id}.reviewDetail.assessmentPlan",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.assessmentPlan"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/grading-review.html",
+      "safety": {
+        "rejectRequiresReason": true,
+        "auditTrailRequired": true,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "realRegradeEnabled": false,
+        "realSandboxRunEnabled": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "route": "/grading/workspace",
+      "title": "Local Grading Workspace",
+      "priority": 1,
+      "purpose": "Create and synchronously run a local grading job with optional controlled Docker evidence, then record a human review on the derived GradingRecord without changing task approval or publishing.",
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/grading/jobs"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/jobs/{id}/run"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/records"
+        },
+        {
+          "method": "POST",
+          "path": "/api/grading/records/{id}/review"
+        }
+      ],
+      "components": [
+        "LocalGradingWorkspace",
+        "GradingWorkspaceDataLoader"
+      ],
+      "dataSources": [
+        "frontend/grading-workspace-data.js",
+        "query: taskId, coreDbPath, gradingDbPath, agentReport",
+        "POST /api/grading/jobs body.dbPath",
+        "POST /api/grading/jobs/{id}/run?dbPath={path}",
+        "GET /api/grading/records?taskId={id}&dbPath={path}",
+        "POST /api/grading/records/{id}/review body.dbPath",
+        "grading-report.html?taskId={taskId}&file={reportPath}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "ai-tasks.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/grading-workspace.html",
+      "safety": {
+        "localStagingOnly": true,
+        "controlledDockerOptional": true,
+        "hostExecutionAllowed": false,
+        "autoApproveAllowed": false,
+        "taskStatusChangedByRecordReview": false,
+        "realAgentImport": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false
+      }
+    },
+    {
+      "route": "/grading/:id/report",
+      "title": "Grading Report",
+      "priority": 1,
+      "purpose": "Display local grading evidence and static fallback summaries for human review without initiating grading commands or executing contestant code from the page.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/grading/report"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/result-preview"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/evidence-readiness"
+        },
+        {
+          "method": "GET",
+          "path": "/api/grading/records"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        }
+      ],
+      "components": [
+        "ReviewerReportWorkspace",
+        "ReviewerSafetySummary",
+        "GradingReportPanel",
+        "GradingResultPreview",
+        "GradingEvidenceReadiness",
+        "EvidenceAutoSummary",
+        "EvidenceAutoExecutionMatrix",
+        "EvidenceAutoScorePreview",
+        "ReviewDecisionOutcome",
+        "GradingRecordReviewSummary",
+        "MergedEvidenceSourceChain",
+        "ManualReviewActionChecklist"
+      ],
+      "dataSources": [
+        "frontend/grading-report-data.js",
+        "local grading evidence reports (readonly)",
+        "ReviewerReportWorkspace.noHorizontalOverflow",
+        "query: coreDbPath",
+        "query: gradingDbPath",
+        "query: agentReport",
+        "review-center.html?taskId={taskId}&decision={decision}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "GET /api/grading/report?file={file}.report",
+        "GET /api/grading/report?file={file}.ReviewerReportWorkspace",
+        "GET /api/grading/report?file={file}.report.reviewerSafetySummary",
+        "GET /api/grading/report?file={file}.reportDetail",
+        "GET /api/grading/report?file={file}.report.manualReviewChecklist",
+        "GET /api/grading/report?file={file}.report.manualReviewChecklist.decisionNoteRecommendation",
+        "GET /api/grading/report?file={file}.report.executionMatrix",
+        "GET /api/grading/report?file={file}.report.scorePreview",
+        "GET /api/grading/report?file={file}&taskId={id}.mergedGradingEvidenceCheckItems",
+        "GET /api/grading/evidence-readiness?report={file}.ReviewerReportWorkspace",
+        "GET /api/grading/records?taskId={id}.items",
+        "GET /api/grading/records?taskId={id}.GradingRecordReviewIntegration",
+        "GET /api/review-tasks/{id}?gradingDbPath={path}.reviewDetail.gradingRecords",
+        "GET /api/grading/records?taskId={id}.ReviewerReportWorkspace",
+        "GET /api/grading/records?taskId={id}.latest.reportPathFallback",
+        "GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/grading-report.html",
+      "safety": {
+        "localCoreGradingReportReadOnly": true,
+        "frontendDirectGradingExecution": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "unknownShellExecuted": false,
+        "commandExecuted": false,
+        "realSandboxRunEnabled": false,
+        "realPytestRun": false,
+        "hostExecutionAllowed": false,
+        "realCloudResourceChanged": false
+      }
+    },
+    {
+      "route": "/exams",
+      "title": "Exams",
+      "priority": 2,
+      "purpose": "List local mock Exam records with grading DSL links while hiding standard answers from candidates.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/exams"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        },
+        {
+          "method": "POST",
+          "path": "/api/exams/generate-from-lab"
+        }
+      ],
+      "components": [
+        "ExamDslPreview",
+        "ReviewActionBar",
+        "PromptVersionSelector"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/exams.html",
+      "safety": {
+        "answerVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false
+      }
+    },
+    {
+      "route": "/exams/:id/review",
+      "title": "Exam Review",
+      "priority": 2,
+      "purpose": "Review generated Exam DSL and Grading DSL while keeping standard answers hidden from candidates.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/approve"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/reject"
+        },
+        {
+          "method": "POST",
+          "path": "/api/exams/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/exams/mock-import"
+        }
+      ],
+      "components": [
+        "ExamDslPreview",
+        "GradingReportPanel",
+        "ReviewActionBar",
+        "ReviewDetailDataLoader",
+        "ReviewActionDataLoader",
+        "AgentImportPreviewActionPanel",
+        "AgentEntityMockImportActionPanel",
+        "AiTaskTimeline"
+      ],
+      "dataSources": [
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "POST /api/ai-tasks/{id}/approve",
+        "POST /api/ai-tasks/{id}/reject",
+        "POST /api/exams/import-preview",
+        "POST /api/exams/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=exam",
+        "frontend/mock-data.json.examReviewPrototype",
+        "frontend/mock-data.json.examReviewPrototype.qualitySignals",
+        "frontend/mock-data.json.examReviewPrototype.dslPreview.candidateSafeExamPreview"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/exam-review.html",
+      "safety": {
+        "rejectRequiresReason": true,
+        "auditTrailRequired": true,
+        "answerVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realSandboxRunEnabled": false,
+        "realPublish": false
+      }
+    },
+    {
+      "route": "/exams/generate",
+      "title": "Exam Generation",
+      "priority": 2,
+      "purpose": "Create local core Exam DSL and Grading DSL from a Lab id, keep candidate answers protected, and route both artifacts into review and local import preview.",
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/exams/generate-from-lab"
+        }
+      ],
+      "components": [
+        "ExamDslPreview",
+        "PromptVersionSelector",
+        "LocalCoreGenerationWorkspace",
+        "ExamGenerationCloseLoopAction",
+        "ExamGenerateDataLoader"
+      ],
+      "dataSources": [
+        "frontend/exam-generate-data.js",
+        "LocalCoreGenerationWorkspace",
+        "frontendDirectRealLlmCall=false",
+        "realLlmResultCanEnterViaCliOrBackend=true",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "POST /api/exams/generate-from-lab.task",
+        "POST /api/exams/generate-from-lab.examDsl",
+        "POST /api/exams/generate-from-lab.gradingDsl",
+        "POST /api/exams/generate-from-lab.providerGenerations",
+        "POST /api/exams/generate-from-lab.closeLoopAction",
+        "ExamGenerationCloseLoopAction.initialContextLinks",
+        "POST /api/exams/generate-from-lab body.coreDbPath",
+        "review-center.html?taskId={taskId}",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "exam-review.html?taskId={taskId}",
+        "exam-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "grading-review.html?taskId={taskId}",
+        "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=exam",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=exam&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=grading",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=grading&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/exam-generate.html",
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "apiMockGenerationEnabled": true,
+        "localCoreGenerationWorkspace": true,
+        "frontendDirectRealLlmCall": false,
+        "realLlmResultCanEnterViaCliOrBackend": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "autoPublishAllowed": false,
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "standardAnswerRevealToCandidate": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ppt",
+      "title": "PPT",
+      "priority": 2,
+      "purpose": "List local mock PPT DSL records and route users to generation or human review without generating real PPT files.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/ppt"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ppt/generate"
+        },
+        {
+          "method": "GET",
+          "path": "/api/review-task-summary"
+        }
+      ],
+      "components": [
+        "PptDslPreview",
+        "ReviewActionBar",
+        "PromptVersionSelector"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/ppt.html",
+      "safety": {
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "realPptFileGenerated": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/ppt/:id/review",
+      "title": "PPT Review",
+      "priority": 2,
+      "purpose": "Review generated PPT DSL and slide plan while keeping real PPT file generation and publishing disabled.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/review-tasks/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/approve"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/reject"
+        },
+        {
+          "method": "POST",
+          "path": "/api/review-tasks/{id}/ppt-page-review-status"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        }
+      ],
+      "components": [
+        "PptDslPreview",
+        "ReviewActionBar",
+        "PptPageReviewUpdateAction",
+        "ReviewDetailDataLoader",
+        "ReviewActionDataLoader",
+        "AiTaskTimeline"
+      ],
+      "dataSources": [
+        "frontend/review-detail-data.js",
+        "frontend/review-action-data.js",
+        "query: agentReport",
+        "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "POST /api/ai-tasks/{id}/approve",
+        "POST /api/ai-tasks/{id}/reject",
+        "GET /api/review-tasks/{id}.reviewDetail.reviewPage.pptPageReview"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/ppt-review.html",
+      "safety": {
+        "rejectRequiresReason": true,
+        "auditTrailRequired": true,
+        "realLlmCalled": false,
+        "artifactGenerated": false,
+        "realPptFileGenerated": false,
+        "pageReviewUpdateTaskStatusChanged": false,
+        "pageReviewUpdateAutoApproveAllowed": false,
+        "autoPublishAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/environments",
+      "title": "Environment Management",
+      "priority": 2,
+      "purpose": "List and manage local mock VM / Notebook records.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/environments"
+        },
+        {
+          "method": "GET",
+          "path": "/api/audit-events"
+        },
+        {
+          "method": "POST",
+          "path": "/api/environments/vm"
+        },
+        {
+          "method": "POST",
+          "path": "/api/environments/notebook"
+        }
+      ],
+      "components": [
+        "EnvironmentStatusCard"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/environments.html",
+      "safety": {
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "destroyRealResourceAllowed": false,
+        "sandboxExecuted": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/skills",
+      "title": "Skills",
+      "priority": 2,
+      "purpose": "Browse reusable Phase 1 skills for operations.",
+      "apiDependencies": [],
+      "components": [
+        "SkillCard"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/skills.html",
+      "safety": {
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "businessCodeMayEmbedPrompts": false,
+        "autoPublishAllowed": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
+      "route": "/settings/providers",
+      "title": "Provider Settings",
+      "priority": 2,
+      "purpose": "Show provider placeholder settings without secrets.",
+      "apiDependencies": [
+        {
+          "method": "GET",
+          "path": "/api/providers"
+        },
+        {
+          "method": "GET",
+          "path": "/api/providers/mock/health"
+        }
+      ],
+      "components": [],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/provider-settings.html",
+      "safety": {
+        "secretVisibleInFrontend": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "secretsRead": false,
+        "realProviderEnabled": false,
+        "apiKeysFromEnvOnly": true,
+        "businessCodeMayEmbedPrompts": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,2451 @@
+{
+  "id": "grading_evidence_merge_3a67c98d24cb",
+  "mode": "GRADING_EVIDENCE_AUTO_REPORT",
+  "phase": "Phase 3",
+  "sourceReportTotal": 1,
+  "sourceReports": [
+    {
+      "index": 0,
+      "path": null,
+      "id": "readonly_sandbox_report_cff61be7dfb6",
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "gradingId": "grading_mixed_checks_demo",
+      "checkSummary": {
+        "total": 6,
+        "passed": 3,
+        "failed": 1,
+        "executed": 4,
+        "deferred": 2,
+        "plannedOnly": 2,
+        "byType": {
+          "file_exists": 1,
+          "stdout_contains": 1,
+          "pytest": 1,
+          "notebook_cell": 1,
+          "json_field": 1,
+          "log_keyword": 1
+        },
+        "scoreTotalMatchesSpec": true
+      },
+      "executionSummary": {
+        "total": 6,
+        "executed": 4,
+        "passed": 3,
+        "failed": 1,
+        "deferred": 2,
+        "byType": {
+          "file_exists": 1,
+          "stdout_contains": 1,
+          "pytest": 1,
+          "notebook_cell": 1,
+          "json_field": 1,
+          "log_keyword": 1
+        }
+      },
+      "score": {
+        "totalScore": 100,
+        "executableScore": 50,
+        "earnedScore": 40,
+        "deferredScore": 50
+      },
+      "safety": {
+        "sandboxExecuted": true,
+        "readonlyOnly": true,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "unknownShellExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "realPublish": false
+      }
+    }
+  ],
+  "summary": {
+    "checkTotal": 6,
+    "executed": 4,
+    "passedCheckTotal": 3,
+    "failedCheckTotal": 1,
+    "deferredCheckTotal": 2,
+    "passed": false,
+    "failed": 1,
+    "deferred": 2,
+    "totalScore": 100,
+    "earnedScore": 40,
+    "coveredScore": 50,
+    "deferredScore": 50,
+    "manualReviewRequired": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false,
+    "sourceMode": "EVIDENCE_AUTO",
+    "readonlyReportIncluded": true,
+    "controlledCommandRequested": false,
+    "controlledCommandIncluded": false,
+    "controlledCommandWarningTotal": 0,
+    "evidenceReadyTotal": 4,
+    "missingEvidenceTotal": 2,
+    "controlledCommandMissingTotal": 2,
+    "nextCoreActionId": "run_evidence_auto_with_controlled_command",
+    "manualReviewChecklistStatus": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "manualReviewChecklistTotal": 6,
+    "manualReviewChecklistReadyTotal": 4,
+    "decisionNoteRecommendation": "needs-evidence",
+    "gradingDslCoverageStatus": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "gradingDslEvidenceReadyTotal": 4,
+    "gradingDslMissingEvidenceTotal": 2,
+    "scorePreviewEarnedScore": 40,
+    "scorePreviewTotalScore": 100,
+    "scorePreviewCoverageRatio": 0.5,
+    "scorePreviewStatus": "PARTIAL_SCORE_PREVIEW_NEEDS_MORE_EVIDENCE",
+    "reviewerSafetySummaryStatus": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "reviewerSafetyReadyForApproveReadyDecision": false,
+    "reviewerSafetyBlockingReasonTotal": 2
+  },
+  "evidenceCoverage": {
+    "totalScore": 100,
+    "earnedScore": 40,
+    "coveredScore": 50,
+    "deferredScore": 50,
+    "coverageRatio": 0.5,
+    "coveredCheckIds": [
+      "check_result_file",
+      "check_notebook_accuracy",
+      "check_metrics_json",
+      "check_training_log"
+    ],
+    "passedCheckIds": [
+      "check_result_file",
+      "check_metrics_json",
+      "check_training_log"
+    ],
+    "failedCheckIds": [
+      "check_notebook_accuracy"
+    ],
+    "deferredCheckIds": [
+      "check_stdout_accuracy",
+      "check_pytest"
+    ],
+    "controlledDocker": {
+      "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+      "checkTotal": 0,
+      "checkIds": [],
+      "checkTypes": [],
+      "score": 0,
+      "earnedScore": 0
+    },
+    "readonlyStatic": {
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "checkTotal": 4,
+      "checkIds": [
+        "check_result_file",
+        "check_notebook_accuracy",
+        "check_metrics_json",
+        "check_training_log"
+      ],
+      "checkTypes": [
+        "file_exists",
+        "json_field",
+        "log_keyword",
+        "notebook_cell"
+      ],
+      "score": 50,
+      "earnedScore": 40
+    }
+  },
+  "scorePreview": {
+    "component": "GradingEvidenceAutoScorePreview",
+    "mode": "GRADING_EVIDENCE_AUTO_SCORE_PREVIEW",
+    "source": "GRADING_EVIDENCE_AUTO_REPORT.executionMatrix.selectedEvidence",
+    "status": "PARTIAL_SCORE_PREVIEW_NEEDS_MORE_EVIDENCE",
+    "totalScore": 100,
+    "earnedScore": 40,
+    "coveredScore": 50,
+    "missingScore": 50,
+    "coverageRatio": 0.5,
+    "scoreRatio": 0.4,
+    "passRate": 0.75,
+    "checkTotal": 6,
+    "evidenceReadyTotal": 4,
+    "missingEvidenceTotal": 2,
+    "passedCheckTotal": 3,
+    "failedCheckTotal": 1,
+    "missingCheckIds": [
+      "check_stdout_accuracy",
+      "check_pytest"
+    ],
+    "readyForDecisionNote": false,
+    "manualReviewRequired": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false
+  },
+  "checks": [
+    {
+      "id": "check_result_file",
+      "type": "file_exists",
+      "runner": "FileExistsGrader",
+      "score": 15,
+      "inputSummary": {
+        "path": "result.csv"
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "verify_file_exists",
+        "path": "result.csv",
+        "description": "Future real sandbox checks that the file exists inside the isolated submission workspace."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_result_file",
+        "checkType": "file_exists",
+        "action": "verify_file_exists",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "path": "result.csv"
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_result_file",
+          "checkType": "file_exists",
+          "action": "verify_file_exists",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "path": "result.csv"
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_result_file",
+          "checkType": "file_exists",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "LOW",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_result_file]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan file existence check for result.csv",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "low",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": true,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "PASSED",
+      "passed": true,
+      "earnedScore": 15,
+      "durationMs": 0,
+      "evidence": {
+        "status": "COLLECTED",
+        "path": "result.csv",
+        "exists": true,
+        "matchedEvidence": [
+          "file_exists"
+        ],
+        "filesInspected": [
+          "result.csv"
+        ],
+        "auditLogRef": "readonly://check_result_file"
+      },
+      "readonlyEvidence": {
+        "status": "COLLECTED",
+        "kind": "file_exists",
+        "path": "result.csv",
+        "exists": true,
+        "matchedEvidence": [
+          "file_exists"
+        ],
+        "auditLogRef": "readonly://check_result_file"
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    },
+    {
+      "id": "check_stdout_accuracy",
+      "type": "stdout_contains",
+      "runner": "StdoutContainsGrader",
+      "score": 25,
+      "inputSummary": {
+        "command": "python main.py",
+        "expectedTokenCount": 1
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "run_command_and_match_stdout",
+        "command": "python main.py",
+        "expected": [
+          "accuracy"
+        ],
+        "description": "Future real sandbox runs the command and matches stdout against expected tokens."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_stdout_accuracy",
+        "checkType": "stdout_contains",
+        "action": "run_command_and_match_stdout",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "command": "python main.py",
+          "expected": [
+            "accuracy"
+          ]
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_stdout_accuracy",
+          "checkType": "stdout_contains",
+          "action": "run_command_and_match_stdout",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "command": "python main.py",
+            "expected": [
+              "accuracy"
+            ]
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_stdout_accuracy",
+          "checkType": "stdout_contains",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "MEDIUM",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_stdout_accuracy]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan stdout check for command: python main.py",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "medium",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": false,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "DEFERRED",
+      "passed": null,
+      "earnedScore": 0,
+      "reason": "Check type is not supported by the read-only sandbox PoC.",
+      "realSandboxRequiredBeforeExecution": true,
+      "evidence": {
+        "status": "NOT_COLLECTED",
+        "matchedEvidence": [],
+        "filesInspected": [],
+        "auditLogRef": null
+      },
+      "readonlyEvidence": {
+        "status": "NOT_COLLECTED",
+        "reason": "Check type is not supported by the read-only sandbox PoC."
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    },
+    {
+      "id": "check_pytest",
+      "type": "pytest",
+      "runner": "PytestGrader",
+      "score": 25,
+      "inputSummary": {
+        "path": "tests/test_main.py"
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "run_pytest_suite",
+        "path": "tests/test_main.py",
+        "description": "Future real sandbox runs pytest against the referenced test path."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_pytest",
+        "checkType": "pytest",
+        "action": "run_pytest_suite",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "path": "tests/test_main.py"
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_pytest",
+          "checkType": "pytest",
+          "action": "run_pytest_suite",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "path": "tests/test_main.py"
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_pytest",
+          "checkType": "pytest",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "MEDIUM",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_pytest]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan pytest check at tests/test_main.py",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "high",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": false,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "DEFERRED",
+      "passed": null,
+      "earnedScore": 0,
+      "reason": "Check type is not supported by the read-only sandbox PoC.",
+      "realSandboxRequiredBeforeExecution": true,
+      "evidence": {
+        "status": "NOT_COLLECTED",
+        "matchedEvidence": [],
+        "filesInspected": [],
+        "auditLogRef": null
+      },
+      "readonlyEvidence": {
+        "status": "NOT_COLLECTED",
+        "reason": "Check type is not supported by the read-only sandbox PoC."
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    },
+    {
+      "id": "check_notebook_accuracy",
+      "type": "notebook_cell",
+      "runner": "NotebookGrader",
+      "score": 10,
+      "inputSummary": {
+        "notebookPath": "notebooks/analysis.ipynb",
+        "cellIndex": 3,
+        "expectedTokenCount": 1
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "run_notebook_cell_and_match_output",
+        "notebookPath": "notebooks/analysis.ipynb",
+        "cellIndex": 3,
+        "expected": [
+          "accuracy"
+        ],
+        "description": "Future real sandbox executes the configured notebook cell in isolation and matches captured output tokens."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_notebook_accuracy",
+        "checkType": "notebook_cell",
+        "action": "run_notebook_cell_and_match_output",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "notebookPath": "notebooks/analysis.ipynb",
+          "cellIndex": 3,
+          "expected": [
+            "accuracy"
+          ]
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_notebook_accuracy",
+          "checkType": "notebook_cell",
+          "action": "run_notebook_cell_and_match_output",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "notebookPath": "notebooks/analysis.ipynb",
+            "cellIndex": 3,
+            "expected": [
+              "accuracy"
+            ]
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_notebook_accuracy",
+          "checkType": "notebook_cell",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "HIGH",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_notebook_accuracy]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan notebook cell output check for notebooks/analysis.ipynb cell 3",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "high",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": true,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "FAILED",
+      "passed": false,
+      "earnedScore": 0,
+      "durationMs": 0,
+      "error": {
+        "code": "NOTEBOOK_CELL_NOT_FOUND",
+        "field": "checks.check_notebook_accuracy.notebookPath",
+        "reason": "Notebook cell index not found"
+      },
+      "evidence": {
+        "status": "ERROR",
+        "matchedEvidence": [],
+        "filesInspected": [
+          "notebooks/analysis.ipynb"
+        ],
+        "auditLogRef": "readonly://check_notebook_accuracy"
+      },
+      "readonlyEvidence": {
+        "status": "ERROR",
+        "matchedEvidence": [],
+        "filesInspected": [
+          "notebooks/analysis.ipynb"
+        ],
+        "error": {
+          "code": "NOTEBOOK_CELL_NOT_FOUND",
+          "field": "checks.check_notebook_accuracy.notebookPath",
+          "reason": "Notebook cell index not found"
+        },
+        "auditLogRef": "readonly://check_notebook_accuracy"
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    },
+    {
+      "id": "check_metrics_json",
+      "type": "json_field",
+      "runner": "JsonFieldGrader",
+      "score": 15,
+      "inputSummary": {
+        "path": "metrics.json",
+        "jsonPath": "$.accuracy",
+        "expectedValueType": "float"
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "inspect_json_field",
+        "path": "metrics.json",
+        "jsonPath": "$.accuracy",
+        "expectedValue": 0.9,
+        "description": "Future real sandbox reads JSON inside the isolated submission workspace and compares the configured field."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_metrics_json",
+        "checkType": "json_field",
+        "action": "inspect_json_field",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "path": "metrics.json",
+          "jsonPath": "$.accuracy",
+          "expectedValue": 0.9
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_metrics_json",
+          "checkType": "json_field",
+          "action": "inspect_json_field",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "path": "metrics.json",
+            "jsonPath": "$.accuracy",
+            "expectedValue": 0.9
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_metrics_json",
+          "checkType": "json_field",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "LOW",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_metrics_json]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan JSON field check for metrics.json $.accuracy",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "low",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": true,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "PASSED",
+      "passed": true,
+      "earnedScore": 15,
+      "durationMs": 0,
+      "evidence": {
+        "status": "COLLECTED",
+        "path": "metrics.json",
+        "jsonPath": "$.accuracy",
+        "expectedValue": 0.9,
+        "actualValue": 0.9,
+        "matchedEvidence": [
+          "json_field_equal"
+        ],
+        "filesInspected": [
+          "metrics.json"
+        ],
+        "auditLogRef": "readonly://check_metrics_json"
+      },
+      "readonlyEvidence": {
+        "status": "COLLECTED",
+        "kind": "json_field",
+        "path": "metrics.json",
+        "jsonPath": "$.accuracy",
+        "expectedValue": 0.9,
+        "actualValue": 0.9,
+        "matchedEvidence": [
+          "json_field_equal"
+        ],
+        "auditLogRef": "readonly://check_metrics_json"
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    },
+    {
+      "id": "check_training_log",
+      "type": "log_keyword",
+      "runner": "LogKeywordGrader",
+      "score": 10,
+      "inputSummary": {
+        "path": "logs/train.log",
+        "expectedTokenCount": 1
+      },
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "executorBoundary": "SandboxExecutor",
+        "wouldRunInsideRealSandbox": true,
+        "sandboxExecuted": false,
+        "commandExecuted": false,
+        "contestantCodeExecuted": false,
+        "hostExecutionAllowed": false,
+        "networkEnabled": false,
+        "requiredLimits": {
+          "cpu": "required_before_real_execution",
+          "memory": "required_before_real_execution",
+          "timeoutSeconds": "required_before_real_execution",
+          "processCount": "required_before_real_execution",
+          "filesystem": "isolated_submission_workspace_required",
+          "network": "disabled_by_default"
+        },
+        "evidenceToCollectInRealSandbox": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "action": "inspect_log_keywords",
+        "path": "logs/train.log",
+        "expected": [
+          "training complete"
+        ],
+        "description": "Future real sandbox reads the configured log file inside the isolated workspace and matches expected keywords."
+      },
+      "sandboxExecutionRequest": {
+        "schemaVersion": "0.1.0",
+        "mode": "REAL_SANDBOX_REQUIRED",
+        "gradingId": "grading_mixed_checks_demo",
+        "checkId": "check_training_log",
+        "checkType": "log_keyword",
+        "action": "inspect_log_keywords",
+        "traceId": "trace_f706cd510f45",
+        "workspace": {
+          "kind": "isolated_submission_workspace",
+          "hostPathAllowed": false,
+          "writeOutsideWorkspaceAllowed": false,
+          "submissionMountedReadOnly": true
+        },
+        "limits": {
+          "timeoutSeconds": 30,
+          "cpuCores": 1,
+          "memoryMb": 512,
+          "processLimit": 1,
+          "network": "disabled_by_default",
+          "filesystem": "isolated_submission_workspace_required"
+        },
+        "network": {
+          "enabled": false,
+          "policy": "disabled_by_default"
+        },
+        "command": {
+          "path": "logs/train.log",
+          "expected": [
+            "training complete"
+          ]
+        },
+        "evidenceRequired": [
+          "stdout",
+          "stderr",
+          "exitCode",
+          "durationMs",
+          "matchedEvidence",
+          "auditLogRef"
+        ],
+        "safety": {
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "contestantCodeRequiresSandbox": true,
+          "secretPassthroughAllowed": false,
+          "realExecutionRequiresImplementation": true
+        }
+      },
+      "containerSandboxPlan": {
+        "schemaVersion": "0.1.0",
+        "mode": "CONTAINER_PLAN_ONLY",
+        "status": "PLANNED",
+        "executor": {
+          "id": "container_sandbox_executor_dry_run",
+          "implementation": "sandbox.container_executor.ContainerSandboxExecutor",
+          "runtime": "container",
+          "dryRun": true
+        },
+        "request": {
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_training_log",
+          "checkType": "log_keyword",
+          "action": "inspect_log_keywords",
+          "traceId": "trace_f706cd510f45"
+        },
+        "containerPlan": {
+          "image": "python:3.11-slim",
+          "workingDirectory": "/workspace/submission",
+          "mounts": [
+            {
+              "kind": "submission",
+              "target": "/workspace/submission",
+              "mode": "read_only"
+            }
+          ],
+          "limits": {
+            "timeoutSeconds": 30,
+            "cpuCores": 1,
+            "memoryMb": 512,
+            "processLimit": 1,
+            "network": "disabled_by_default",
+            "filesystem": "isolated_submission_workspace_required"
+          },
+          "network": {
+            "enabled": false,
+            "policy": "disabled_by_default"
+          },
+          "commandPreview": {
+            "path": "logs/train.log",
+            "expected": [
+              "training complete"
+            ]
+          },
+          "evidenceRequired": [
+            "stdout",
+            "stderr",
+            "exitCode",
+            "durationMs",
+            "matchedEvidence",
+            "auditLogRef"
+          ]
+        },
+        "safety": {
+          "containerStarted": false,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "hostExecutionAllowed": false,
+          "unknownShellAllowed": false,
+          "networkEnabled": false,
+          "secretPassthroughAllowed": false
+        },
+        "resultPlaceholder": {
+          "schemaVersion": "0.1.0",
+          "mode": "RESULT_PLACEHOLDER",
+          "gradingId": "grading_mixed_checks_demo",
+          "checkId": "check_training_log",
+          "checkType": "log_keyword",
+          "traceId": "trace_f706cd510f45",
+          "status": "NOT_EXECUTED",
+          "passed": null,
+          "earnedScore": null,
+          "stdout": null,
+          "stderr": null,
+          "exitCode": null,
+          "durationMs": null,
+          "matchedEvidence": [],
+          "auditLogRef": null,
+          "sandboxExecuted": false,
+          "contestantCodeExecuted": false,
+          "commandExecuted": false,
+          "error": {
+            "code": "REAL_SANDBOX_NOT_IMPLEMENTED",
+            "message": "Execution request contract was built, but no real sandbox executor ran it."
+          }
+        }
+      },
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "reason": "Phase 3 Mock runner does not execute checks or inspect contestant submissions.",
+        "stdout": null,
+        "stderr": null,
+        "filesInspected": [],
+        "pytestNodeIds": [],
+        "artifacts": [],
+        "traceableWhenRealSandboxEnabled": true
+      },
+      "riskLevel": "MEDIUM",
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_training_log]",
+      "assessmentPlanAlignedWithCheck": true,
+      "assessmentPlanInputSummary": "Plan log keyword check for logs/train.log",
+      "assessmentPlanExecutionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "required",
+          "memory": "required",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "isolated_workspace_required",
+          "process": "limited"
+        },
+        "wouldRunInsideRealSandbox": true
+      },
+      "assessmentPlanMockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanRiskLevel": "medium",
+      "assessmentPlanSandboxRequiredBeforeRealExecution": true,
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "executor": "readonly_submission_sandbox_executor",
+      "sandboxExecuted": true,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "traceId": "trace_f706cd510f45",
+      "status": "PASSED",
+      "passed": true,
+      "earnedScore": 10,
+      "durationMs": 0,
+      "evidence": {
+        "status": "COLLECTED",
+        "method": "STATIC_LOG_TEXT_SCAN",
+        "path": "logs/train.log",
+        "expected": [
+          "training complete"
+        ],
+        "matchedTokens": [
+          "training complete"
+        ],
+        "missingTokens": [],
+        "matchedEvidence": [
+          "log_keyword_static_match"
+        ],
+        "filesInspected": [
+          "logs/train.log"
+        ],
+        "auditLogRef": "readonly://check_training_log",
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "networkEnabled": false
+      },
+      "readonlyEvidence": {
+        "status": "COLLECTED",
+        "kind": "log_keyword_static_scan",
+        "method": "STATIC_LOG_TEXT_SCAN",
+        "path": "logs/train.log",
+        "expected": [
+          "training complete"
+        ],
+        "matchedTokens": [
+          "training complete"
+        ],
+        "missingTokens": [],
+        "matchedEvidence": [
+          "log_keyword_static_match"
+        ],
+        "auditLogRef": "readonly://check_training_log",
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "networkEnabled": false
+      },
+      "evidenceSource": {
+        "reportIndex": 0,
+        "sourcePath": null,
+        "reportId": "readonly_sandbox_report_cff61be7dfb6",
+        "reportMode": "READONLY_REAL_SANDBOX_POC",
+        "runnerId": "readonly_submission_sandbox_executor"
+      }
+    }
+  ],
+  "mergeWarnings": [],
+  "safety": {
+    "sandboxExecuted": true,
+    "readonlyOnly": true,
+    "contestantCodeExecuted": false,
+    "commandExecuted": false,
+    "unknownShellExecuted": false,
+    "pytestExecuted": false,
+    "notebookExecuted": false,
+    "networkEnabled": false,
+    "hostExecutionAllowed": false,
+    "realPublish": false,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false,
+    "manualReviewRequired": true,
+    "mergeExecutedOnlyExistingReports": true,
+    "sourceMode": "EVIDENCE_AUTO",
+    "readonlyAlwaysRunsFirst": true,
+    "controlledCommandRequiresExplicitFlag": true,
+    "controlledCommandRequested": false,
+    "controlledCommandIncluded": false
+  },
+  "traceId": "trace_f706cd510f45",
+  "note": "Evidence auto runs read-only grading evidence and optionally controlled Docker command evidence, then merges existing reports into one reviewable grading report.",
+  "sourceMode": "EVIDENCE_AUTO",
+  "steps": [
+    {
+      "id": "readonly_static_evidence",
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "status": "COMPLETED",
+      "executed": 4,
+      "passed": 3,
+      "safety": {
+        "sandboxExecuted": true,
+        "readonlyOnly": true,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "unknownShellExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "realPublish": false
+      }
+    },
+    {
+      "id": "controlled_command_evidence",
+      "status": "SKIPPED",
+      "reason": "includeControlledCommand=false",
+      "contestantCodeExecuted": false,
+      "commandExecuted": false
+    }
+  ],
+  "warnings": [],
+  "executionMatrix": {
+    "mode": "GRADING_EVIDENCE_AUTO_EXECUTION_MATRIX",
+    "source": "grading.spec.checks + readonly_report + optional_controlled_report",
+    "summary": {
+      "checkTotal": 6,
+      "evidenceReadyTotal": 4,
+      "missingEvidenceTotal": 2,
+      "readonlyStaticCheckTotal": 4,
+      "readonlyStaticCoveredTotal": 4,
+      "controlledCommandCheckTotal": 2,
+      "controlledCommandCoveredTotal": 0,
+      "controlledCommandMissingTotal": 2,
+      "controlledCommandRequested": false,
+      "controlledCommandRuntimeWarning": false,
+      "readyForScorePreview": true,
+      "readyForApprovalRecommendation": false,
+      "manualReviewRequired": true,
+      "autoApproveAllowed": false,
+      "realPublishAllowed": false
+    },
+    "items": [
+      {
+        "checkId": "check_result_file",
+        "checkType": "file_exists",
+        "score": 15,
+        "status": "PASSED",
+        "passed": true,
+        "earnedScore": 15,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "evidenceSourceKind": "READONLY_REAL_SANDBOX_POC",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [
+          "result.csv"
+        ],
+        "errorCode": null,
+        "errorReason": null,
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 15,
+          "sandboxExecuted": true,
+          "auditLogRef": "readonly://check_result_file"
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_APPLICABLE",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 15,
+          "exitCode": null,
+          "stdoutTail": null,
+          "stderrTail": null,
+          "filesInspected": [
+            "result.csv"
+          ],
+          "errorCode": null,
+          "errorReason": null
+        },
+        "evidenceReady": true,
+        "recommendedNextEvidence": "manual_review_ready_evidence",
+        "reason": "selected_readonly_static_evidence_passed",
+        "manualReviewRequired": true
+      },
+      {
+        "checkId": "check_stdout_accuracy",
+        "checkType": "stdout_contains",
+        "score": 25,
+        "status": "MISSING",
+        "passed": null,
+        "earnedScore": 0,
+        "selectedEvidenceMode": "MISSING",
+        "evidenceSourceKind": "MISSING",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [],
+        "errorCode": null,
+        "errorReason": null,
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "DEFERRED",
+          "passed": null,
+          "earnedScore": 0,
+          "sandboxExecuted": false,
+          "auditLogRef": null
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_REQUESTED",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "MISSING",
+          "status": "MISSING",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "evidenceReady": false,
+        "recommendedNextEvidence": "run_evidence_auto_with_controlled_command",
+        "reason": "run_evidence_auto_with_controlled_command",
+        "manualReviewRequired": true
+      },
+      {
+        "checkId": "check_pytest",
+        "checkType": "pytest",
+        "score": 25,
+        "status": "MISSING",
+        "passed": null,
+        "earnedScore": 0,
+        "selectedEvidenceMode": "MISSING",
+        "evidenceSourceKind": "MISSING",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [],
+        "errorCode": null,
+        "errorReason": null,
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "DEFERRED",
+          "passed": null,
+          "earnedScore": 0,
+          "sandboxExecuted": false,
+          "auditLogRef": null
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_REQUESTED",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "MISSING",
+          "status": "MISSING",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "evidenceReady": false,
+        "recommendedNextEvidence": "run_evidence_auto_with_controlled_command",
+        "reason": "run_evidence_auto_with_controlled_command",
+        "manualReviewRequired": true
+      },
+      {
+        "checkId": "check_notebook_accuracy",
+        "checkType": "notebook_cell",
+        "score": 10,
+        "status": "FAILED",
+        "passed": false,
+        "earnedScore": 0,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "evidenceSourceKind": "READONLY_REAL_SANDBOX_POC",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [
+          "notebooks/analysis.ipynb"
+        ],
+        "errorCode": "NOTEBOOK_CELL_NOT_FOUND",
+        "errorReason": "Notebook cell index not found",
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "FAILED",
+          "passed": false,
+          "earnedScore": 0,
+          "sandboxExecuted": true,
+          "auditLogRef": "readonly://check_notebook_accuracy"
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_APPLICABLE",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "FAILED",
+          "passed": false,
+          "earnedScore": 0,
+          "exitCode": null,
+          "stdoutTail": null,
+          "stderrTail": null,
+          "filesInspected": [
+            "notebooks/analysis.ipynb"
+          ],
+          "errorCode": "NOTEBOOK_CELL_NOT_FOUND",
+          "errorReason": "Notebook cell index not found"
+        },
+        "evidenceReady": true,
+        "recommendedNextEvidence": "manual_review_ready_evidence",
+        "reason": "selected_readonly_static_evidence_failed",
+        "manualReviewRequired": true
+      },
+      {
+        "checkId": "check_metrics_json",
+        "checkType": "json_field",
+        "score": 15,
+        "status": "PASSED",
+        "passed": true,
+        "earnedScore": 15,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "evidenceSourceKind": "READONLY_REAL_SANDBOX_POC",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [
+          "metrics.json"
+        ],
+        "errorCode": null,
+        "errorReason": null,
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 15,
+          "sandboxExecuted": true,
+          "auditLogRef": "readonly://check_metrics_json"
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_APPLICABLE",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 15,
+          "exitCode": null,
+          "stdoutTail": null,
+          "stderrTail": null,
+          "filesInspected": [
+            "metrics.json"
+          ],
+          "errorCode": null,
+          "errorReason": null
+        },
+        "evidenceReady": true,
+        "recommendedNextEvidence": "manual_review_ready_evidence",
+        "reason": "selected_readonly_static_evidence_passed",
+        "manualReviewRequired": true
+      },
+      {
+        "checkId": "check_training_log",
+        "checkType": "log_keyword",
+        "score": 10,
+        "status": "PASSED",
+        "passed": true,
+        "earnedScore": 10,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "evidenceSourceKind": "READONLY_REAL_SANDBOX_POC",
+        "exitCode": null,
+        "stdoutTail": null,
+        "stderrTail": null,
+        "filesInspected": [
+          "logs/train.log"
+        ],
+        "errorCode": null,
+        "errorReason": null,
+        "readonlyEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 10,
+          "sandboxExecuted": true,
+          "auditLogRef": "readonly://check_training_log"
+        },
+        "controlledCommandEvidence": {
+          "mode": "CONTROLLED_DOCKER_SANDBOX_POC",
+          "status": "NOT_APPLICABLE",
+          "passed": null,
+          "earnedScore": 0
+        },
+        "selectedEvidence": {
+          "mode": "READONLY_REAL_SANDBOX_POC",
+          "status": "PASSED",
+          "passed": true,
+          "earnedScore": 10,
+          "exitCode": null,
+          "stdoutTail": null,
+          "stderrTail": null,
+          "filesInspected": [
+            "logs/train.log"
+          ],
+          "errorCode": null,
+          "errorReason": null
+        },
+        "evidenceReady": true,
+        "recommendedNextEvidence": "manual_review_ready_evidence",
+        "reason": "selected_readonly_static_evidence_passed",
+        "manualReviewRequired": true
+      }
+    ]
+  },
+  "gradingDslCoverageSummary": {
+    "component": "GradingDslCoverageSummary",
+    "mode": "GRADING_DSL_COVERAGE_SUMMARY",
+    "source": "grading.spec.checks + GRADING_EVIDENCE_AUTO_REPORT.executionMatrix",
+    "status": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "dslCheckTotal": 6,
+    "evidenceReadyTotal": 4,
+    "missingEvidenceTotal": 2,
+    "readonlyStaticCheckTotal": 4,
+    "readonlyStaticCoveredTotal": 4,
+    "controlledCommandCheckTotal": 2,
+    "controlledCommandCoveredTotal": 0,
+    "controlledCommandMissingTotal": 2,
+    "missingCheckIds": [
+      "check_stdout_accuracy",
+      "check_pytest"
+    ],
+    "controlledCommandMissingCheckIds": [
+      "check_stdout_accuracy",
+      "check_pytest"
+    ],
+    "readonlyStaticMissingCheckIds": [],
+    "manualReviewOnlyCheckIds": [],
+    "scorePreviewStatus": "PARTIAL_SCORE_PREVIEW_NEEDS_MORE_EVIDENCE",
+    "scorePreviewReadyForDecisionNote": false,
+    "decisionNoteRecommendation": "needs-evidence",
+    "nextCoreActionId": "run_evidence_auto_with_controlled_command",
+    "manualReviewRequired": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false
+  },
+  "nextCoreAction": {
+    "id": "run_evidence_auto_with_controlled_command",
+    "label": "Run evidence-auto with controlled command evidence",
+    "reason": "stdout_contains/pytest checks still need controlled Docker evidence.",
+    "api": {
+      "method": "POST",
+      "path": "/api/grading/evidence-auto",
+      "bodyPatch": {
+        "includeControlledCommand": true
+      }
+    },
+    "cli": "python lab_cli.py grade evidence-auto --include-controlled-command --grading <grading> --submission <submission> --output <output>",
+    "safety": {
+      "manualReviewRequired": true,
+      "autoApproveAllowed": false,
+      "realPublishAllowed": false,
+      "hostExecutionAllowed": false,
+      "networkEnabled": false
+    }
+  },
+  "manualReviewChecklist": {
+    "component": "GradingEvidenceAutoManualReviewChecklist",
+    "mode": "GRADING_EVIDENCE_AUTO_MANUAL_REVIEW_CHECKLIST",
+    "source": "GRADING_EVIDENCE_AUTO_REPORT.executionMatrix",
+    "status": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "summary": {
+      "itemTotal": 6,
+      "readyForDecisionTotal": 4,
+      "missingEvidenceTotal": 2,
+      "controlledCommandMissingTotal": 2,
+      "readonlyStaticMissingTotal": 0,
+      "readyForApprovalRecommendation": false,
+      "nextCoreActionId": "run_evidence_auto_with_controlled_command"
+    },
+    "decisionNoteRecommendation": {
+      "decision": "needs-evidence",
+      "reason": "Controlled command evidence is missing or runtime is unavailable.",
+      "nextCoreActionId": "run_evidence_auto_with_controlled_command",
+      "api": {
+        "method": "POST",
+        "path": "/api/review-tasks/{id}/decision-note"
+      },
+      "manualReviewRequired": true,
+      "autoApproveAllowed": false
+    },
+    "items": [
+      {
+        "checkId": "check_result_file",
+        "checkType": "file_exists",
+        "score": 15,
+        "readyForDecision": true,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "selectedEvidenceStatus": "PASSED",
+        "readonlyEvidenceStatus": "PASSED",
+        "controlledCommandEvidenceStatus": "NOT_APPLICABLE",
+        "recommendedReviewAction": "verify_static_evidence_and_score",
+        "recommendedDecision": "approve-ready",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      {
+        "checkId": "check_stdout_accuracy",
+        "checkType": "stdout_contains",
+        "score": 25,
+        "readyForDecision": false,
+        "selectedEvidenceMode": "MISSING",
+        "selectedEvidenceStatus": "MISSING",
+        "readonlyEvidenceStatus": "DEFERRED",
+        "controlledCommandEvidenceStatus": "NOT_REQUESTED",
+        "recommendedReviewAction": "collect_controlled_command_evidence_before_decision_note",
+        "recommendedDecision": "needs-evidence",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      {
+        "checkId": "check_pytest",
+        "checkType": "pytest",
+        "score": 25,
+        "readyForDecision": false,
+        "selectedEvidenceMode": "MISSING",
+        "selectedEvidenceStatus": "MISSING",
+        "readonlyEvidenceStatus": "DEFERRED",
+        "controlledCommandEvidenceStatus": "NOT_REQUESTED",
+        "recommendedReviewAction": "collect_controlled_command_evidence_before_decision_note",
+        "recommendedDecision": "needs-evidence",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      {
+        "checkId": "check_notebook_accuracy",
+        "checkType": "notebook_cell",
+        "score": 10,
+        "readyForDecision": true,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "selectedEvidenceStatus": "FAILED",
+        "readonlyEvidenceStatus": "FAILED",
+        "controlledCommandEvidenceStatus": "NOT_APPLICABLE",
+        "recommendedReviewAction": "verify_static_evidence_and_score",
+        "recommendedDecision": "approve-ready",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      {
+        "checkId": "check_metrics_json",
+        "checkType": "json_field",
+        "score": 15,
+        "readyForDecision": true,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "selectedEvidenceStatus": "PASSED",
+        "readonlyEvidenceStatus": "PASSED",
+        "controlledCommandEvidenceStatus": "NOT_APPLICABLE",
+        "recommendedReviewAction": "verify_static_evidence_and_score",
+        "recommendedDecision": "approve-ready",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      },
+      {
+        "checkId": "check_training_log",
+        "checkType": "log_keyword",
+        "score": 10,
+        "readyForDecision": true,
+        "selectedEvidenceMode": "READONLY_REAL_SANDBOX_POC",
+        "selectedEvidenceStatus": "PASSED",
+        "readonlyEvidenceStatus": "PASSED",
+        "controlledCommandEvidenceStatus": "NOT_APPLICABLE",
+        "recommendedReviewAction": "verify_static_evidence_and_score",
+        "recommendedDecision": "approve-ready",
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false
+      }
+    ],
+    "safety": {
+      "manualReviewRequired": true,
+      "singleTaskDecisionNoteOnly": true,
+      "autoApproveAllowed": false,
+      "autoPublishAllowed": false,
+      "realPublishAllowed": false,
+      "hostExecutionAllowedByChecklist": false,
+      "networkEnabledByChecklist": false
+    }
+  },
+  "reviewerSafetySummary": {
+    "component": "GradingEvidenceAutoReviewerSafetySummary",
+    "mode": "GRADING_EVIDENCE_AUTO_REVIEWER_SAFETY_SUMMARY",
+    "source": "scorePreview + executionMatrix + manualReviewChecklist + controlledReport.safety",
+    "status": "NEEDS_CONTROLLED_COMMAND_EVIDENCE",
+    "readyForHumanReview": true,
+    "readyForHumanScoreReview": false,
+    "readyForApproveReadyDecision": false,
+    "blockingReasons": [
+      {
+        "id": "controlled_command_evidence_missing",
+        "severity": "warning",
+        "missingTotal": 2,
+        "message": "stdout_contains/pytest checks still need controlled Docker evidence.",
+        "nextCoreActionId": "run_evidence_auto_with_controlled_command"
+      },
+      {
+        "id": "score_preview_not_ready_for_approve_ready",
+        "severity": "info",
+        "message": "Score preview is partial; record needs-evidence/needs-revision before approve-ready.",
+        "nextCoreActionId": "run_evidence_auto_with_controlled_command"
+      }
+    ],
+    "score": {
+      "earnedScore": 40,
+      "totalScore": 100,
+      "coveredScore": 50,
+      "missingScore": 50,
+      "coverageRatio": 0.5,
+      "scoreRatio": 0.4,
+      "passRate": 0.75
+    },
+    "evidence": {
+      "checkTotal": 6,
+      "evidenceReadyTotal": 4,
+      "missingEvidenceTotal": 2,
+      "controlledCommandRequested": false,
+      "controlledCommandIncluded": false,
+      "controlledCommandMissingTotal": 2,
+      "controlledCommandRuntimeWarning": false,
+      "manualChecklistReadyTotal": 4,
+      "manualChecklistTotal": 6
+    },
+    "requiredManualChecks": [
+      {
+        "id": "verify_score_preview",
+        "status": "NEEDS_EVIDENCE",
+        "description": "Review earned score, missing score, failed checks, and evidence coverage."
+      },
+      {
+        "id": "verify_controlled_command_evidence",
+        "status": "NEEDS_EVIDENCE",
+        "description": "Confirm stdout_contains/pytest checks use controlled Docker evidence when applicable."
+      },
+      {
+        "id": "record_human_decision_note",
+        "status": "NEEDS_DECISION",
+        "description": "Record approve-ready, needs-evidence, or needs-revision manually."
+      }
+    ],
+    "decisionNoteRecommendation": {
+      "decision": "needs-evidence",
+      "reason": "Controlled command evidence is missing or runtime is unavailable.",
+      "nextCoreActionId": "run_evidence_auto_with_controlled_command",
+      "api": {
+        "method": "POST",
+        "path": "/api/review-tasks/{id}/decision-note"
+      },
+      "manualReviewRequired": true,
+      "autoApproveAllowed": false
+    },
+    "nextCoreAction": {
+      "id": "run_evidence_auto_with_controlled_command",
+      "label": "Run evidence-auto with controlled command evidence",
+      "cli": "python lab_cli.py grade evidence-auto --include-controlled-command --grading <grading> --submission <submission> --output <output>",
+      "api": {
+        "method": "POST",
+        "path": "/api/grading/evidence-auto",
+        "bodyPatch": {
+          "includeControlledCommand": true
+        }
+      }
+    },
+    "safety": {
+      "manualReviewRequired": true,
+      "controlledCommandRequiresExplicitFlag": true,
+      "contestantCodeExecutedInControlledSandbox": false,
+      "hostExecutionAllowed": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "autoApproveAllowed": false,
+      "autoPublishAllowed": false,
+      "realPublishAllowed": false
+    }
+  },
+  "reportPath": "examples/output/mcp-local-core-client-e2e/grading-evidence.json",
+  "gradingJobId": "grading_job_6884ec89aec4",
+  "taskId": "task_8bda83d21433",
+  "operationAuditEvent": {
+    "action": "GRADING_JOB_RUN",
+    "resourceType": "GRADING_JOB",
+    "resourceId": "grading_job_6884ec89aec4",
+    "actor": "teacher_1",
+    "beforeState": "QUEUED",
+    "afterState": "WAITING_REVIEW",
+    "detail": {
+      "component": "GradingJobRun",
+      "jobId": "grading_job_6884ec89aec4",
+      "taskId": "task_8bda83d21433",
+      "submissionId": "submission_mcp_local_core_client",
+      "candidateId": "candidate_mcp_local_core_client",
+      "reportId": "grading_evidence_merge_3a67c98d24cb",
+      "reportPath": "examples/output/mcp-local-core-client-e2e/grading-evidence.json",
+      "gradingRecordId": "grading_record_933da6f1d995",
+      "summary": {
+        "mode": "GRADING_EVIDENCE_AUTO_REPORT",
+        "sourceMode": "EVIDENCE_AUTO",
+        "earnedScore": 40,
+        "totalScore": 100,
+        "coveredScore": 50,
+        "missingScore": 50,
+        "coverageRatio": 0.5,
+        "recordStatus": "NEEDS_EVIDENCE",
+        "manualReviewRequired": true
+      },
+      "safety": {
+        "localStagingJob": true,
+        "databaseWritten": false,
+        "queuePersistedToProduction": false,
+        "workerStarted": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": true,
+        "readonlyOnly": true,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "unknownShellExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "manualReviewRequired": true,
+        "mergeExecutedOnlyExistingReports": true,
+        "sourceMode": "EVIDENCE_AUTO",
+        "readonlyAlwaysRunsFirst": true,
+        "controlledCommandRequiresExplicitFlag": true,
+        "controlledCommandRequested": false,
+        "controlledCommandIncluded": false,
+        "recordCreated": true,
+        "recordCreatesNewExecution": false
+      }
+    },
+    "id": "op_audit_abd831357886",
+    "occurredAt": "2026-07-11T17:08:25.663223Z",
+    "traceId": "trace_06c17e592592",
+    "mode": "MOCK_ONLY",
+    "realLlmCalled": false,
+    "realCloudResourceChanged": false,
+    "contestantCodeExecuted": false,
+    "realPublish": false
+  },
+  "artifact": {
+    "kind": "GRADING_REPORT",
+    "path": "examples/output/mcp-local-core-client-e2e/grading-evidence.json",
+    "title": "Grading Job Evidence Report",
+    "status": "COMPLETED",
+    "id": "artifact_7df395ffeb8b",
+    "taskId": "task_8bda83d21433",
+    "workflowRunId": null,
+    "sourceRef": "templates/grading/examples/mixed-checks.yaml",
+    "traceId": "trace_06c17e592592",
+    "metadata": {
+      "reportType": "GRADING_EVIDENCE_AUTO",
+      "gradingJobId": "grading_job_6884ec89aec4",
+      "gradingRecordId": "grading_record_933da6f1d995",
+      "submissionId": "submission_mcp_local_core_client",
+      "candidateId": "candidate_mcp_local_core_client",
+      "summary": {
+        "mode": "GRADING_EVIDENCE_AUTO_REPORT",
+        "sourceMode": "EVIDENCE_AUTO",
+        "earnedScore": 40,
+        "totalScore": 100,
+        "coveredScore": 50,
+        "missingScore": 50,
+        "coverageRatio": 0.5,
+        "recordStatus": "NEEDS_EVIDENCE",
+        "manualReviewRequired": true
+      },
+      "safety": {
+        "localStagingJob": true,
+        "databaseWritten": false,
+        "queuePersistedToProduction": false,
+        "workerStarted": false,
+        "autoApproveAllowed": false,
+        "realPublishAllowed": false,
+        "realPublish": false,
+        "sandboxExecuted": true,
+        "readonlyOnly": true,
+        "contestantCodeExecuted": false,
+        "commandExecuted": false,
+        "unknownShellExecuted": false,
+        "pytestExecuted": false,
+        "notebookExecuted": false,
+        "networkEnabled": false,
+        "hostExecutionAllowed": false,
+        "manualReviewRequired": true,
+        "mergeExecutedOnlyExistingReports": true,
+        "sourceMode": "EVIDENCE_AUTO",
+        "readonlyAlwaysRunsFirst": true,
+        "controlledCommandRequiresExplicitFlag": true,
+        "controlledCommandRequested": false,
+        "controlledCommandIncluded": false,
+        "recordCreated": true,
+        "recordCreatesNewExecution": false
+      }
+    },
+    "mode": "MOCK_ONLY",
+    "realLlmCalled": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": true,
+    "contestantCodeExecuted": false,
+    "realPublish": false,
+    "createdAt": "2026-07-11T17:08:25.665058Z",
+    "updatedAt": "2026-07-11T17:08:25.665065Z"
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "id": "real_sdk_dependency_install_execution_gate_contract",
+  "gateId": "real_sdk_dependency_install_execution_gate",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Reviewed real SDK dependency install execution gate. It may evaluate the reviewed install change proposal and produce a local execution gate model, but must not authorize execution, write dependency files, write patch files, apply patches, materialize or execute commands, install packages, resolve package metadata, check secrets, use network access, import SDKs, create clients, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_install_execution_gate_module",
+      "path": "providers/real_sdk_dependency_install_execution_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_contract",
+      "path": "providers/real-sdk-dependency-install-execution-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_module",
+      "path": "providers/real_sdk_dependency_install_change_proposal.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_contract",
+      "path": "providers/real-sdk-dependency-install-change-proposal.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-execution-gate describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installExecutionGateOnly": true,
+        "installExecutionGateModelReady": false,
+        "executionAuthorized": false,
+        "commandExecuted": false,
+        "dependencyInstallExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-execution-gate evaluate --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installChangeProposalModelReady": false,
+        "installExecutionGateModelReady": false,
+        "executionAuthorized": false,
+        "commandExecuted": false,
+        "dependencyInstallExecuted": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW",
+    "gateOnly": true,
+    "targetPackage": "openai",
+    "recommendedSpecifier": "openai>=1.0.0,<2.0.0"
+  },
+  "requiredContext": {
+    "installChangeProposalRequired": true,
+    "installChangeProposalModelReady": false,
+    "installExecutionGateOnly": true,
+    "installExecutionGateModelReady": false,
+    "readyForSeparateDependencyInstallExecutionApproval": false,
+    "dependencyInstallExecutionAuthorized": false,
+    "executionAuthorized": false,
+    "dependencyFileWriteAuthorized": false,
+    "dependencyFileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "dependencyPatchGenerated": false,
+    "patchGenerated": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecuted": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "authorize_dependency_install_execution",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "write_patch_file",
+    "materialize_patch_file",
+    "apply_patch",
+    "materialize_install_command",
+    "execute_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_after_install_execution_gate",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_install_execution_gate",
+    "test_real_sdk_dependency_install_change_proposal",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "installChangeProposalRequiredBeforeGate": true,
+    "installExecutionGateOnly": true,
+    "executionAuthorizationGranted": false,
+    "dependencyInstallExecutionAuthorized": false,
+    "dependencyFileWriteAuthorized": false,
+    "dependencyFileChanged": false,
+    "patchGenerated": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "commandMaterialized": false,
+    "installCommandMaterialized": false,
+    "commandExecuted": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

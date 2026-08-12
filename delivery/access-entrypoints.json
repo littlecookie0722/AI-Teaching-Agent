@@ -1,0 +1,189 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 5",
+  "mode": "MOCK_ONLY",
+  "id": "phase5_access_entrypoints_delivery",
+  "title": "Phase 5 Access Entrypoints Delivery Package",
+  "description": "Machine-testable Mock delivery package for local visual access entrypoints and future IP + port handoff. It documents static previews, planned local URLs, disabled service bindings, validation commands, and safety boundaries without starting a real HTTP server, binding an external IP, opening network access, deploying cloud resources, starting a real Agent, or publishing content.",
+  "inputs": [
+    {
+      "id": "frontend_manifest",
+      "path": "frontend/ui.manifest.json",
+      "required": true
+    },
+    {
+      "id": "frontend_mock_data",
+      "path": "frontend/mock-data.json",
+      "required": true
+    },
+    {
+      "id": "operations_launchpad",
+      "path": "frontend/operations-launchpad.html",
+      "required": true
+    },
+    {
+      "id": "operations_signoff",
+      "path": "frontend/operations-signoff.html",
+      "required": true
+    },
+    {
+      "id": "delivery_preview",
+      "path": "frontend/delivery.html",
+      "required": true
+    },
+    {
+      "id": "console_preview",
+      "path": "frontend/console.html",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    },
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "access_entrypoints_markdown",
+      "path": "delivery/ACCESS_ENTRYPOINTS.md",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    },
+    {
+      "id": "access_entrypoints_contract",
+      "path": "delivery/access-entrypoints.json",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    },
+    {
+      "id": "access_entrypoints_static_preview",
+      "path": "frontend/access.html",
+      "route": "/access",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    }
+  ],
+  "accessPlan": {
+    "primaryStaticPreview": {
+      "route": "/access",
+      "path": "frontend/access.html",
+      "manualPreviewCommand": "start .\\frontend\\access.html",
+      "manualOnly": true,
+      "startsServer": false,
+      "bindsPort": false
+    },
+    "plannedLocalUrls": [
+      {
+        "id": "frontend_dev_server_placeholder",
+        "label": "Frontend 2.0",
+        "url": "http://127.0.0.1:3000",
+        "host": "127.0.0.1",
+        "port": 3000,
+        "enabled": false,
+        "portListening": false,
+        "externalIpBound": false,
+        "externalNetworkAllowed": false
+      },
+      {
+        "id": "backend_mock_api_placeholder",
+        "label": "Backend Mock API",
+        "url": "http://127.0.0.1:8000",
+        "host": "127.0.0.1",
+        "port": 8000,
+        "enabled": false,
+        "portListening": false,
+        "externalIpBound": false,
+        "externalNetworkAllowed": false
+      },
+      {
+        "id": "mcp_server_placeholder",
+        "label": "MCP Server",
+        "url": "http://127.0.0.1:8080",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "enabled": false,
+        "portListening": false,
+        "externalIpBound": false,
+        "externalNetworkAllowed": false
+      }
+    ],
+    "allowedHostsWhenRealDeploymentIsApproved": [
+      "127.0.0.1",
+      "localhost"
+    ],
+    "blockedHosts": [
+      "0.0.0.0",
+      "public-ip",
+      "lan-ip"
+    ],
+    "externalUrlGenerated": false,
+    "tlsConfigured": false,
+    "reverseProxyConfigured": false,
+    "deploymentPackageGenerated": false
+  },
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_access_entrypoints",
+    "test_frontend_contract",
+    "test_delivery_package_contract",
+    "test_operations_manual",
+    "test_final_signoff",
+    "test_real_provider_sdk_poc",
+    "test_all"
+  ],
+  "validation": {
+    "deterministicChecks": [
+      "All input and output files exist locally.",
+      "The /access static prototype is registered in frontend/ui.manifest.json.",
+      "frontend/mock-data.json includes accessEntrypointsPrototype.",
+      "Recommended command ids are allowlisted in scripts/manifest.json.",
+      "Planned local URLs remain disabled and never bind a real port.",
+      "No public IP, LAN IP, TLS, reverse proxy, deployment package, real Agent, real MCP Server, real LLM, cloud resource, sandbox, unknown Shell, upload, auto publish, or real publish is enabled."
+    ],
+    "successSignals": [
+      "tests/test_access_entrypoints.py passes.",
+      "Delivery package includes access_entrypoints_md, access_entrypoints_contract, and frontend_access_entrypoints_prototype.",
+      "Final signoff references the access entrypoints package.",
+      "All safety flags remain false for real network exposure and real execution."
+    ]
+  },
+  "safety": {
+    "manualOnly": true,
+    "readOnly": true,
+    "realHttpServerStarted": false,
+    "portListening": false,
+    "externalIpBound": false,
+    "lanAccessEnabled": false,
+    "publicUrlGenerated": false,
+    "networkAccess": false,
+    "tlsConfigured": false,
+    "reverseProxyConfigured": false,
+    "deploymentPackageGenerated": false,
+    "realBackendStarted": false,
+    "realFrontendServerStarted": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "realProviderEnabled": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false
+  }
+}

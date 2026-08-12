@@ -1,0 +1,220 @@
+{
+  "id": "real_sdk_dependency_install_plan_contract",
+  "planId": "real_sdk_dependency_install_plan",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Draft-only dependency install plan for a future real SDK task. It does not install packages, generate install commands, resolve package metadata, modify lockfiles, import SDKs, check secrets, use network access, create AI tasks, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_install_plan_module",
+      "path": "providers/real_sdk_dependency_install_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_module",
+      "path": "providers/real_sdk_dependency_env_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_contract",
+      "path": "providers/real-sdk-dependency-env-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_module",
+      "path": "providers/real_sdk_minimal_impl.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_contract",
+      "path": "providers/real-sdk-minimal-impl.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement_module",
+      "path": "providers/real_sdk_enablement.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_enablement_contract",
+      "path": "providers/real-sdk-enablement.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-plan describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "readyForDependencyInstallImplementationReview": false,
+        "dependencyInstallCommandGenerated": false,
+        "dependencyInstallExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-plan plan --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "dependencyEnvGateReady": false,
+        "installPlanChecklistPassed": false,
+        "readyForDependencyInstallImplementationReview": false,
+        "dependencyInstallCommandGenerated": false,
+        "dependencyInstallExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-install-plan plan --provider openai --approval-ref APPROVAL-001 --reviewer teacher_1 --confirm-dry-run-plan --confirm-runtime-guard --confirm-schema-review --confirm-human-review-policy --confirm-audit-redaction --confirm-sdk-dependency-review --confirm-provider-contract-review --confirm-runtime-contract-review --confirm-secret-injection-review --confirm-network-access-review --confirm-rollback-plan --confirm-minimal-impl-review --confirm-sdk-package-review --confirm-sdk-version-pin-review --confirm-dependency-license-review --confirm-dependency-hash-review --confirm-env-var-name-review --confirm-env-example-review --confirm-secret-non-read-policy --confirm-ci-install-policy --confirm-package-manager-review --confirm-lockfile-strategy-review --confirm-version-pin-strategy --confirm-hash-verification-strategy --confirm-rollback-files-review --confirm-ci-cache-policy --confirm-no-install-execution --confirm-no-network-policy --confirm-no-secret-policy",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "dependencyEnvGateReady": true,
+        "installPlanChecklistPassed": true,
+        "readyForDependencyInstallImplementationReview": true,
+        "dependencyInstallCommandGenerated": false,
+        "dependencyInstallExecuted": false,
+        "dependencyLockfileChanged": false,
+        "networkAccess": false,
+        "secretPresenceChecked": false
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "real_sdk_dependency_env_gate",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "package_manager_strategy_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "version_pin_strategy_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "hash_and_lockfile_strategy_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "rollback_files_review",
+      "required": true,
+      "appliedNow": false
+    },
+    {
+      "id": "future_dependency_install_implementation_task",
+      "required": true,
+      "appliedNow": false
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "dependencyEnvGateRequired": true,
+    "dependencyEnvGateReady": false,
+    "installPlanChecklistPassed": false,
+    "readyForDependencyInstallImplementationReview": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstallAllowed": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "dependencyLockfileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "install_sdk_dependency",
+    "generate_install_command",
+    "execute_install_command",
+    "download_sdk_package",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "modify_dependency_lockfile",
+    "modify_pyproject_or_requirements",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_install_plan",
+    "test_real_sdk_dependency_env_gate",
+    "test_real_sdk_minimal_impl",
+    "test_real_sdk_enablement",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "sdkDependencyInstalled": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "dependencyLockfileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

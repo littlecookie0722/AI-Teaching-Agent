@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>本地核心评分报告</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --ok: #166534;
+      --warn: #b45309;
+      --blocked: #991b1b;
+      --code: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .section-head p {
+      overflow-wrap: anywhere;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .reviewer-workspace {
+      display: grid;
+      gap: 12px;
+      margin: 0 16px 16px;
+      padding: 14px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .reviewer-workspace > * {
+      min-width: 0;
+    }
+
+    .reviewer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .reviewer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .reviewer-actions > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+      min-width: 0;
+    }
+
+    .detail-card {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .detail-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .kv {
+      display: grid;
+      gap: 7px;
+    }
+
+    .kv p {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #eef2f7;
+      padding-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .kv p:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .kv strong,
+    .mono {
+      color: var(--text);
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+
+    .table-wrap {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .metric {
+      min-width: 0;
+      min-height: 82px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow-wrap: anywhere;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 20px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 16px;
+      padding: 0 16px 16px;
+    }
+
+    .content-grid > * {
+      min-width: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f9fafb;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 238px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .callout {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow-wrap: anywhere;
+    }
+
+    .callout h3,
+    .callout p {
+      overflow-wrap: anywhere;
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .blocked {
+      color: var(--blocked);
+      font-weight: 700;
+    }
+
+    .evidence {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 920px) {
+      header,
+      .summary-grid,
+      .reviewer-grid,
+      .detail-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>评分报告</h1>
+      <p class="pill strong">LOCAL_CORE_MVP</p>
+    </div>
+    <div class="pill-row" aria-label="Local core grading report safety state">
+      <span class="pill">本地评分报告：只读加载</span>
+      <span class="pill">评分执行：本页不发起</span>
+      <span class="pill">选手代码：本页不执行</span>
+      <span class="pill">命令 / Pytest：本页不运行</span>
+      <span class="pill">未知 Shell：本页不执行</span>
+      <span class="pill">reportDetail：只读</span>
+      <span class="pill">containerSandboxPlan：只读</span>
+      <a class="pill strong" id="grading-report-workspace-link" href="grading-workspace.html?taskId=task_grading_demo">打开评分工作台</a>
+      <span class="pill">真实发布：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">评分摘要</h2>
+          <p>本地评分 evidence / 静态 fallback · 只读审核与结果复核</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">GET /api/grading/report</span>
+          <span class="pill strong">reportDetail</span>
+          <span class="pill warn" id="grading-report-api-state">STATIC_HTML_FALLBACK</span>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="metric">
+          <span>总分</span>
+          <strong id="grading-report-total-score">100</strong>
+        </div>
+        <div class="metric">
+          <span>得分</span>
+          <strong id="grading-report-earned-score" class="ok">100</strong>
+        </div>
+        <div class="metric">
+          <span>评分项</span>
+          <strong id="grading-report-check-summary" class="ok">6 / 6</strong>
+        </div>
+        <div class="metric">
+          <span>真实执行</span>
+          <strong id="grading-report-executed-total">0</strong>
+        </div>
+      </div>
+
+      <div class="reviewer-workspace" aria-labelledby="reviewer-workspace-title">
+        <div class="section-head">
+          <div>
+            <h2 id="reviewer-workspace-title">ReviewerReportWorkspace</h2>
+            <p id="reviewer-workspace-summary">source=GET /api/grading/report + GET /api/grading/records + GET /api/grading/evidence-readiness · readonly=true · waiting for reviewer readable grading summary</p>
+          </div>
+          <span class="pill warn" id="reviewer-workspace-state">WAITING_REVIEW_DECISION_NOTE</span>
+        </div>
+        <div class="reviewer-grid" aria-label="Reviewer report workspace metrics">
+          <div class="metric">
+            <span>得分结论</span>
+            <strong id="reviewer-workspace-score">100 / 100</strong>
+          </div>
+          <div class="metric">
+            <span>证据状态</span>
+            <strong id="reviewer-workspace-evidence">evidenceReady=4/4</strong>
+          </div>
+          <div class="metric">
+            <span>人工结论</span>
+            <strong id="reviewer-workspace-decision">note=none</strong>
+          </div>
+          <div class="metric">
+            <span>评分记录</span>
+            <strong id="reviewer-workspace-record">NO_GRADING_RECORD</strong>
+          </div>
+        </div>
+        <div class="reviewer-actions">
+          <span class="pill strong" id="reviewer-workspace-candidate-safety">candidateSafe=true · answerVisibleToCandidate=false · gradingRefVisibleToCandidate=false</span>
+          <span class="pill warn" id="reviewer-workspace-next-action">nextAction=record_review_decision_note</span>
+          <a class="pill strong" id="reviewer-workspace-review-center-link" href="review-center.html?taskId=task_grading_demo&amp;decision=needs-evidence&amp;source=grading-report-reviewer-workspace">打开审核中心记录结论</a>
+          <span class="pill" id="reviewer-workspace-safety">noExecutionFromPage=true · autoApproveAllowed=false · realPublishAllowed=false</span>
+        </div>
+        <div class="detail-grid" id="reviewer-safety-summary-list" aria-label="Reviewer safety summary">
+          <div class="callout">
+            <h3>ReviewerSafetySummary · STATIC_HTML_FALLBACK</h3>
+            <p id="reviewer-safety-summary-status">source=GET /api/grading/report?file={file}.report.reviewerSafetySummary · readyForApproveReadyDecision=false · manualReviewRequired=true</p>
+            <p>blockingReasons=controlled_command_evidence_missing, score_preview_not_ready_for_approve_ready · noExecutionFromPage=true · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-grid" aria-label="Report detail boundary">
+        <div class="detail-card">
+          <h3>沙箱策略</h3>
+          <div class="kv">
+            <p><span>sandboxPolicy.executorBoundary</span><strong id="grading-report-executor-boundary">SandboxExecutor</strong></p>
+            <p><span>hostExecutionAllowed</span><strong id="grading-report-host-execution">false</strong></p>
+            <p><span>networkAccess</span><strong id="grading-report-network-access">disabled_by_default</strong></p>
+            <p><span>requiredLimits</span><strong id="grading-report-required-limits">timeout/cpu/memory/process</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>可解释性</h3>
+          <div class="kv">
+            <p><span>explainability.status</span><strong id="grading-report-explainability-status">EXPLAINABLE_MOCK_PLAN</strong></p>
+            <p><span>eachCheckHasPlan</span><strong id="grading-report-each-check-plan">true</strong></p>
+            <p><span>eachCheckHasInputSummary</span><strong id="grading-report-each-check-input">true</strong></p>
+            <p><span>assessmentPlanAlignedWithChecks</span><strong id="grading-report-assessment-aligned">true</strong></p>
+            <p><span>realSandboxEvidenceRequired</span><strong id="grading-report-real-evidence-required">true</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>审计摘要</h3>
+          <div class="kv">
+            <p><span>reportPath</span><strong id="grading-report-path">STATIC_HTML_FALLBACK</strong></p>
+            <p><span>runRealPytestEnabled</span><strong id="grading-report-real-pytest">false</strong></p>
+            <p><span>mockEvidence</span><strong id="grading-report-mock-evidence">MOCK_EVIDENCE_NOT_COLLECTED</strong></p>
+            <p><span>blockedActions</span><strong id="grading-report-blocked-actions">realSandboxRun/runRealPytest</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>AssessmentPlan 追溯</h3>
+          <div class="kv">
+            <p><span>assessmentPlanSummary.source</span><strong>grading.spec.assessmentPlan</strong></p>
+            <p><span>assessmentPlanSummary.planTotal</span><strong>6</strong></p>
+            <p><span>assessmentPlanSummary.alignedWithChecks</span><strong>true</strong></p>
+            <p><span>assessmentPlanSourceField</span><strong>spec.assessmentPlan[checkId=*]</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>容器计划</h3>
+          <div class="kv">
+            <p><span>containerSandboxPlan.mode</span><strong>CONTAINER_PLAN_ONLY</strong></p>
+            <p><span>containerPlan.image</span><strong>python:3.11-slim</strong></p>
+            <p><span>mounts[0].mode</span><strong>read_only</strong></p>
+            <p><span>resultPlaceholder.status</span><strong>NOT_EXECUTED</strong></p>
+            <p><span>containerStarted</span><strong>false</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>ReadonlyReportDetail</h3>
+          <div class="kv">
+            <p><span>source</span><strong>realDemoPrototype.readonlyEvidenceDemo.reportDetail</strong></p>
+            <p><span>mode</span><strong>READONLY_REAL_SANDBOX_POC</strong></p>
+            <p><span>checkSummary.executed</span><strong>2</strong></p>
+            <p><span>readonlyEvidence.status</span><strong>COLLECTED</strong></p>
+            <p><span>sourceGradingModified</span><strong>false</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>ControlledDockerEvidence</h3>
+          <div class="kv">
+            <p><span>source</span><strong>realDemoPrototype.controlledDockerEvidenceDemo</strong></p>
+            <p><span>mode</span><strong>CONTROLLED_DOCKER_SANDBOX_POC</strong></p>
+            <p><span>plan</span><strong>mimo-real-demo-controlled-plan.json</strong></p>
+            <p><span>image</span><strong>ai-grading-python:0.1</strong></p>
+            <p><span>checkSummary</span><strong>stdout_contains=1 / pytest=1</strong></p>
+            <p><span>earnedScore</span><strong>40 / 40</strong></p>
+          </div>
+        </div>
+        <div class="detail-card">
+          <h3>GradingEvidenceCoverage</h3>
+          <div class="kv">
+            <p><span>status</span><strong>GRADING_EVIDENCE_COVERAGE_COMPLETE</strong></p>
+            <p><span>controlledDocker</span><strong>40 / 40</strong></p>
+            <p><span>staticNotebook</span><strong>60 / 60</strong></p>
+            <p><span>earnedScore</span><strong>100 / 100</strong></p>
+            <p><span>manualReviewRequired</span><strong>true</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Evidence auto report summary">
+        <div class="section-head">
+          <div>
+            <h2>EvidenceAutoSummary</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}.report · mode=GRADING_EVIDENCE_AUTO_REPORT · readonly=true</p>
+            <p class="warning" id="evidence-auto-status">autoReportStatus=STATIC_HTML_FALLBACK · sourceMode=EVIDENCE_AUTO · noExecutionFromPage=true</p>
+          </div>
+          <span class="pill warn" id="evidence-auto-summary">readonlyReportIncluded=true · controlledCommandRequested=false</span>
+        </div>
+        <div class="detail-grid" id="evidence-auto-step-list">
+          <div class="callout">
+            <h3>readonly_static_evidence · COMPLETED</h3>
+            <p>mode=READONLY_REAL_SANDBOX_POC · readonlyOnly=true · commandExecuted=false</p>
+          </div>
+          <div class="callout">
+            <h3>controlled_command_evidence · SKIPPED</h3>
+            <p>reason=includeControlledCommand=false · contestantCodeExecuted=false · commandExecuted=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Evidence auto execution matrix">
+        <div class="section-head">
+          <div>
+            <h2>EvidenceAutoExecutionMatrix</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}.report.executionMatrix · readonly=true · noExecutionFromPage=true</p>
+            <p class="warning" id="evidence-auto-matrix-status">matrixStatus=STATIC_HTML_FALLBACK · mode=GRADING_EVIDENCE_AUTO_EXECUTION_MATRIX</p>
+          </div>
+          <span class="pill warn" id="evidence-auto-next-action">nextCoreAction=run_evidence_auto_with_controlled_command</span>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>证据 ready</span>
+            <strong id="evidence-auto-matrix-ready">4 / 6</strong>
+          </div>
+          <div class="metric">
+            <span>受控命令覆盖</span>
+            <strong id="evidence-auto-matrix-controlled">0 / 2</strong>
+          </div>
+          <div class="metric">
+            <span>静态证据覆盖</span>
+            <strong id="evidence-auto-matrix-readonly">4 / 4</strong>
+          </div>
+          <div class="metric">
+            <span>可建议人工通过</span>
+            <strong id="evidence-auto-matrix-approval">false</strong>
+          </div>
+        </div>
+        <div class="detail-grid" id="evidence-auto-matrix-list">
+          <div class="callout">
+            <h3>check_stdout_accuracy · stdout_contains · MISSING</h3>
+            <p>readonlyEvidence=DEFERRED · controlledCommandEvidence=NOT_REQUESTED · selectedEvidence=MISSING</p>
+            <p>recommendedNextEvidence=run_evidence_auto_with_controlled_command · manualReviewRequired=true</p>
+          </div>
+          <div class="callout">
+            <h3>check_pytest · pytest · MISSING</h3>
+            <p>readonlyEvidence=DEFERRED · controlledCommandEvidence=NOT_REQUESTED · selectedEvidence=MISSING</p>
+            <p>recommendedNextEvidence=run_evidence_auto_with_controlled_command · manualReviewRequired=true</p>
+          </div>
+        </div>
+        <div class="detail-grid" id="evidence-auto-next-action-detail">
+          <div class="callout">
+            <h3>nextCoreAction · run_evidence_auto_with_controlled_command</h3>
+            <p>api=POST /api/grading/evidence-auto · bodyPatch.includeControlledCommand=true</p>
+            <p>manualReviewRequired=true · autoApproveAllowed=false · realPublishAllowed=false</p>
+            <p><a class="pill strong" id="evidence-auto-review-center-link" href="review-center.html?taskId=task_grading_demo&amp;decision=needs-evidence&amp;source=grading-report-next-core-action">打开审核中心记录结论</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Evidence auto score preview">
+        <div class="section-head">
+          <div>
+            <h2>EvidenceAutoScorePreview</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}.report.scorePreview · readonly=true · humanReviewOnly=true</p>
+            <p class="warning" id="evidence-auto-score-preview-status">scorePreviewStatus=STATIC_HTML_FALLBACK · mode=GRADING_EVIDENCE_AUTO_SCORE_PREVIEW · manualReviewRequired=true</p>
+          </div>
+          <span class="pill warn" id="evidence-auto-score-preview-summary">earnedScore=50/100 · coveredScore=50 · missingScore=50 · readyForDecisionNote=false</span>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>预览得分</span>
+            <strong id="evidence-auto-score-preview-score">50 / 100</strong>
+          </div>
+          <div class="metric">
+            <span>覆盖率</span>
+            <strong id="evidence-auto-score-preview-coverage">0.5</strong>
+          </div>
+          <div class="metric">
+            <span>通过率</span>
+            <strong id="evidence-auto-score-preview-passrate">0.5</strong>
+          </div>
+          <div class="metric">
+            <span>缺证据项</span>
+            <strong id="evidence-auto-score-preview-missing">2</strong>
+          </div>
+        </div>
+        <div class="detail-grid" id="evidence-auto-score-preview-missing-list">
+          <div class="callout">
+            <h3>GradingEvidenceAutoScorePreview · PARTIAL_SCORE_PREVIEW_NEEDS_MORE_EVIDENCE</h3>
+            <p>missingCheckIds=check_stdout_accuracy, check_pytest · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Grading result preview">
+        <div class="section-head">
+          <div>
+            <h2>GradingResultPreview</h2>
+            <p class="warning">source=GET /api/grading/result-preview?report={file}&amp;taskId={id} · candidateSafe=true · readonly=true</p>
+            <p class="warning" id="grading-result-preview-status">resultPreviewStatus=STATIC_HTML_FALLBACK · mode=READ_EXISTING_GRADING_REPORT_ONLY · noExecutionFromPage=true</p>
+          </div>
+          <span class="pill warn" id="grading-result-preview-summary">summary.executed=0 · resultStatus=NOT_PASSED</span>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>预览得分</span>
+            <strong id="grading-result-preview-score" class="ok">100 / 100</strong>
+          </div>
+          <div class="metric">
+            <span>结果状态</span>
+            <strong id="grading-result-preview-result">STATIC_PREVIEW</strong>
+          </div>
+          <div class="metric">
+            <span>候选人可见答案</span>
+            <strong id="grading-result-preview-answer-visible">false</strong>
+          </div>
+          <div class="metric">
+            <span>预览执行代码</span>
+            <strong id="grading-result-preview-execution">false</strong>
+          </div>
+        </div>
+        <div class="detail-grid" id="grading-result-preview-list">
+          <div class="callout">
+            <h3>candidate safe result preview</h3>
+            <p>score=100/100 · evidencePreview.totalVisible=4 · candidateSafe=true</p>
+            <p>answerVisibleToCandidate=false · gradingRefVisibleToCandidate=false</p>
+            <p>sandboxExecutedByPreview=false · contestantCodeExecutedByPreview=false · autoApproveAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Grading evidence readiness">
+        <div class="section-head">
+          <div>
+            <h2>GradingEvidenceReadiness</h2>
+            <p class="warning">source=GET /api/grading/evidence-readiness?report={file} · readExistingReportsOnly=true · readonly=true</p>
+            <p class="warning" id="grading-evidence-readiness-status">readinessStatus=STATIC_HTML_FALLBACK · mode=GRADING_EVIDENCE_READINESS · noExecutionFromPage=true</p>
+          </div>
+          <span class="pill warn" id="grading-evidence-readiness-summary">evidenceReadyTotal=4 · missingEvidenceTotal=0</span>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>证据覆盖率</span>
+            <strong id="grading-evidence-readiness-coverage" class="ok">100%</strong>
+          </div>
+          <div class="metric">
+            <span>缺失 evidence</span>
+            <strong id="grading-evidence-readiness-missing">0</strong>
+          </div>
+          <div class="metric">
+            <span>可进入人工结论</span>
+            <strong id="grading-evidence-readiness-approval">true</strong>
+          </div>
+          <div class="metric">
+            <span>页面执行代码</span>
+            <strong id="grading-evidence-readiness-execution">false</strong>
+          </div>
+        </div>
+        <div class="detail-grid" id="grading-evidence-readiness-list">
+          <div class="callout">
+            <h3>readiness summary</h3>
+            <p>coverageRatio=1.0 · readyForApprovalRecommendation=true · manualReviewRequired=true</p>
+            <p>readExistingReportsOnly=true · sandboxExecutedByReadiness=false · contestantCodeExecutedByReadiness=false</p>
+          </div>
+        </div>
+        <div class="detail-grid" id="grading-evidence-readiness-actions">
+          <div class="callout">
+            <h3>review_ready_score_and_evidence</h3>
+            <p>核对评分、证据来源、人工复核动作和发布阻断边界。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Merged evidence source chain">
+        <div class="section-head">
+          <div>
+            <h2>MergedEvidenceSourceChain</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}&amp;taskId={id}.mergedGradingEvidenceCheckItems · fallbackSource=reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems · route=/review-center -&gt; /grading/:id/report</p>
+            <p class="warning" id="merged-evidence-api-status">apiStatus=STATIC_HTML_FALLBACK · dynamicSource=GET /api/grading/report?file={file}&amp;taskId={id}.mergedGradingEvidence · fallbackDynamicSource=GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence · readonly=true</p>
+          </div>
+          <span class="pill ok" id="merged-evidence-api-summary">checkEvidenceReviewItemTotal=4 · manualCheckReviewTotal=0</span>
+        </div>
+        <table aria-label="Check evidence source chain">
+          <thead>
+            <tr>
+              <th>Check</th>
+              <th>类型</th>
+              <th>证据来源</th>
+              <th>报告模式</th>
+              <th>证据文件</th>
+              <th>得分</th>
+              <th>人工动作</th>
+              <th>安全边界</th>
+            </tr>
+          </thead>
+          <tbody id="merged-evidence-source-chain-body">
+            <tr>
+              <td>check_q1</td>
+              <td>stdout_contains</td>
+              <td class="mono">evidenceSourceKind=controlledDocker</td>
+              <td class="mono">reportMode=CONTROLLED_DOCKER_SANDBOX_POC</td>
+              <td class="mono">examples/output/mimo-real-demo-controlled-sandbox-report.json</td>
+              <td class="ok">20 / 20</td>
+              <td class="mono">recommendedAction=verify_controlled_docker_output_and_score</td>
+              <td class="mono">mergeExecutedOnlyExistingReports=true · autoApproveAllowed=false · realPublishAllowed=false</td>
+            </tr>
+            <tr>
+              <td>check_q4</td>
+              <td>pytest</td>
+              <td class="mono">evidenceSourceKind=controlledDocker</td>
+              <td class="mono">reportMode=CONTROLLED_DOCKER_SANDBOX_POC</td>
+              <td class="mono">examples/output/mimo-real-demo-controlled-sandbox-report.json</td>
+              <td class="ok">20 / 20</td>
+              <td class="mono">recommendedAction=verify_controlled_docker_output_and_score</td>
+              <td class="mono">contestantCodeExecuted=false · networkEnabled=false · realPublishAllowed=false</td>
+            </tr>
+            <tr>
+              <td>check_q2</td>
+              <td>notebook_cell</td>
+              <td class="mono">evidenceSourceKind=notebookStatic</td>
+              <td class="mono">reportMode=STATIC_NOTEBOOK_JSON_PARSE</td>
+              <td class="mono">examples/output/mimo-real-demo-notebook-static-report.json</td>
+              <td class="ok">30 / 30</td>
+              <td class="mono">recommendedAction=review_static_notebook_evidence_matches_expected_tokens</td>
+              <td class="mono">notebookKernelStarted=false · notebookExecuted=false · autoApproveAllowed=false</td>
+            </tr>
+            <tr>
+              <td>check_q3</td>
+              <td>notebook_cell</td>
+              <td class="mono">evidenceSourceKind=notebookStatic</td>
+              <td class="mono">reportMode=STATIC_NOTEBOOK_JSON_PARSE</td>
+              <td class="mono">examples/output/mimo-real-demo-notebook-static-report.json</td>
+              <td class="ok">30 / 30</td>
+              <td class="mono">recommendedAction=review_static_notebook_evidence_matches_expected_tokens</td>
+              <td class="mono">manualReviewRequired=true · autoApproveAllowed=false · realPublishAllowed=false</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap" aria-label="Review decision hints">
+        <div class="section-head">
+          <div>
+            <h2>ReviewDecisionHints</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}&amp;taskId={id}.reviewDecisionHints · deterministicRules=true · reviewerKeepsFinalDecision=true</p>
+          </div>
+          <span class="pill warn" id="review-decision-hint-summary">overallHint=NEEDS_EVIDENCE · autoApproveAllowed=false</span>
+        </div>
+        <div class="detail-grid" id="review-decision-hint-list">
+          <div class="callout">
+            <h3>check_q1 · CAN_REVIEW_PASS</h3>
+            <p>reason=evidence_passed_and_manual_review_required · recommendedAction=verify_controlled_docker_output_and_score</p>
+            <p>manualReviewRequired=true · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Review decision notes">
+        <div class="section-head">
+          <div>
+            <h2>ReviewDecisionNotes</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}&amp;taskId={id}.reviewDecisionNotes · fallbackSource=GET /api/review-tasks/{id}.reviewDetail.reviewDecisionNotes · readonly=true</p>
+          </div>
+          <span class="pill warn" id="review-decision-note-summary">reviewDecisionNoteTotal=0 · latestDecision=none · statusChanged=false</span>
+        </div>
+        <div class="detail-grid" id="review-decision-note-list">
+          <div class="callout">
+            <h3>no review decision note</h3>
+            <p>等待审核中心记录 approve-ready / needs-revision / needs-evidence。</p>
+            <p>autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Review decision outcome">
+        <div class="section-head">
+          <div>
+            <h2>ReviewDecisionOutcome</h2>
+            <p class="warning">source=reviewDecisionNotes.latest + reviewDecisionHints · readonly=true · manualApproveStillRequired=true</p>
+          </div>
+          <span class="pill warn" id="review-decision-outcome-status">outcome=WAITING_REVIEW_DECISION_NOTE</span>
+        </div>
+        <div class="detail-grid" id="review-decision-outcome-list">
+          <div class="callout">
+            <h3>waiting for decision note</h3>
+            <p id="review-decision-outcome-summary">reviewDecisionNoteRecorded=false · latestDecision=none · nextRequiredAction=record_review_decision_note</p>
+            <p id="review-decision-outcome-safety">autoApproveAllowed=false · manualApproveStillRequired=true · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Grading record review summary">
+        <div class="section-head">
+          <div>
+            <h2>GradingRecordReviewSummary</h2>
+            <p class="warning">source=GET /api/grading/records?taskId={id} · fallbackSource=GET /api/review-tasks/{id}.reviewDetail.gradingRecords.reviewIntegration · readonly=true</p>
+          </div>
+          <span class="pill warn" id="grading-record-review-status">recordReviewState=STATIC_HTML_FALLBACK</span>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>评分记录</span>
+            <strong id="grading-record-review-total">0</strong>
+          </div>
+          <div class="metric">
+            <span>最新状态</span>
+            <strong id="grading-record-review-latest-status">none</strong>
+          </div>
+          <div class="metric">
+            <span>人工结论</span>
+            <strong id="grading-record-review-latest-decision">none</strong>
+          </div>
+          <div class="metric">
+            <span>可进入复核</span>
+            <strong id="grading-record-review-ready">false</strong>
+          </div>
+        </div>
+        <div class="detail-grid" id="grading-record-review-list">
+          <div class="callout">
+            <h3>no grading record review loaded</h3>
+            <p id="grading-record-review-summary">recordTotal=0 · latestRecordId=none · readyForAgentReview=false · agentApiRequired=false</p>
+            <p>taskStatusChanged=false · commandExecutedFromPage=false · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Check evidence detail panel">
+        <div class="section-head">
+          <div>
+            <h2>CheckEvidenceDetailPanel</h2>
+            <p class="warning">source=mergedGradingEvidenceCheckItems + GRADING_EVIDENCE_AUTO_REPORT.checks · readonly=true · reviewerActionRequired=true</p>
+          </div>
+          <span class="pill warn" id="check-evidence-detail-summary">detailItemTotal=4 · autoApproveAllowed=false</span>
+        </div>
+        <div class="detail-grid" id="check-evidence-detail-list">
+          <div class="callout">
+            <h3>check_q1 · stdout_contains · PASSED</h3>
+            <p>inputSummary=stdout_contains expected token · evidenceSourceKind=controlledDocker · reportMode=CONTROLLED_DOCKER_SANDBOX_POC</p>
+            <p>score=20/20 · recommendedAction=verify_controlled_docker_output_and_score</p>
+            <p>reportPath=examples/output/mimo-real-demo-controlled-sandbox-report.json · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="callout">
+            <h3>check_q2 · notebook_cell · PASSED</h3>
+            <p>inputSummary=Notebook cell static JSON tokens · evidenceSourceKind=notebookStatic · reportMode=STATIC_NOTEBOOK_JSON_PARSE</p>
+            <p>score=30/30 · recommendedAction=review_static_notebook_evidence_matches_expected_tokens</p>
+            <p>notebookKernelStarted=false · notebookExecuted=false · manualReviewRequired=true</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" aria-label="Manual review action checklist">
+        <div class="section-head">
+          <div>
+            <h2>ManualReviewActionChecklist</h2>
+            <p class="warning">source=GET /api/grading/report?file={file}.report.manualReviewChecklist · fallbackSource=GET /api/grading/report?file={file}&amp;taskId={id}.mergedGradingEvidenceCheckItems[].recommendedAction · readonly=true</p>
+          </div>
+          <span class="pill warn" id="manual-review-action-summary">manualChecklistStatus=STATIC_HTML_FALLBACK · decisionNoteRecommendation=needs-evidence · autoApproveAllowed=false</span>
+        </div>
+        <div class="detail-grid" id="manual-review-action-list">
+          <div class="callout">
+            <h3>check_stdout_accuracy · collect_controlled_command_evidence_before_decision_note</h3>
+            <p>先补采受控 Docker command evidence，再记录 needs-evidence 或 approve-ready decision note。</p>
+            <p>recommendedDecision=needs-evidence · readyForDecision=false · selectedEvidenceMode=MISSING</p>
+            <p>manualReviewRequired=true · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="callout">
+            <h3>check_q1 · verify_controlled_docker_output_and_score</h3>
+            <p>核对受控 Docker stdout 证据、score=20/20、reportMode=CONTROLLED_DOCKER_SANDBOX_POC。</p>
+            <p>expectedReviewerAction=confirm_stdout_contains_expected_token</p>
+            <p>autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="callout">
+            <h3>check_q4 · verify_controlled_docker_output_and_score</h3>
+            <p>核对 pytest 证据、passed=true、score=20/20，确认未开启网络。</p>
+            <p>expectedReviewerAction=confirm_pytest_passed_in_controlled_container</p>
+            <p>contestantCodeExecuted=false · realPublishAllowed=false</p>
+          </div>
+          <div class="callout">
+            <h3>check_q2 · review_static_notebook_evidence_matches_expected_tokens</h3>
+            <p>核对 Notebook 静态 JSON evidence 中的 cell 目标、输出 token 和 score=30/30。</p>
+            <p>expectedReviewerAction=verify_notebook_cell_targets_and_expected_output_tokens</p>
+            <p>notebookKernelStarted=false · notebookExecuted=false</p>
+          </div>
+          <div class="callout">
+            <h3>check_q3 · review_static_notebook_evidence_matches_expected_tokens</h3>
+            <p>核对 Notebook 静态 evidence 与评分计划中的 `assessmentPlan` 是否一致。</p>
+            <p>expectedReviewerAction=confirm_assessment_plan_alignment_before_publish_review</p>
+            <p>manualReviewRequired=true · autoApproveAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div>
+          <div class="table-wrap">
+          <table aria-label="Mock grading checks">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>类型</th>
+                <th>Runner</th>
+                <th>计划</th>
+                <th>输入摘要</th>
+                <th>AssessmentPlan</th>
+                <th>容器计划</th>
+                <th>证据</th>
+                <th>限制</th>
+                <th>得分</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>check_result_file</td>
+                <td>file_exists</td>
+                <td>FileExistsGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">path=result.csv</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_result_file]</td>
+                <td class="mono">CONTAINER_PLAN_ONLY · image=python:3.11-slim · mount=read_only</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">network=disabled_by_default</td>
+                <td class="ok">15 / 15</td>
+              </tr>
+              <tr>
+                <td>check_stdout_accuracy</td>
+                <td>stdout_contains</td>
+                <td>StdoutContainsGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">command=python main.py; expected=accuracy</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_stdout_accuracy]</td>
+                <td class="mono">commandPreview=python main.py · result=NOT_EXECUTED</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">timeout=30s; process=1</td>
+                <td class="ok">25 / 25</td>
+              </tr>
+              <tr>
+                <td>check_pytest</td>
+                <td>pytest</td>
+                <td>PytestGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">path=tests/test_main.py</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_pytest]</td>
+                <td class="mono">commandPreview=tests/test_main.py · network=false</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">cpu=1; memory=512MB</td>
+                <td class="ok">25 / 25</td>
+              </tr>
+              <tr>
+                <td>check_notebook_accuracy</td>
+                <td>notebook_cell</td>
+                <td>NotebookGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">notebookPath=notebooks/analysis.ipynb; cellIndex=3; expected=accuracy</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_notebook_accuracy]</td>
+                <td class="mono">commandPreview=notebooks/analysis.ipynb cell 3 · result=NOT_EXECUTED</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">cpu=1; memory=512MB</td>
+                <td class="ok">10 / 10</td>
+              </tr>
+              <tr>
+                <td>check_metrics_json</td>
+                <td>json_field</td>
+                <td>JsonFieldGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">path=metrics.json; jsonPath=$.accuracy; expectedValue=0.9</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_metrics_json]</td>
+                <td class="mono">commandPreview=metrics.json $.accuracy · network=false</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">network=disabled_by_default</td>
+                <td class="ok">15 / 15</td>
+              </tr>
+              <tr>
+                <td>check_training_log</td>
+                <td>log_keyword</td>
+                <td>LogKeywordGrader</td>
+                <td>MOCK_PLAN_ONLY</td>
+                <td class="mono">path=logs/train.log; expected=training complete</td>
+                <td class="mono">assessmentPlanAlignedWithCheck=true · spec.assessmentPlan[checkId=check_training_log]</td>
+                <td class="mono">commandPreview=logs/train.log · result=NOT_EXECUTED</td>
+                <td class="evidence">MOCK_EVIDENCE_NOT_COLLECTED</td>
+                <td class="mono">timeout=30s; process=1</td>
+                <td class="ok">10 / 10</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="callout">
+            <h3>安全标记</h3>
+            <p>sandboxExecuted=false</p>
+            <p>contestantCodeExecuted=false</p>
+            <p>commandExecuted=false</p>
+            <p>unknownShellExecuted=false</p>
+            <p>hostExecutionAllowed=false</p>
+            <p>realCloudResourceChanged=false</p>
+          </div>
+          <div class="callout">
+            <h3>Runner 摘要</h3>
+            <p>runner.id=mock_grading_runner</p>
+            <p>checkSummary.executed=0</p>
+            <p>checkSummary.plannedOnly=6</p>
+            <p>reportDetail.checkPlans=6</p>
+            <p>containerSandboxPlan.mode=CONTAINER_PLAN_ONLY</p>
+          </div>
+          <div class="callout">
+            <h3>演示闭环 Evidence</h3>
+            <p>/real-demo -&gt; /grading/:id/report</p>
+            <p>ReadonlyReportDetail.source=realDemoPrototype.readonlyEvidenceDemo.reportDetail</p>
+            <p>READONLY_REAL_SANDBOX_POC</p>
+            <p>readonlyEvidenceCollectedTotal=2</p>
+            <p>checkPlans[].readonlyEvidence.status=COLLECTED</p>
+            <p>sandboxExecutionRequest.mode=REAL_SANDBOX_REQUIRED</p>
+            <p>sourceGradingModified=false</p>
+          </div>
+          <div class="callout">
+            <h3>受控 Docker Evidence</h3>
+            <p>ControlledDockerEvidenceDemo.source=grade sandbox-run --execution-mode controlled-command</p>
+            <p>planPath=examples/output/mimo-real-demo-controlled-plan.json</p>
+            <p>reportPath=examples/output/mimo-real-demo-controlled-sandbox-report.json</p>
+            <p>imageVerifyPath=examples/output/grading-sandbox-image-verify.json</p>
+            <p>CONTROLLED_DOCKER_SANDBOX_POC · ai-grading-python:0.1 · pytest 9.0.2</p>
+            <p>check_q1 stdout_contains=1 · check_q4 pytest=1 · earnedScore=40/40</p>
+            <p>hostExecutionAllowed=false · networkEnabled=false · realPublish=false</p>
+          </div>
+          <div class="callout">
+            <h3>Notebook Static Evidence</h3>
+            <p>notebookStaticReportPath=examples/output/mimo-real-demo-notebook-static-report.json</p>
+            <p>check_q2 notebook_cell=1 · check_q3 notebook_cell=1 · earnedScore=60/60</p>
+            <p>STATIC_NOTEBOOK_JSON_PARSE · notebookKernelStarted=false · notebookExecuted=false</p>
+          </div>
+          <div class="callout">
+            <h3>总覆盖</h3>
+            <p>gradingEvidenceCoverage=100/100</p>
+            <p>GRADING_EVIDENCE_COVERAGE_COMPLETE</p>
+            <p>autoApproveAllowed=false · manualReviewRequired=true · realPublish=false</p>
+          </div>
+          <div class="callout">
+            <h3>审计入口</h3>
+            <p>GET /api/audit-events</p>
+            <p>resourceType=GRADING_REPORT</p>
+            <p>action=MOCK_GRADING_RUN</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="primary" type="button">导出报告</button>
+        <button type="button">查看审计事件</button>
+        <button type="button" disabled title="评分执行不在本页面发起">重新评分</button>
+        <button type="button" disabled title="本页面不运行 pytest">运行 Pytest</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="json-title">
+      <div class="section-head">
+        <div>
+          <h2 id="json-title">报告 JSON</h2>
+          <p class="blocked">不包含真实执行日志</p>
+        </div>
+        <span class="pill warn">sandboxExecuted=false</span>
+      </div>
+      <pre>{
+  "mode": "MOCK_ONLY",
+  "phase": "Phase 3",
+  "gradingId": "grading_mixed_checks_demo",
+  "totalScore": 100,
+  "earnedScore": 100,
+  "passed": true,
+  "runner": {
+    "id": "mock_grading_runner",
+    "executor": "mock_check_executor",
+    "strategy": "MOCK_PLAN_ONLY"
+  },
+  "checkSummary": {
+    "total": 6,
+    "executed": 0,
+    "plannedOnly": 6
+  },
+  "assessmentPlanSummary": {
+    "source": "grading.spec.assessmentPlan",
+    "planTotal": 6,
+    "checkTotal": 6,
+    "alignedWithChecks": true,
+    "executionStrategies": ["MOCK_PLAN_ONLY"],
+    "mockEvidenceStatuses": ["MOCK_EVIDENCE_NOT_COLLECTED"],
+    "riskLevels": ["high", "low", "medium"]
+  },
+  "sandboxPolicy": {
+    "executorBoundary": "SandboxExecutor",
+    "hostExecutionAllowed": false,
+    "realSandboxRunEnabled": false,
+    "networkAccess": "disabled_by_default",
+    "filesystemIsolation": "required",
+    "requiredLimits": ["timeout", "cpu", "memory", "process"]
+  },
+  "explainability": {
+    "status": "EXPLAINABLE_MOCK_PLAN",
+    "eachCheckHasPlan": true,
+    "eachCheckHasInputSummary": true,
+    "eachCheckHasMockEvidence": true,
+    "assessmentPlanSource": "grading.spec.assessmentPlan",
+    "assessmentPlanAlignedWithChecks": true,
+    "realSandboxEvidenceRequired": true
+  },
+  "sandboxExecuted": false,
+  "contestantCodeExecuted": false,
+  "commandExecuted": false,
+  "unknownShellExecuted": false,
+  "readonlyReportDetailSummary": {
+    "source": "realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+    "mode": "READONLY_REAL_SANDBOX_POC",
+    "checkSummary": {"executed": 2, "deferred": 0},
+    "readonlyEvidenceCollectedTotal": 2,
+    "checkPlans[].readonlyEvidence.status": "COLLECTED",
+    "sourceGradingModified": false
+  },
+  "mergedEvidenceSourceChain": {
+    "source": "reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems",
+    "fallbackSource": "realDemoPrototype.gradingEvidenceCoverage.items",
+    "checkEvidenceReviewItemTotal": 4,
+    "manualCheckReviewTotal": 0,
+    "mergeExecutedOnlyExistingReports": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false,
+    "items": [
+      {"checkId": "check_q1", "evidenceSourceKind": "controlledDocker", "reportMode": "CONTROLLED_DOCKER_SANDBOX_POC"},
+      {"checkId": "check_q4", "evidenceSourceKind": "controlledDocker", "reportMode": "CONTROLLED_DOCKER_SANDBOX_POC"},
+      {"checkId": "check_q2", "evidenceSourceKind": "notebookStatic", "reportMode": "STATIC_NOTEBOOK_JSON_PARSE"},
+      {"checkId": "check_q3", "evidenceSourceKind": "notebookStatic", "reportMode": "STATIC_NOTEBOOK_JSON_PARSE"}
+    ]
+  },
+  "reportDetail": {
+    "audit": {
+      "action": "MOCK_GRADING_RUN",
+      "hostExecutionAllowed": false,
+      "runRealPytestEnabled": false
+    },
+    "checkPlans": [
+      {
+        "id": "check_result_file",
+        "riskLevel": "LOW",
+        "inputSummary": "path=result.csv",
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED",
+          "reason": "Mock runner only creates an explainable plan."
+        },
+        "assessmentPlanSource": "grading.spec.assessmentPlan",
+        "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_result_file]",
+        "assessmentPlanAlignedWithCheck": true,
+        "assessmentPlanExecutionPlan": {
+          "strategy": "MOCK_PLAN_ONLY"
+        },
+        "assessmentPlanMockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "network": "disabled_by_default",
+            "timeoutSeconds": 30
+          }
+        },
+        "containerSandboxPlan": {
+          "mode": "CONTAINER_PLAN_ONLY",
+          "status": "PLANNED",
+          "containerPlan": {
+            "image": "python:3.11-slim",
+            "workingDirectory": "/workspace/submission",
+            "mounts": [{"mode": "read_only"}],
+            "network": {"enabled": false},
+            "commandPreview": {"path": "result.csv"}
+          },
+          "resultPlaceholder": {
+            "status": "NOT_EXECUTED"
+          },
+          "safety": {
+            "containerStarted": false,
+            "sandboxExecuted": false,
+            "contestantCodeExecuted": false,
+            "commandExecuted": false
+          }
+      }
+    },
+    {
+      "id": "check_notebook_accuracy",
+      "type": "notebook_cell",
+      "runner": "NotebookGrader",
+      "riskLevel": "HIGH",
+      "inputSummary": "notebookPath=notebooks/analysis.ipynb; cellIndex=3; expected=accuracy",
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_notebook_accuracy]",
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "run_notebook_cell_and_match_output"
+      }
+    },
+    {
+      "id": "check_metrics_json",
+      "type": "json_field",
+      "runner": "JsonFieldGrader",
+      "riskLevel": "LOW",
+      "inputSummary": "path=metrics.json; jsonPath=$.accuracy; expectedValue=0.9",
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_metrics_json]",
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "inspect_json_field"
+      }
+    },
+    {
+      "id": "check_training_log",
+      "type": "log_keyword",
+      "runner": "LogKeywordGrader",
+      "riskLevel": "MEDIUM",
+      "inputSummary": "path=logs/train.log; expected=training complete",
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "assessmentPlanSourceField": "spec.assessmentPlan[checkId=check_training_log]",
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "inspect_log_keywords"
+      }
+    }
+  ]
+},
+  "checks": [
+    {
+      "id": "check_result_file",
+      "type": "file_exists",
+      "runner": "FileExistsGrader",
+      "score": 15,
+      "earnedScore": 15,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "verify_file_exists"
+      },
+      "inputSummary": "path=result.csv",
+      "mockEvidence": {
+        "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+      },
+      "logs": []
+    },
+    {
+      "id": "check_stdout_accuracy",
+      "type": "stdout_contains",
+      "runner": "StdoutContainsGrader",
+      "score": 25,
+      "earnedScore": 25,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "run_command_and_match_stdout"
+      },
+      "logs": []
+    },
+    {
+      "id": "check_pytest",
+      "type": "pytest",
+      "runner": "PytestGrader",
+      "score": 25,
+      "earnedScore": 25,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "run_pytest_suite"
+      },
+      "logs": []
+    },
+    {
+      "id": "check_notebook_accuracy",
+      "type": "notebook_cell",
+      "runner": "NotebookGrader",
+      "score": 10,
+      "earnedScore": 10,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "run_notebook_cell_and_match_output"
+      },
+      "logs": []
+    },
+    {
+      "id": "check_metrics_json",
+      "type": "json_field",
+      "runner": "JsonFieldGrader",
+      "score": 15,
+      "earnedScore": 15,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "inspect_json_field"
+      },
+      "logs": []
+    },
+    {
+      "id": "check_training_log",
+      "type": "log_keyword",
+      "runner": "LogKeywordGrader",
+      "score": 10,
+      "earnedScore": 10,
+      "executionPlan": {
+        "strategy": "MOCK_PLAN_ONLY",
+        "action": "inspect_log_keywords"
+      },
+      "logs": []
+    }
+  ]
+}</pre>
+    </section>
+  </main>
+  <script src="grading-report-data.js"></script>
+</body>
+</html>

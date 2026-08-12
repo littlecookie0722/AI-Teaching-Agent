@@ -1,0 +1,93 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Local artifact ignore contract for Phase 1. Generated reports, local stores, caches, and real secret files must stay out of version control.",
+  "gitignorePath": ".gitignore",
+  "trackedAllowList": [
+    ".env.example",
+    "examples/output/README.md"
+  ],
+  "ignoredArtifacts": [
+    {
+      "pattern": ".env",
+      "category": "secret",
+      "reason": "Real local environment files may contain API keys, tokens, passwords, or private endpoints."
+    },
+    {
+      "pattern": ".env.*",
+      "category": "secret",
+      "reason": "Environment variants must stay local; .env.example is explicitly allowed as a safe template.",
+      "exception": ".env.example"
+    },
+    {
+      "pattern": "cli/.lab_cli_store.json",
+      "category": "local_state",
+      "reason": "The default CLI store is local Mock state and can contain reviewer names, paths, and generated task snapshots."
+    },
+    {
+      "pattern": "*.lab_cli_store.json",
+      "category": "local_state",
+      "reason": "Custom CLI Mock stores should not be committed."
+    },
+    {
+      "pattern": "examples/output/*.json",
+      "category": "generated_output",
+      "reason": "Phase 1 workflow, grading, and delivery reports are reproducible local outputs."
+    },
+    {
+      "pattern": "examples/output/*.md",
+      "category": "generated_output",
+      "reason": "Phase 1 acceptance reports are reproducible local Markdown outputs.",
+      "exception": "examples/output/README.md"
+    },
+    {
+      "pattern": "codex_ai_platform_full_package.zip",
+      "category": "generated_output",
+      "reason": "Local delivery package archives should be regenerated instead of committed."
+    },
+    {
+      "pattern": "__pycache__/",
+      "category": "cache",
+      "reason": "Python bytecode cache."
+    },
+    {
+      "pattern": "*.py[cod]",
+      "category": "cache",
+      "reason": "Python bytecode files."
+    },
+    {
+      "pattern": ".pytest_cache/",
+      "category": "cache",
+      "reason": "Pytest local cache."
+    },
+    {
+      "pattern": ".cache/",
+      "category": "cache",
+      "reason": "Local tool cache."
+    },
+    {
+      "pattern": "*.log",
+      "category": "log",
+      "reason": "Local logs can include paths or operational details."
+    },
+    {
+      "pattern": "*.tmp",
+      "category": "temp",
+      "reason": "Temporary files are not source artifacts."
+    },
+    {
+      "pattern": "*.bak",
+      "category": "temp",
+      "reason": "Editor backup files are not source artifacts."
+    }
+  ],
+  "rules": {
+    "realSecretsMustBeIgnored": true,
+    "envExampleMustRemainTracked": true,
+    "mockStoresMustBeIgnored": true,
+    "generatedReportsMustBeIgnored": true,
+    "cacheArtifactsMustBeIgnored": true,
+    "ignoreContractMustBeTested": true
+  }
+}

@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Observability Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --warn: #b45309;
+      --danger: #b91c1c;
+      --ok-bg: #e7f8f2;
+      --warn-bg: #fff7ed;
+      --danger-bg: #fef2f2;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #103f4a;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 940px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .action-bar,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.8fr) minmax(240px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(190px, 0.8fr) 1fr;
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+    }
+
+    .status.fail {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .filter {
+      min-height: 64px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .filter span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .filter strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 940px) {
+      .summary-grid,
+      .content-grid,
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill warn">只读审计</span>
+    </div>
+    <h1>Audit Observability Mock</h1>
+    <p>Provider、MCP Tool、Workflow、Operation 与 Review 审计记录的本地静态视图。数据来自 <code>frontend/mock-data.json</code>，不启动真实后端、真实 MCP Server、真实 Agent、真实 Provider 或真实云资源。</p>
+    <div class="pill-row">
+      <span class="pill">GET /api/provider-audit-events</span>
+      <span class="pill">GET /api/mcp-tool-call-records</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/audit-events</span>
+      <span class="pill">GET /api/review-audit-events</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">审计总览</h2>
+          <p>providerCallAuditEvents + mcpToolCallRecords + workflowRuns + operationAuditEvents + reviewAuditEvents。</p>
+        </div>
+        <span class="pill strong">readOnly=true</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Provider Calls</span>
+          <strong>5</strong>
+        </div>
+        <div class="metric">
+          <span>MCP Calls</span>
+          <strong>6</strong>
+        </div>
+        <div class="metric">
+          <span>Workflow Runs</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Operation Events</span>
+          <strong>5</strong>
+        </div>
+        <div class="metric">
+          <span>Review Events</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Failed Records</span>
+          <strong>2</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="filters-title">
+      <div class="section-head">
+        <div>
+          <h2 id="filters-title">筛选状态</h2>
+          <p>筛选控件为静态占位，Phase 1 不请求真实服务、不导出审计包。</p>
+        </div>
+        <span class="pill">frontend/mock-data.json.auditObservabilityPrototype</span>
+      </div>
+      <div class="filter-grid">
+        <div class="filter">
+          <span>recordType</span>
+          <strong>provider / mcp / workflow / operation / review</strong>
+        </div>
+        <div class="filter">
+          <span>status</span>
+          <strong>SUCCESS / FAILED / COMPLETED / WAITING_REVIEW</strong>
+        </div>
+        <div class="filter">
+          <span>traceId</span>
+          <strong>trace_demo</strong>
+        </div>
+        <div class="filter">
+          <span>actor</span>
+          <strong>lab-cli / teacher_1</strong>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="primary">查看本地审计</button>
+        <button>打开 Mock 数据</button>
+        <button disabled>导出真实审计包</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>创建真实云资源</button>
+        <button disabled>运行真实沙箱</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+        <button disabled>展示密钥</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="records-title">
+      <div class="section-head">
+        <div>
+          <h2 id="records-title">审计记录</h2>
+          <p>MCP 参数预览仅展示脱敏字段；Provider 输出默认进入 WAITING_REVIEW。</p>
+        </div>
+        <span class="pill strong">secretVisibleInFrontend=false</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>Provider Call Audit</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>provider_audit_lab_demo</span>
+                <span>generateJson · Lab · lab_generation_v0 · WAITING_REVIEW</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+              <div class="row">
+                <span>provider_audit_exam_demo</span>
+                <span>generateJson · Exam · exam_generation_v0 · WAITING_REVIEW</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+              <div class="row">
+                <span>provider_audit_grading_demo</span>
+                <span>generateJson · Grading · grading_generation_v0 · WAITING_REVIEW</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+              <div class="row">
+                <span>provider_audit_ppt_demo</span>
+                <span>generateJson · PPT · ppt_generation_v0 · WAITING_REVIEW</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>MCP Tool Call Records</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>mcp_call_analyze_demo</span>
+                <span>analyze_material · POST /api/materials/analyze · backendCalled=true</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+              <div class="row">
+                <span>mcp_call_missing_input_demo</span>
+                <span>analyze_material · VALIDATION_ERROR · backendCalled=false</span>
+                <strong class="status fail">FAILED</strong>
+              </div>
+              <div class="row">
+                <span>mcp_call_publish_lab_intent_demo</span>
+                <span>publish_lab · POST /api/mcp/intents/publish-lab · reviewIntentOnly=true</span>
+                <strong class="status warn">WAITING_REVIEW</strong>
+              </div>
+              <div class="row">
+                <span>mcp_call_publish_exam_intent_demo</span>
+                <span>publish_exam · POST /api/mcp/intents/publish-exam · postReviewDisposition=APPROVED_EXECUTION_BLOCKED · realPublish=false</span>
+                <strong class="status warn">BLOCKED</strong>
+              </div>
+              <div class="row">
+                <span>mcp_call_destroy_environment_intent_demo</span>
+                <span>destroy_environment · POST /api/mcp/intents/destroy-environment · postReviewDisposition=APPROVED_PENDING_SECOND_CONFIRMATION · requiresSecondConfirmation=true</span>
+                <strong class="status warn">SECOND_CONFIRM</strong>
+              </div>
+              <div class="row">
+                <span>mcp_call_get_second_confirmation_status_demo</span>
+                <span>get_second_confirmation_status · GET /api/review-tasks/{id}/second-confirmation-status · readOnly=true · confirmationEndpointEnabled=false</span>
+                <strong class="status">SUCCESS</strong>
+              </div>
+              <div class="row compact">
+                <span>argumentPreviewRedactsSecrets=true</span>
+                <span class="muted">argumentKeys 仅展示 input，不展示 API Key、Token、密码。</span>
+              </div>
+              <div class="row compact">
+                <span>realActionExecuted=false</span>
+                <span class="muted">高风险 MCP 工具只创建待审核意图，真实发布和真实环境销毁均禁用。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>Second Confirmation Status</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>second_confirmation_status_destroy_environment_demo</span>
+                <span>task_mcp_destroy_environment_intent_demo · APPROVED_PENDING_SECOND_CONFIRMATION · get_second_confirmation_status</span>
+                <strong class="status warn">READ_ONLY</strong>
+              </div>
+              <div class="row compact">
+                <span>secondConfirmationSatisfied=false · confirmationActionAvailable=false</span>
+                <span class="muted">confirmationEndpointEnabled=false，destroyRealEnvironmentEnabled=false，environmentDestroyed=false。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>WorkflowLogViewer</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>workflow_run_demo</span>
+                <span>phase1_main_demo · generate_lab/exam/grading/ppt + mock_grade_run</span>
+                <strong class="status">COMPLETED</strong>
+              </div>
+              <div class="row compact">
+                <span>generatedStatus=WAITING_REVIEW</span>
+                <span class="muted">审核通过前不得发布，autoPublishAllowed=false。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Operation / Review Audit</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>op_audit_env_demo</span>
+                <span>ENV_CREATE · ENVIRONMENT · env_vm_demo</span>
+                <strong class="status warn">MOCK</strong>
+              </div>
+              <div class="row">
+                <span>op_audit_grading_demo</span>
+                <span>MOCK_GRADING_RUN · mock_grading_runner · checkSummary.executed=0 · MOCK_PLAN_ONLY</span>
+                <strong class="status warn">MOCK</strong>
+              </div>
+              <div class="row compact">
+                <span>AssessmentPlanAuditSignal · assessmentPlanSummary.source=grading.spec.assessmentPlan</span>
+                <span class="muted">operationAuditEvents.detail.assessmentPlanSummary · planTotal=6 · checkTotal=6 · assessmentPlanAlignedWithChecks=true。</span>
+              </div>
+              <div class="row compact">
+                <span>checkPlans[].assessmentPlanSourceField</span>
+                <span class="muted">spec.assessmentPlan[checkId=check_result_file] · spec.assessmentPlan[checkId=check_stdout_accuracy] · spec.assessmentPlan[checkId=check_pytest] · spec.assessmentPlan[checkId=check_notebook_accuracy] · spec.assessmentPlan[checkId=check_metrics_json] · spec.assessmentPlan[checkId=check_training_log]。</span>
+              </div>
+              <div class="row compact">
+                <span>assessmentPlanExecutionPlan · assessmentPlanMockEvidence</span>
+                <span class="muted">MOCK_PLAN_ONLY · MOCK_EVIDENCE_NOT_COLLECTED · assessmentPlanSandboxRequiredBeforeRealExecution=true。</span>
+              </div>
+              <div class="row compact">
+                <span>checkPlans[].containerSandboxPlan</span>
+                <span class="muted">CONTAINER_PLAN_ONLY · image=python:3.11-slim · mount=read_only · resultPlaceholder.status=NOT_EXECUTED。</span>
+              </div>
+              <div class="row compact">
+                <span>containerSandboxPlan.safety</span>
+                <span class="muted">containerStarted=false，sandboxExecuted=false，contestantCodeExecuted=false，commandExecuted=false。</span>
+              </div>
+              <div class="row compact">
+                <span>runRealPytestEnabled=false</span>
+                <span class="muted">sandboxExecuted=false，commandExecuted=false，contestantCodeExecuted=false，Phase 3 仅保留评分计划审计。</span>
+              </div>
+              <div class="row">
+                <span>op_audit_publish_lab_intent_demo</span>
+                <span>PUBLISH_LAB_INTENT · LAB · lab_demo · WAITING_REVIEW</span>
+                <strong class="status warn">INTENT</strong>
+              </div>
+              <div class="row">
+                <span>op_audit_publish_exam_intent_demo</span>
+                <span>PUBLISH_EXAM_INTENT · EXAM · exam_demo · APPROVED_EXECUTION_BLOCKED</span>
+                <strong class="status warn">INTENT</strong>
+              </div>
+              <div class="row">
+                <span>op_audit_destroy_environment_intent_demo</span>
+                <span>DESTROY_ENVIRONMENT_INTENT · ENVIRONMENT · env_vm_demo · APPROVED_PENDING_SECOND_CONFIRMATION · requiresSecondConfirmation=true</span>
+                <strong class="status warn">INTENT</strong>
+              </div>
+              <div class="row compact">
+                <span>secondConfirmationSatisfied=false · destroyRealEnvironmentEnabled=false</span>
+                <span class="muted">reviewIntentOnly=true，realPublish=false，environmentDestroyed=false。</span>
+              </div>
+              <div class="row">
+                <span>audit_demo</span>
+                <span>APPROVE · WAITING_REVIEW -> APPROVED · realPublish=false</span>
+                <strong class="status">REVIEW</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="guardrails-title">
+      <div class="section-head">
+        <div>
+          <h2 id="guardrails-title">Phase 1 安全断言</h2>
+          <p>此页用于观察 Mock 调用链，不承担任何生产变更能力。</p>
+        </div>
+        <span class="pill warn">真实发布：禁用</span>
+      </div>
+      <div class="row-list">
+        <div class="row compact">
+          <span>realLlmCalled=false</span>
+          <span class="muted">真实大模型调用保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>realMcpServerStarted=false</span>
+          <span class="muted">真实 MCP Server 启动保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>realAgentStarted=false</span>
+          <span class="muted">真实智能体启动保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>secretsRead=false</span>
+          <span class="muted">密钥读取与前端展示保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>networkAccess=false</span>
+          <span class="muted">Provider / MCP Mock 不访问外部网络。</span>
+        </div>
+        <div class="row compact">
+          <span>realCloudResourceChanged=false</span>
+          <span class="muted">真实云资源创建、启动、停止、删除保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>sandboxExecuted=false</span>
+          <span class="muted">真实沙箱执行保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>contestantCodeExecuted=false</span>
+          <span class="muted">选手代码执行保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>autoPublishAllowed=false</span>
+          <span class="muted">AI 生成结果不得自动发布。</span>
+        </div>
+        <div class="row compact">
+          <span>realPublish=false</span>
+          <span class="muted">真实发布保持禁用。</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

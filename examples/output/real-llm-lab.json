@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "kind": "Lab",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "id": "ai-tools-intro-lab",
+    "title": "AI 工具应用入门实验",
+    "durationMinutes": 60,
+    "difficulty": "beginner",
+    "tags": [
+      "AI工具",
+      "编程助手",
+      "代码修改",
+      "入门实验"
+    ],
+    "category": "ai-platform"
+  },
+  "spec": {
+    "steps": [
+      {
+        "id": "step-1",
+        "title": "检查开发环境",
+        "instruction": "1. 打开你的代码编辑器（如 VS Code）。\n2. 确认已安装必要的编程语言运行时（如 Python 或 Node.js）。\n3. 确认网络连接正常，以便后续访问 AI 服务。",
+        "expectedResult": "编辑器可正常启动，终端可执行基本命令（如 `python --version` 或 `node --version`）且无报错。"
+      },
+      {
+        "id": "step-2",
+        "title": "阅读并分析示例代码",
+        "instruction": "1. 创建一个名为 `calculator.py` 的新文件。\n2. 输入以下示例代码：\n```python\ndef add(a, b):\n    return a + b\n\ndef subtract(a, b):\n    return a - b\n\n# 这是一个待完成的函数\ndef multiply(a, b):\n    # 请使用 AI 助手来补全这个函数\n    pass\n\nresult = add(10, 5)\nprint(f\"10 + 5 = {result}\")\n```",
+        "expectedResult": "文件创建成功，代码结构清晰，包含一个未完成的 `multiply` 函数。"
+      },
+      {
+        "id": "step-3",
+        "title": "使用 AI 辅助修改代码",
+        "instruction": "1. 选中 `multiply` 函数的 `pass` 语句。\n2. 使用你的 AI 编程助手（如 GitHub Copilot、Cursor 或内置 AI 功能）获取代码补全建议。\n3. 观察 AI 提供的建议，选择并采纳一个正确的 `multiply` 函数实现。\n4. 在代码末尾添加一行，调用 `multiply(3, 4)` 并打印结果。",
+        "expectedResult": "`multiply` 函数被正确补全（应包含 `return a * b` 或类似逻辑），代码末尾新增了乘法运算的打印语句。"
+      },
+      {
+        "id": "step-4",
+        "title": "运行测试并验证结果",
+        "instruction": "1. 在终端中运行命令 `python calculator.py`。\n2. 观察程序输出。\n3. 验证 `add`、`subtract`（如果调用）和 `multiply` 函数的结果是否符合预期。",
+        "expectedResult": "程序成功运行，输出应包含类似以下内容：\n`10 + 5 = 15`\n`3 * 4 = 12`"
+      }
+    ],
+    "objectives": [
+      "完成真实 LLM 生成内容的人工审核演示"
+    ],
+    "targetUsers": [
+      "高职学生"
+    ],
+    "environment": {
+      "type": "notebook",
+      "image": "python:3.11"
+    },
+    "materials": [
+      {
+        "type": "markdown",
+        "path": "examples/input/demo-source.md"
+      }
+    ]
+  }
+}

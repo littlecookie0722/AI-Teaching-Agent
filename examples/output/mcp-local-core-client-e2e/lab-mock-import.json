@@ -1,0 +1,82 @@
+{
+  "component": "LabTemplateMockImport",
+  "mode": "LOCAL_PLATFORM_ENTITY_MOCK_IMPORT",
+  "taskId": "task_8bda83d21433",
+  "taskStatus": "APPROVED",
+  "reviewer": "teacher_1",
+  "agentEntity": "lab_template",
+  "agentEntityRecord": {
+    "entityType": "lab_template",
+    "title": "AI 工具应用入门实验",
+    "payload": {
+      "id": "lab_demo",
+      "title": "AI 工具应用入门实验",
+      "category": "AI 工具应用",
+      "difficulty": "beginner",
+      "durationMinutes": 60,
+      "tags": [
+        "AI",
+        "工具应用"
+      ],
+      "status": "DRAFT_PENDING_PLATFORM_IMPORT_REVIEW",
+      "sourceTaskId": "task_8bda83d21433",
+      "sourceDslPath": "examples/output/task_8bda83d21433-lab.json",
+      "objectiveTotal": 3,
+      "stepTotal": 4,
+      "materialTotal": 1,
+      "environment": {
+        "type": "ubuntu-vm",
+        "image": "ubuntu-22.04",
+        "resources": {
+          "cpu": 2,
+          "memoryGb": 4
+        }
+      },
+      "gradingRef": "grading_demo",
+      "reviewChecklist": [
+        "confirm_objectives_are_measurable",
+        "confirm_steps_are_teachable",
+        "confirm_environment_matches_platform_capacity",
+        "confirm_grading_ref_is_available_or_planned",
+        "confirm_no_auto_publish"
+      ]
+    },
+    "sourceTaskId": "task_8bda83d21433",
+    "sourcePreviewArtifactId": "artifact_b01dd9bb23e2",
+    "sourcePreviewPath": "examples/output/mcp-local-core-client-e2e/lab-import-preview.json",
+    "reviewer": "teacher_1",
+    "id": "agent_entity_0b7c7101ba89",
+    "status": "DRAFT_CREATED",
+    "traceId": "trace_0f89a44feee5",
+    "sourceDslPath": "examples/output/task_8bda83d21433-lab.json",
+    "sourceArtifactId": "artifact_5d056b99c45c",
+    "sourceArtifactKind": "LAB_DSL",
+    "mockStoreWritten": true,
+    "databaseWritten": false,
+    "realAgentImport": false,
+    "realPublish": false,
+    "createdAt": "2026-07-11T17:08:25.597606Z",
+    "updatedAt": "2026-07-11T17:08:25.597617Z"
+  },
+  "sourcePreview": {
+    "component": "LabTemplateImportPreview",
+    "artifactId": "artifact_b01dd9bb23e2",
+    "artifactPath": "examples/output/mcp-local-core-client-e2e/lab-import-preview.json",
+    "sourceDslPath": "examples/output/task_8bda83d21433-lab.json",
+    "schemaValidated": true
+  },
+  "safety": {
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "mockStoreWritten": true,
+    "databaseWritten": false,
+    "realAgentImport": false,
+    "autoPublishAllowed": false,
+    "realPublishAllowed": false,
+    "realPublish": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false
+  },
+  "traceId": "trace_0f89a44feee5"
+}

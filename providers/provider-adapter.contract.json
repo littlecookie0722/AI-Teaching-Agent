@@ -1,0 +1,291 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "provider_adapter_contract",
+  "title": "Mock-only LLMProvider Adapter Contract",
+  "description": "A thin provider adapter boundary for Phase 2 workflow wiring. It exposes the LLMProvider operation shape while routing only to the deterministic MockProvider.",
+  "adapterId": "mock_provider_adapter",
+  "interfaceName": "LLMProvider",
+  "activeProvider": "mock",
+  "inputs": [
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_plan",
+      "path": "providers/PHASE2_PROVIDER_PLAN.md",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "mock_provider",
+      "path": "providers/mock_provider.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate",
+      "path": "providers/real_provider_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell",
+      "path": "providers/real_provider_shell.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell_contract",
+      "path": "providers/real-provider-shell.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "operations": [
+    {
+      "id": "health",
+      "enabled": true,
+      "requiresPrompt": false,
+      "delegatesTo": "MockProvider.health",
+      "returns": "ProviderHealth"
+    },
+    {
+      "id": "generateText",
+      "enabled": true,
+      "requiresPrompt": true,
+      "delegatesTo": "MockProvider.generate_text",
+      "returns": "ProviderResult",
+      "requiresSchemaValidation": false
+    },
+    {
+      "id": "generateJson",
+      "enabled": true,
+      "requiresPrompt": true,
+      "delegatesTo": "MockProvider.generate_json",
+      "returns": "ProviderJsonResult",
+      "requiresSchemaValidation": true,
+      "generatedStatus": "WAITING_REVIEW"
+    },
+    {
+      "id": "streamGenerate",
+      "enabled": false,
+      "requiresPrompt": true,
+      "delegatesTo": null,
+      "returns": "ProviderStreamResult",
+      "deferred": true,
+      "errorCode": "UNSUPPORTED_OPERATION"
+    },
+    {
+      "id": "realProviderPreflight",
+      "enabled": true,
+      "requiresPrompt": true,
+      "delegatesTo": "preflight_real_provider",
+      "returns": "ProviderGateContext",
+      "requiresExplicitOptIn": true,
+      "performsNetworkCall": false,
+      "readsSecretValue": false,
+      "generatedStatus": "WAITING_REVIEW",
+      "errorCodes": [
+        "REAL_PROVIDER_OPT_IN_REQUIRED",
+        "REAL_PROVIDER_DISABLED",
+        "MISSING_PROVIDER_SECRET",
+        "UNSUPPORTED_OPERATION",
+        "VALIDATION_ERROR",
+        "NOT_FOUND"
+      ]
+    },
+    {
+      "id": "realProviderShell",
+      "enabled": true,
+      "requiresPrompt": false,
+      "delegatesTo": "DisabledRealProvider",
+      "returns": "ProviderShellContext",
+      "performsNetworkCall": false,
+      "readsSecretValue": false,
+      "generationOperationsEnabled": false,
+      "errorCodes": [
+        "REAL_PROVIDER_SHELL_DISABLED",
+        "REAL_PROVIDER_OPT_IN_REQUIRED",
+        "REAL_PROVIDER_DISABLED",
+        "UNSUPPORTED_OPERATION"
+      ]
+    },
+    {
+      "id": "realProviderRuntimeGuard",
+      "enabled": true,
+      "requiresPrompt": true,
+      "delegatesTo": "evaluate_provider_runtime_guard",
+      "returns": "ProviderRuntimeGuardContext",
+      "performsNetworkCall": false,
+      "readsSecretValue": false,
+      "importsSdk": false,
+      "createsClient": false,
+      "requiresTimeout": true,
+      "requiresRetry": true,
+      "requiresConcurrencyLimit": true,
+      "requiresRedaction": true,
+      "requiresSchemaValidation": true,
+      "generatedStatus": "WAITING_REVIEW",
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "UNSUPPORTED_OPERATION",
+        "NOT_FOUND"
+      ]
+    },
+    {
+      "id": "realLlmPocAdapter",
+      "enabled": true,
+      "requiresPrompt": true,
+      "delegatesTo": "invoke_real_llm_poc_adapter",
+      "returns": "RealLlmPocAdapterContext",
+      "performsNetworkCall": false,
+      "readsSecretValue": false,
+      "importsSdk": false,
+      "createsClient": false,
+      "generationOperationsEnabled": false,
+      "requiresRuntimeGuard": true,
+      "requiresPreflight": true,
+      "requiresExplicitOptIn": true,
+      "generatedStatus": "WAITING_REVIEW",
+      "errorCodes": [
+        "REAL_PROVIDER_OPT_IN_REQUIRED",
+        "REAL_PROVIDER_DISABLED",
+        "REAL_LLM_POC_ADAPTER_DISABLED",
+        "VALIDATION_ERROR",
+        "UNSUPPORTED_OPERATION",
+        "NOT_FOUND"
+      ]
+    }
+  ],
+  "resultFields": [
+    "adapterId",
+    "interfaceName",
+    "operation",
+    "providerId",
+    "mode",
+    "promptId",
+    "promptVersion",
+    "generatedStatus",
+    "realLlmCalled",
+    "secretsRead",
+    "networkAccess",
+    "traceId"
+  ],
+  "rules": {
+    "mockProviderOnly": true,
+    "providerSelectionAllowlist": [
+      "mock"
+    ],
+    "realProviderRoutingAllowed": false,
+    "streamGenerateEnabled": false,
+    "schemaValidationRequiredForGenerateJson": true,
+    "promptMustLoadFromPrompts": true,
+    "businessCodeMayEmbedPrompts": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "generatedContentDefaultStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "realProviderPreflightAllowed": true,
+    "realProviderPreflightNetworkAccess": false,
+    "realProviderPreflightSecretValueReturned": false,
+    "realProviderPreflightDefaultReady": false,
+    "realProviderShellAllowed": true,
+    "realProviderShellGenerationEnabled": false,
+    "providerRuntimeGuardAllowed": true,
+    "providerRuntimeGuardReadyForRealProvider": false,
+    "providerRuntimeGuardNetworkAccess": false,
+    "providerRuntimeGuardSecretValueReturned": false,
+    "providerRuntimeGuardRedactionRequired": true,
+    "realLlmPocAdapterAllowed": true,
+    "realLlmPocAdapterEnabled": false,
+    "realLlmPocAdapterNetworkAccess": false,
+    "realLlmPocAdapterSecretValueReturned": false,
+    "realLlmPocAdapterRequiresRuntimeGuard": true,
+    "realLlmPocAdapterRequiresPreflight": true
+  },
+  "blockedOperations": [
+    "route_to_openai",
+    "route_to_anthropic",
+    "route_to_local_model",
+    "read_real_secret",
+    "network_call",
+    "stream_real_tokens",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish",
+    "real_provider_success_without_gate",
+    "real_provider_shell_success_without_gate",
+    "runtime_guard_bypass",
+    "real_llm_poc_adapter_success_without_gate",
+    "real_llm_poc_adapter_sdk_call",
+    "missing_timeout_retry_concurrency_guard",
+    "unredacted_provider_payload"
+  ],
+  "recommendedCommandIds": [
+    "test_provider_adapter",
+    "test_real_provider_gate",
+    "test_real_provider_shell",
+    "test_provider_runtime_guard",
+    "test_real_llm_poc_adapter",
+    "test_provider_contract",
+    "test_provider_mock",
+    "test_phase2_provider_plan",
+    "test_all"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

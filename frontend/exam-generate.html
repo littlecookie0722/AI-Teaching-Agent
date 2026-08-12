@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Core Exam Generation</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --line: #d8dee8;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --warn: #a16207;
+      --danger: #991b1b;
+      --ok: #047857;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .section-head p {
+      overflow-wrap: anywhere;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .api-state {
+      margin: 16px 16px 0;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .api-state.pending {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: var(--warn);
+    }
+
+    .api-state.error {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    label.confirmation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      min-width: 18px;
+      min-height: 18px;
+      margin: 0;
+      padding: 0;
+    }
+
+    textarea {
+      min-height: 132px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .pill.strong {
+      border-color: #bfdbfe;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.safe {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .next-action-rail {
+      display: grid;
+      gap: 10px;
+      margin: 0 16px 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .next-action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .next-action-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .metric,
+    .flow-step,
+    .policy {
+      min-width: 0;
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow-wrap: anywhere;
+    }
+
+    .metric span,
+    .flow-step span,
+    .policy span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .flow-step strong,
+    .policy strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      padding: 0 16px 16px;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 330px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #dbeafe;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      padding: 0 16px 16px;
+    }
+
+    .flow-step {
+      min-height: 62px;
+    }
+
+    .flow-step strong {
+      font-size: 15px;
+    }
+
+    .policy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .blocked {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      main,
+      .card-grid,
+      .next-action-grid,
+      .preview-grid,
+      .policy-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+      }
+
+      main {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Exam / Grading 生成工作台</h1>
+      <p class="pill strong">LOCAL_CORE_MVP</p>
+    </div>
+    <div class="pill-row" aria-label="Local core safety state">
+      <span class="pill">真实 LLM：通过后端/CLI 显式接入</span>
+      <span class="pill">标准答案选手端：隐藏</span>
+      <span class="pill">真实沙箱：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="input-title">
+      <div class="section-head">
+        <div>
+          <h2 id="input-title">输入与 Prompt</h2>
+          <p>从 Lab ID 生成 Exam DSL 与 Grading DSL</p>
+        </div>
+        <span class="pill">POST /api/exams/generate-from-lab</span>
+      </div>
+      <div class="stack">
+        <label>
+          Lab ID
+          <input id="exam-generate-lab-id" value="lab_demo">
+        </label>
+        <label>
+          Lab DSL 路径
+          <input id="exam-generate-lab-dsl-path" value="templates/lab/examples/basic-lab.yaml">
+        </label>
+        <label>
+          Prompt 版本
+          <select aria-label="Prompt version">
+            <option>exam_generation_v0</option>
+            <option>grading_generation_v0</option>
+          </select>
+        </label>
+        <label>
+          生成模式
+          <select id="exam-generate-provider-mode">
+            <option value="mock" selected>本地 Mock</option>
+            <option value="real-llm">真实 LLM</option>
+          </select>
+        </label>
+        <label>
+          模型（真实 LLM 可选）
+          <input id="exam-generate-model" placeholder="留空使用 OPENAI_MODEL">
+        </label>
+        <label>
+          Base URL（真实 LLM 可选）
+          <input id="exam-generate-base-url" placeholder="留空使用 OPENAI_BASE_URL">
+        </label>
+        <label class="confirmation">
+          <input id="exam-generate-explicit-real-call" type="checkbox">
+          已确认真实请求仅生成 DSL，并进入 WAITING_REVIEW
+        </label>
+        <label>
+          生成说明
+          <textarea readonly>从本地 Lab 引用生成 Exam DSL 与 Grading DSL。默认调用本地 Backend Mock API；选择真实 LLM 后由同源后端读取环境变量中的密钥。生成结果必须进入 WAITING_REVIEW，标准答案不得进入选手端预览。</textarea>
+        </label>
+        <div class="pill-row">
+          <span class="pill strong">Local Backend API</span>
+          <span class="pill">schema: exam.schema.json</span>
+          <span class="pill">schema: grading.schema.json</span>
+          <span class="pill warn">review required</span>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button type="button">读取 Lab DSL</button>
+        <button id="exam-generate-run" class="primary" type="button">生成 Exam / Grading</button>
+        <button type="button" disabled title="审核通过前禁止自动发布">发布考试</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="result-title">
+      <div class="section-head">
+        <div>
+          <h2 id="result-title">生成结果</h2>
+          <p class="blocked">生成后状态：WAITING_REVIEW</p>
+        </div>
+        <span class="pill safe">answerVisibleToCandidate=false</span>
+      </div>
+
+      <div id="exam-generate-api-state" class="api-state">STATIC_HTML_FALLBACK</div>
+
+      <div class="card-grid">
+        <div class="metric">
+          <span>来源 Lab</span>
+          <strong id="exam-generate-source-lab">lab_demo</strong>
+        </div>
+        <div class="metric">
+          <span>题型</span>
+          <strong id="exam-generate-question-type">notebook_fill_blank</strong>
+        </div>
+        <div class="metric">
+          <span>总分</span>
+          <strong id="exam-generate-total-score">100</strong>
+        </div>
+        <div class="metric">
+          <span>审核状态</span>
+          <strong id="exam-generate-status">WAITING_REVIEW</strong>
+        </div>
+      </div>
+
+      <div class="next-action-rail" aria-labelledby="exam-generate-next-title">
+        <div class="section-head">
+          <div>
+            <h3 id="exam-generate-next-title">ExamGenerationCloseLoopAction</h3>
+            <p id="exam-generate-next-summary">source=POST /api/exams/generate-from-lab · next=review_center_candidate_safe_preview_and_local_import_preview</p>
+          </div>
+          <span class="pill warn" id="exam-generate-next-status">WAITING_REVIEW</span>
+        </div>
+        <div class="next-action-grid">
+          <div class="metric">
+            <span>任务</span>
+            <strong id="exam-generate-next-task">task=not_created</strong>
+          </div>
+          <div class="metric">
+            <span>Exam 产物</span>
+            <strong id="exam-generate-next-exam-artifact">examDslPath=none</strong>
+          </div>
+          <div class="metric">
+            <span>Grading 产物</span>
+            <strong id="exam-generate-next-grading-artifact">gradingDslPath=none</strong>
+          </div>
+          <div class="metric">
+            <span>候选端</span>
+            <strong id="exam-generate-next-candidate-safety">answersHidden=true</strong>
+          </div>
+        </div>
+        <div class="next-action-links">
+          <a class="pill strong" id="exam-generate-review-center-link" href="review-center.html">打开审核中心</a>
+          <a class="pill" id="exam-generate-review-page-link" href="exam-review.html">打开 Exam 审核页</a>
+          <a class="pill" id="exam-generate-grading-review-link" href="grading-review.html">打开 Grading 审核页</a>
+          <a class="pill" id="exam-generate-exam-import-preview-link" href="agent-entities.html?entityKind=exam">Exam 导入预览</a>
+          <a class="pill" id="exam-generate-grading-import-preview-link" href="agent-entities.html?entityKind=grading">Grading 导入预览</a>
+          <span class="pill" id="exam-generate-next-boundary">answerVisibleToCandidate=false · sandboxExecuted=false · realPublishAllowed=false</span>
+        </div>
+      </div>
+
+      <div class="preview-grid">
+        <pre id="exam-generate-exam-json">version: "1.0"
+kind: "Exam"
+metadata:
+  id: "exam_demo"
+  title: "Notebook 代码挖空题"
+  sourceLabId: "lab_demo"
+status: "WAITING_REVIEW"
+spec:
+  questionType: "notebook_fill_blank"
+  totalScore: 100
+  questions:
+    - id: "q1"
+      title: "补全 CSV 读取代码"
+      blankCode: "df = pd.____('data.csv')"
+      score: 100
+candidateSafety:
+  answerVisibleToCandidate: false
+  gradingRefVisibleToCandidate: false</pre>
+        <pre id="exam-generate-grading-json">version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_demo"
+  title: "Python Pytest 评分"
+  sourceExamId: "exam_demo"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 100
+  timeoutSeconds: 30
+  checks:
+    - id: "check_pytest"
+      type: "pytest"
+      path: "tests/test_main.py"
+      score: 100</pre>
+      </div>
+
+      <div class="policy-grid">
+        <div class="policy">
+          <span>选手端预览</span>
+          <strong>标准答案隐藏</strong>
+        </div>
+        <div class="policy">
+          <span>发布策略</span>
+          <strong>审核前阻断</strong>
+        </div>
+        <div class="policy">
+          <span>评分执行</span>
+          <strong>sandboxExecuted=false</strong>
+        </div>
+      </div>
+
+      <div class="flow" aria-label="Mock exam generation workflow">
+        <div class="flow-step">
+          <span>1</span>
+          <strong>读取 Lab 引用</strong>
+          <p>labId=lab_demo</p>
+        </div>
+        <div class="flow-step">
+          <span>2</span>
+          <strong>本地生成服务输出 Exam / Grading</strong>
+          <p>reviewGated=true</p>
+        </div>
+        <div class="flow-step">
+          <span>3</span>
+          <strong>Schema 校验</strong>
+          <p>Exam DSL / Grading DSL</p>
+        </div>
+        <div class="flow-step">
+          <span>4</span>
+          <strong>创建 AI Task</strong>
+          <p>WAITING_REVIEW</p>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button id="exam-generate-review-link" type="button">查看审核详情</button>
+        <button type="button" disabled title="标准答案不得展示给选手端">展示标准答案</button>
+        <button type="button" disabled title="审核通过前禁止发布">发布考试</button>
+      </div>
+    </section>
+  </main>
+  <script src="exam-generate-data.js"></script>
+</body>
+</html>

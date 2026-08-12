@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations Acceptance Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --warn: #b45309;
+      --ok-bg: #e7f8f2;
+      --warn-bg: #fff7ed;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #123f46;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 980px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .action-bar,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.86fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(210px, 0.64fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(200px, 0.5fr) minmax(260px, 1fr);
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .command {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 940px) {
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">DeliveryChecklistPanel</span>
+      <span class="pill">ConsoleNavPanel</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill warn">readOnly=true</span>
+    </div>
+    <h1>Operations Acceptance Mock</h1>
+    <p>运营验收总览页。数据来自 <code>frontend/mock-data.json.operationsAcceptancePrototype</code>、<code>config/delivery-package.contract.json</code>、<code>delivery/DEMO_SCRIPT_CHECKLIST.md</code>、<code>delivery/FAQ.md</code>、<code>delivery/HANDOFF.md</code> 和 <code>delivery/PHASE2_READINESS.md</code>，只聚合验收状态，不上传交付包、不运行命令、不发布真实内容。</p>
+    <div class="pill-row">
+      <span class="pill">route=/operations/acceptance</span>
+      <span class="pill">GET /api/health</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/artifacts</span>
+      <span class="pill">GET /api/audit-events</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">验收总览</h2>
+          <p>acceptanceItems + linkedPages + safeCommands + safety。</p>
+        </div>
+        <span class="pill strong">readyForPhase2MockHandoff=true</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Acceptance</span>
+          <strong>8 / 8</strong>
+        </div>
+        <div class="metric">
+          <span>Required</span>
+          <strong>8</strong>
+        </div>
+        <div class="metric">
+          <span>Missing</span>
+          <strong>0</strong>
+        </div>
+        <div class="metric">
+          <span>Pages</span>
+          <strong>7</strong>
+        </div>
+        <div class="metric">
+          <span>Safe Commands</span>
+          <strong>5</strong>
+        </div>
+        <div class="metric">
+          <span>Real Calls</span>
+          <strong>0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="items-title">
+      <div class="section-head">
+        <div>
+          <h2 id="items-title">验收项</h2>
+          <p>每个验收项来自本地契约或文档，不读取远程资源，不执行真实发布。</p>
+        </div>
+        <span class="pill">deliveryManifest.summary.missingRequired=0</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>Required Acceptance Items</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>delivery_manifest_ready</span>
+                <span>Delivery Manifest ready=127 required=127</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>phase1_check_passed</span>
+                <span>Phase 1 check 20/20</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>runbook_present</span>
+                <span>Operations Runbook static page present</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>demo_script_checklist_present</span>
+                <span>delivery/DEMO_SCRIPT_CHECKLIST.md</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>faq_present</span>
+                <span>delivery/FAQ.md</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>handoff_present</span>
+                <span>delivery/HANDOFF.md</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>phase2_gate_present</span>
+                <span>delivery/PHASE2_READINESS.md</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>assessment_plan_audit_trace_visible</span>
+                <span>AssessmentPlanAuditSignal links gradingReport.assessmentPlanSummary and operationAuditEvents.detail.assessmentPlanSummary</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row compact">
+                <span>assessmentPlanSummary.source=grading.spec.assessmentPlan</span>
+                <span class="muted">checkPlans[].assessmentPlanSourceField · assessmentPlanAlignedWithChecks=true · MOCK_EVIDENCE_NOT_COLLECTED。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>白名单验证命令</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>Phase 1 自检</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+              </div>
+              <div class="row compact">
+                <span>导出交付包</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+              </div>
+              <div class="row compact">
+                <span>生成验收报告</span>
+                <span class="command">python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</span>
+              </div>
+              <div class="row compact">
+                <span>前端契约测试</span>
+                <span class="command">python -m pytest tests/test_frontend_manifest.py</span>
+              </div>
+              <div class="row compact">
+                <span>全量测试</span>
+                <span class="command">python -m pytest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>关联静态页面</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>/operations/launchpad</span>
+                <span>frontend/operations-launchpad.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/operations/presenter</span>
+                <span>frontend/operations-presenter.html</span>
+              </li>
+              <li>
+                <strong><a href="operations-signoff.html">/operations/signoff</a></strong>
+                <span>frontend/operations-signoff.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/operations/demo-script</span>
+                <span>frontend/operations-demo-script.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/operations/runbook</span>
+                <span>frontend/operations-runbook.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/delivery</span>
+                <span>frontend/delivery.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/audit</span>
+                <span>frontend/audit.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>/audit/incidents</span>
+                <span>frontend/audit-incidents.html</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Action Policy</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>viewAcceptanceSummaryEnabled=true</span>
+                <span>openLinkedStaticPageEnabled=true · copySafeCommandEnabled=true</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row compact">
+                <span>runCommandEnabled=false</span>
+                <span class="muted">页面不执行任何命令。</span>
+              </div>
+              <div class="row compact">
+                <span>uploadPackageEnabled=false</span>
+                <span class="muted">交付包上传保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>startRealAgentEnabled=false</span>
+                <span class="muted">真实智能体启动保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>enableRealProviderEnabled=false</span>
+                <span class="muted">真实 Provider 启用保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>callRealLlmEnabled=false</span>
+                <span class="muted">真实大模型调用保持禁用。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublishEnabled=false</span>
+                <span class="muted">真实发布保持禁用。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Phase 1 安全断言</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>realLlmCalled=false</span>
+                <span class="muted">不调用真实大模型。</span>
+              </div>
+              <div class="row compact">
+                <span>realAgentStarted=false</span>
+                <span class="muted">不启动真实 Agent。</span>
+              </div>
+              <div class="row compact">
+                <span>realCloudResourceChanged=false</span>
+                <span class="muted">不创建或变更真实云资源。</span>
+              </div>
+              <div class="row compact">
+                <span>sandboxExecuted=false</span>
+                <span class="muted">不执行真实沙箱。</span>
+              </div>
+              <div class="row compact">
+                <span>contestantCodeExecuted=false</span>
+                <span class="muted">不执行选手代码。</span>
+              </div>
+              <div class="row compact">
+                <span>unknownShellExecuted=false</span>
+                <span class="muted">不执行未知 Shell。</span>
+              </div>
+              <div class="row compact">
+                <span>autoPublishAllowed=false</span>
+                <span class="muted">不自动发布。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublish=false</span>
+                <span class="muted">不发布真实实验或考试。</span>
+              </div>
+              <div class="row compact">
+                <span>remoteUploadAllowed=false</span>
+                <span class="muted">不远程上传交付包。</span>
+              </div>
+              <div class="row compact">
+                <span>secretVisibleInFrontend=false</span>
+                <span class="muted">不展示密钥。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar" style="margin-top:16px">
+        <button class="primary">查看验收总览</button>
+        <button>打开关联静态页</button>
+        <button>复制白名单命令</button>
+        <button>查看安全断言</button>
+        <button disabled>执行命令</button>
+        <button disabled>上传交付包</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>创建真实云资源</button>
+        <button disabled>运行真实沙箱</button>
+        <button disabled>执行选手代码</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+        <button disabled>显示密钥</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

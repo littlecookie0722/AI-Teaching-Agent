@@ -1,0 +1,177 @@
+{
+  "id": "real_sdk_dependency_implementation_task_plan_contract",
+  "gateId": "real_sdk_dependency_implementation_task_plan",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled implementation task plan for future real SDK dependency file changes. It only prepares reviewed task-plan evidence and does not create tasks, write dependency files, materialize patches, apply patches, execute commands, install packages, import SDKs, check secrets, use network access, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_module",
+      "path": "providers/real_sdk_dependency_implementation_task_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_contract",
+      "path": "providers/real-sdk-dependency-implementation-task-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_module",
+      "path": "providers/real_sdk_dependency_apply_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_contract",
+      "path": "providers/real-sdk-dependency-apply-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-implementation-task-plan describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "implementationTaskPlanOnly": true,
+        "dependencyImplementationTaskCreated": false,
+        "dependencyFileChanged": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-implementation-task-plan plan --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "applyGateReady": false,
+        "implementationTaskPlanReady": false,
+        "readyForReviewedDependencyImplementationTask": false,
+        "dependencyImplementationTaskCreated": false,
+        "dependencyFileChanged": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "applyGateRequired": true,
+    "applyGateReady": false,
+    "implementationTaskPlanOnly": true,
+    "implementationTaskPlanReady": false,
+    "readyForReviewedDependencyImplementationTask": false,
+    "dependencyImplementationTaskCreated": false,
+    "implementationTicketMaterialized": false,
+    "taskCreationAuthorized": false,
+    "dependencyFileChangeAuthorized": false,
+    "dependencyManifestWriteAuthorized": false,
+    "dependencyLockfileWriteAuthorized": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "applyAuthorized": false,
+    "patchApplyAuthorized": false,
+    "commandExecutionAuthorized": false,
+    "dependencyFileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallAfterPlanAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "create_dependency_implementation_task",
+    "create_ai_task_from_real_output",
+    "materialize_implementation_ticket",
+    "authorize_dependency_file_change",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "write_patch_file",
+    "materialize_patch",
+    "apply_patch",
+    "authorize_patch_apply",
+    "execute_command",
+    "generate_executable_install_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_after_plan",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_implementation_task_plan",
+    "test_real_sdk_dependency_apply_gate",
+    "test_real_sdk_dependency_patch_proposal",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "implementationTaskPlanOnly": true,
+    "dependencyImplementationTaskCreated": false,
+    "implementationTicketMaterialized": false,
+    "taskCreationAuthorized": false,
+    "dependencyFileChangeAuthorized": false,
+    "dependencyManifestWriteAuthorized": false,
+    "dependencyLockfileWriteAuthorized": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "applyAuthorized": false,
+    "patchApplyAuthorized": false,
+    "commandExecutionAuthorized": false,
+    "dependencyFileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallAfterPlanAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

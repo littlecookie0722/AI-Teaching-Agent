@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Real LLM Demo Evidence Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --line: #d9e0ea;
+      --text: #172033;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #e7f8f2;
+      --info: #1d4ed8;
+      --info-soft: #eef4ff;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #991b1b;
+      --danger-soft: #fef2f2;
+      --code: #101828;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 { font-size: 26px; line-height: 1.25; }
+    h2 { font-size: 18px; line-height: 1.35; }
+    h3 { font-size: 15px; line-height: 1.35; }
+    p { color: var(--muted); line-height: 1.6; }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .pill.info {
+      border-color: #bfdbfe;
+      background: var(--info-soft);
+      color: var(--info);
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .pill.danger {
+      border-color: #fecaca;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .panel,
+    .row,
+    .command-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 88px;
+      padding: 13px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 21px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .panel {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.55fr) minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(210px, 0.62fr) minmax(0, 1fr);
+    }
+
+    .muted { color: var(--muted); }
+
+    .status {
+      justify-self: end;
+      border-radius: 8px;
+      padding: 5px 9px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.warn {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .status.info {
+      background: var(--info-soft);
+      color: var(--info);
+    }
+
+    .command,
+    code {
+      font-family: Consolas, "SFMono-Regular", monospace;
+      color: var(--code);
+    }
+
+    .command-box {
+      padding: 12px;
+      background: #111827;
+      color: #f9fafb;
+      overflow-x: auto;
+    }
+
+    .command-box code { color: #f9fafb; }
+
+    .preview-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .preview-item {
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      overflow-wrap: anywhere;
+    }
+
+    .preview-item strong {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .preview-item p {
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      header,
+      .section-head {
+        flex-direction: column;
+      }
+
+      .summary-grid,
+      .content-grid,
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row,
+      .row.compact {
+        grid-template-columns: 1fr;
+      }
+
+      .status { justify-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>真实 LLM Demo Evidence</h1>
+      <p>展示已有真实大模型产出的 Lab / Exam / Grading / PPT DSL 演示包、候选人预览脱敏结果和只读 evidence 评分报告。页面只读，不发起请求，不读取密钥。</p>
+    </div>
+    <div class="pill-row" aria-label="Safety mode">
+      <span class="pill strong">REAL_LLM_DEMO_REPLAY</span>
+      <span class="pill info">WAITING_REVIEW</span>
+      <span class="pill warn">newLlmRequestSent=false</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">演示包摘要</h2>
+          <p>数据来源：frontend/mock-data.json.realDemoPrototype + examples/output/real-llm-demo-bundle.json。</p>
+        </div>
+        <span class="pill strong">answerVisibleToCandidate=false</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>DSL Validated</span>
+          <strong>4 / 4</strong>
+        </div>
+        <div class="metric">
+          <span>Generated Status</span>
+          <strong>WAITING_REVIEW</strong>
+        </div>
+        <div class="metric">
+          <span>Candidate Preview</span>
+          <strong>SAFE</strong>
+        </div>
+        <div class="metric">
+          <span>Readonly Evidence</span>
+          <strong>70 / 70</strong>
+        </div>
+        <div class="metric">
+          <span>Executed Checks</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>Contestant Code</span>
+          <strong>false</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="path-title">
+      <div class="section-head">
+        <div>
+          <h2 id="path-title">CoreBusinessDemoPath</h2>
+          <p>从真实 LLM 产物复放，到候选人安全预览、只读评分证据、PPTX Artifact 和页级审核动作的一条运营演示主线。</p>
+        </div>
+        <span class="pill strong">manualReviewRequired=true</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>演示步骤</h3>
+            <div class="row">
+              <span>01 · real_lab_dsl</span>
+              <span>LAB_DSL · examples/output/real-llm-lab.json · lab.schemaValidated=true · nextRoute=/labs/:id/review</span>
+              <strong class="status">WAITING_REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>02 · real_exam_dsl_candidate_safe</span>
+              <span>EXAM_DSL · candidatePreview.answersRemoved=true · answerVisibleToCandidate=false · nextRoute=/exams/:id/review</span>
+              <strong class="status">WAITING_REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>03 · real_grading_dsl_preserved</span>
+              <span>GRADING_DSL · sourceGradingPreserved=true · reviewerAction=review_assessment_plan_before_approval</span>
+              <strong class="status">WAITING_REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>04 · readonly_evidence_score</span>
+              <span>READONLY_EVIDENCE_REPORT · readonlyEvidenceDemo.executed=2 earnedScore=70 · doesNotModifySourceGrading=true</span>
+              <strong class="status info">DEMO_EVIDENCE_READY</strong>
+            </div>
+            <div class="row">
+              <span>05 · pptx_artifact_review</span>
+              <span>PPTX_FILE · pptxArtifactGenerated=true previewAvailable=true · nextRoute=/ppt/:id/review</span>
+              <strong class="status">WAITING_REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>06 · ppt_page_review_update</span>
+              <span>PPT_PAGE_REVIEW · POST /api/review-tasks/{id}/ppt-page-review-status · PPT_PAGE_REVIEW_UPDATE writesOperationAudit=true</span>
+              <strong class="status warn">MANUAL_REVIEW_ACTION</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>验收信号</h3>
+            <div class="row compact">
+              <span>route</span>
+              <span>/real-demo -&gt; /review-center -&gt; /ppt/:id/review -&gt; /grading/:id/report</span>
+            </div>
+            <div class="row compact">
+              <span>stepTotal</span>
+              <span>6 · reviewCenterLinked=true · pptPageReviewActionVisible=true</span>
+            </div>
+            <div class="row compact">
+              <span>DSL</span>
+              <span>dslValidatedTotal=4 · waitingReviewDslTotal=4 · reviewRequiredBeforePublish=true</span>
+            </div>
+            <div class="row compact">
+              <span>Evidence</span>
+              <span>readonlyEvidenceDemoExecuted=true · readonlyEvidenceDemoEarnedScore=70</span>
+            </div>
+            <div class="row compact">
+              <span>PPT</span>
+              <span>pptxArtifactWaitingReview=true · pptPageReviewActionVisible=true</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>RealDemoAcceptanceSummary</h3>
+            <div class="row compact">
+              <span>source</span>
+              <span>phase2 demo-bundle acceptance · summaryPath=examples/output/real-llm-demo-acceptance-summary.json</span>
+            </div>
+            <div class="row compact">
+              <span>acceptance.passed</span>
+              <span>true · passedCount=7 · total=7 · failedStepIds=[]</span>
+            </div>
+            <div class="row compact">
+              <span>closedLoop</span>
+              <span>real_demo_bundle_valid · review_center_real_demo_queue_visible · mcp_get_review_task_summary_contract_visible</span>
+            </div>
+            <div class="row compact">
+              <span>evidenceSignals</span>
+              <span>mcpOutputContractIncludesRealDemoReviewQueue=true · readonlyEvidenceCollectedTotal=2 · gradingEvidenceCoverage=100/100 · candidatePreviewAnswerSafe=true</span>
+            </div>
+            <div class="row compact">
+              <span>gradingEvidenceCoverage</span>
+              <span>GRADING_EVIDENCE_COVERAGE_COMPLETE · controlledDocker=40/40 · staticNotebook=60/60 · manualReviewRequired=true</span>
+            </div>
+            <div class="row compact">
+              <span>safety</span>
+              <span>newLlmRequestSent=false · secretsRead=false · networkAccess=false · batchStateChangeAllowed=false · realPublishAllowed=false</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>RealDemoOneClickChecklist</h3>
+            <div class="row compact">
+              <span>source</span>
+              <span>phase2 demo-bundle checklist · checklistPath=examples/output/real-llm-demo-checklist.json</span>
+            </div>
+            <div class="row compact">
+              <span>readyForDemo</span>
+              <span>true · acceptance=7/7 · sections=6/6 · failedStepIds=[]</span>
+            </div>
+            <div class="row compact">
+              <span>sections</span>
+              <span>generated_dsl · candidate_preview · grading_evidence_coverage · pptx_artifact · review_and_mcp · safety_boundaries</span>
+            </div>
+            <div class="row compact">
+              <span>coverage</span>
+              <span>gradingEvidenceCoverage=100/100 · controlledDocker=40/40 · staticNotebook=60/60</span>
+            </div>
+            <div class="row compact">
+              <span>safety</span>
+              <span>newLlmRequestSent=false · sandboxExecutedByChecklist=false · commandExecutedByChecklist=false · realPublishAllowed=false</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>RealDemoMcpRevisionLoop</h3>
+            <div class="row compact">
+              <span>toolChain</span>
+              <span>request_review_revision -&gt; regenerate_from_revision_mock</span>
+            </div>
+            <div class="row compact">
+              <span>request_review_revision</span>
+              <span>POST /api/review-tasks/{taskId}/revision-request · priority=HIGH · taskStatusChanged=false</span>
+            </div>
+            <div class="row compact">
+              <span>regenerate_from_revision_mock</span>
+              <span>POST /api/review-tasks/{taskId}/regenerate-mock · newTaskId=task_lab_demo_revision · newTaskStatus=WAITING_REVIEW</span>
+            </div>
+            <div class="row compact">
+              <span>artifact</span>
+              <span>artifact_lab_revision_demo · examples/output/task_lab_demo-lab-revision.json · sourceTaskStatusUnchanged=true</span>
+            </div>
+            <div class="row compact">
+              <span>safety</span>
+              <span>newLlmRequestSent=false · realLlmCalled=false · autoApproveAllowed=false · realPublish=false</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>主线安全边界</h3>
+            <div class="row compact">
+              <span>newLlmRequestSent=false</span>
+              <span class="muted">只复放已有演示包，不再次请求模型。</span>
+            </div>
+            <div class="row compact">
+              <span>sourceGradingModified=false</span>
+              <span class="muted">只读 evidence 不替换真实 Grading DSL。</span>
+            </div>
+            <div class="row compact">
+              <span>autoApproveAllowed=false</span>
+              <span class="muted">质量信号和页级状态都不能绕过人工审核。</span>
+            </div>
+            <div class="row compact">
+              <span>autoPublishAllowed=false · realPublish=false</span>
+              <span class="muted">演示主线只证明产出可审，不做真实发布。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="real-dsl-review-title">
+      <div class="section-head">
+        <div>
+          <h2 id="real-dsl-review-title">RealDslReviewPreview</h2>
+          <p>直接展示本次真实 LLM DSL 的可审核内容：Lab 步骤、Exam 选手预览、教师评分引用、Grading 计划和 PPT 大纲。</p>
+        </div>
+        <span class="pill strong">STATIC_REAL_LLM_DSL_REVIEW_PREVIEW</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Lab Steps</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>Exam Questions</span>
+          <strong>1 / 100</strong>
+        </div>
+        <div class="metric">
+          <span>Grading Plans</span>
+          <strong>1 / 100</strong>
+        </div>
+        <div class="metric">
+          <span>PPT Slides</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>Quality Status</span>
+          <strong>NEEDS_REVIEW</strong>
+        </div>
+        <div class="metric">
+          <span>Candidate Safety</span>
+          <strong>SAFE</strong>
+        </div>
+        <div class="metric">
+          <span>Manual Review</span>
+          <strong>true</strong>
+        </div>
+      </div>
+      <div class="review-grid">
+        <div class="panel">
+          <h3>LabReview · AI 工具应用入门实验</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>examples/output/real-llm-lab.json · duration=60 · difficulty=beginner · targetUsers=高职学生</span>
+          </div>
+          <div class="row compact">
+            <span>objectives</span>
+            <span>理解 AI 工具在代码生成与辅助开发中的基本应用</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>step-1 · 环境检查</strong>
+              <p>打开代码编辑器或在线编程环境，确认 Python 环境已正确安装并可运行；预期输出 Python 版本号。</p>
+            </div>
+            <div class="preview-item">
+              <strong>step-2 · 阅读示例代码</strong>
+              <p>阅读实验材料中的 Python 计算器脚本，理解函数定义与基础运算输出。</p>
+            </div>
+            <div class="preview-item">
+              <strong>step-3 · 使用 AI 辅助修改代码</strong>
+              <p>使用 AI 工具生成改进建议，例如增加错误处理、补充测试或重构函数结构。</p>
+            </div>
+            <div class="preview-item">
+              <strong>step-4 · 应用修改并运行测试</strong>
+              <p>应用 AI 建议并运行脚本，验证输出仍符合预期。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>ExamReview · Candidate Safe Preview</h3>
+          <div class="row compact">
+            <span>candidatePreview</span>
+            <span>answersRemoved=true · answerVisibleToCandidate=false · gradingRefVisibleToCandidate=false · removedFields=questions[].gradingRef</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>q1 · 审核状态确认 · 100 分</strong>
+              <p>说明生成内容为什么必须进入 WAITING_REVIEW；blankCodePresent=false。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>TeacherOnlyGradingRefs</h3>
+          <div class="row compact">
+            <span>visibility</span>
+            <span>teacherOnly=true · candidateVisible=false · standardAnswerRevealToCandidate=false</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>q1</strong>
+              <p>评分引用：check_waiting_review，仅教师审核可见；选手端不展示内部评分引用。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>GradingReview · 真实 LLM Demo 评分</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>examples/output/real-llm-grading.json · normalized=real-llm-demo-grading-normalized.json · precheck=READY_FOR_MANUAL_SANDBOX_REVIEW</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>check_waiting_review · stdout_contains · 100 分</strong>
+              <p>strategy=MOCK_PLAN_ONLY · mockEvidence=MOCK_EVIDENCE_NOT_COLLECTED · sandboxRequiredBeforeRealExecution=true。</p>
+            </div>
+            <p>检查运行 `python calculator.py` 后是否包含预期加法和乘法输出；页面不执行命令。</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>PptReview · AI 工具应用入门演示</h3>
+          <div class="row compact">
+            <span>artifact</span>
+            <span>examples/output/real-llm-demo-ppt-artifact.pptx · slideTotal=4 · pageReviewActionVisible=true</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>slide_1 · 标题页</strong>
+              <p>AI 工具应用入门：代码修改实验。</p>
+            </div>
+            <div class="preview-item">
+              <strong>slide_2 · 学习目标</strong>
+              <p>理解 AI 编程助手用途、完成 AI 辅助代码修改实验、掌握代码修改与测试流程。</p>
+            </div>
+            <div class="preview-item">
+              <strong>slide_3 / slide_4</strong>
+              <p>演示步骤和总结；每页默认 NEEDS_REVIEW。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Quality Signals · NEEDS_REVIEW</h3>
+          <div class="row compact">
+            <span>issues</span>
+            <span>qualityIssueTotal=3 · blockingIssueTotal=0 · revisionSuggestionTotal=3</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-item">
+              <strong>lab_objective_depth · MEDIUM</strong>
+              <p>实验学习目标偏少，建议补充至少 2 个可观察、可验收的学习目标。</p>
+            </div>
+            <div class="preview-item">
+              <strong>grading_sandbox_execution_required · MEDIUM</strong>
+              <p>评分包含 stdout_contains，进入真实执行前需绑定受控沙箱和资源限制。</p>
+            </div>
+            <div class="preview-item">
+              <strong>ppt_slide_depth · LOW</strong>
+              <p>PPT 页数偏少，建议补充课堂练习或总结页。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Revision Diff Preview</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.realDslRevisionDiffPreview · examples/output/real-llm-demo-revision-diff-preview.json</span>
+          </div>
+          <div class="row compact">
+            <span>summary</span>
+            <span>draftTotal=3 · diffTotal=12 · allDraftsWaitingReview=true</span>
+          </div>
+          <div class="row compact">
+            <span>fields</span>
+            <span>$.spec.steps[0].instruction · $.spec.assessmentPlan[0].inputSummary · $.spec.slides[].bullets</span>
+          </div>
+          <div class="row compact">
+            <span>safety</span>
+            <span>newLlmRequestSent=false · secretsRead=false · networkAccess=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Revision Decision</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.realDslRevisionDecision · examples/output/real-llm-demo-revision-decision-report.json</span>
+          </div>
+          <div class="row compact">
+            <span>decision</span>
+            <span>suggestionId=revise_lab_objective_depth · decision=approve · decisionStatus=REVISION_APPROVED_FOR_MANUAL_MERGE</span>
+          </div>
+          <div class="row compact">
+            <span>boundary</span>
+            <span>manualMergeRequired=true · sourceDslModified=false · revisedDslModified=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Revision Promotion</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.realDslRevisionPromotion · examples/output/real-llm-demo-revision-promotion-report.json</span>
+          </div>
+          <div class="row compact">
+            <span>candidate</span>
+            <span>promotedStatus=WAITING_REVIEW · schemaValidated=true · promotedCandidateWritten=true</span>
+          </div>
+          <div class="row compact">
+            <span>boundary</span>
+            <span>sourceDslModified=false · revisedDslModified=false · autoApproveAllowed=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Promotion Review Queue</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.realDslRevisionPromotionReviewQueueItem · POST /api/review/real-dsl-revision-enqueue</span>
+          </div>
+          <div class="row compact">
+            <span>queue</span>
+            <span>taskType=LAB_GENERATION_REVISION · taskStatus=WAITING_REVIEW · artifactKind=LAB_DSL</span>
+          </div>
+          <div class="row compact">
+            <span>detail</span>
+            <span>reviewDetailAvailable=true · GET /api/review-tasks/{id} · autoPublishAllowed=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Promotion Review Disposition</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.realDslRevisionPromotionReviewDisposition · reviewDetail.promotionReviewDisposition</span>
+          </div>
+          <div class="row compact">
+            <span>approved</span>
+            <span>state=APPROVED_FOR_MOCK_PUBLISH_ONLY · mockPublishAvailable=true · publishBlockedUntilApproved=false</span>
+          </div>
+          <div class="row compact">
+            <span>boundary</span>
+            <span>nextRequiredAction=optional_mock_publish_or_manual_platform_import · autoPublishAllowed=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Lab Template Import Preview</h3>
+          <div class="row compact">
+            <span>source</span>
+            <span>realDemoPrototype.labTemplateImportPreview · POST /api/labs/import-preview · create_lab_template_import_preview</span>
+          </div>
+          <div class="row compact">
+            <span>draft</span>
+            <span>agentEntity=lab_template · sourceTaskStatus=APPROVED · draftStatus=DRAFT_PENDING_PLATFORM_IMPORT_REVIEW</span>
+          </div>
+          <div class="row compact">
+            <span>boundary</span>
+            <span>databaseWritten=false · realAgentImport=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Review Safety</h3>
+          <div class="row compact">
+            <span>candidate</span>
+            <span>answerVisibleToCandidate=false · gradingRefVisibleToCandidate=false · answerLeakDetected=false</span>
+          </div>
+          <div class="row compact">
+            <span>teacher review</span>
+            <span>teacherOnlyGradingRefVisibleInReview=true · manualReviewRequired=true</span>
+          </div>
+          <div class="row compact">
+            <span>execution</span>
+            <span>commandExecutedFromPage=false · realSandboxRunEnabled=false · autoApproveAllowed=false · realPublishAllowed=false</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="bundle-title">
+      <div class="section-head">
+        <div>
+          <h2 id="bundle-title">真实产物与 evidence</h2>
+          <p>原始真实 Grading 保持不变；readonlyEvidenceDemo 是独立演示层，只读取演示提交目录里的文件证据。</p>
+        </div>
+        <span class="pill info">doesNotModifySourceGrading=true</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>Generated DSL</h3>
+            <div class="row">
+              <span>Lab DSL</span>
+              <span>examples/output/real-llm-lab.json · schemaValidated=true · status=WAITING_REVIEW</span>
+              <strong class="status">REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>Exam DSL</span>
+              <span>examples/output/real-llm-exam.json · answersRemoved=true · answerVisibleToCandidate=false</span>
+              <strong class="status">SAFE</strong>
+            </div>
+            <div class="row">
+              <span>Grading DSL</span>
+              <span>examples/output/real-llm-grading.json · normalized path available · original preserved</span>
+              <strong class="status info">SOURCE</strong>
+            </div>
+            <div class="row">
+              <span>PPT DSL</span>
+              <span>examples/output/real-llm-ppt.json · PPTX Artifact=examples/output/real-llm-demo-ppt-artifact.pptx · status=WAITING_REVIEW</span>
+              <strong class="status">REVIEW</strong>
+            </div>
+            <div class="row">
+              <span>PPTX Artifact</span>
+              <span>PPTX_FILE · slideCount=2 · autoPublishAllowed=false · realPublish=false</span>
+              <strong class="status">REVIEW</strong>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>ReadonlyEvidenceDemo</h3>
+            <div class="row">
+              <span>check_result_file</span>
+              <span>type=file_exists · path=result.csv · score=30 · passed=true</span>
+              <strong class="status">PASS</strong>
+            </div>
+            <div class="row">
+              <span>check_accuracy_metric</span>
+              <span>type=json_field · path=metrics.json · jsonPath=$.accuracy · expectedValue=0.9 · score=40 · passed=true</span>
+              <strong class="status">PASS</strong>
+            </div>
+            <div class="row">
+              <span>executionSummary</span>
+              <span>total=2 · executed=2 · passed=2 · deferred=0 · earnedScore=70</span>
+              <strong class="status strong">70</strong>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>ReadonlyReportDetail</h3>
+            <div class="row">
+              <span>reportDetail.source</span>
+              <span>sandbox.grade_runner.build_grading_report_detail · reportPath=examples/output/real-llm-demo-readonly-evidence-report.json</span>
+              <strong class="status info">READONLY_REAL_SANDBOX_POC</strong>
+            </div>
+            <div class="row">
+              <span>reportDetail.checkSummary</span>
+              <span>total=2 · executed=2 · passed=2 · failed=0 · deferred=0 · checkPlanTotal=2</span>
+              <strong class="status">COLLECTED</strong>
+            </div>
+            <div class="row">
+              <span>checkPlans[].readonlyEvidence.status</span>
+              <span>check_result_file=file_exists · check_accuracy_metric=json_field · readonlyEvidenceCollectedTotal=2</span>
+              <strong class="status">COLLECTED</strong>
+            </div>
+            <div class="row">
+              <span>sandboxExecutionRequest.mode</span>
+              <span>REAL_SANDBOX_REQUIRED · containerSandboxPlan.mode=CONTAINER_PLAN_ONLY · resultPlaceholder.status=NOT_EXECUTED</span>
+              <strong class="status warn">READONLY</strong>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>ControlledDockerEvidenceDemo</h3>
+            <div class="row">
+              <span>mode</span>
+              <span>CONTROLLED_DOCKER_SANDBOX_POC · planPath=examples/output/mimo-real-demo-controlled-plan.json · reportPath=examples/output/mimo-real-demo-controlled-sandbox-report.json</span>
+              <strong class="status info">DOCKER</strong>
+            </div>
+            <div class="row">
+              <span>image</span>
+              <span>ai-grading-python:0.1 · imageVerifyPath=examples/output/grading-sandbox-image-verify.json · CONTROLLED_DOCKER_SANDBOX_IMAGE_VERIFY · pytest 9.0.2 · networkEnabledForGrading=false</span>
+              <strong class="status">VERIFIED</strong>
+            </div>
+            <div class="row">
+              <span>checks</span>
+              <span>check_q1 stdout_contains=1 · check_q4 pytest=1 · executed=2 · passed=2 · earnedScore=40/40</span>
+              <strong class="status strong">40</strong>
+            </div>
+            <div class="row">
+              <span>safety</span>
+              <span>sourceGradingPath=examples/output/real-llm-grading.json · submissionMountMode=read_only · hostExecutionAllowed=false · autoApproveAllowed=false · realPublish=false</span>
+              <strong class="status warn">CONTROLLED</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>安全边界</h3>
+            <div class="row compact">
+              <span>newLlmRequestSent=false</span>
+              <span class="muted">页面复放已有真实产物，不再次调用模型。</span>
+            </div>
+            <div class="row compact">
+              <span>secretsRead=false</span>
+              <span class="muted">不读取、不展示 API Key 或 Token。</span>
+            </div>
+            <div class="row compact">
+              <span>contestantCodeExecuted=false</span>
+              <span class="muted">只读 evidence 检查不执行选手代码。</span>
+            </div>
+            <div class="row compact">
+              <span>commandExecuted=false</span>
+              <span class="muted">不运行命令、不运行 pytest、不执行 Notebook。</span>
+            </div>
+            <div class="row compact">
+              <span>controlledDockerEvidenceExecuted=true</span>
+              <span class="muted">受控 Docker evidence 来自预先执行的 CLI 报告，页面不触发容器执行。</span>
+            </div>
+            <div class="row compact">
+              <span>readonlyOnly=true · sourceGradingModified=false</span>
+              <span class="muted">reportDetail 只展示 evidence，不替代真实 Grading DSL。</span>
+            </div>
+            <div class="row compact">
+              <span>realPublish=false</span>
+              <span class="muted">所有 DSL 仍需人工审核，审核前不得发布。</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>验收命令文本</h3>
+            <div class="command-box">
+              <code>python lab_cli.py phase2 demo-bundle report --file examples/output/real-llm-demo-bundle.json</code>
+            </div>
+            <div class="command-box">
+              <code>python lab_cli.py phase2 demo-bundle acceptance --bundle examples/output/real-llm-demo-bundle.json --output examples/output/real-llm-demo-acceptance-summary.json</code>
+            </div>
+            <div class="row compact">
+              <span>acceptanceSignals.readonlyEvidenceDemoExecuted</span>
+              <span>true</span>
+            </div>
+            <div class="row compact">
+              <span>acceptanceSignals.readonlyEvidenceDemoEarnedScore</span>
+              <span>70</span>
+            </div>
+            <div class="row compact">
+              <span>acceptanceSignals.controlledDockerEvidenceEarnedScore</span>
+              <span>40</span>
+            </div>
+            <div class="row compact">
+              <span>candidatePreviewAnswerSafe</span>
+              <span>true · standardAnswerRevealToCandidate=false</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

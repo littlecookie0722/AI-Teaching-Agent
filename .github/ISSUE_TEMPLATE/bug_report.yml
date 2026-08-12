@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible defect in the local agent workflow.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include API keys, learner submissions, private source material, or production credentials.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and why it is a problem.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide a sanitized command, fixture, and expected result.
+      placeholder: |
+        1. Run ...
+        2. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit or release
+      description: Include a commit SHA or release tag when available.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized logs or JSON response
+      render: text

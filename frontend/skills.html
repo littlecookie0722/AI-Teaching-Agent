@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Skills Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .skill-card,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .skill-card span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .skill-card strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .skill-grid,
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .skill-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .skill-card,
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .skill-head,
+    .link-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .link-cell {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .skill-grid,
+      .link-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Skills 管理 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实智能体：禁用</span>
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">Prompt 散落：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">Skill 注册表</h2>
+          <p>skills/manifest.json + prompts/manifest.json + ai-workflows/workflow.manifest.json</p>
+        </div>
+        <span class="pill strong">4 skills</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Skill</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>Prompt</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>Workflow</span>
+          <strong>3</strong>
+        </div>
+        <div class="metric">
+          <span>输出 DSL</span>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <span>审核要求</span>
+          <strong class="danger">true</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="skills-title">
+      <div class="section-head">
+        <div>
+          <h2 id="skills-title">运营复用能力</h2>
+          <p>每个 Skill 只引用 Prompt、Workflow、Schema 和 CLI Mock</p>
+        </div>
+        <span class="pill warn">publish blocked</span>
+      </div>
+      <div class="content-grid">
+        <div class="skill-grid" aria-label="Reusable skills">
+          <article class="skill-card">
+            <div class="skill-head">
+              <div>
+                <h3>Lab Generation</h3>
+                <p>lab-generation</p>
+              </div>
+              <span class="pill strong">Lab</span>
+            </div>
+            <div class="link-grid">
+              <div class="link-cell">
+                <span>Prompt</span>
+                <strong>lab_generation_v0</strong>
+                <p>prompts/workflows/lab_generation.md</p>
+              </div>
+              <div class="link-cell">
+                <span>Workflow</span>
+                <strong>lab_generation_mock</strong>
+                <p>POST /api/labs/generate</p>
+              </div>
+              <div class="link-cell">
+                <span>Schema</span>
+                <strong>lab.schema.json</strong>
+                <p>WAITING_REVIEW</p>
+              </div>
+              <div class="link-cell">
+                <span>CLI</span>
+                <strong>lab generate-from-source</strong>
+                <p>python lab_cli.py lab generate-from-source --input &lt;input&gt;</p>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill warn">reviewRequired=true</span>
+              <span class="pill">realLlmCalled=false</span>
+            </div>
+          </article>
+
+          <article class="skill-card">
+            <div class="skill-head">
+              <div>
+                <h3>Exam Generation</h3>
+                <p>exam-generation</p>
+              </div>
+              <span class="pill strong">Exam</span>
+            </div>
+            <div class="link-grid">
+              <div class="link-cell">
+                <span>Prompt</span>
+                <strong>exam_generation_v0</strong>
+                <p>prompts/workflows/exam_generation.md</p>
+              </div>
+              <div class="link-cell">
+                <span>Workflow</span>
+                <strong>exam_generation_mock</strong>
+                <p>POST /api/exams/generate-from-lab</p>
+              </div>
+              <div class="link-cell">
+                <span>Schema</span>
+                <strong>exam.schema.json</strong>
+                <p>answerVisibleToCandidate=false</p>
+              </div>
+              <div class="link-cell">
+                <span>CLI</span>
+                <strong>exam generate-from-lab</strong>
+                <p>python lab_cli.py exam generate-from-lab --lab-id &lt;labId&gt;</p>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill warn">reviewRequired=true</span>
+              <span class="pill">standard answer hidden</span>
+            </div>
+          </article>
+
+          <article class="skill-card">
+            <div class="skill-head">
+              <div>
+                <h3>Grading Script Generation</h3>
+                <p>grading-script-generation</p>
+              </div>
+              <span class="pill strong">Grading</span>
+            </div>
+            <div class="link-grid">
+              <div class="link-cell">
+                <span>Prompt</span>
+                <strong>grading_generation_v0</strong>
+                <p>prompts/workflows/grading_generation.md</p>
+              </div>
+              <div class="link-cell">
+                <span>Workflow</span>
+                <strong>exam_generation_mock</strong>
+                <p>validate_grading_schema</p>
+              </div>
+              <div class="link-cell">
+                <span>Schema</span>
+                <strong>grading.schema.json</strong>
+                <p>sandboxRequiredBeforeRealExecution=true</p>
+              </div>
+              <div class="link-cell">
+                <span>CLI</span>
+                <strong>grade run</strong>
+                <p>python lab_cli.py grade run --grading &lt;grading&gt;</p>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill warn">reviewRequired=true</span>
+              <span class="pill">sandboxExecuted=false</span>
+            </div>
+          </article>
+
+          <article class="skill-card">
+            <div class="skill-head">
+              <div>
+                <h3>PPT Generation</h3>
+                <p>ppt-generation</p>
+              </div>
+              <span class="pill strong">PPT</span>
+            </div>
+            <div class="link-grid">
+              <div class="link-cell">
+                <span>Prompt</span>
+                <strong>ppt_generation_v0</strong>
+                <p>prompts/workflows/ppt_generation.md</p>
+              </div>
+              <div class="link-cell">
+                <span>Workflow</span>
+                <strong>ppt_generation_mock</strong>
+                <p>POST /api/ppt/generate</p>
+              </div>
+              <div class="link-cell">
+                <span>Schema</span>
+                <strong>ppt.schema.json</strong>
+                <p>artifactGenerated=false</p>
+              </div>
+              <div class="link-cell">
+                <span>CLI</span>
+                <strong>ppt generate</strong>
+                <p>python lab_cli.py ppt generate --input &lt;input&gt;</p>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill warn">reviewRequired=true</span>
+              <span class="pill">real artifact disabled</span>
+            </div>
+          </article>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>复用边界</h3>
+            <p class="ok">businessCodeMayEmbedPrompts=false</p>
+            <p class="ok">outputMustBeDsl=true</p>
+            <p class="ok">generatedContentDefaultStatus=WAITING_REVIEW</p>
+            <p class="ok">publishBlockedUntilApproved=true</p>
+          </div>
+          <div class="card">
+            <h3>Mock 调用示例</h3>
+            <pre>python lab_cli.py provider mock-generate --prompt-id lab_generation_v0
+python lab_cli.py workflow demo --input examples/input/demo-source.md --reviewer teacher_1
+python lab_cli.py review batch-summary</pre>
+          </div>
+          <div class="card">
+            <h3>安全总览</h3>
+            <p class="ok">realAgentStarted=false</p>
+            <p class="ok">realLlmCalled=false</p>
+            <p class="ok">realCloudResourceCreated=false</p>
+            <p class="ok">contestantCodeExecuted=false</p>
+            <p class="ok">autoPublishAllowed=false</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button">查看 Skill Manifest</button>
+        <button type="button">查看 Prompt Manifest</button>
+        <button type="button">查看 Workflow Manifest</button>
+        <button type="button" disabled title="Phase 1 禁止启动真实智能体">启动智能体</button>
+        <button type="button" disabled title="Phase 1 禁止自动发布">自动发布</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

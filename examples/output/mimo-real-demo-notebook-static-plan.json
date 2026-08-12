@@ -1,0 +1,88 @@
+{
+  "kind": "Grading",
+  "version": "1.0",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "sourceExamId": "exam_real_llm_demo",
+    "title": "AI 工具应用入门考试 - Notebook 静态证据计划",
+    "id": "grading_real_llm_demo_notebook_static"
+  },
+  "spec": {
+    "totalScore": 60,
+    "passingScore": 60,
+    "gradingMethod": "readonly_static_notebook_checks",
+    "timeoutSeconds": 30,
+    "assessmentPlan": [
+      {
+        "checkId": "check_q2",
+        "type": "notebook_cell",
+        "runner": "NotebookGrader",
+        "score": 30,
+        "inputSummary": "静态读取 notebooks/analysis.ipynb 第 0 个 cell，检查类型提示题的预期 token",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "50m",
+            "memory": "64Mi",
+            "timeout": "10s",
+            "network": "disabled_by_default",
+            "filesystem": "read_only",
+            "process": "none"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      },
+      {
+        "checkId": "check_q3",
+        "type": "notebook_cell",
+        "runner": "NotebookGrader",
+        "score": 30,
+        "inputSummary": "静态读取 notebooks/analysis.ipynb 第 0 个 cell，检查函数参数重命名题的预期 token",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "50m",
+            "memory": "64Mi",
+            "timeout": "10s",
+            "network": "disabled_by_default",
+            "filesystem": "read_only",
+            "process": "none"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      }
+    ],
+    "checks": [
+      {
+        "id": "check_q2",
+        "type": "notebook_cell",
+        "score": 30,
+        "notebookPath": "notebooks/analysis.ipynb",
+        "cellIndex": 0,
+        "expected": [
+          "提示词应清晰描述需求，如“请为函数 calculate_sum 添加类型提示，参数 a 和 b 为整数，返回值也为整数。”，或等效表述。"
+        ]
+      },
+      {
+        "id": "check_q3",
+        "type": "notebook_cell",
+        "score": 30,
+        "notebookPath": "notebooks/analysis.ipynb",
+        "cellIndex": 0,
+        "expected": [
+          "函数参数应重命名（如改为 num1, num2），函数体内的使用应相应更新，函数功能（求和）保持不变。"
+        ]
+      }
+    ]
+  }
+}

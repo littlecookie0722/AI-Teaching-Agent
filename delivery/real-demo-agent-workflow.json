@@ -1,0 +1,579 @@
+{
+  "version": "0.1.0",
+  "id": "real_demo_agent_workflow_design",
+  "phase": "Phase 2 Demo",
+  "mode": "MOCK_AGENT_RUNNER",
+  "title": "Real Demo Agent Workflow Design",
+  "description": "Mock runner workflow for a future demo agent that can replay real LLM demo evidence, inspect review queues, use provider quality summaries and review detail action bars for manual triage, request revisions, and create mock revision drafts through MCP tools without starting a real agent or sending new model requests.",
+  "inputs": [
+    {
+      "id": "mcp_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    },
+    {
+      "id": "quick_commands",
+      "path": "delivery/real-demo-quick-commands.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_script",
+      "path": "delivery/real-demo-script.json",
+      "required": true
+    },
+    {
+      "id": "frontend_real_demo",
+      "path": "frontend/real-demo.html",
+      "required": true
+    },
+    {
+      "id": "frontend_mock_data",
+      "path": "frontend/mock-data.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "workflow_design_markdown",
+      "path": "delivery/REAL_DEMO_AGENT_WORKFLOW.md",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "mock_agent_runner",
+      "path": "agents/real_demo_runner.py",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "agentGoal": "Help an operator demonstrate real LLM outputs and the MCP review-revision loop while keeping every generated artifact in WAITING_REVIEW.",
+  "trigger": {
+    "actor": "operator",
+    "entry": "manual_demo_request",
+    "externalPlatformConnected": false,
+    "realAgentStarted": false
+  },
+  "inputSchema": {
+    "type": "object",
+    "required": [
+      "demoSourcePath",
+      "reviewer"
+    ],
+    "properties": {
+      "demoSourcePath": {
+        "type": "string",
+        "example": "examples/input/demo-source.md"
+      },
+      "reviewer": {
+        "type": "string",
+        "example": "teacher_1"
+      },
+      "revisionComment": {
+        "type": "string",
+        "example": "补充步骤截图验收标准。"
+      },
+      "revisionPriority": {
+        "type": "string",
+        "enum": [
+          "LOW",
+          "NORMAL",
+          "HIGH"
+        ]
+      },
+      "approvedLabTaskId": {
+        "type": "string",
+        "description": "Optional APPROVED Lab DSL task id. When provided, the runner verifies review detail import-preview actions and creates a local LabTemplateImportPreview through MCP."
+      },
+      "labImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-lab-import-preview.json"
+      },
+      "createLabMockImport": {
+        "type": "boolean",
+        "description": "Optional explicit switch. When true, the runner writes the approved Lab import preview into the local mock platform entity store only."
+      },
+      "labMockImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-lab-mock-import.json"
+      },
+      "approvedExamTaskId": {
+        "type": "string",
+        "description": "Optional APPROVED task id that contains an Exam DSL artifact. It may be the same id as approvedGradingTaskId when one conversion task contains both artifacts."
+      },
+      "examImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-exam-import-preview.json"
+      },
+      "createExamMockImport": {
+        "type": "boolean",
+        "description": "Optional explicit switch. When true, the runner writes the approved Exam import preview into the local mock platform entity store only."
+      },
+      "examMockImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-exam-mock-import.json"
+      },
+      "approvedGradingTaskId": {
+        "type": "string",
+        "description": "Optional APPROVED task id that contains a Grading DSL artifact. It may be the same id as approvedExamTaskId when one conversion task contains both artifacts."
+      },
+      "gradingImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-grading-import-preview.json"
+      },
+      "createGradingMockImport": {
+        "type": "boolean",
+        "description": "Optional explicit switch. When true, the runner writes the approved Grading import preview into the local mock platform entity store only."
+      },
+      "gradingMockImportOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-grading-mock-import.json"
+      },
+      "readonlyGradingSubmission": {
+        "type": "string",
+        "description": "Optional local submission directory for read-only grading evidence collection. Requires approvedGradingTaskId."
+      },
+      "readonlyGradingOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-readonly-grading-evidence.json"
+      },
+      "controlledGradingSubmission": {
+        "type": "string",
+        "description": "Optional local submission directory for controlled Docker grading evidence collection. Requires approvedGradingTaskId and executes only allowlisted stdout_contains/pytest checks in Docker with network disabled."
+      },
+      "controlledGradingOutput": {
+        "type": "string",
+        "example": "examples/output/demo-agent-controlled-grading-evidence.json"
+      },
+      "controlledGradingImage": {
+        "type": "string",
+        "example": "ai-grading-python:0.1"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": [
+      "success",
+      "code",
+      "message",
+      "traceId"
+    ],
+    "properties": {
+      "success": {
+        "type": "boolean"
+      },
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object"
+      },
+      "traceId": {
+        "type": "string"
+      }
+    }
+  },
+  "allowedMcpTools": [
+    "get_review_task_summary",
+    "generate_lab_from_source",
+    "request_review_revision",
+    "regenerate_from_revision_mock",
+    "list_mcp_tool_call_records",
+    "get_review_detail",
+    "create_lab_template_import_preview",
+    "create_lab_template_mock_import",
+    "create_exam_question_import_preview",
+    "create_exam_question_mock_import",
+    "create_grading_rule_import_preview",
+    "create_grading_rule_mock_import",
+    "get_agent_entity_readiness_report",
+    "run_readonly_grading_evidence",
+    "run_controlled_grading_evidence",
+    "get_core_workflow_readiness",
+    "run_grading_evidence_auto",
+    "create_agent_entity_import_dry_run",
+    "record_agent_entity_publish_result"
+  ],
+  "blockedMcpTools": [
+    "publish_lab",
+    "publish_exam",
+    "destroy_environment"
+  ],
+  "workflowSteps": [
+    {
+      "id": "open_static_demo",
+      "order": 1,
+      "type": "manual_preview",
+      "tool": null,
+      "stateCheck": "frontend/real-demo.html visible",
+      "humanReviewStop": false,
+      "mutatesState": false
+    },
+    {
+      "id": "summarize_review_queue",
+      "order": 2,
+      "type": "mcp_tool",
+      "tool": "get_review_task_summary",
+      "stateCheck": "reviewTaskSummary.realDemoReviewQueue.waitingReviewTotal == 4",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "create_local_lab_task",
+      "order": 3,
+      "type": "mcp_tool",
+      "tool": "generate_lab_from_source",
+      "stateCheck": "task.status == WAITING_REVIEW",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "triage_provider_quality",
+      "order": 4,
+      "type": "mcp_tool",
+      "tool": "get_review_task_summary",
+      "stateCheck": "providerQualityTaskSignal drives manual review recommendation",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "inspect_review_detail",
+      "order": 5,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "stateCheck": "reviewDetail.reviewPage.actionBar keeps publish blocked",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "request_revision",
+      "order": 6,
+      "type": "mcp_tool",
+      "tool": "request_review_revision",
+      "stateCheck": "revisionRequest.taskStatusChanged == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "create_mock_revision",
+      "order": 7,
+      "type": "mcp_tool",
+      "tool": "regenerate_from_revision_mock",
+      "stateCheck": "mockRegeneration.newTask.status == WAITING_REVIEW",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_audit",
+      "order": 8,
+      "type": "mcp_tool",
+      "tool": "list_mcp_tool_call_records",
+      "stateCheck": "mcpToolCallRecords include regenerate_from_revision_mock",
+      "humanReviewStop": false,
+      "mutatesState": false
+    },
+    {
+      "id": "inspect_approved_lab_detail",
+      "order": 9,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "approved review detail exposes lab import preview action",
+      "humanReviewStop": false,
+      "mutatesState": false
+    },
+    {
+      "id": "create_lab_import_preview",
+      "order": 10,
+      "type": "mcp_tool",
+      "tool": "create_lab_template_import_preview",
+      "optional": true,
+      "stateCheck": "labTemplateImportPreview.databaseWritten == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_lab_import_preview_signoff",
+      "order": 11,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "reviewDetail.platformImportPreview visible after local preview",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "create_lab_mock_import",
+      "order": 12,
+      "type": "mcp_tool",
+      "tool": "create_lab_template_mock_import",
+      "optional": true,
+      "explicitOptIn": true,
+      "stateCheck": "labTemplateMockImport.databaseWritten == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_approved_exam_detail",
+      "order": 13,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "approved review detail exposes exam import preview action",
+      "humanReviewStop": false,
+      "mutatesState": false
+    },
+    {
+      "id": "create_exam_import_preview",
+      "order": 14,
+      "type": "mcp_tool",
+      "tool": "create_exam_question_import_preview",
+      "optional": true,
+      "stateCheck": "examQuestionImportPreview.answerVisibleToCandidate == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_exam_import_preview_signoff",
+      "order": 15,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "reviewDetail.platformImportPreview includes exam_question preview",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "create_exam_mock_import",
+      "order": 16,
+      "type": "mcp_tool",
+      "tool": "create_exam_question_mock_import",
+      "optional": true,
+      "explicitOptIn": true,
+      "stateCheck": "examQuestionMockImport.answerVisibleToCandidate == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_approved_grading_detail",
+      "order": 17,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "approved review detail exposes grading import preview action",
+      "humanReviewStop": false,
+      "mutatesState": false
+    },
+    {
+      "id": "create_grading_import_preview",
+      "order": 18,
+      "type": "mcp_tool",
+      "tool": "create_grading_rule_import_preview",
+      "optional": true,
+      "stateCheck": "gradingRuleImportPreview.sandboxExecuted == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "inspect_grading_import_preview_signoff",
+      "order": 19,
+      "type": "mcp_tool",
+      "tool": "get_review_detail",
+      "optional": true,
+      "stateCheck": "reviewDetail.platformImportPreview includes grading_rule preview",
+      "humanReviewStop": true,
+      "mutatesState": false
+    },
+    {
+      "id": "create_grading_mock_import",
+      "order": 20,
+      "type": "mcp_tool",
+      "tool": "create_grading_rule_mock_import",
+      "optional": true,
+      "explicitOptIn": true,
+      "stateCheck": "gradingRuleMockImport.sandboxExecuted == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "collect_readonly_grading_evidence",
+      "order": 21,
+      "type": "mcp_tool",
+      "tool": "run_readonly_grading_evidence",
+      "optional": true,
+      "stateCheck": "readonly grading evidence keeps contestantCodeExecuted == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "collect_controlled_grading_evidence",
+      "order": 22,
+      "type": "mcp_tool",
+      "tool": "run_controlled_grading_evidence",
+      "optional": true,
+      "stateCheck": "controlled grading evidence keeps networkEnabled == false",
+      "humanReviewStop": true,
+      "mutatesState": true
+    },
+    {
+      "id": "summarize_agent_entity_readiness",
+      "order": 23,
+      "type": "mcp_tool",
+      "tool": "get_agent_entity_readiness_report",
+      "optional": true,
+      "stateCheck": "agentEntityReadinessReport is read-only and realAgentImport == false",
+      "humanReviewStop": true,
+      "mutatesState": false
+    }
+  ],
+  "stateModel": {
+    "conversationMemoryMayBeSoleState": false,
+    "requestState": [
+      "demoSourcePath",
+      "reviewer",
+      "revisionComment",
+      "TASK_ID",
+      "PROVIDER_QUALITY_TASK_SIGNAL",
+      "AGENT_REVIEW_TRIAGE",
+      "AGENT_REVIEW_DETAIL_GUIDANCE",
+      "REVISION_REQUEST_ID",
+      "APPROVED_LAB_TASK_ID",
+      "LAB_IMPORT_PREVIEW_ID",
+      "APPROVED_EXAM_TASK_ID",
+      "EXAM_IMPORT_PREVIEW_ID",
+      "APPROVED_GRADING_TASK_ID",
+      "GRADING_IMPORT_PREVIEW_ID",
+      "LAB_MOCK_IMPORT_ID",
+      "EXAM_MOCK_IMPORT_ID",
+      "GRADING_MOCK_IMPORT_ID",
+      "PLATFORM_ENTITY_READINESS_REPORT",
+      "READONLY_GRADING_SUBMISSION",
+      "READONLY_GRADING_EVIDENCE_ID",
+      "CONTROLLED_GRADING_SUBMISSION",
+      "CONTROLLED_GRADING_IMAGE",
+      "CONTROLLED_GRADING_EVIDENCE_ID",
+      "AGENT_CORE_NEXT_TOOL_PLAN",
+      "AGENT_CORE_NEXT_TOOL_EXECUTION"
+    ],
+    "persistentState": [
+      "JsonTaskStore.aiTasks",
+      "JsonTaskStore.artifacts",
+      "JsonTaskStore.mcpToolCallRecords",
+      "JsonTaskStore.operationAuditEvents"
+    ],
+    "auditState": [
+      "mcpToolCallRecord",
+      "operationAuditEvent",
+      "workflowRun",
+      "artifact"
+    ]
+  },
+  "errorModes": [
+    {
+      "code": "MISSING_TASK_ID",
+      "recovery": "Run generate_lab_from_source and capture data.task.id before requesting revision."
+    },
+    {
+      "code": "REVISION_REQUEST_NOT_FOUND",
+      "recovery": "Run request_review_revision before regenerate_from_revision_mock."
+    },
+    {
+      "code": "TASK_NOT_WAITING_REVIEW",
+      "recovery": "Stop and ask for a new WAITING_REVIEW task; do not approve or publish automatically."
+    },
+    {
+      "code": "BLOCKED_TOOL_REQUESTED",
+      "recovery": "Reject publish_lab, publish_exam, and destroy_environment for this demo agent."
+    },
+    {
+      "code": "APPROVED_LAB_TASK_REQUIRED",
+      "recovery": "Provide a human-approved Lab DSL task id before asking the agent to create a Lab import preview."
+    },
+    {
+      "code": "APPROVED_EXAM_TASK_REQUIRED",
+      "recovery": "Provide a human-approved task id containing an Exam DSL artifact before asking the agent to create an Exam import preview."
+    },
+    {
+      "code": "APPROVED_GRADING_TASK_REQUIRED",
+      "recovery": "Provide a human-approved task id containing a Grading DSL artifact before asking the agent to create a Grading import preview."
+    },
+    {
+      "code": "IMPORT_PREVIEW_ACTION_NOT_AVAILABLE",
+      "recovery": "Open review detail and confirm platformImportPreviewActions.enabledTotal > 0 after human approval."
+    },
+    {
+      "code": "CORE_READINESS_TASK_REQUIRED",
+      "recovery": "Provide an existing AI task id before asking the agent to plan the next core tool."
+    },
+    {
+      "code": "CONFIRM_RECOMMENDED_TOOL_REQUIRED",
+      "recovery": "Pass --confirm-execute-recommended-tool before executing one recommended MCP tool."
+    },
+    {
+      "code": "NEXT_TOOL_MANUAL_ACTION_REQUIRED",
+      "recovery": "Open the review page and complete the manual review or signoff action; do not let the agent replace it."
+    },
+    {
+      "code": "RECOMMENDED_TOOL_ARGUMENTS_INCOMPLETE",
+      "recovery": "Provide missing tool arguments with --arguments or --arguments-file before executing the recommended tool."
+    }
+  ],
+  "validation": {
+    "deterministic": true,
+    "commands": [
+      "python -m pytest tests/test_real_demo_agent_runner.py",
+      "python -m pytest tests/test_real_demo_agent_workflow.py",
+      "python -m pytest tests/test_mcp_manifest.py tests/test_mcp_mock_tools.py"
+    ],
+    "successSignals": [
+      "all outputs use unified JSON",
+      "source task remains WAITING_REVIEW",
+      "new revision task remains WAITING_REVIEW",
+      "agent review triage uses providerQualityTaskSignal",
+      "agent review detail guidance keeps publish blocked",
+      "optional lab import preview keeps databaseWritten=false",
+      "optional exam import preview keeps answerVisibleToCandidate=false",
+      "optional grading import preview keeps sandboxExecuted=false",
+      "optional lab mock import keeps databaseWritten=false",
+      "optional exam mock import keeps answerVisibleToCandidate=false",
+      "optional grading mock import keeps sandboxExecuted=false",
+      "optional platform entity readiness report keeps realAgentImport=false",
+      "optional readonly grading evidence keeps contestantCodeExecuted=false",
+      "core next tool plan reads readiness only and keeps recommendedToolCalled=false",
+      "core next tool executor calls exactly one confirmed recommended tool",
+      "core next tool executor rereads readiness after execution",
+      "core next tool executor returns next single-step action guide",
+      "mcp audit includes both revision tools",
+      "realPublish remains false"
+    ]
+  },
+  "safety": {
+    "designOnly": false,
+    "mockRunnerImplemented": true,
+    "realAgentStarted": false,
+    "externalPlatformConnected": false,
+    "newLlmRequestSent": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realMcpServerStarted": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "blockedHighRiskToolsDirectExecution": true,
+    "humanReviewRequiredBeforePublish": true
+  },
+  "implementationCutover": {
+    "nextStep": "Continue core Lab/Exam/Grading/PPT generation quality, review detail, local import preview, sandbox grading, and MCP tool integration. Operations delivery stays paused.",
+    "doNotAddNewGate": true,
+    "requiresRealLlm": false,
+    "requiresRealMcpServer": false
+  }
+}

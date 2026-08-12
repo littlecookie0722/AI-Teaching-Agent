@@ -1,0 +1,165 @@
+{
+  "id": "real_sdk_dependency_installer_audit_contract",
+  "auditId": "real_sdk_dependency_installer_audit",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled installer audit for a future real SDK dependency installation task. It does not generate executable commands, install packages, resolve package metadata, modify dependency files, import SDKs, check secrets, use network access, create AI tasks, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_installer_audit_module",
+      "path": "providers/real_sdk_dependency_installer_audit.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_module",
+      "path": "providers/real_sdk_dependency_install_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_contract",
+      "path": "providers/real-sdk-dependency-install-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_contract",
+      "path": "providers/real-sdk-dependency-env-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-installer-audit describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installerExecutionEnabled": false,
+        "installCommandMaterialized": false,
+        "dependencyInstallExecuted": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-installer-audit audit --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installPlanReady": false,
+        "installerAuditChecklistPassed": false,
+        "readyForInstallerImplementationTask": false,
+        "installCommandMaterialized": false,
+        "dependencyInstallExecuted": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "installPlanRequired": true,
+    "installPlanReady": false,
+    "installerAuditChecklistPassed": false,
+    "readyForInstallerImplementationTask": false,
+    "installerExecutionEnabled": false,
+    "installCommandMaterialized": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstallAllowed": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "dependencyLockfileChanged": false,
+    "dependencyFileChanged": false,
+    "lockfileDiffGenerated": false,
+    "rollbackCommandGenerated": false,
+    "offlineCiExecuted": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "generate_executable_install_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "modify_dependency_manifest",
+    "modify_dependency_lockfile",
+    "generate_lockfile_diff",
+    "generate_rollback_command",
+    "execute_offline_ci",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_installer_audit",
+    "test_real_sdk_dependency_install_plan",
+    "test_real_sdk_dependency_env_gate",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "installerExecutionEnabled": false,
+    "installCommandMaterialized": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "dependencyLockfileChanged": false,
+    "dependencyFileChanged": false,
+    "lockfileDiffGenerated": false,
+    "rollbackCommandGenerated": false,
+    "offlineCiExecuted": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

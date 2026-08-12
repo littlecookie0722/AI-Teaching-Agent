@@ -1,0 +1,19 @@
+version: "1.0"
+kind: "Exam"
+metadata:
+  id: "exam_demo"
+  title: "Notebook 代码挖空题"
+  sourceLabId: "lab_demo"
+  difficulty: "beginner"
+status: "WAITING_REVIEW"
+spec:
+  questionType: "notebook_fill_blank"
+  totalScore: 100
+  questions:
+    - id: "q1"
+      title: "补全 CSV 读取代码"
+      stem: "请补全 Pandas 读取 CSV 文件的代码。"
+      blankCode: "df = pd.____('data.csv')"
+      answer: "read_csv"
+      score: 100
+      gradingRef: "check_pytest"

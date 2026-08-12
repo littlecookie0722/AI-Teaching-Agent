@@ -1,0 +1,315 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 3",
+  "mode": "MOCK_ONLY",
+  "description": "Mock-only grading runner interface for file_exists, stdout_contains, pytest, notebook_cell, json_field, and log_keyword checks. It plans checks but does not execute contestant code, notebooks, or commands.",
+  "runner": {
+    "id": "mock_grading_runner",
+    "module": "sandbox.grade_runner",
+    "entrypoint": "build_mock_grading_report",
+    "executor": "mock_check_executor",
+    "strategy": "MOCK_PLAN_ONLY"
+  },
+  "futureExecutionBoundary": {
+    "contract": "sandbox/execution-contract.json",
+    "requestBuilder": "sandbox.execution_contract.build_sandbox_execution_request",
+    "placeholderResultBuilder": "sandbox.execution_contract.build_sandbox_result_placeholder",
+    "mode": "CONTRACT_ONLY",
+    "realContainerExecuted": false,
+    "dryRunAdapter": {
+      "contract": "sandbox/container-executor.contract.json",
+      "module": "sandbox.container_executor",
+      "entrypoint": "build_container_sandbox_plan",
+      "mode": "CONTAINER_PLAN_ONLY",
+      "realContainerExecuted": false
+    }
+  },
+  "supportedCheckTypes": [
+    {
+      "type": "file_exists",
+      "runner": "FileExistsGrader",
+      "requiredFields": [
+        "path"
+      ],
+      "realExecutionDeferred": true
+    },
+    {
+      "type": "stdout_contains",
+      "runner": "StdoutContainsGrader",
+      "requiredFields": [
+        "command",
+        "expected"
+      ],
+      "realExecutionDeferred": true
+    },
+    {
+      "type": "pytest",
+      "runner": "PytestGrader",
+      "requiredFields": [
+        "path"
+      ],
+      "realExecutionDeferred": true
+    },
+    {
+      "type": "notebook_cell",
+      "runner": "NotebookGrader",
+      "requiredFields": [
+        "notebookPath",
+        "cellIndex",
+        "expected"
+      ],
+      "realExecutionDeferred": true
+    },
+    {
+      "type": "json_field",
+      "runner": "JsonFieldGrader",
+      "requiredFields": [
+        "path",
+        "jsonPath",
+        "expectedValue"
+      ],
+      "realExecutionDeferred": true
+    },
+    {
+      "type": "log_keyword",
+      "runner": "LogKeywordGrader",
+      "requiredFields": [
+        "path",
+        "expected"
+      ],
+      "realExecutionDeferred": true
+    }
+  ],
+  "inputs": [
+    {
+      "name": "grading",
+      "kind": "Grading",
+      "schema": "templates/grading/grading.schema.json",
+      "required": true,
+      "assessmentPlanSource": "grading.spec.assessmentPlan",
+      "assessmentPlanTraceRequired": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "gradingReport",
+      "type": "json",
+      "requiredFields": [
+        "id",
+        "mode",
+        "phase",
+        "gradingId",
+        "totalScore",
+        "earnedScore",
+        "passed",
+        "runner",
+        "sandboxPolicy",
+        "checkSummary",
+        "assessmentPlanSummary",
+        "explainability",
+        "checks",
+        "sandboxExecuted",
+        "contestantCodeExecuted",
+        "unknownShellExecuted",
+        "commandExecuted",
+        "traceId"
+      ]
+    },
+    {
+      "name": "reportDetail",
+      "type": "json",
+      "builder": "sandbox.grade_runner.build_grading_report_detail",
+      "requiredFields": [
+        "source",
+        "mode",
+        "phase",
+        "gradingId",
+        "passed",
+        "score",
+        "runner",
+        "sandboxPolicy",
+        "checkSummary",
+        "assessmentPlanSummary",
+        "explainability",
+        "checkPlans",
+        "safety",
+        "audit"
+      ]
+    }
+  ],
+  "sandboxPolicy": {
+    "executorBoundary": "SandboxExecutor",
+    "hostExecutionAllowed": false,
+    "realSandboxRunEnabled": false,
+    "networkEnabled": false,
+    "filesystemIsolationRequired": true,
+    "cpuLimitRequired": true,
+    "memoryLimitRequired": true,
+    "timeoutRequired": true,
+    "processLimitRequired": true,
+    "stdoutCapturedRequired": true,
+    "stderrCapturedRequired": true,
+    "auditLogRequired": true
+  },
+  "checkPlanFields": [
+    "executionPlan.strategy",
+    "executionPlan.requiredLimits",
+    "sandboxExecutionRequest",
+    "containerSandboxPlan",
+    "inputSummary",
+    "mockEvidence",
+    "riskLevel"
+  ],
+  "assessmentPlanTrace": {
+    "source": "grading.spec.assessmentPlan",
+    "alignmentRule": "Each spec.checks[].id should match one spec.assessmentPlan[].checkId with the same type, runner, and score.",
+    "summaryFields": [
+      "source",
+      "planTotal",
+      "checkTotal",
+      "checkIds",
+      "alignedWithChecks",
+      "missingPlanForChecks",
+      "orphanPlanCheckIds",
+      "executionStrategies",
+      "mockEvidenceStatuses",
+      "riskLevels",
+      "realSandboxEvidenceRequired",
+      "sandboxRequiredBeforeRealExecution"
+    ],
+    "checkPlanFields": [
+      "assessmentPlanSource",
+      "assessmentPlanSourceField",
+      "assessmentPlanAlignedWithCheck",
+      "assessmentPlanInputSummary",
+      "assessmentPlanExecutionPlan",
+      "assessmentPlanMockEvidence",
+      "assessmentPlanRiskLevel",
+      "assessmentPlanSandboxRequiredBeforeRealExecution"
+    ],
+    "realExecutionDeferred": true
+  },
+  "reportDetailContract": {
+    "source": "sandbox.grade_runner.build_grading_report_detail",
+    "sharedCheckPlanBuilder": "sandbox.grade_runner._build_check_plans",
+    "usedBy": [
+      "POST /api/grading/run",
+      "GET /api/grading/report",
+      "frontend/grading.html",
+      "frontend/grading-review.html",
+      "frontend/grading-report.html"
+    ],
+    "requiredTopLevelFields": [
+      "source",
+      "mode",
+      "phase",
+      "gradingId",
+      "passed",
+      "score",
+      "runner",
+      "sandboxPolicy",
+      "checkSummary",
+      "assessmentPlanSummary",
+      "explainability",
+      "checkPlans",
+      "safety",
+      "audit"
+    ],
+    "scoreFields": [
+      "total",
+      "earned",
+      "scoreTotalMatchesSpec"
+    ],
+    "safetyFields": [
+      "sandboxExecuted",
+      "contestantCodeExecuted",
+      "commandExecuted",
+      "unknownShellExecuted",
+      "networkEnabled",
+      "hostExecutionAllowed",
+      "realSandboxRunEnabled"
+    ],
+    "auditFields": [
+      "operationAuditEventId",
+      "action",
+      "blockedActions",
+      "runRealPytestEnabled",
+      "hostExecutionAllowed"
+    ],
+    "checkPlanFields": [
+      "id",
+      "type",
+      "runner",
+      "score",
+      "earnedScore",
+      "passed",
+      "inputSummary",
+      "executionPlan",
+      "executionPlan.strategy",
+      "executionPlan.requiredLimits",
+      "sandboxExecutionRequest",
+      "sandboxExecutionRequest.mode",
+      "containerSandboxPlan",
+      "containerSandboxPlan.mode",
+      "mockEvidence",
+      "mockEvidence.status",
+      "riskLevel",
+      "assessmentPlanSource",
+      "assessmentPlanSourceField",
+      "assessmentPlanAlignedWithCheck",
+      "assessmentPlanExecutionPlan",
+      "assessmentPlanMockEvidence",
+      "assessmentPlanRiskLevel",
+      "status",
+      "mode",
+      "evidence",
+      "readonlyEvidence",
+      "readonlyEvidence.status",
+      "sandboxExecuted",
+      "contestantCodeExecuted",
+      "commandExecuted",
+      "unknownShellExecuted"
+    ],
+    "safetyAssertions": {
+      "source": "sandbox.grade_runner.build_grading_report_detail",
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "hostExecutionAllowed": false,
+      "realSandboxRunEnabled": false,
+      "mockEvidenceStatus": "MOCK_EVIDENCE_NOT_COLLECTED",
+      "readonlyEvidenceAllowedForModes": ["READONLY_REAL_SANDBOX_POC"]
+    }
+  },
+  "entrypoints": {
+    "cli": "python lab_cli.py grade run --grading templates/grading/examples/mixed-checks.yaml",
+    "backend": "POST /api/grading/run",
+    "reportCli": "python lab_cli.py grade report --file examples/output/phase3-grading-report.json"
+  },
+  "safety": {
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "commandExecuted": false,
+    "realSandboxRunEnabled": false,
+    "hostExecutionAllowed": false,
+    "networkEnabled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "execute_unknown_shell",
+    "execute_grading_command_on_host",
+    "execute_pytest_on_host",
+    "execute_contestant_code_on_host",
+    "enable_network_by_default",
+    "read_host_sensitive_paths",
+    "write_outside_workspace",
+    "log_secret_values"
+  ],
+  "recommendedTests": [
+    "python -m pytest tests/test_sandbox_execution_contract.py",
+    "python -m pytest tests/test_sandbox_mock_executor.py",
+    "python -m pytest tests/test_cli.py tests/test_backend_mock_api.py"
+  ]
+}

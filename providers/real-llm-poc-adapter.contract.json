@@ -1,0 +1,176 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_llm_poc_adapter_contract",
+  "title": "Disabled Real LLM PoC Adapter Contract",
+  "description": "Machine-testable contract for the disabled real LLM PoC adapter shell. The adapter wires runtime guard, preflight, and disabled provider shells together while preventing SDK imports, client creation, secret reads, network calls, generated content, AI task creation, and publish actions.",
+  "adapterId": "real_llm_poc_adapter",
+  "interfaceName": "LLMProvider",
+  "activeProvider": "mock",
+  "inputs": [
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate",
+      "path": "providers/real_provider_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell",
+      "path": "providers/real_provider_shell.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_shell_contract",
+      "path": "providers/real-provider-shell.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-poc-adapter describe",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-poc-adapter generate-json --provider openai",
+      "expectedCode": "REAL_PROVIDER_OPT_IN_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-poc-adapter generate-json --provider openai --explicit-opt-in",
+      "expectedCode": "REAL_PROVIDER_DISABLED"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "provider_runtime_guard",
+      "required": true,
+      "mustPassBeforePreflight": true
+    },
+    {
+      "id": "real_provider_preflight",
+      "required": true,
+      "mustFailWhileProviderDisabled": true
+    },
+    {
+      "id": "disabled_real_provider_shell",
+      "required": true,
+      "generationEnabled": false
+    },
+    {
+      "id": "sdk_call_disabled",
+      "required": true,
+      "enabled": false
+    }
+  ],
+  "allowedScope": {
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "llmPocScope": "lab_generate_from_source_only"
+  },
+  "requiredContext": {
+    "adapterId": "real_llm_poc_adapter",
+    "mode": "MOCK_ONLY",
+    "defaultProvider": "mock",
+    "adapterEnabled": false,
+    "readyForRealProvider": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretValueReturned": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "errorCodes": [
+    "REAL_PROVIDER_OPT_IN_REQUIRED",
+    "REAL_PROVIDER_DISABLED",
+    "REAL_LLM_POC_ADAPTER_DISABLED",
+    "VALIDATION_ERROR",
+    "UNSUPPORTED_OPERATION",
+    "NOT_FOUND"
+  ],
+  "blockedOperations": [
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "bypass_runtime_guard",
+    "bypass_preflight",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_llm_poc_adapter",
+    "test_provider_runtime_guard",
+    "test_real_provider_gate",
+    "test_real_provider_shell",
+    "test_phase2_provider_plan",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

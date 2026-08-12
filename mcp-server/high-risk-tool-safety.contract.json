@@ -1,0 +1,302 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 4",
+  "mode": "MOCK_ONLY",
+  "title": "High-Risk MCP Tool Safety Matrix",
+  "description": "Machine-testable safety matrix for high-risk MCP Mock tools. It locks review-intent-only and read-only behavior without enabling real execution.",
+  "sourceManifest": "mcp-server/tools.manifest.json",
+  "frontendMockData": "frontend/mock-data.json",
+  "relatedContracts": [
+    "mcp-server/server.contract.json",
+    "mcp-server/tool-call-audit.contract.json"
+  ],
+  "scope": [
+    "publish_lab",
+    "publish_exam",
+    "destroy_environment",
+    "get_second_confirmation_status"
+  ],
+  "globalSafetyAssertions": {
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "networkAccess": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "realActionExecuted": false,
+    "environmentDestroyed": false,
+    "bypassReviewEnabled": false
+  },
+  "postReviewDispositionStates": [
+    "WAITING_HUMAN_REVIEW",
+    "APPROVED_EXECUTION_BLOCKED",
+    "APPROVED_PENDING_SECOND_CONFIRMATION"
+  ],
+  "matrix": [
+    {
+      "name": "publish_lab",
+      "riskLevel": "high",
+      "toolCategory": "high_risk_review_intent",
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/publish-lab"
+      },
+      "reviewRequired": true,
+      "createsAiTask": true,
+      "createdTaskType": "MCP_PUBLISH_LAB_INTENT",
+      "createdTaskStatus": "WAITING_REVIEW",
+      "reviewIntentOnly": true,
+      "readOnly": false,
+      "requiresSecondConfirmation": false,
+      "allowedPostReviewDispositionStates": [
+        "WAITING_HUMAN_REVIEW",
+        "APPROVED_EXECUTION_BLOCKED"
+      ],
+      "blockedActions": [
+        "executeRealAction",
+        "executeRealPublish",
+        "autoPublish",
+        "bypassHumanReview"
+      ],
+      "expectedManifestSafety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "expectedRuntimeSafety": {
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "frontendEvidence": {
+        "highRiskIntentItem": true,
+        "mcpToolCallRecordId": "mcp_call_publish_lab_intent_demo",
+        "expectedMockDisposition": "WAITING_HUMAN_REVIEW"
+      }
+    },
+    {
+      "name": "publish_exam",
+      "riskLevel": "high",
+      "toolCategory": "high_risk_review_intent",
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/publish-exam"
+      },
+      "reviewRequired": true,
+      "createsAiTask": true,
+      "createdTaskType": "MCP_PUBLISH_EXAM_INTENT",
+      "createdTaskStatus": "WAITING_REVIEW",
+      "reviewIntentOnly": true,
+      "readOnly": false,
+      "requiresSecondConfirmation": false,
+      "allowedPostReviewDispositionStates": [
+        "WAITING_HUMAN_REVIEW",
+        "APPROVED_EXECUTION_BLOCKED"
+      ],
+      "blockedActions": [
+        "executeRealAction",
+        "executeRealPublish",
+        "autoPublish",
+        "bypassHumanReview"
+      ],
+      "expectedManifestSafety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "expectedRuntimeSafety": {
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false
+      },
+      "frontendEvidence": {
+        "highRiskIntentItem": true,
+        "mcpToolCallRecordId": "mcp_call_publish_exam_intent_demo",
+        "expectedMockDisposition": "APPROVED_EXECUTION_BLOCKED"
+      }
+    },
+    {
+      "name": "destroy_environment",
+      "riskLevel": "critical",
+      "toolCategory": "high_risk_review_intent",
+      "backend": {
+        "method": "POST",
+        "path": "/api/mcp/intents/destroy-environment"
+      },
+      "reviewRequired": true,
+      "createsAiTask": true,
+      "createdTaskType": "MCP_DESTROY_ENVIRONMENT_INTENT",
+      "createdTaskStatus": "WAITING_REVIEW",
+      "reviewIntentOnly": true,
+      "readOnly": false,
+      "requiresSecondConfirmation": true,
+      "allowedPostReviewDispositionStates": [
+        "WAITING_HUMAN_REVIEW",
+        "APPROVED_PENDING_SECOND_CONFIRMATION"
+      ],
+      "blockedActions": [
+        "confirmSecondFactor",
+        "executeRealAction",
+        "destroyRealEnvironment",
+        "realCloudResourceChange",
+        "bypassHumanReview"
+      ],
+      "expectedManifestSafety": {
+        "mode": "MOCK_ONLY",
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "reviewIntentOnly": true,
+        "publishBlockedUntilApproved": true,
+        "requiresSecondConfirmation": true,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false,
+        "realCloudResourceChanged": false,
+        "environmentDestroyed": false
+      },
+      "expectedRuntimeSafety": {
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false,
+        "environmentDestroyed": false,
+        "confirmationActionAvailable": false,
+        "confirmationEndpointEnabled": false,
+        "secondConfirmationSatisfied": false,
+        "destroyRealEnvironmentEnabled": false
+      },
+      "frontendEvidence": {
+        "highRiskIntentItem": true,
+        "mcpToolCallRecordId": "mcp_call_destroy_environment_intent_demo",
+        "expectedMockDisposition": "APPROVED_PENDING_SECOND_CONFIRMATION"
+      }
+    },
+    {
+      "name": "get_second_confirmation_status",
+      "riskLevel": "critical",
+      "toolCategory": "read_only_second_confirmation_status",
+      "backend": {
+        "method": "GET",
+        "path": "/api/review-tasks/{taskId}/second-confirmation-status"
+      },
+      "reviewRequired": false,
+      "createsAiTask": false,
+      "createdTaskType": null,
+      "createdTaskStatus": null,
+      "reviewIntentOnly": true,
+      "readOnly": true,
+      "requiresSecondConfirmation": true,
+      "allowedPostReviewDispositionStates": [
+        "APPROVED_PENDING_SECOND_CONFIRMATION"
+      ],
+      "blockedActions": [
+        "confirmSecondFactor",
+        "executeRealAction",
+        "destroyRealEnvironment",
+        "bypassHumanReview"
+      ],
+      "expectedManifestSafety": {
+        "mode": "MOCK_ONLY",
+        "readOnly": true,
+        "reviewIntentOnly": true,
+        "requiresSecondConfirmation": true,
+        "secondConfirmationSatisfied": false,
+        "confirmationActionAvailable": false,
+        "confirmationEndpointEnabled": false,
+        "executeRealActionAllowed": false,
+        "destroyRealEnvironmentEnabled": false,
+        "environmentDestroyed": false,
+        "realCloudResourceChanged": false,
+        "realActionExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "bypassReviewEnabled": false
+      },
+      "expectedRuntimeSafety": {
+        "realMcpServerStarted": false,
+        "realAgentStarted": false,
+        "realLlmCalled": false,
+        "networkAccess": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "realActionExecuted": false,
+        "environmentDestroyed": false,
+        "confirmationActionAvailable": false,
+        "confirmationEndpointEnabled": false,
+        "secondConfirmationSatisfied": false,
+        "executeRealActionAllowed": false,
+        "destroyRealEnvironmentEnabled": false,
+        "bypassReviewEnabled": false
+      },
+      "frontendEvidence": {
+        "secondConfirmationStatusPrototype": true,
+        "mcpToolCallRecordId": "mcp_call_get_second_confirmation_status_demo",
+        "expectedMockDisposition": "APPROVED_PENDING_SECOND_CONFIRMATION"
+      }
+    }
+  ],
+  "entrypoints": {
+    "cli": [
+      "python lab_cli.py mcp call --tool publish_lab --arguments {\"labId\":\"lab_demo\",\"reason\":\"运营申请发布\"}",
+      "python lab_cli.py mcp call --tool publish_exam --arguments {\"examId\":\"exam_demo\",\"reason\":\"考试发布前人工复核\"}",
+      "python lab_cli.py mcp call --tool destroy_environment --arguments {\"environmentId\":\"env_demo\",\"reason\":\"清理申请\"}",
+      "python lab_cli.py mcp call --tool get_second_confirmation_status --arguments {\"taskId\":\"task_mcp_destroy_environment_intent_demo\"}"
+    ],
+    "backendMock": [
+      "POST /api/mcp/intents/publish-lab",
+      "POST /api/mcp/intents/publish-exam",
+      "POST /api/mcp/intents/destroy-environment",
+      "GET /api/review-tasks/{taskId}/second-confirmation-status"
+    ],
+    "frontendMock": [
+      "frontend/mock-data.json.highRiskMcpIntentPrototype",
+      "frontend/mock-data.json.secondConfirmationStatusPrototype",
+      "frontend/mock-data.json.mcpToolCallRecords"
+    ]
+  },
+  "recommendedCommandIds": [
+    "test_high_risk_mcp_safety_contract",
+    "test_mcp_manifest",
+    "test_mcp_mock_tools",
+    "test_mcp_server_mock",
+    "test_frontend_contract",
+    "test_backend_mock_api",
+    "test_cli",
+    "test_all"
+  ]
+}

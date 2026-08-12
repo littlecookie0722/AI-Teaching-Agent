@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Delivery Acceptance Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .card,
+    .command-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.8fr) minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    .row.two {
+      grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1fr);
+    }
+
+    .status {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .blocked {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .command-box {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      background: var(--code);
+      color: #d1fae5;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      border-color: #f3c7c7;
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .section-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row,
+      .row.two {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>交付验收 Mock</h1>
+      <p>Phase 1 Delivery Acceptance Mock · /delivery · DeliveryChecklistPanel</p>
+    </div>
+    <div class="pill-row">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill warn">真实大模型：禁用</span>
+      <span class="pill warn">真实云资源：禁用</span>
+      <span class="pill warn">真实沙箱：禁用</span>
+      <span class="pill warn">自动发布：禁用</span>
+      <span class="pill warn">真实发布：禁用</span>
+      <span class="pill warn">密钥展示：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="package-title">
+      <div class="section-head">
+        <div>
+          <h2 id="package-title">Phase 1 交付包</h2>
+          <p>本页只展示本地 Mock 交付状态，导出命令仍由 CLI 统一返回 JSON。</p>
+        </div>
+        <span class="pill strong">readyForPhase2MockHandoff=true</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Deliverables</span>
+          <strong>90</strong>
+        </div>
+        <div class="metric">
+          <span>Ready</span>
+          <strong>127</strong>
+        </div>
+        <div class="metric">
+          <span>Missing Required</span>
+          <strong>0</strong>
+        </div>
+        <div class="metric">
+          <span>Acceptance Passed</span>
+          <strong>true</strong>
+        </div>
+        <div class="metric">
+          <span>Safety Passed</span>
+          <strong>true</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="contract-title">
+      <div class="section-head">
+        <div>
+          <h2 id="contract-title">交付清单与验收清单</h2>
+          <p>对应 config/delivery-package.contract.json 与 examples/output/phase1-delivery-package.json。</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">GET /api/health</span>
+          <span class="pill">GET /api/workflow-runs</span>
+          <span class="pill">GET /api/artifacts</span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="card">
+            <h3>Delivery Manifest</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>deliveryManifest.summary.missingRequired=0</span>
+                <span>required=127 · ready=127</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>frontend_console_prototype</span>
+                <span>frontend/console.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_dashboard_prototype</span>
+                <span>frontend/dashboard.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_audit_observability_prototype</span>
+                <span>frontend/audit.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_audit_detail_prototype</span>
+                <span>frontend/audit-detail.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_audit_incident_review_prototype</span>
+                <span>frontend/audit-incidents.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_launchpad_prototype</span>
+                <span>frontend/operations-launchpad.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_runbook_prototype</span>
+                <span>frontend/operations-runbook.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_acceptance_prototype</span>
+                <span>frontend/operations-acceptance.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_demo_map_prototype</span>
+                <span>frontend/operations-demo-map.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_presenter_prototype</span>
+                <span>frontend/operations-presenter.html</span>
+              </li>
+              <li>
+                <strong>frontend_operations_signoff_prototype</strong>
+                <span>frontend/operations-signoff.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_operations_demo_script_prototype</span>
+                <span>frontend/operations-demo-script.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_ppt_review_prototype</span>
+                <span>frontend/ppt-review.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>frontend_delivery_prototype</span>
+                <span>frontend/delivery.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_index_readme</span>
+                <span>delivery/README.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_index_contract</span>
+                <span>delivery/phase1-delivery-index.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_faq_md</span>
+                <span>delivery/FAQ.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_faq_contract</span>
+                <span>delivery/phase1-faq.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_handoff_md</span>
+                <span>delivery/HANDOFF.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_handoff_contract</span>
+                <span>delivery/phase1-handoff.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>demo_script_checklist_md</span>
+                <span>delivery/DEMO_SCRIPT_CHECKLIST.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>demo_script_checklist_contract</span>
+                <span>delivery/phase1-demo-script-checklist.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>phase2_readiness_md</span>
+                <span>delivery/PHASE2_READINESS.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>phase2_readiness_contract</span>
+                <span>delivery/phase2-readiness-gate.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>phase2_provider_plan_md</span>
+                <span>providers/PHASE2_PROVIDER_PLAN.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>phase2_provider_plan_contract</span>
+                <span>providers/phase2-provider-plan.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_adapter</span>
+                <span>providers/adapter.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>real_llm_sdk_task_blueprint</span>
+                <span>providers/real_llm_sdk_task_blueprint.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>real_llm_sdk_task_blueprint_contract</span>
+                <span>providers/real-llm-sdk-task-blueprint.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>real_provider_sdk_poc</span>
+                <span>providers/real_provider_sdk_poc.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>real_provider_sdk_poc_contract</span>
+                <span>providers/real-provider-sdk-poc.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_adapter_contract</span>
+                <span>providers/provider-adapter.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_adapter_errors_contract</span>
+                <span>providers/provider-adapter-errors.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_call_audit_model</span>
+                <span>cli/provider_audit.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_audit_contract</span>
+                <span>providers/provider-audit.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_audit_workflow_contract</span>
+                <span>ai-workflows/provider-audit-workflow.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>provider_adapter_workflow_helper</span>
+                <span>ai_workflows/provider_adapter_workflow.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>mcp_mock_tools</span>
+                <span>mcp_server/mock_tools.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>mcp_tool_call_audit_model</span>
+                <span>cli/mcp_audit.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>mcp_tool_call_audit_contract</span>
+                <span>mcp-server/tool-call-audit.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>high_risk_mcp_safety_matrix</span>
+                <span>mcp-server/high-risk-tool-safety.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>high_risk_mcp_handoff_md</span>
+                <span>delivery/HIGH_RISK_MCP_HANDOFF.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>high_risk_mcp_handoff_contract</span>
+                <span>delivery/high-risk-mcp-handoff.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>final_signoff_md</span>
+                <span>delivery/FINAL_SIGNOFF.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>final_signoff_contract</span>
+                <span>delivery/final-signoff.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>operations_manual_md</span>
+                <span>delivery/OPERATIONS_MANUAL.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>operations_manual_contract</span>
+                <span>delivery/operations-manual.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>operations_skill_pack_md</span>
+                <span>skills/operations-skill-pack/SKILL.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>operations_skill_pack_contract</span>
+                <span>skills/operations-skill-pack.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>standalone_agent_delivery_md</span>
+                <span>delivery/STANDALONE_AGENT_DELIVERY.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>standalone_agent_delivery_contract</span>
+                <span>delivery/standalone-agent-delivery.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>mcp_mock_tools_tests</span>
+                <span>tests/test_mcp_mock_tools.py</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>scripts_phase1_demo_runbook_json</span>
+                <span>scripts/phase1-demo.runbook.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>scripts_phase1_demo_runbook_md</span>
+                <span>scripts/phase1-demo.runbook.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>delivery_package_contract</span>
+                <span>config/delivery-package.contract.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>test_suite</span>
+                <span>tests</span>
+                <strong class="status">READY</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Acceptance Checklist</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>acceptanceSummary.passed=true</span>
+                <span>requiredPassed=14 · readyForPhase2MockHandoff=true</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>dsl_examples_valid</span>
+                <span>Lab / Exam / Grading / PPT DSL 示例可校验</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>ai_task_review_gate</span>
+                <span>AI 生成内容默认 WAITING_REVIEW</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>provider_mock_only</span>
+                <span>MockProvider-only</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>workflow_mock_only</span>
+                <span>Workflow 报告保持 MOCK_ONLY</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>core_deliverables_present</span>
+                <span>核心实现、文档、示例和测试已存在</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>phase1_demo_runbook_present</span>
+                <span>本地演示验收 Runbook 已纳入交付清单</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>demo_script_checklist_present</span>
+                <span>运营演示脚本检查清单已纳入交付清单</span>
+                <strong class="status">PASS</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <h3>Phase 1 Check</h3>
+            <div class="row-list">
+              <div class="row two">
+                <span>phase1Check.total=20</span>
+                <strong class="status">passed=20</strong>
+              </div>
+              <div class="row two">
+                <span>dsl_lab=true · dsl_exam=true</span>
+                <span>dsl_grading=true · dsl_ppt=true</span>
+              </div>
+              <div class="row two">
+                <span>review_detail_mock=true</span>
+                <span>review_batch_summary_mock=true</span>
+              </div>
+              <div class="row two">
+                <span>provider_mock_generate=true</span>
+                <span>workflow_run_logged=true</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>safetyAssertions</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>real_llm_disabled</span>
+                <span>realLlmCalled=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>real_cloud_disabled</span>
+                <span>realCloudResourceCreated=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>real_sandbox_disabled</span>
+                <span>sandboxExecuted=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>auto_publish_disabled</span>
+                <span>autoPublishAllowed=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>contestant_code_execution_disabled</span>
+                <span>contestantCodeExecuted=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>unknown_shell_execution_disabled</span>
+                <span>unknownShellExecuted=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>realPublish=false</span>
+                <span>remoteUploadAllowed=false · secretVisibleInFrontend=false</span>
+                <strong class="status">PASS</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Recommended Commands</h3>
+            <div class="command-box">
+              <div>python lab_cli.py phase1 check</div>
+              <div>python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</div>
+              <div>python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</div>
+              <div>start .\frontend\operations-launchpad.html</div>
+              <div>start .\frontend\operations-runbook.html</div>
+              <div>start .\frontend\operations-acceptance.html</div>
+              <div>start .\frontend\operations-demo-map.html</div>
+              <div>start .\frontend\operations-presenter.html</div>
+              <div>start .\frontend\operations-signoff.html</div>
+              <div>start .\frontend\operations-demo-script.html</div>
+              <div>python lab_cli.py workflow demo --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/demo-report.json</div>
+              <div>python -m pytest</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="primary">查看交付清单</button>
+        <button>查看验收清单</button>
+        <button>查看安全断言</button>
+        <button>导出 Mock 包</button>
+        <button disabled>上传交付包</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="limits-title">
+      <div class="section-head">
+        <div>
+          <h2 id="limits-title">Phase 1 限制</h2>
+          <p>本页不接入真实大模型、不接入真实云资源、不执行选手代码、不绕过人工审核。</p>
+        </div>
+        <span class="pill warn blocked">真实发布：禁用</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

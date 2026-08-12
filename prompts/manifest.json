@@ -1,0 +1,96 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Prompt registry for Phase 1. These templates are placeholders and must not be embedded directly in business code.",
+  "globalRules": {
+    "promptStorage": "prompts/",
+    "businessCodeMayEmbedPrompts": false,
+    "realLlmCalled": false,
+    "outputMustBeDsl": true,
+    "generatedContentDefaultStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "secretsAllowedInPrompt": false
+  },
+  "prompts": [
+    {
+      "id": "lab_generation_v0",
+      "version": "0.1.0",
+      "title": "Lab DSL generation prompt",
+      "path": "prompts/workflows/lab_generation.md",
+      "owner": "teaching-operations",
+      "inputTypes": ["markdown"],
+      "outputKind": "Lab",
+      "outputSchema": "templates/lab/lab.schema.json",
+      "defaultStatus": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "mode": "MOCK_ONLY"
+    },
+    {
+      "id": "exam_generation_v0",
+      "version": "0.1.0",
+      "title": "Exam DSL generation prompt",
+      "path": "prompts/workflows/exam_generation.md",
+      "owner": "teaching-operations",
+      "inputTypes": ["lab_dsl", "lab_id"],
+      "outputKind": "Exam",
+      "outputSchema": "templates/exam/exam.schema.json",
+      "defaultStatus": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "answerVisibleToCandidate": false,
+      "mode": "MOCK_ONLY"
+    },
+    {
+      "id": "grading_generation_v0",
+      "version": "0.1.0",
+      "title": "Grading DSL generation prompt",
+      "path": "prompts/workflows/grading_generation.md",
+      "owner": "teaching-operations",
+      "inputTypes": ["exam_dsl", "lab_dsl"],
+      "outputKind": "Grading",
+      "outputSchema": "templates/grading/grading.schema.json",
+      "defaultStatus": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "sandboxRequiredBeforeRealExecution": true,
+      "mode": "MOCK_ONLY"
+    },
+    {
+      "id": "ppt_generation_v0",
+      "version": "0.1.0",
+      "title": "PPT DSL generation prompt",
+      "path": "prompts/workflows/ppt_generation.md",
+      "owner": "teaching-operations",
+      "inputTypes": ["markdown"],
+      "outputKind": "PPT",
+      "outputSchema": "templates/ppt/ppt.schema.json",
+      "defaultStatus": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "artifactGenerated": false,
+      "mode": "MOCK_ONLY"
+    },
+    {
+      "id": "phase1_bootstrap_v0",
+      "version": "0.1.0",
+      "title": "Codex Phase 1 bootstrap prompt",
+      "path": "prompts/codex/phase1_bootstrap.md",
+      "owner": "engineering",
+      "inputTypes": ["task"],
+      "outputKind": "DevelopmentPlan",
+      "defaultStatus": "DRAFT",
+      "reviewRequired": false,
+      "mode": "MOCK_ONLY"
+    },
+    {
+      "id": "self_check_v0",
+      "version": "0.1.0",
+      "title": "Codex self check prompt",
+      "path": "prompts/codex/self_check.md",
+      "owner": "engineering",
+      "inputTypes": ["repository"],
+      "outputKind": "ReviewReport",
+      "defaultStatus": "DRAFT",
+      "reviewRequired": false,
+      "mode": "MOCK_ONLY"
+    }
+  ]
+}

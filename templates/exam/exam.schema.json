@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Exam DSL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "kind",
+    "metadata",
+    "status",
+    "spec"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "Exam"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "sourceLabId",
+        "difficulty"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "sourceLabId": {
+          "type": "string"
+        },
+        "difficulty": {
+          "enum": [
+            "beginner",
+            "intermediate",
+            "advanced"
+          ]
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "WAITING_REVIEW",
+        "APPROVED",
+        "REJECTED",
+        "PUBLISHED"
+      ]
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "questionType",
+        "totalScore",
+        "questions"
+      ],
+      "properties": {
+        "questionType": {
+          "enum": [
+            "notebook_fill_blank",
+            "coding_task",
+            "short_answer"
+          ]
+        },
+        "totalScore": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title",
+              "stem",
+              "score",
+              "gradingRef"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "stem": {
+                "type": "string"
+              },
+              "blankCode": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              },
+              "score": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "gradingRef": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "REAL_SDK_BOUNDARY_ONLY",
+  "description": "Real LLM SDK installation and environment boundary. It may inspect local dependency declaration, package metadata, and environment variable name presence, but must not import SDKs, create clients, read secret values, access network, call real LLMs, create tasks, or publish content.",
+  "supportedProvider": "openai",
+  "dependencyManifestPath": "requirements.txt",
+  "targetPackage": "openai",
+  "sdkImportName": "openai",
+  "secretEnv": "OPENAI_API_KEY",
+  "envExamplePath": ".env.example",
+  "allowedOperations": [
+    "read_requirements_txt_declaration",
+    "inspect_local_package_metadata",
+    "check_secret_environment_variable_name_presence"
+  ],
+  "blockedOperations": [
+    "sdk_import",
+    "client_creation",
+    "secret_value_read",
+    "network_request",
+    "real_llm_call",
+    "content_creation",
+    "task_creation",
+    "auto_publish"
+  ],
+  "rules": {
+    "requiresExplicitSdkBoundaryOptIn": true,
+    "dependencyManifestReadOnly": true,
+    "sdkMetadataCheckOnly": true,
+    "secretPresenceOnly": true,
+    "secretValueMustNotBeReturned": true,
+    "realCallAuthorized": false,
+    "generatedContentDefaultStatus": "WAITING_REVIEW"
+  },
+  "assertions": {
+    "sdkImportAttempted": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

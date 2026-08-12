@@ -1,0 +1,84 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "id": "provider_call_audit_contract",
+  "title": "Provider Adapter Call Audit Contract",
+  "description": "Local mock audit contract for Provider registry, health, and generateJson calls. It records success and failure paths without calling real LLMs, reading secrets, accessing network, creating tasks, or publishing content.",
+  "adapterId": "mock_provider_adapter",
+  "interfaceName": "LLMProvider",
+  "storeKey": "providerCallAuditEvents",
+  "inputs": [
+    {
+      "id": "provider_audit_model",
+      "path": "cli/provider_audit.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "cli_store",
+      "path": "cli/store.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "cli_mock",
+      "path": "cli/lab_cli.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "backend_mock_api",
+      "path": "backend/mock_api.py",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider audit",
+      "returnsJson": true
+    },
+    {
+      "type": "api",
+      "method": "GET",
+      "path": "/api/provider-audit-events",
+      "returnsJson": true
+    }
+  ],
+  "recordedOperations": ["registry", "health", "generateJson"],
+  "statuses": ["SUCCESS", "FAILED"],
+  "supportedFilters": ["providerId", "operation", "status", "promptId", "traceId", "actor"],
+  "requiredEventFields": [
+    "id",
+    "operation",
+    "providerId",
+    "adapterId",
+    "interfaceName",
+    "status",
+    "actor",
+    "traceId",
+    "mode",
+    "realLlmCalled",
+    "secretsRead",
+    "networkAccess",
+    "generatedContentCreated",
+    "taskCreated",
+    "reviewBypassed",
+    "autoPublishAllowed",
+    "realPublish"
+  ],
+  "failureFields": ["errorCode", "errorField", "errorMessage"],
+  "successFields": ["promptId", "outputKind", "dslPath", "dslId", "generatedStatus"],
+  "recommendedCommandIds": ["test_provider_adapter", "test_all"],
+  "safety": {
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

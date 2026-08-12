@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Labs Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .card,
+    .lab-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span,
+    .card span,
+    .lab-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .card strong,
+    .lab-row strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .lab-list,
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .lab-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(120px, 0.45fr));
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .lab-row {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Labs 管理 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+      <span class="pill">真实发布：禁用</span>
+      <span class="pill">密钥展示：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">实验列表</h2>
+          <p>GET /api/labs + GET /api/review-task-summary</p>
+        </div>
+        <span class="pill warn">WAITING_REVIEW first</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Lab Total</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>Waiting Review</span>
+          <strong class="danger">1</strong>
+        </div>
+        <div class="metric">
+          <span>Approved</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Published</span>
+          <strong class="ok">0</strong>
+        </div>
+        <div class="metric">
+          <span>Auto Publish</span>
+          <strong class="danger">false</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="labs-title">
+      <div class="section-head">
+        <div>
+          <h2 id="labs-title">Lab 清单</h2>
+          <p>列表只展示本地 Mock 元数据，发布动作固定阻断</p>
+        </div>
+        <div class="pill-row">
+          <span class="pill strong">status: all</span>
+          <span class="pill">category: AI 工具应用</span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="lab-list" aria-label="Lab rows">
+          <article class="lab-row">
+            <div>
+              <h3>AI 编码助手入门实验</h3>
+              <p>lab_demo · templates/lab/examples/basic-lab.yaml</p>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong class="danger">WAITING_REVIEW</strong>
+            </div>
+            <div>
+              <span>Task</span>
+              <strong>task_lab_demo</strong>
+            </div>
+            <div>
+              <span>Action</span>
+              <strong>review</strong>
+            </div>
+          </article>
+
+          <article class="lab-row">
+            <div>
+              <h3>Mock 已审核实验样例</h3>
+              <p>lab_reviewed_demo · local mock metadata only</p>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong class="ok">APPROVED</strong>
+            </div>
+            <div>
+              <span>Task</span>
+              <strong>task_lab_reviewed_demo</strong>
+            </div>
+            <div>
+              <span>Action</span>
+              <strong>preview</strong>
+            </div>
+          </article>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>快捷入口</h3>
+            <p class="ok">/labs/generate</p>
+            <p class="ok">/labs/:id/review</p>
+            <p class="ok">GET /api/labs</p>
+            <p class="ok">GET /api/review-task-summary</p>
+          </div>
+          <div class="card">
+            <h3>安全策略</h3>
+            <p class="danger">autoPublishAllowed=false</p>
+            <p class="danger">batchStateChangeAllowed=false</p>
+            <p class="danger">realPublish=false</p>
+            <p class="danger">realLlmCalled=false</p>
+            <p class="danger">secretVisibleInFrontend=false</p>
+          </div>
+          <div class="card">
+            <h3>LabDslPreview</h3>
+            <pre>kind: "Lab"
+metadata:
+  id: "lab_demo"
+status: "WAITING_REVIEW"
+reviewRequired: true
+publishBlockedUntilApproved: true</pre>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button">新建 Mock Lab</button>
+        <button type="button">打开审核详情</button>
+        <button type="button">查看 DSL 预览</button>
+        <button type="button" disabled title="Phase 1 禁止批量通过">批量通过</button>
+        <button type="button" disabled title="Phase 1 禁止自动发布">自动发布</button>
+        <button type="button" disabled title="Phase 1 禁止真实发布">真实发布</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

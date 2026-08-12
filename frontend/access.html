@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Access Entrypoints Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8e0ea;
+      --brand: #0f766e;
+      --accent: #2563eb;
+      --warn: #b45309;
+      --ok-bg: #e7f8f2;
+      --info-bg: #eef4ff;
+      --warn-bg: #fff7ed;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #163b48;
+      color: #fff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 8px; font-size: 30px; font-weight: 720; }
+    h2 { margin-bottom: 0; font-size: 20px; }
+    h3 { margin-bottom: 12px; font-size: 16px; }
+    p { color: var(--muted); line-height: 1.62; }
+    header p { max-width: 980px; color: rgba(255, 255, 255, 0.82); }
+
+    section {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar,
+    .section-head,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong { color: var(--brand); background: var(--ok-bg); border-color: #9ad8cb; }
+    .pill.info { color: var(--accent); background: var(--info-bg); border-color: #bfdbfe; }
+    .pill.warn { color: var(--warn); background: var(--warn-bg); border-color: #fed7aa; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.86fr);
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .row-list { display: grid; gap: 10px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.42fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(190px, 0.46fr) minmax(220px, 1fr);
+    }
+
+    .row span:nth-child(2),
+    .muted { color: var(--muted); }
+
+    .status {
+      justify-self: end;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--ok-bg);
+      color: var(--brand);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status.warn { background: var(--warn-bg); color: var(--warn); }
+    .command {
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: #eef2f7;
+      font-family: Consolas, "Courier New", monospace;
+      color: #243143;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    @media (max-width: 920px) {
+      .summary-grid,
+      .content-grid { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+      .status { justify-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill info">/access</span>
+      <span class="pill warn">No Server Started</span>
+    </div>
+    <h1>Access Entrypoints</h1>
+    <p>Phase 5 本地访问入口交付页。页面只读展示静态入口、计划中的本地 IP + 端口占位和安全限制，不监听端口，不绑定外网，不启动真实服务。</p>
+  </header>
+
+  <main>
+    <section>
+      <div class="summary-grid">
+        <div class="metric"><span>Delivery</span><strong>175 / 175</strong></div>
+        <div class="metric"><span>Routes</span><strong>31</strong></div>
+        <div class="metric"><span>Ports Listening</span><strong>0</strong></div>
+        <div class="metric"><span>External Access</span><strong>Disabled</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>本地静态入口</h2>
+        <span class="pill strong">Manual Preview Only</span>
+      </div>
+      <div class="content-grid">
+        <div class="panel">
+          <h3>可打开页面</h3>
+          <div class="row-list">
+            <div class="row"><strong><a href="access.html">/access</a></strong><span>访问入口总览</span><span class="status">READY</span></div>
+            <div class="row"><strong><a href="operations-launchpad.html">/operations/launchpad</a></strong><span>运营演示首屏</span><span class="status">READY</span></div>
+            <div class="row"><strong><a href="operations-signoff.html">/operations/signoff</a></strong><span>签收总览</span><span class="status">READY</span></div>
+            <div class="row"><strong><a href="delivery.html">/delivery</a></strong><span>交付验收清单</span><span class="status">READY</span></div>
+            <div class="row"><strong><a href="console.html">/console</a></strong><span>Mock 控制台</span><span class="status">READY</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>人工预览命令</h3>
+          <div class="row-list">
+            <div class="row compact"><strong>Access</strong><span class="command">start .\frontend\access.html</span></div>
+            <div class="row compact"><strong>Launchpad</strong><span class="command">start .\frontend\operations-launchpad.html</span></div>
+            <div class="row compact"><strong>Signoff</strong><span class="command">start .\frontend\operations-signoff.html</span></div>
+            <div class="row compact"><strong>Delivery</strong><span class="command">start .\frontend\delivery.html</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>IP + 端口占位</h2>
+        <span class="pill warn">Disabled In This Phase</span>
+      </div>
+      <div class="row-list">
+        <div class="row"><strong>Frontend 2.0</strong><span>http://127.0.0.1:3000</span><span class="status warn">DISABLED</span></div>
+        <div class="row"><strong>Backend Mock API</strong><span>http://127.0.0.1:8000</span><span class="status warn">DISABLED</span></div>
+        <div class="row"><strong>MCP Server</strong><span>http://127.0.0.1:8080</span><span class="status warn">DISABLED</span></div>
+        <div class="row"><strong>独立智能体</strong><span>documentation only</span><span class="status warn">DISABLED</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>验收与限制</h2>
+        <span class="pill info">Contract: delivery/access-entrypoints.json</span>
+      </div>
+      <div class="content-grid">
+        <div class="panel">
+          <h3>白名单验证</h3>
+          <div class="row-list">
+            <div class="row compact"><strong>Access Contract</strong><span class="command">python -m pytest tests/test_access_entrypoints.py</span></div>
+            <div class="row compact"><strong>Frontend Contract</strong><span class="command">python -m pytest tests/test_frontend_manifest.py</span></div>
+            <div class="row compact"><strong>Delivery Export</strong><span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>禁用动作</h3>
+          <div class="row-list">
+            <div class="row compact"><strong>Network</strong><span>不绑定 0.0.0.0、公网 IP 或内网 IP</span></div>
+            <div class="row compact"><strong>Runtime</strong><span>不启动真实前端、后端、MCP Server 或 Agent</span></div>
+            <div class="row compact"><strong>Publish</strong><span>不上传交付包，不自动发布或真实发布</span></div>
+            <div class="row compact"><strong>Secrets</strong><span>不展示密钥或选手端隐藏答案</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

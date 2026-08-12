@@ -1,0 +1,106 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 3",
+  "mode": "CONTRACT_ONLY",
+  "description": "Contract for future real sandbox execution requests and results. It defines the boundary but does not execute containers, commands, notebooks, or contestant code.",
+  "builder": {
+    "module": "sandbox.execution_contract",
+    "requestFunction": "build_sandbox_execution_request",
+    "placeholderResultFunction": "build_sandbox_result_placeholder"
+  },
+  "supportedCheckTypes": [
+    "file_exists",
+    "stdout_contains",
+    "pytest",
+    "notebook_cell",
+    "json_field",
+    "log_keyword"
+  ],
+  "request": {
+    "mode": "REAL_SANDBOX_REQUIRED",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "mode",
+      "gradingId",
+      "checkId",
+      "checkType",
+      "action",
+      "traceId",
+      "workspace",
+      "limits",
+      "network",
+      "command",
+      "evidenceRequired",
+      "safety"
+    ],
+    "workspaceFields": [
+      "kind",
+      "hostPathAllowed",
+      "writeOutsideWorkspaceAllowed",
+      "submissionMountedReadOnly"
+    ],
+    "limitFields": [
+      "timeoutSeconds",
+      "cpuCores",
+      "memoryMb",
+      "processLimit",
+      "network",
+      "filesystem"
+    ],
+    "evidenceRequired": [
+      "stdout",
+      "stderr",
+      "exitCode",
+      "durationMs",
+      "matchedEvidence",
+      "auditLogRef"
+    ]
+  },
+  "result": {
+    "placeholderMode": "RESULT_PLACEHOLDER",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "mode",
+      "gradingId",
+      "checkId",
+      "checkType",
+      "traceId",
+      "status",
+      "passed",
+      "earnedScore",
+      "stdout",
+      "stderr",
+      "exitCode",
+      "durationMs",
+      "matchedEvidence",
+      "auditLogRef",
+      "sandboxExecuted",
+      "contestantCodeExecuted",
+      "commandExecuted",
+      "error"
+    ],
+    "placeholderStatus": "NOT_EXECUTED",
+    "placeholderErrorCode": "REAL_SANDBOX_NOT_IMPLEMENTED"
+  },
+  "safetyAssertions": {
+    "hostExecutionAllowed": false,
+    "unknownShellAllowed": false,
+    "networkEnabledByDefault": false,
+    "writeOutsideWorkspaceAllowed": false,
+    "secretPassthroughAllowed": false,
+    "realExecutionRequiresImplementation": true
+  },
+  "blockedOperations": [
+    "execute_container_from_contract_only_builder",
+    "execute_unknown_shell",
+    "mount_host_sensitive_paths",
+    "enable_network_by_default",
+    "write_outside_workspace",
+    "pass_runtime_secrets_to_submission",
+    "skip_audit_log"
+  ],
+  "recommendedTests": [
+    "python -m pytest tests/test_sandbox_execution_contract.py",
+    "python -m pytest tests/test_sandbox_mock_executor.py"
+  ]
+}

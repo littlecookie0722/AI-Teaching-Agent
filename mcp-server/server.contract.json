@@ -1,0 +1,76 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 4",
+  "mode": "MOCK_ONLY",
+  "server": {
+    "id": "ai_training_platform_mcp_mock",
+    "protocol": "mcp-server-mock",
+    "transport": "local_function_only",
+    "stdioTransport": "line_delimited_jsonrpc",
+    "manifest": "mcp-server/tools.manifest.json"
+  },
+  "capabilities": {
+    "initialize": true,
+    "listTools": true,
+    "callTool": true,
+    "streaming": false,
+    "resources": false,
+    "prompts": false
+  },
+  "entrypoints": {
+    "stdio": [
+      "python -m mcp_server.stdio_server"
+    ],
+    "cli": [
+      "python lab_cli.py mcp server-info",
+      "python lab_cli.py mcp server-tools",
+      "python lab_cli.py mcp server-call --tool analyze_material --arguments {\"input\":\"examples/input/demo-source.md\"}",
+      "python lab_cli.py mcp stdio-smoke --input examples/input/demo-source.md --output examples/output/mcp-stdio-client-smoke.json",
+      "python lab_cli.py mcp stdio-local-core-demo --input examples/input/demo-source.md --work-dir examples/output/mcp-local-core-client --output examples/output/mcp-local-core-client-draft.json"
+    ],
+    "backendMock": [
+      "GET /api/mcp/server/info",
+      "GET /api/mcp/server/tools",
+      "POST /api/mcp/server/call"
+    ]
+  },
+  "toolPolicy": {
+    "toolsCallBackendMockOnly": true,
+    "defaultToolProfile": "local-core-mvp",
+    "directInvocationDefaultProfile": "local-core-mvp",
+    "allToolsProfile": "all",
+    "realPlatformBackendToolsEnabledByDefault": false,
+    "returnsUnifiedJson": true,
+    "auditRequired": true,
+    "argumentPreviewRedactsSecrets": true,
+    "highRiskRequiresReview": true
+  },
+  "safetyAssertions": {
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "networkListenerStarted": false,
+    "networkAccess": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "stdioSafetyAssertions": {
+    "stdioTransportStarted": true,
+    "networkListenerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalledByServer": false,
+    "realCloudResourceChangedByServer": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "recommendedCommandIds": [
+    "test_mcp_server_mock",
+    "test_mcp_stdio_server",
+    "test_mcp_stdio_client_smoke",
+    "test_mcp_mock_tools",
+    "test_mcp_manifest"
+  ]
+}

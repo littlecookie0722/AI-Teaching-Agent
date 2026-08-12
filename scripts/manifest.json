@@ -1,0 +1,1081 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Script safety contract for local Phase 1 validation commands. This manifest does not define destructive or production scripts.",
+  "executionPolicy": {
+    "allowedWorkingDirectory": "project_root",
+    "requiresHumanInitiatedRun": true,
+    "unknownShellScriptsAllowed": false,
+    "destructiveCommandsAllowed": false,
+    "productionAccessAllowed": false,
+    "cloudAccessAllowed": false,
+    "contestantCodeExecutionAllowed": false,
+    "secretLoggingAllowed": false
+  },
+  "allowedCommands": [
+    {
+      "id": "phase1_check",
+      "description": "Run Phase 1 CLI self-check.",
+      "command": "python lab_cli.py phase1 check",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase1_export",
+      "description": "Export Phase 1 local mock delivery package.",
+      "command": "python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase1-delivery-package.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase1_report",
+      "description": "Render Phase 1 local mock acceptance report from the delivery package.",
+      "command": "python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase1-acceptance-report.md"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_workflow_run",
+      "description": "Run Phase 2 Mock content generation workflow with MockProvider only.",
+      "command": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase2-content-generation-report.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_workflow_report",
+      "description": "Read and summarize the Phase 2 Mock content generation workflow report.",
+      "command": "python lab_cli.py phase2 workflow report --file examples/output/phase2-content-generation-report.json",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_exam_convert_run",
+      "description": "Run Phase 2 Mock Lab/Notebook to Exam and Grading DSL conversion workflow.",
+      "command": "python lab_cli.py phase2 exam-convert run --lab templates/lab/examples/basic-lab.yaml --notebook examples/notebooks/demo-lab.ipynb --reviewer teacher_1 --output examples/output/phase2-exam-conversion-report.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase2-exam-conversion-report.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_exam_convert_report",
+      "description": "Read and summarize the Phase 2 Mock exam conversion workflow report.",
+      "command": "python lab_cli.py phase2 exam-convert report --file examples/output/phase2-exam-conversion-report.json",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "exam_candidate_preview_export",
+      "description": "Export a candidate-facing Exam preview with standard answers removed.",
+      "command": "python lab_cli.py exam candidate-preview --exam templates/exam/examples/notebook-fill-blank.yaml --output examples/output/exam-candidate-preview.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/exam-candidate-preview.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_ppt_generate_run",
+      "description": "Run Phase 2 Mock Markdown to slide plan and PPT DSL generation workflow.",
+      "command": "python lab_cli.py phase2 ppt-generate run --input examples/input/demo-source.md --reviewer teacher_1 --slide-plan-output examples/output/phase2-ppt-slide-plan.json --output examples/output/phase2-ppt-generation-report.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase2-ppt-slide-plan.json",
+        "examples/output/phase2-ppt-generation-report.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_ppt_generate_report",
+      "description": "Read and summarize the Phase 2 Mock PPT generation workflow report.",
+      "command": "python lab_cli.py phase2 ppt-generate report --file examples/output/phase2-ppt-generation-report.json",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_workflow_registry_list",
+      "description": "List Phase 2 Mock workflow capabilities from the local registry.",
+      "command": "python lab_cli.py workflow registry list",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase2_workflow_registry_get",
+      "description": "Read one Phase 2 Mock workflow capability and its contract from the local registry.",
+      "command": "python lab_cli.py workflow registry get --workflow-id phase2_content_generation",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "mcp_list_workflows",
+      "description": "Invoke the local MCP Mock tool that lists Phase 2 workflow registry capabilities.",
+      "command": "python lab_cli.py mcp call --tool list_workflows --arguments \"{\\\"category\\\":\\\"ppt_generation\\\"}\"",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "mcp_get_workflow",
+      "description": "Invoke the local MCP Mock tool that reads one Phase 2 workflow registry capability.",
+      "command": "python lab_cli.py mcp call --tool get_workflow --arguments \"{\\\"workflowId\\\":\\\"phase2_content_generation\\\"}\"",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase3_grade_runner_mock",
+      "description": "Run Phase 3 Mock grading runner over all supported check types without executing commands or contestant code.",
+      "command": "python lab_cli.py grade run --grading templates/grading/examples/mixed-checks.yaml --output examples/output/phase3-grading-report.json",
+      "category": "mock_export",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/phase3-grading-report.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "phase3_grading_sandbox_image_verify",
+      "description": "Verify the fixed local Docker grading image through lab-cli JSON output.",
+      "command": "python lab_cli.py grade sandbox-image verify --output examples/output/grading-sandbox-image-verify.json",
+      "category": "validation",
+      "writesToWorkspace": true,
+      "allowedWritePaths": [
+        "examples/output/grading-sandbox-image-verify.json"
+      ],
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase3_grade_runner",
+      "description": "Run Phase 3 Mock grading runner contract tests.",
+      "command": "python -m pytest tests/test_sandbox_mock_executor.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_all",
+      "description": "Run all unit and contract tests.",
+      "command": "python -m pytest",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_backend_mock_api",
+      "description": "Run Backend Mock API tests.",
+      "command": "python -m pytest tests/test_backend_mock_api.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_cli",
+      "description": "Run CLI behavior tests.",
+      "command": "python -m pytest tests/test_cli.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_frontend_contract",
+      "description": "Run frontend contract tests.",
+      "command": "python -m pytest tests/test_frontend_manifest.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_scripts_manifest",
+      "description": "Run scripts safety manifest and demo runbook tests.",
+      "command": "python -m pytest tests/test_scripts_manifest.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_mcp_mock_tools",
+      "description": "Run local MCP Tool Mock invocation tests.",
+      "command": "python -m pytest tests/test_mcp_mock_tools.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_mcp_manifest",
+      "description": "Run MCP Tool manifest contract tests.",
+      "command": "python -m pytest tests/test_mcp_manifest.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_mcp_server_mock",
+      "description": "Run Phase 4 MCP Server Mock tests.",
+      "command": "python -m pytest tests/test_mcp_server_mock.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_high_risk_mcp_safety_contract",
+      "description": "Run high-risk MCP Tool safety matrix contract tests.",
+      "command": "python -m pytest tests/test_high_risk_mcp_safety_contract.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_high_risk_mcp_handoff",
+      "description": "Run high-risk MCP operation handoff contract tests.",
+      "command": "python -m pytest tests/test_high_risk_mcp_handoff.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_final_signoff",
+      "description": "Run final operation signoff package contract tests.",
+      "command": "python -m pytest tests/test_final_signoff.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_operations_manual",
+      "description": "Run Phase 5 operations manual contract tests.",
+      "command": "python -m pytest tests/test_operations_manual.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_operations_skill_pack",
+      "description": "Run Phase 5 operations Skill pack contract tests.",
+      "command": "python -m pytest tests/test_operations_skill_pack.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_skill_manifest",
+      "description": "Run reusable Skill manifest contract tests.",
+      "command": "python -m pytest tests/test_skill_manifest.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_standalone_agent_delivery",
+      "description": "Run Phase 5 Standalone Agent delivery contract tests.",
+      "command": "python -m pytest tests/test_standalone_agent_delivery.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_access_entrypoints",
+      "description": "Run Phase 5 access entrypoints delivery contract tests.",
+      "command": "python -m pytest tests/test_access_entrypoints.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase5_mock_baseline",
+      "description": "Run Phase 5 mock baseline freeze contract tests.",
+      "command": "python -m pytest tests/test_phase5_mock_baseline.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_delivery_package_contract",
+      "description": "Run delivery package contract tests.",
+      "command": "python -m pytest tests/test_delivery_package_contract.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_delivery_index",
+      "description": "Run delivery index contract tests.",
+      "command": "python -m pytest tests/test_delivery_index.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_delivery_faq",
+      "description": "Run Phase 1 delivery FAQ and troubleshooting contract tests.",
+      "command": "python -m pytest tests/test_delivery_faq.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_delivery_handoff",
+      "description": "Run Phase 1 operation handoff checklist contract tests.",
+      "command": "python -m pytest tests/test_delivery_handoff.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_demo_script_checklist",
+      "description": "Run Phase 1 operator demo script checklist contract tests.",
+      "command": "python -m pytest tests/test_demo_script_checklist.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_readiness",
+      "description": "Run Phase 2 readiness gate contract tests.",
+      "command": "python -m pytest tests/test_phase2_readiness_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_provider_contract",
+      "description": "Run provider contract tests.",
+      "command": "python -m pytest tests/test_provider_contract.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_provider_mock",
+      "description": "Run MockProvider behavior tests.",
+      "command": "python -m pytest tests/test_provider_mock.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_provider_gate",
+      "description": "Run real provider preflight gate tests.",
+      "command": "python -m pytest tests/test_real_provider_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_provider_shell",
+      "description": "Run disabled real provider shell tests.",
+      "command": "python -m pytest tests/test_real_provider_shell.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_provider_runtime_guard",
+      "description": "Run provider runtime guard contract and CLI tests.",
+      "command": "python -m pytest tests/test_provider_runtime_guard.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_llm_poc_adapter",
+      "description": "Run disabled real LLM PoC adapter contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_llm_poc_adapter.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_llm_dry_run_plan",
+      "description": "Run real LLM dry-run plan contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_llm_dry_run_plan.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_llm_approval_gate",
+      "description": "Run real LLM SDK approval gate contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_llm_approval_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_llm_sdk_task_blueprint",
+      "description": "Run real LLM SDK task blueprint contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_llm_sdk_task_blueprint.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_provider_sdk_poc",
+      "description": "Run default-disabled real provider SDK PoC harness contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_provider_sdk_poc.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_enablement",
+      "description": "Run real SDK enablement switch design contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_enablement.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_minimal_impl",
+      "description": "Run default-disabled real SDK minimal implementation shell contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_minimal_impl.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_env_gate",
+      "description": "Run real SDK dependency and environment review gate contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_env_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_install_plan",
+      "description": "Run real SDK dependency install plan contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_plan.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_installer_audit",
+      "description": "Run disabled real SDK dependency installer audit contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_installer_audit.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_change_preview",
+      "description": "Run disabled real SDK dependency change preview contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_change_preview.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_patch_proposal",
+      "description": "Run disabled real SDK dependency patch proposal contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_patch_proposal.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_apply_gate",
+      "description": "Run disabled real SDK dependency apply gate contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_apply_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_implementation_task_plan",
+      "description": "Run disabled real SDK dependency implementation task plan contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_implementation_task_plan.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_change_approval_package",
+      "description": "Run disabled real SDK dependency change approval package contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_change_approval_package.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_readonly_diff_review",
+      "description": "Run disabled real SDK dependency readonly diff review contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_readonly_diff_review.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_final_execution_confirmation",
+      "description": "Run disabled real SDK dependency final execution confirmation contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_final_execution_confirmation.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_execution_task_creation",
+      "description": "Run disabled real SDK dependency execution task creation contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_execution_task_creation.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_executor_disabled",
+      "description": "Run disabled real SDK dependency executor shell contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_executor_disabled.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_dry_run_evidence",
+      "description": "Run disabled real SDK dependency dry-run evidence contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_dry_run_evidence.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_target_resolver",
+      "description": "Run disabled real SDK dependency target resolver contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_target_resolver.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_readonly_snapshot",
+      "description": "Run disabled real SDK dependency readonly snapshot contract and CLI tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_readonly_snapshot.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_real_sdk_dependency_content_read_approval",
+      "description": "Run real SDK dependency content read approval disabled shell tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_content_read_approval.py",
+      "category": "validation",
+      "requiresNetwork": false,
+      "writesFiles": false,
+      "mockOnly": true,
+      "writesToWorkspace": false
+    },
+    {
+      "id": "test_real_sdk_dependency_content_read_plan",
+      "description": "Run real SDK dependency content read plan disabled shell tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_content_read_plan.py",
+      "category": "validation",
+      "requiresNetwork": false,
+      "writesFiles": false,
+      "writesToWorkspace": false,
+      "mockOnly": true
+    },
+    {
+      "id": "test_real_sdk_dependency_content_read_final_confirmation",
+      "description": "Run real SDK dependency content read final confirmation disabled shell tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_content_read_final_confirmation.py",
+      "category": "validation",
+      "requiresNetwork": false,
+      "writesFiles": false,
+      "writesToWorkspace": false,
+      "mockOnly": true
+    },
+    {
+      "id": "test_real_sdk_dependency_content_read_readonly_execution",
+      "description": "Run real SDK dependency content read readonly execution redacted preview tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_content_read_readonly_execution.py",
+      "category": "validation",
+      "requiresNetwork": false,
+      "writesFiles": false,
+      "writesToWorkspace": false,
+      "mockOnly": true
+    },
+    {
+      "id": "test_real_sdk_dependency_install_change_proposal",
+      "description": "Run real SDK dependency install change proposal safety tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_change_proposal.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_sdk_dependency_install_execution_gate",
+      "description": "Run real SDK dependency install execution gate safety tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_execution_gate.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_sdk_dependency_install_authorization_package",
+      "description": "Run real SDK dependency install authorization package safety tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_authorization_package.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_sdk_dependency_install_execution_request",
+      "description": "Run real SDK dependency install execution request safety tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_execution_request.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_sdk_dependency_install_executor_disabled",
+      "description": "Run real SDK dependency install disabled executor safety tests.",
+      "command": "python -m pytest tests/test_real_sdk_dependency_install_executor_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_sdk_boundary",
+      "description": "Run real LLM SDK installation and environment boundary tests.",
+      "command": "python -m pytest tests/test_real_llm_sdk_boundary.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_sdk_client_boundary",
+      "description": "Run real LLM SDK client construction boundary tests.",
+      "command": "python -m pytest tests/test_real_llm_sdk_client_boundary.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_review_package",
+      "description": "Run real LLM first request review package tests.",
+      "command": "python -m pytest tests/test_real_llm_request_review_package.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_first_call_approval_gate",
+      "description": "Run real LLM first-call approval gate tests.",
+      "command": "python -m pytest tests/test_real_llm_first_call_approval_gate.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_first_call_executor_disabled",
+      "description": "Run real LLM first-call disabled executor tests.",
+      "command": "python -m pytest tests/test_real_llm_first_call_executor_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_pre_send_dry_run_record",
+      "description": "Run real LLM pre-send dry-run record tests.",
+      "command": "python -m pytest tests/test_real_llm_pre_send_dry_run_record.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_minimal_call_poc_review",
+      "description": "Run real LLM minimal call PoC implementation review tests.",
+      "command": "python -m pytest tests/test_real_llm_minimal_call_poc_review.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_minimal_call_send_executor_disabled",
+      "description": "Run real LLM minimal call disabled send executor tests.",
+      "command": "python -m pytest tests/test_real_llm_minimal_call_send_executor_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_authorization_package",
+      "description": "Run real LLM request send authorization package tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_authorization_package.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_execution_request_disabled",
+      "description": "Run real LLM request send disabled execution request tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_execution_request_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_executor_disabled",
+      "description": "Run real LLM request send disabled executor tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_executor_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_final_approval_review",
+      "description": "Run real LLM request send final approval review tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_final_approval_review.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_authorization_task_disabled",
+      "description": "Run real LLM request send authorization task disabled tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_authorization_task_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_authorization_record_write_gate",
+      "description": "Run real LLM request send authorization record write gate tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_authorization_record_write_gate.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_runtime_gate_disabled",
+      "description": "Run real LLM request send runtime gate disabled tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_runtime_gate_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_executor_creation_gate_disabled",
+      "description": "Run real LLM request send executor creation gate disabled tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_executor_creation_gate_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_executor_dispatch_gate_disabled",
+      "description": "Run real LLM request send executor dispatch gate disabled tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_executor_dispatch_gate_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_real_llm_request_send_attempt_gate_disabled",
+      "description": "Run real LLM request send attempt gate disabled tests.",
+      "command": "python -m pytest tests/test_real_llm_request_send_attempt_gate_disabled.py",
+      "category": "validation",
+      "localOnly": true,
+      "writesArtifacts": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "writesToWorkspace": false,
+      "allowedWritePaths": []
+    },
+    {
+      "id": "test_provider_adapter",
+      "description": "Run mock-only provider adapter tests.",
+      "command": "python -m pytest tests/test_provider_adapter.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_provider_adapter_workflow",
+      "description": "Run provider-adapter backed mock workflow tests.",
+      "command": "python -m pytest tests/test_provider_adapter_workflow.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_provider_plan",
+      "description": "Run Phase 2 provider integration plan contract tests.",
+      "command": "python -m pytest tests/test_phase2_provider_plan.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_workflow_orchestrator",
+      "description": "Run Phase 2 Mock workflow orchestrator contract and CLI tests.",
+      "command": "python -m pytest tests/test_phase2_workflow_orchestrator.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_exam_conversion_workflow",
+      "description": "Run Phase 2 Mock exam conversion workflow contract, helper, and CLI tests.",
+      "command": "python -m pytest tests/test_phase2_exam_conversion_workflow.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_exam_candidate_preview",
+      "description": "Run Exam candidate preview redaction helper and leak-detection tests.",
+      "command": "python -m pytest tests/test_exam_candidate_preview.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_ppt_generation_workflow",
+      "description": "Run Phase 2 Mock PPT generation workflow contract, helper, and CLI tests.",
+      "command": "python -m pytest tests/test_phase2_ppt_generation_workflow.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_phase2_workflow_registry",
+      "description": "Run Phase 2 Mock workflow registry contract, helper, and CLI tests.",
+      "command": "python -m pytest tests/test_phase2_workflow_registry.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    },
+    {
+      "id": "test_security_contracts",
+      "description": "Run prompt, skill, material, provider, SDK dependency gates, sandbox, workflow, MCP, config, artifact, and delivery package contract tests.",
+      "command": "python -m pytest tests/test_prompt_manifest.py tests/test_skill_manifest.py tests/test_operations_skill_pack.py tests/test_standalone_agent_delivery.py tests/test_access_entrypoints.py tests/test_phase5_mock_baseline.py tests/test_material_analyzer.py tests/test_real_provider_gate.py tests/test_real_provider_shell.py tests/test_provider_runtime_guard.py tests/test_real_llm_poc_adapter.py tests/test_real_llm_dry_run_plan.py tests/test_real_llm_approval_gate.py tests/test_real_llm_sdk_task_blueprint.py tests/test_real_provider_sdk_poc.py tests/test_real_sdk_enablement.py tests/test_real_sdk_minimal_impl.py tests/test_real_sdk_dependency_env_gate.py tests/test_real_sdk_dependency_install_plan.py tests/test_real_sdk_dependency_installer_audit.py tests/test_real_sdk_dependency_change_preview.py tests/test_real_sdk_dependency_patch_proposal.py tests/test_real_sdk_dependency_apply_gate.py tests/test_real_sdk_dependency_implementation_task_plan.py tests/test_real_sdk_dependency_change_approval_package.py tests/test_real_sdk_dependency_readonly_diff_review.py tests/test_real_sdk_dependency_final_execution_confirmation.py tests/test_real_sdk_dependency_execution_task_creation.py tests/test_real_sdk_dependency_executor_disabled.py tests/test_real_sdk_dependency_dry_run_evidence.py tests/test_real_sdk_dependency_target_resolver.py tests/test_real_sdk_dependency_readonly_snapshot.py tests/test_real_sdk_dependency_content_read_readonly_execution.py tests/test_real_sdk_dependency_install_change_proposal.py tests/test_real_sdk_dependency_install_execution_gate.py tests/test_real_sdk_dependency_install_authorization_package.py tests/test_real_sdk_dependency_install_execution_request.py tests/test_real_sdk_dependency_install_executor_disabled.py tests/test_real_llm_sdk_boundary.py tests/test_real_llm_sdk_client_boundary.py tests/test_real_llm_request_review_package.py tests/test_real_llm_first_call_approval_gate.py tests/test_real_llm_first_call_executor_disabled.py tests/test_real_llm_pre_send_dry_run_record.py tests/test_real_llm_minimal_call_poc_review.py tests/test_real_llm_minimal_call_send_executor_disabled.py tests/test_real_llm_request_send_authorization_package.py tests/test_real_llm_request_send_execution_request_disabled.py tests/test_real_llm_request_send_executor_disabled.py tests/test_real_llm_request_send_final_approval_review.py tests/test_real_llm_request_send_authorization_task_disabled.py tests/test_real_llm_request_send_authorization_record_write_gate.py tests/test_real_llm_request_send_runtime_gate_disabled.py tests/test_real_llm_request_send_executor_creation_gate_disabled.py tests/test_real_llm_request_send_executor_dispatch_gate_disabled.py tests/test_real_llm_request_send_attempt_gate_disabled.py tests/test_provider_contract.py tests/test_provider_mock.py tests/test_provider_adapter.py tests/test_provider_adapter_workflow.py tests/test_phase2_provider_plan.py tests/test_phase2_workflow_orchestrator.py tests/test_phase2_exam_conversion_workflow.py tests/test_phase2_ppt_generation_workflow.py tests/test_phase2_workflow_registry.py tests/test_sandbox_mock_executor.py tests/test_workflow_manifest.py tests/test_mcp_manifest.py tests/test_mcp_mock_tools.py tests/test_high_risk_mcp_safety_contract.py tests/test_high_risk_mcp_handoff.py tests/test_final_signoff.py tests/test_operations_manual.py tests/test_config_contract.py tests/test_local_artifacts_contract.py tests/test_delivery_package_contract.py tests/test_delivery_faq.py tests/test_delivery_handoff.py tests/test_demo_script_checklist.py tests/test_phase2_readiness_gate.py",
+      "category": "validation",
+      "writesToWorkspace": false,
+      "requiresNetwork": false
+    }
+  ],
+  "blockedPatterns": [
+    "rm -rf",
+    "Remove-Item -Recurse -Force",
+    "del /s /q",
+    "git reset --hard",
+    "git checkout --",
+    "kubectl delete",
+    "terraform destroy",
+    "aws ",
+    "az ",
+    "gcloud ",
+    "docker run",
+    "Invoke-Expression",
+    "iex ",
+    "curl |",
+    "wget |"
+  ],
+  "blockedTargets": [
+    "production database",
+    "cloud resource",
+    "contestant code",
+    "host sensitive path",
+    "secret value",
+    "candidate answer"
+  ],
+  "demoRunbooks": [
+    {
+      "id": "phase1_demo_runbook",
+      "title": "Phase 1 Local Demo Acceptance Runbook",
+      "contractPath": "scripts/phase1-demo.runbook.json",
+      "readmePath": "scripts/phase1-demo.runbook.md",
+      "manualOnly": true,
+      "requiresHumanInitiatedRun": true,
+      "requiresNetwork": false,
+      "allowedCommandIds": [
+        "phase1_check",
+        "phase1_export",
+        "phase1_report",
+        "test_scripts_manifest",
+        "test_delivery_package_contract",
+        "test_delivery_index",
+        "test_delivery_faq",
+        "test_delivery_handoff",
+        "test_demo_script_checklist",
+        "test_phase2_readiness",
+        "test_cli",
+        "test_real_provider_gate",
+        "test_real_provider_shell",
+        "test_provider_runtime_guard",
+        "test_real_llm_poc_adapter",
+        "test_real_llm_dry_run_plan",
+        "test_real_llm_approval_gate",
+        "test_real_llm_sdk_task_blueprint",
+        "test_real_provider_sdk_poc",
+        "test_real_sdk_enablement",
+        "test_real_sdk_minimal_impl",
+        "test_real_sdk_dependency_env_gate",
+        "test_real_sdk_dependency_install_plan",
+        "test_real_sdk_dependency_installer_audit",
+        "test_real_sdk_dependency_change_preview",
+        "test_real_sdk_dependency_patch_proposal",
+        "test_real_sdk_dependency_apply_gate",
+        "test_real_sdk_dependency_implementation_task_plan",
+        "test_real_sdk_dependency_change_approval_package",
+        "test_real_sdk_dependency_readonly_diff_review",
+        "test_real_sdk_dependency_final_execution_confirmation",
+        "test_real_sdk_dependency_execution_task_creation",
+        "test_real_sdk_dependency_executor_disabled",
+        "test_real_sdk_dependency_dry_run_evidence",
+        "test_real_sdk_dependency_target_resolver",
+        "test_real_sdk_dependency_readonly_snapshot",
+        "test_provider_adapter",
+        "test_provider_adapter_workflow",
+        "test_mcp_mock_tools",
+        "test_high_risk_mcp_safety_contract",
+        "test_high_risk_mcp_handoff",
+        "test_final_signoff",
+        "test_operations_manual",
+        "test_operations_skill_pack",
+        "test_standalone_agent_delivery",
+        "test_access_entrypoints",
+        "test_phase5_mock_baseline",
+        "test_phase2_provider_plan",
+        "test_frontend_contract",
+        "test_all",
+        "test_real_sdk_dependency_content_read_final_confirmation",
+        "test_real_sdk_dependency_content_read_readonly_execution",
+        "test_real_sdk_dependency_install_change_proposal",
+        "test_real_sdk_dependency_install_execution_gate",
+        "test_real_sdk_dependency_install_executor_disabled"
+      ],
+      "previewTargets": [
+        "frontend/operations-launchpad.html",
+        "frontend/access.html",
+        "frontend/operations-presenter.html",
+        "frontend/operations-signoff.html",
+        "frontend/operations-demo-script.html",
+        "frontend/console.html",
+        "frontend/delivery.html"
+      ],
+      "allowedWritePaths": [
+        "examples/output/phase1-delivery-package.json",
+        "examples/output/phase1-acceptance-report.md"
+      ],
+      "realLlmCalled": false,
+      "realAgentStarted": false,
+      "realCloudResourceCreated": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecutionAllowed": false,
+      "unknownShellScriptsAllowed": false,
+      "autoPublishAllowed": false,
+      "realPublish": false
+    }
+  ]
+}

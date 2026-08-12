@@ -1,0 +1,35 @@
+version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_demo"
+  title: "Python Pytest 评分"
+  sourceExamId: "exam_demo"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 100
+  timeoutSeconds: 30
+  assessmentPlan:
+    - checkId: "check_pytest"
+      type: "pytest"
+      runner: "PytestGrader"
+      score: 100
+      inputSummary: "Plan pytest check at tests/test_main.py"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "high"
+      sandboxRequiredBeforeRealExecution: true
+  checks:
+    - id: "check_pytest"
+      type: "pytest"
+      path: "tests/test_main.py"
+      score: 100

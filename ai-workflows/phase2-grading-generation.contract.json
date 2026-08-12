@@ -1,0 +1,99 @@
+{
+  "version": "0.1.0",
+  "workflowId": "phase2_grading_generation",
+  "phase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "title": "Phase 2 Mock Grading Generation Workflow",
+  "description": "Generate a Grading DSL review bundle from an existing Exam DSL through MockProvider. It validates the Exam DSL, generates Grading DSL, and emits assessmentPlan quality signals without running a real sandbox or contestant code.",
+  "entrypoints": {
+    "cliRun": "python lab_cli.py phase2 grading-generate run --exam templates/exam/examples/notebook-fill-blank.yaml --reviewer teacher_1 --output examples/output/phase2-grading-generation-report.json",
+    "cliReport": "python lab_cli.py phase2 grading-generate report --file examples/output/phase2-grading-generation-report.json",
+    "backendRun": {
+      "method": "POST",
+      "path": "/api/phase2/workflows/grading-generation/run"
+    },
+    "pythonHelper": "ai_workflows.grading_generation_workflow.run_phase2_grading_generation"
+  },
+  "inputs": [
+    {
+      "name": "examDsl",
+      "kind": "Exam",
+      "path": "templates/exam/examples/notebook-fill-blank.yaml",
+      "localOnly": true,
+      "schemaValidated": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "gradingDsl",
+      "kind": "Grading",
+      "path": "templates/grading/examples/python-pytest.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "generated": true
+    },
+    {
+      "name": "workflowReport",
+      "kind": "WorkflowReport",
+      "path": "examples/output/phase2-grading-generation-report.json",
+      "status": "COMPLETED",
+      "generated": true
+    }
+  ],
+  "steps": [
+    {
+      "name": "validate_exam_dsl",
+      "type": "validation",
+      "schema": "templates/exam/exam.schema.json",
+      "status": "COMPLETED"
+    },
+    {
+      "name": "generate_grading_dsl",
+      "type": "provider_adapter",
+      "provider": "MockProvider",
+      "promptId": "grading_generation_v0",
+      "outputKind": "Grading",
+      "status": "WAITING_REVIEW"
+    },
+    {
+      "name": "assemble_grading_review_bundle",
+      "type": "review_bundle",
+      "status": "COMPLETED",
+      "reviewRequired": true,
+      "publishBlockedUntilApproved": true
+    }
+  ],
+  "qualitySignals": {
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "fields": [
+      "grading.assessmentPlan",
+      "coverage.gradingRefCoverage",
+      "coverage.scoreCoverage",
+      "coverage.explainability.assessmentPlanAlignedWithChecks",
+      "coverage.explainability.assessmentPlanHasReportDetailFields"
+    ]
+  },
+  "reviewGate": {
+    "defaultGeneratedStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "autoPublishAllowed": false
+  },
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "reviewBypassed": false
+  },
+  "recommendedCommandIds": [
+    "phase2_grading_generate_run",
+    "phase2_grading_generate_report",
+    "test_phase2_grading_generation_workflow"
+  ]
+}

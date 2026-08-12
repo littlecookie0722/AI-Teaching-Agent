@@ -1,0 +1,153 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_llm_approval_gate_contract",
+  "title": "Real LLM SDK Approval Gate Contract",
+  "description": "Machine-testable contract for the local pre-implementation approval gate before any future real LLM SDK task. The gate requires dry-run confirmation, runtime guard confirmation, schema review, human review policy, and audit redaction checks while keeping real calls disabled.",
+  "gateId": "real_llm_approval_gate",
+  "activeProvider": "mock",
+  "inputs": [
+    {
+      "id": "real_llm_approval_gate",
+      "path": "providers/real_llm_approval_gate.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_dry_run_plan",
+      "path": "providers/real_llm_dry_run_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_dry_run_plan_contract",
+      "path": "providers/real-llm-dry-run-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "lab_schema",
+      "path": "templates/lab/lab.schema.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-approval-gate check --provider openai",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-approval-gate check --provider openai --approval-ref APPROVAL-001 --reviewer teacher_1 --confirm-dry-run-plan --confirm-runtime-guard --confirm-schema-review --confirm-human-review-policy --confirm-audit-redaction",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-approval-gate check --provider openai --output-kind Exam",
+      "expectedCode": "VALIDATION_ERROR"
+    }
+  ],
+  "approvalChecklist": [
+    "approval_ref_provided",
+    "reviewer_provided",
+    "dry_run_plan_passed",
+    "dry_run_plan_confirmed",
+    "runtime_guard_confirmed",
+    "schema_review_confirmed",
+    "human_review_policy_confirmed",
+    "audit_redaction_confirmed"
+  ],
+  "requiredContext": {
+    "gateId": "real_llm_approval_gate",
+    "mode": "MOCK_ONLY",
+    "approvalMode": "PRE_IMPLEMENTATION_REVIEW",
+    "defaultProvider": "mock",
+    "providerEnabled": false,
+    "providerContractEnabled": false,
+    "readyForRealProvider": false,
+    "realCallAuthorized": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "authorize_real_call",
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "check_secret_presence_from_environment",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "bypass_dry_run_plan",
+    "bypass_runtime_guard",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_llm_approval_gate",
+    "test_real_llm_dry_run_plan",
+    "test_real_llm_poc_adapter",
+    "test_provider_runtime_guard",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realCallAuthorized": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

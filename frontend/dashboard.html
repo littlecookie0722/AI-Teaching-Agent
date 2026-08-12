@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Dashboard Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --blocked: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .metric,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .card {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .artifact-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .artifact-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 0.8fr) minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .blocked {
+      color: var(--blocked);
+      font-weight: 700;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .summary-grid,
+      .content-grid,
+      .artifact-row {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Dashboard Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型：禁用</span>
+      <span class="pill">真实云资源：禁用</span>
+      <span class="pill">真实沙箱：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">Phase 1 总览</h2>
+          <p>GET /api/health + GET /api/review-task-summary</p>
+        </div>
+        <span class="pill strong">UP</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>待审核任务</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>AI Task</span>
+          <strong>3</strong>
+        </div>
+        <div class="metric">
+          <span>Workflow Run</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Artifact</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>自动发布</span>
+          <strong class="blocked">false</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="operations-title">
+      <div class="section-head">
+        <div>
+          <h2 id="operations-title">运营看板</h2>
+          <p>待审核压力、Workflow、Artifact 与安全状态</p>
+        </div>
+        <span class="pill warn">publish blocked</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="card">
+            <h3>待审核队列</h3>
+            <p>WAITING_REVIEW: 2</p>
+            <p>batchApproveAllowed=false</p>
+            <p>batchPublishAllowed=false</p>
+          </div>
+          <div class="card">
+            <h3>AssessmentPlanDashboardSignal</h3>
+            <p>source=gradingReviewPrototype.assessmentPlanSummary</p>
+            <p>backend=GET /api/review-tasks/{id}.reviewDetail.assessmentPlan.summary</p>
+            <p>GRADING_GENERATION: planTotal=1, alignedWithChecks=true, riskLevel=high</p>
+            <p>MOCK_EVIDENCE_NOT_COLLECTED, realSandboxEvidenceRequired=true</p>
+            <p>requiredLimits=timeout/cpu/memory/network/filesystem/process</p>
+          </div>
+          <div class="card">
+            <h3>Artifact</h3>
+            <div class="artifact-list">
+              <div class="artifact-row">
+                <span>artifact_material_demo</span>
+                <span>examples/input/demo-source.md</span>
+                <span class="pill">COMPLETED</span>
+              </div>
+              <div class="artifact-row">
+                <span>artifact_lab_demo</span>
+                <span>templates/lab/examples/basic-lab.yaml</span>
+                <span class="pill warn">WAITING_REVIEW</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>Workflow Run</h3>
+            <ol class="timeline">
+              <li>generate_lab_dsl：COMPLETED</li>
+              <li>generate_exam_dsl：COMPLETED</li>
+              <li>generate_grading_dsl：COMPLETED</li>
+              <li>generate_ppt_dsl：COMPLETED</li>
+              <li>mock_grade_run：COMPLETED</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>安全总览</h3>
+            <p class="ok">realLlmCalled=false</p>
+            <p class="ok">realCloudResourceChanged=false</p>
+            <p class="ok">sandboxExecuted=false</p>
+            <p class="ok">contestantCodeExecuted=false</p>
+            <p class="ok">secretVisibleInFrontend=false</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button">打开 AI 任务中心</button>
+        <button type="button">打开审核中心</button>
+        <button type="button">查看 Workflow 日志</button>
+        <button type="button" disabled title="Phase 1 禁用自动发布">自动发布</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

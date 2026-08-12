@@ -1,0 +1,78 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Sandbox safety contract for Phase 1. The mock executor does not execute contestant code.",
+  "executor": {
+    "name": "MockSandboxExecutor",
+    "module": "sandbox.mock_executor",
+    "entrypoint": "build_mock_grading_report"
+  },
+  "futureExecutionBoundary": {
+    "contract": "sandbox/execution-contract.json",
+    "requestBuilder": "sandbox.execution_contract.build_sandbox_execution_request",
+    "placeholderResultBuilder": "sandbox.execution_contract.build_sandbox_result_placeholder",
+    "mode": "CONTRACT_ONLY",
+    "realContainerExecuted": false,
+    "dryRunAdapter": {
+      "contract": "sandbox/container-executor.contract.json",
+      "module": "sandbox.container_executor",
+      "entrypoint": "build_container_sandbox_plan",
+      "mode": "CONTAINER_PLAN_ONLY",
+      "realContainerExecuted": false
+    }
+  },
+  "inputs": [
+    {
+      "name": "grading",
+      "kind": "Grading",
+      "schema": "templates/grading/grading.schema.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "gradingReport",
+      "type": "json",
+      "requiredFields": [
+        "id",
+        "mode",
+        "gradingId",
+        "totalScore",
+        "earnedScore",
+        "passed",
+        "checks",
+        "sandboxExecuted",
+        "contestantCodeExecuted",
+        "traceId"
+      ]
+    }
+  ],
+  "phase1Guarantees": {
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "networkEnabled": false,
+    "filesystemIsolated": true,
+    "realResourceTouched": false
+  },
+  "futureRealSandboxRequirements": {
+    "cpuLimitRequired": true,
+    "memoryLimitRequired": true,
+    "timeoutRequired": true,
+    "networkDisabledByDefault": true,
+    "filesystemIsolationRequired": true,
+    "processLimitRequired": true,
+    "stdoutCaptured": true,
+    "stderrCaptured": true,
+    "auditLogRequired": true
+  },
+  "blockedOperations": [
+    "execute_unknown_shell",
+    "execute_contestant_code_on_host",
+    "enable_network_by_default",
+    "read_host_sensitive_paths",
+    "write_outside_workspace",
+    "log_secret_values"
+  ]
+}

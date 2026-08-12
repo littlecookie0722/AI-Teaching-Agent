@@ -1,0 +1,204 @@
+{
+  "version": "0.1.0",
+  "registryId": "phase2_workflow_registry",
+  "phase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "title": "Phase 2 Mock Workflow Registry",
+  "description": "Queryable registry for Phase 2 mock-only workflows. It is a capability catalog, not a workflow execution engine.",
+  "entrypoints": {
+    "cliList": "python lab_cli.py workflow registry list",
+    "cliGet": "python lab_cli.py workflow registry get --workflow-id phase2_content_generation",
+    "backendList": {
+      "method": "GET",
+      "path": "/api/workflow-registry"
+    },
+    "backendGet": {
+      "method": "GET",
+      "path": "/api/workflow-registry/{workflowId}"
+    },
+    "pythonHelper": "ai_workflows.workflow_registry"
+  },
+  "workflows": [
+    {
+      "workflowId": "phase2_content_generation",
+      "title": "Phase 2 Mock Content Generation Workflow",
+      "phase": "Phase 2",
+      "mode": "MOCK_ONLY",
+      "category": "content_generation",
+      "status": "READY",
+      "contractPath": "ai-workflows/phase2-content-generation.contract.json",
+      "entrypoints": {
+        "cli": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json",
+        "backend": {
+          "method": "POST",
+          "path": "/api/phase2/workflows/content-generation/run"
+        }
+      },
+      "inputKinds": [
+        "Markdown"
+      ],
+      "outputKinds": [
+        "Lab",
+        "Exam",
+        "Grading",
+        "PPT"
+      ],
+      "reviewGate": {
+        "reviewRequired": true,
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "autoPublishAllowed": false
+      },
+      "safety": {
+        "realLlmCalled": false,
+        "realAgentStarted": false,
+        "realCloudResourceCreated": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      }
+    },
+    {
+      "workflowId": "phase2_exam_conversion",
+      "title": "Phase 2 Mock Exam Conversion Workflow",
+      "phase": "Phase 2",
+      "mode": "MOCK_ONLY",
+      "category": "exam_conversion",
+      "status": "READY",
+      "contractPath": "ai-workflows/phase2-exam-conversion.contract.json",
+      "entrypoints": {
+        "cli": "python lab_cli.py phase2 exam-convert run --lab templates/lab/examples/basic-lab.yaml --notebook examples/notebooks/demo-lab.ipynb --reviewer teacher_1 --output examples/output/phase2-exam-conversion-report.json",
+        "backend": {
+          "method": "POST",
+          "path": "/api/phase2/workflows/exam-conversion/run"
+        }
+      },
+      "inputKinds": [
+        "LabDsl",
+        "Notebook"
+      ],
+      "outputKinds": [
+        "Exam",
+        "Grading"
+      ],
+      "reviewGate": {
+        "reviewRequired": true,
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "autoPublishAllowed": false
+      },
+      "safety": {
+        "realLlmCalled": false,
+        "realAgentStarted": false,
+        "realCloudResourceCreated": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "workflowId": "phase2_ppt_generation",
+      "title": "Phase 2 Mock PPT Generation Workflow",
+      "phase": "Phase 2",
+      "mode": "MOCK_ONLY",
+      "category": "ppt_generation",
+      "status": "READY",
+      "contractPath": "ai-workflows/phase2-ppt-generation.contract.json",
+      "entrypoints": {
+        "cli": "python lab_cli.py phase2 ppt-generate run --input examples/input/demo-source.md --reviewer teacher_1 --slide-plan-output examples/output/phase2-ppt-slide-plan.json --output examples/output/phase2-ppt-generation-report.json",
+        "backend": {
+          "method": "POST",
+          "path": "/api/phase2/workflows/ppt-generation/run"
+        }
+      },
+      "inputKinds": [
+        "Markdown"
+      ],
+      "outputKinds": [
+        "SlidePlan",
+        "PPT"
+      ],
+      "reviewGate": {
+        "reviewRequired": true,
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "autoPublishAllowed": false
+      },
+      "safety": {
+        "realLlmCalled": false,
+        "realAgentStarted": false,
+        "realCloudResourceCreated": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false,
+        "realPptFileCreated": false
+      }
+    },
+    {
+      "workflowId": "phase2_grading_generation",
+      "title": "Phase 2 Mock Grading Generation Workflow",
+      "phase": "Phase 2",
+      "mode": "MOCK_ONLY",
+      "category": "grading_generation",
+      "status": "READY",
+      "contractPath": "ai-workflows/phase2-grading-generation.contract.json",
+      "entrypoints": {
+        "cli": "python lab_cli.py phase2 grading-generate run --exam templates/exam/examples/notebook-fill-blank.yaml --reviewer teacher_1 --output examples/output/phase2-grading-generation-report.json",
+        "backend": {
+          "method": "POST",
+          "path": "/api/phase2/workflows/grading-generation/run"
+        }
+      },
+      "inputKinds": [
+        "ExamDsl"
+      ],
+      "outputKinds": [
+        "Grading"
+      ],
+      "reviewGate": {
+        "reviewRequired": true,
+        "defaultGeneratedStatus": "WAITING_REVIEW",
+        "publishBlockedUntilApproved": true,
+        "autoPublishAllowed": false
+      },
+      "safety": {
+        "realLlmCalled": false,
+        "realAgentStarted": false,
+        "realCloudResourceCreated": false,
+        "realCloudResourceChanged": false,
+        "sandboxExecuted": false,
+        "contestantCodeExecuted": false,
+        "realPublish": false
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "WorkflowRegistry",
+      "status": "COMPLETED",
+      "generated": false,
+      "reviewRequired": false
+    }
+  ],
+  "recommendedCommandIds": [
+    "phase2_workflow_registry_list",
+    "phase2_workflow_registry_get",
+    "mcp_list_workflows",
+    "mcp_get_workflow",
+    "test_phase2_workflow_registry"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "workflowExecuted": false,
+    "taskCreated": false,
+    "artifactCreated": false,
+    "reviewBypassed": false
+  }
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地自动评分工作台</title>
+  <style>
+    :root { --bg:#f4f7f9; --panel:#fff; --line:#d7dee7; --text:#172033; --muted:#64748b; --accent:#0f766e; --soft:#ecfdf5; --warn:#b45309; --danger:#b42318; --code:#101828; }
+    * { box-sizing:border-box; } body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font:14px/1.5 "Microsoft YaHei","Segoe UI",Arial,sans-serif; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 28px; border-bottom:1px solid var(--line); background:var(--panel); } h1,h2,h3,p { margin:0; } h1 { font-size:24px; } h2 { font-size:18px; } h3 { font-size:15px; }
+    main { max-width:1280px; margin:0 auto; padding:18px; display:grid; gap:18px; } section { min-width:0; border:1px solid var(--line); border-radius:8px; background:var(--panel); } .section-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:16px; border-bottom:1px solid var(--line); }
+    .pill-row,.actions,.links { display:flex; flex-wrap:wrap; align-items:center; gap:8px; } .pill,.api-state { display:inline-flex; align-items:center; min-height:28px; padding:4px 10px; border:1px solid var(--line); border-radius:8px; color:var(--muted); background:#f8fafc; overflow-wrap:anywhere; }.pill.strong { color:var(--accent); border-color:#99f6e4; background:var(--soft); font-weight:700; }.pill.warn { color:var(--warn); border-color:#fed7aa; background:#fff7ed; font-weight:700; }.api-state { margin:16px; }.api-state.pending { color:var(--warn); border-color:#fed7aa; }.api-state.error { color:var(--danger); border-color:#fecaca; background:#fef2f2; }
+    .form-grid,.summary-grid,.detail-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px; }.form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } label,.metric,.detail { min-width:0; display:grid; gap:7px; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fbfcfd; }.metric span,.detail span { color:var(--muted); font-size:12px; }.metric strong,.detail strong { overflow-wrap:anywhere; }
+    input,select,textarea { width:100%; min-height:38px; padding:8px 10px; border:1px solid var(--line); border-radius:6px; color:var(--text); background:#fff; font:inherit; } textarea { min-height:70px; resize:vertical; }.checkbox { display:flex; align-items:center; gap:8px; }.checkbox input { width:auto; min-height:auto; }
+    button,.action-link { min-height:36px; padding:8px 12px; border:1px solid var(--line); border-radius:6px; color:var(--text); background:#fff; font:inherit; text-decoration:none; cursor:pointer; } button.primary { color:#fff; border-color:var(--accent); background:var(--accent); } button:disabled { color:#94a3b8; border-color:#e2e8f0; background:#f1f5f9; cursor:not-allowed; }.actions,.links { padding:0 16px 16px; }.links .pill { text-decoration:none; }
+    pre { min-height:220px; margin:0 16px 16px; padding:14px; overflow:auto; border-radius:6px; background:var(--code); color:#d1fae5; white-space:pre-wrap; overflow-wrap:anywhere; }.safety { margin:0 16px 16px; padding:12px; border-left:3px solid var(--accent); background:#f0fdfa; color:#135d54; }.hidden { display:none; }
+    @media (max-width:760px) { header { align-items:flex-start; flex-direction:column; padding:14px; } main { padding:12px; }.section-head { flex-direction:column; }.form-grid,.summary-grid,.detail-grid { grid-template-columns:1fr; } input { font-size:12px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>本地自动评分工作台</h1><p class="pill strong">LOCAL_CORE_MVP</p></div>
+    <div class="pill-row" aria-label="评分安全状态"><span class="pill">受控 Docker：可选执行</span><span class="pill">人工复核：必须</span><span class="pill">自动发布：禁用</span><span class="pill">真实平台：暂停</span></div>
+  </header>
+  <main>
+    <section aria-labelledby="grading-workspace-input-title">
+      <div class="section-head"><div><h2 id="grading-workspace-input-title">创建评分任务</h2><p>选择本地 Grading DSL 与提交目录，创建后可发起一次受控评分。</p></div><span class="pill">POST /api/grading/jobs</span></div>
+      <div class="form-grid">
+        <label>审核任务 ID（可选）<input id="grading-workspace-task-id" placeholder="从审核中心或 AI Task 进入时自动带入"></label>
+        <label>Grading DSL<input id="grading-workspace-grading" value="templates/grading/examples/mixed-checks.yaml"></label>
+        <label>提交目录<input id="grading-workspace-submission" value="examples/submissions/mixed-checks-pass"></label>
+        <label>证据报告输出<input id="grading-workspace-output" value="examples/output/grading-evidence.json"></label>
+        <label>提交编号<input id="grading-workspace-submission-id" value="submission_workspace_001"></label>
+        <label>候选人编号<input id="grading-workspace-candidate-id" value="candidate_workspace_001"></label>
+        <label>审核人<input id="grading-workspace-reviewer" value="teacher_1"></label>
+        <label>本地 SQLite 路径（可选）<input id="grading-workspace-db-path" placeholder="examples/output/grading-local.sqlite3"></label>
+      </div>
+      <div class="actions"><label class="checkbox"><input id="grading-workspace-controlled" type="checkbox" checked>执行受控 Docker command evidence</label><label class="checkbox"><input id="grading-workspace-fail-unavailable" type="checkbox">Docker 不可用时失败</label></div>
+      <div class="actions"><button id="grading-workspace-create" class="primary" type="button">创建评分任务</button><button id="grading-workspace-run" type="button" disabled>运行受控评分</button><button id="grading-workspace-reload" type="button" disabled>刷新评分记录</button></div>
+      <p class="safety">页面只提交本地路径与人工填写的任务元数据。不会读取模型密钥、不会自动 approve、不会发布或调用真实平台接口。</p>
+    </section>
+
+    <section aria-labelledby="grading-workspace-result-title">
+      <div class="section-head"><div><h2 id="grading-workspace-result-title">评分任务与结果</h2><p>运行完成后生成 evidence 与 GradingRecord，仍停在人工复核边界。</p></div><span id="grading-workspace-api-state" class="api-state">STATIC_HTML_FALLBACK</span></div>
+      <div class="summary-grid">
+        <div class="metric"><span>评分任务</span><strong id="grading-workspace-job">job=not_created</strong></div>
+        <div class="metric"><span>任务状态</span><strong id="grading-workspace-job-status">NOT_CREATED</strong></div>
+        <div class="metric"><span>得分</span><strong id="grading-workspace-score">-</strong></div>
+        <div class="metric"><span>评分记录</span><strong id="grading-workspace-record">record=not_created</strong></div>
+        <div class="metric"><span>证据报告</span><strong id="grading-workspace-report">report=none</strong></div>
+        <div class="metric"><span>下一步</span><strong id="grading-workspace-next">create_local_job</strong></div>
+      </div>
+      <div class="links"><a id="grading-workspace-report-link" class="pill strong" aria-disabled="true">等待评分报告</a><a id="grading-workspace-review-link" class="pill" aria-disabled="true">等待审核任务</a><a id="grading-workspace-task-link" class="pill" aria-disabled="true">打开 AI Task</a></div>
+      <pre id="grading-workspace-result-json">{
+  "status": "STATIC_HTML_FALLBACK",
+  "manualReviewRequired": true,
+  "autoApproveAllowed": false,
+  "realPublish": false
+}</pre>
+    </section>
+
+    <section aria-labelledby="grading-workspace-review-title">
+      <div class="section-head"><div><h2 id="grading-workspace-review-title">人工复核 GradingRecord</h2><p>复核只更新本地评分记录，不改变 AI Task 审核状态。</p></div><span class="pill warn" id="grading-workspace-review-status">recordReview=WAITING_RECORD</span></div>
+      <div class="form-grid">
+        <label>评分记录 ID<input id="grading-workspace-record-id" placeholder="运行完成后自动填入"></label>
+        <label>复核结论<select id="grading-workspace-decision"><option value="approve-ready">approve-ready</option><option value="needs-evidence">needs-evidence</option><option value="needs-revision">needs-revision</option></select></label>
+        <label style="grid-column:1/-1">复核原因（needs-evidence / needs-revision 必填）<textarea id="grading-workspace-reason" placeholder="记录需要补充证据或修订的具体原因"></textarea></label>
+      </div>
+      <div class="actions"><button id="grading-workspace-review-record" type="button" disabled>记录人工复核</button><span class="pill">taskStatusChanged=false · autoApproveAllowed=false · realPublish=false</span></div>
+    </section>
+  </main>
+  <script src="grading-workspace-data.js"></script>
+</body>
+</html>

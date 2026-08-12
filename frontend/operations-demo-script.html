@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations Demo Script Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --accent: #2563eb;
+      --warn: #b45309;
+      --ok-bg: #e7f8f2;
+      --info-bg: #eef4ff;
+      --warn-bg: #fff7ed;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #123f46;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1200px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 1040px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.info {
+      color: var(--accent);
+      background: var(--info-bg);
+      border-color: #bfdbfe;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.82fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.44fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(210px, 0.55fr) minmax(260px, 1fr);
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status.info {
+      background: var(--info-bg);
+      color: var(--accent);
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .command,
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    a {
+      color: var(--brand-dark);
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    @media (max-width: 980px) {
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">Presenter View</span>
+      <span class="pill">ConsoleNavPanel</span>
+      <span class="pill">DeliveryChecklistPanel</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill warn">readOnly=true</span>
+    </div>
+    <h1>Operations Demo Script Mock</h1>
+    <p>运营演示脚本页。数据来自 <code>frontend/mock-data.json.operationsDemoScriptPrototype</code>、<code>frontend/mock-data.json.operationsPresenterPrototype</code>、<code>frontend/mock-data.json.operationsSignoffPrototype</code>、<code>delivery/phase1-demo-script-checklist.json</code> 和 <code>delivery/DEMO_SCRIPT_CHECKLIST.md</code>，只展示 14 步演示顺序、验收信号、白名单命令、CLI / Backend / MCP 三链路 <code>reviewPriorityQueue</code> 和禁止动作，不运行命令、不上传交付包、不发布真实内容。</p>
+    <div class="pill-row">
+      <span class="pill">route=/operations/demo-script</span>
+      <span class="pill">GET /api/health</span>
+      <span class="pill">GET /api/review-task-summary</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/artifacts</span>
+      <span class="pill">GET /api/audit-events</span>
+      <span class="pill">MCP get_review_task_summary</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">演示脚本总览</h2>
+          <p>demoSteps + acceptanceSignals + safeCommands + blockedActions + safety。</p>
+        </div>
+        <span class="pill strong">runCommandEnabled=false</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Steps</span>
+          <strong>15</strong>
+        </div>
+        <div class="metric">
+          <span>Signals</span>
+          <strong>8</strong>
+        </div>
+        <div class="metric">
+          <span>Blocked Actions</span>
+          <strong>8</strong>
+        </div>
+        <div class="metric">
+          <span>Delivery Ready</span>
+          <strong>175 / 175</strong>
+        </div>
+        <div class="metric">
+          <span>Phase1 Checks</span>
+          <strong>20 / 20</strong>
+        </div>
+        <div class="metric">
+          <span>New LLM Calls</span>
+          <strong>0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="steps-title">
+      <div class="section-head">
+        <div>
+          <h2 id="steps-title">演示顺序</h2>
+          <p>按清单从规则、入口、地图、Runbook、CLI 验证、验收、交付、审计和安全边界依次演示。</p>
+        </div>
+        <span class="pill info">delivery/phase1-demo-script-checklist.json</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>Demo Steps</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>read_rules</span>
+                <span>AGENTS.md + docs/AI_PLATFORM_CODEX_FULL_GUIDE.md</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>open_launchpad</span>
+                <span><a href="operations-launchpad.html">/operations/launchpad</a> · start .\frontend\operations-launchpad.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>open_demo_map</span>
+                <span><a href="operations-demo-map.html">/operations/demo-map</a> · start .\frontend\operations-demo-map.html</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>open_real_demo_evidence</span>
+                <span><a href="real-demo.html">/real-demo</a> · readonlyEvidenceDemo.executed=2 · earnedScore=70 · newLlmRequestSent=false</span>
+                <strong class="status info">EVIDENCE</strong>
+              </div>
+              <div class="row">
+                <span>open_runbook</span>
+                <span><a href="operations-runbook.html">/operations/runbook</a> · scripts/phase1-demo.runbook.json</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>run_phase1_check</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+                <strong class="status">20 / 20</strong>
+              </div>
+              <div class="row">
+                <span>export_delivery_package</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row">
+                <span>render_acceptance_report</span>
+                <span class="command">python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row">
+                <span>open_acceptance</span>
+                <span><a href="operations-acceptance.html">/operations/acceptance</a> · deliveryManifest.summary.missingRequired=0</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>open_delivery</span>
+                <span><a href="delivery.html">/delivery</a> · acceptanceSummary.passed=true</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>open_incident_review</span>
+                <span><a href="audit-incidents.html">/audit/incidents</a> · failed mock records only</span>
+                <strong class="status">READY</strong>
+              </div>
+              <div class="row">
+                <span>validate_cli_review_priority_queue</span>
+                <span class="command">python lab_cli.py review batch-summary · reviewPriorityQueue: URGENT/HIGH/NORMAL · autoApproveAllowed=false</span>
+                <strong class="status info">QUEUE</strong>
+              </div>
+              <div class="row">
+                <span>validate_backend_mcp_review_priority_queue</span>
+                <span class="command">GET /api/review-task-summary · MCP get_review_task_summary · batchStateChangeAllowed=false</span>
+                <strong class="status info">TRIAGE</strong>
+              </div>
+              <div class="row">
+                <span>confirm_review_gate</span>
+                <span>Lab / Exam / Grading / PPT DSL 继续保持 WAITING_REVIEW。</span>
+                <strong class="status warn">GATE</strong>
+              </div>
+              <div class="row">
+                <span>confirm_blocked_actions</span>
+                <span>真实 LLM、真实 Agent、真实云、真实沙箱、远程上传、自动发布、真实发布全部禁用。</span>
+                <strong class="status warn">LOCKED</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>白名单命令文本</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>打开讲解台</span>
+                <span class="command">start .\frontend\operations-presenter.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开脚本页</span>
+                <span class="command">start .\frontend\operations-demo-script.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开 Launchpad</span>
+                <span class="command">start .\frontend\operations-launchpad.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开 Demo Map</span>
+                <span class="command">start .\frontend\operations-demo-map.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开真实 Demo Evidence</span>
+                <span class="command">start .\frontend\real-demo.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开 Runbook</span>
+                <span class="command">start .\frontend\operations-runbook.html</span>
+              </div>
+              <div class="row compact">
+                <span>Phase 1 自检</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+              </div>
+              <div class="row compact">
+                <span>导出交付包</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+              </div>
+              <div class="row compact">
+                <span>渲染验收报告</span>
+                <span class="command">python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</span>
+              </div>
+              <div class="row compact">
+                <span>审核优先队列 CLI</span>
+                <span class="command">python lab_cli.py review batch-summary</span>
+              </div>
+              <div class="row compact">
+                <span>审核优先队列 MCP</span>
+                <span class="command">python lab_cli.py mcp call --tool get_review_task_summary --arguments "{}"</span>
+              </div>
+              <div class="row compact">
+                <span>清单测试</span>
+                <span class="command">python -m pytest tests/test_demo_script_checklist.py</span>
+              </div>
+              <div class="row compact">
+                <span>三链路队列测试</span>
+                <span class="command">python -m pytest tests/test_backend_mock_api.py tests/test_mcp_mock_tools.py tests/test_cli.py</span>
+              </div>
+              <div class="row compact">
+                <span>全量测试</span>
+                <span class="command">python -m pytest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>Acceptance Signals</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>launchpad_first</span>
+                <span>先打开 frontend/operations-launchpad.html。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>phase1_check_passed</span>
+                <span>phase1 check 返回 success=true 和 data.passed=true。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>delivery_manifest_ready</span>
+                <span>deliveryManifest.summary.missingRequired=0。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>acceptance_report_ready</span>
+                <span>acceptancePassed=true 且 safetyAssertionsPassed=true。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>review_gate_visible</span>
+                <span>WAITING_REVIEW 在审核与交付叙事中可见。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>review_priority_queue_visible</span>
+                <span>CLI review batch-summary、GET /api/review-task-summary、MCP get_review_task_summary 同源展示 reviewPriorityQueue，autoApproveAllowed=false，batchStateChangeAllowed=false。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>real_actions_disabled</span>
+                <span>真实执行、上传、Provider、Agent、发布操作全部 disabled。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>assessment_plan_audit_trace_visible</span>
+                <span>AssessmentPlanAuditSignal · gradingReport.assessmentPlanSummary -> operationAuditEvents.detail.assessmentPlanSummary · assessmentPlanSummary.source=grading.spec.assessmentPlan。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row compact">
+                <span>checkPlans[].assessmentPlanSourceField</span>
+                <span class="muted">MOCK_GRADING_RUN 可追溯 spec.assessmentPlan[checkId=check_result_file]，assessmentPlanAlignedWithChecks=true。</span>
+              </div>
+              <div class="row compact">
+                <span>ReviewPriorityQueue</span>
+                <span class="muted">topPriorityTaskId=task_grading_demo · reasonCode=HIGH_RISK_MOCK_EVIDENCE_REQUIRED · recommendedAction=review_grading_plan_before_publish。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Action Policy</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>viewDemoScriptSummaryEnabled=true</span>
+                <span>openLinkedStaticPageEnabled=true · copySafeCommandEnabled=true</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row compact">
+                <span>runCommandEnabled=false</span>
+                <span class="muted">页面不执行命令。</span>
+              </div>
+              <div class="row compact">
+                <span>uploadPackageEnabled=false</span>
+                <span class="muted">不上传交付包。</span>
+              </div>
+              <div class="row compact">
+                <span>batchStateChangeEnabled=false</span>
+                <span class="muted">不批量变更任务状态。</span>
+              </div>
+              <div class="row compact">
+                <span>startRealAgentEnabled=false</span>
+                <span class="muted">不启动真实 Agent。</span>
+              </div>
+              <div class="row compact">
+                <span>enableRealProviderEnabled=false</span>
+                <span class="muted">不启用真实 Provider。</span>
+              </div>
+              <div class="row compact">
+                <span>callRealLlmEnabled=false</span>
+                <span class="muted">不调用真实大模型。</span>
+              </div>
+              <div class="row compact">
+                <span>runRealSandboxEnabled=false</span>
+                <span class="muted">不运行真实沙箱。</span>
+              </div>
+              <div class="row compact">
+                <span>executeContestantCodeEnabled=false</span>
+                <span class="muted">不执行选手代码。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublishEnabled=false</span>
+                <span class="muted">不真实发布。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Phase 1 安全断言</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>realLlmCalled=false</span>
+                <span class="muted">不接入真实大模型。</span>
+              </div>
+              <div class="row compact">
+                <span>realMcpServerStarted=false</span>
+                <span class="muted">不启动真实 MCP Server。</span>
+              </div>
+              <div class="row compact">
+                <span>realAgentStarted=false</span>
+                <span class="muted">不启动真实智能体。</span>
+              </div>
+              <div class="row compact">
+                <span>realCloudResourceChanged=false</span>
+                <span class="muted">不创建或变更真实云资源。</span>
+              </div>
+              <div class="row compact">
+                <span>sandboxExecuted=false</span>
+                <span class="muted">不执行真实沙箱。</span>
+              </div>
+              <div class="row compact">
+                <span>contestantCodeExecuted=false</span>
+                <span class="muted">不执行选手代码。</span>
+              </div>
+              <div class="row compact">
+                <span>unknownShellExecuted=false</span>
+                <span class="muted">不执行未知 Shell。</span>
+              </div>
+              <div class="row compact">
+                <span>autoPublishAllowed=false</span>
+                <span class="muted">不自动发布。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublish=false</span>
+                <span class="muted">不真实发布。</span>
+              </div>
+              <div class="row compact">
+                <span>remoteUploadAllowed=false</span>
+                <span class="muted">不远程上传。</span>
+              </div>
+              <div class="row compact">
+                <span>secretVisibleInFrontend=false</span>
+                <span class="muted">不展示密钥。</span>
+              </div>
+              <div class="row compact">
+                <span>answerVisibleToCandidate=false</span>
+                <span class="muted">不向选手展示隐藏答案。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pill-row">
+        <button class="primary">查看演示步骤</button>
+        <button>查看验收信号</button>
+        <button>复制命令文本</button>
+        <button disabled>运行命令</button>
+        <button disabled>上传交付包</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>真实发布</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

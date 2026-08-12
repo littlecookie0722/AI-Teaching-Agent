@@ -1,0 +1,2649 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 5",
+  "mode": "MOCK_ONLY",
+  "id": "phase5_mock_baseline",
+  "title": "Phase 5 Mock Baseline Freeze",
+  "description": "Machine-testable baseline freeze before any real LLM provider PoC. It records the local mock delivery state and the gates that must remain true before implementing a disabled-by-default real provider.",
+  "inputs": [
+    {
+      "id": "project_readme",
+      "path": "README.md",
+      "required": true
+    },
+    {
+      "id": "full_guide",
+      "path": "docs/AI_PLATFORM_CODEX_FULL_GUIDE.md",
+      "required": true
+    },
+    {
+      "id": "testing_acceptance",
+      "path": "docs/08_TESTING_AND_ACCEPTANCE.md",
+      "required": true
+    },
+    {
+      "id": "operations_guide",
+      "path": "docs/10_OPERATIONS_GUIDE.md",
+      "required": true
+    },
+    {
+      "id": "delivery_index",
+      "path": "delivery/phase1-delivery-index.json",
+      "required": true
+    },
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "final_signoff",
+      "path": "delivery/FINAL_SIGNOFF.md",
+      "required": true
+    },
+    {
+      "id": "operations_manual",
+      "path": "delivery/OPERATIONS_MANUAL.md",
+      "required": true
+    },
+    {
+      "id": "operations_skill_pack",
+      "path": "skills/operations-skill-pack/SKILL.md",
+      "required": true
+    },
+    {
+      "id": "standalone_agent_delivery",
+      "path": "delivery/STANDALONE_AGENT_DELIVERY.md",
+      "required": true
+    },
+    {
+      "id": "access_entrypoints",
+      "path": "delivery/ACCESS_ENTRYPOINTS.md",
+      "required": true
+    },
+    {
+      "id": "phase2_provider_plan",
+      "path": "providers/PHASE2_PROVIDER_PLAN.md",
+      "required": true
+    },
+    {
+      "id": "provider_adapter_contract",
+      "path": "providers/provider-adapter.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_gate",
+      "path": "providers/real_provider_gate.py",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_shell_contract",
+      "path": "providers/real-provider-shell.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_shell",
+      "path": "providers/real_provider_shell.py",
+      "required": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_dry_run_plan_contract",
+      "path": "providers/real-llm-dry-run-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_dry_run_plan",
+      "path": "providers/real_llm_dry_run_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_approval_gate_contract",
+      "path": "providers/real-llm-approval-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_approval_gate",
+      "path": "providers/real_llm_approval_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_contract",
+      "path": "providers/real-llm-sdk-task-blueprint.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "path": "providers/real_llm_sdk_task_blueprint.py",
+      "required": true
+    },
+    {
+      "id": "real_provider_sdk_poc_contract",
+      "path": "providers/real-provider-sdk-poc.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_sdk_poc",
+      "path": "providers/real_provider_sdk_poc.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_enablement_contract",
+      "path": "providers/real-sdk-enablement.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_enablement",
+      "path": "providers/real_sdk_enablement.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_contract",
+      "path": "providers/real-sdk-minimal-impl.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_minimal_impl",
+      "path": "providers/real_sdk_minimal_impl.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_contract",
+      "path": "providers/real-sdk-dependency-env-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate",
+      "path": "providers/real_sdk_dependency_env_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_contract",
+      "path": "providers/real-sdk-dependency-install-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan",
+      "path": "providers/real_sdk_dependency_install_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_contract",
+      "path": "providers/real-sdk-dependency-installer-audit.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit",
+      "path": "providers/real_sdk_dependency_installer_audit.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_contract",
+      "path": "providers/real-sdk-dependency-change-preview.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview",
+      "path": "providers/real_sdk_dependency_change_preview.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_contract",
+      "path": "providers/real-sdk-dependency-patch-proposal.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal",
+      "path": "providers/real_sdk_dependency_patch_proposal.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_contract",
+      "path": "providers/real-sdk-dependency-apply-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate",
+      "path": "providers/real_sdk_dependency_apply_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_contract",
+      "path": "providers/real-sdk-dependency-implementation-task-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan",
+      "path": "providers/real_sdk_dependency_implementation_task_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_contract",
+      "path": "providers/real-sdk-dependency-change-approval-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package",
+      "path": "providers/real_sdk_dependency_change_approval_package.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_contract",
+      "path": "providers/real-sdk-dependency-readonly-diff-review.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review",
+      "path": "providers/real_sdk_dependency_readonly_diff_review.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_contract",
+      "path": "providers/real-sdk-dependency-final-execution-confirmation.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation",
+      "path": "providers/real_sdk_dependency_final_execution_confirmation.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_contract",
+      "path": "providers/real-sdk-dependency-execution-task-creation.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation",
+      "path": "providers/real_sdk_dependency_execution_task_creation.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_contract",
+      "path": "providers/real-sdk-dependency-executor-disabled.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled",
+      "path": "providers/real_sdk_dependency_executor_disabled.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_contract",
+      "path": "providers/real-sdk-dependency-dry-run-evidence.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence",
+      "path": "providers/real_sdk_dependency_dry_run_evidence.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_contract",
+      "path": "providers/real-sdk-dependency-target-resolver.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver",
+      "path": "providers/real_sdk_dependency_target_resolver.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_contract",
+      "path": "providers/real-sdk-dependency-readonly-snapshot.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_contract",
+      "path": "providers/real-sdk-dependency-content-read-approval.contract.json",
+      "description": "真实 SDK 依赖 content read approval 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadApprovalArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_contract",
+      "path": "providers/real-sdk-dependency-content-read-plan.contract.json",
+      "description": "真实 SDK 依赖 content read plan 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadPlanArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_contract",
+      "path": "providers/real-sdk-dependency-content-read-final-confirmation.contract.json",
+      "description": "真实 SDK 依赖 content read final confirmation 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadFinalConfirmationArtifactWritten=false、contentReadExecutionTaskCreated=false、contentReadExecutionApprovalGranted=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+      "path": "providers/real-sdk-dependency-content-read-readonly-execution.contract.json",
+      "description": "真实 SDK 依赖 content read readonly execution 机器契约，允许最终确认后的本地只读脱敏预览，并约束 rawDependencyContentReturned=false、dependencyContentPersisted=false、contentReadReadonlyExecutionArtifactWritten=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_contract",
+      "path": "providers/real-sdk-dependency-install-change-proposal.contract.json",
+      "description": "真实 SDK 依赖 install change proposal 机器契约，允许生成计划模型和不可执行 patch 预览，并约束 dependencyInstallPatchPlanGenerated=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_contract",
+      "path": "providers/real-sdk-dependency-install-execution-gate.contract.json",
+      "description": "真实 SDK 依赖 install execution gate 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Gate Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_contract",
+      "path": "providers/real-sdk-dependency-install-authorization-package.contract.json",
+      "description": "真实 SDK 依赖 install authorization package 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Authorization Package Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_contract",
+      "path": "providers/real-sdk-dependency-install-execution-request.contract.json",
+      "description": "真实 SDK 依赖 install execution request 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Request Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_contract",
+      "path": "providers/real-sdk-dependency-install-executor-disabled.contract.json",
+      "description": "真实 SDK 依赖 install executor disabled 机器契约，约束 executorDispatched=false、executorStarted=false、executorRunCreated=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Executor Disabled Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot",
+      "path": "providers/real_sdk_dependency_readonly_snapshot.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval",
+      "path": "providers/real_sdk_dependency_content_read_approval.py",
+      "description": "真实 SDK 依赖 content read approval 禁用壳，只生成未来依赖文件内容读取审批模型，不读取依赖文件内容、不返回原文、不持久化内容、不写审批产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan",
+      "path": "providers/real_sdk_dependency_content_read_plan.py",
+      "description": "真实 SDK 依赖 content read plan 禁用壳，只生成未来依赖文件内容读取只读审查计划模型，不读取依赖文件内容、不返回原文、不持久化内容、不写计划产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation",
+      "path": "providers/real_sdk_dependency_content_read_final_confirmation.py",
+      "description": "真实 SDK 依赖 content read final confirmation 禁用壳，只生成未来依赖文件内容只读读取前最终确认模型，不读取依赖文件内容、不返回原文、不持久化内容或确认记录、不写确认产物、不创建执行任务、不授权读取执行、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution",
+      "path": "providers/real_sdk_dependency_content_read_readonly_execution.py",
+      "description": "真实 SDK 依赖 content read readonly execution，只在最终确认后读取允许名单内本地依赖文件并返回脱敏预览；不返回原文、不持久化内容或记录、不写产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal",
+      "path": "providers/real_sdk_dependency_install_change_proposal.py",
+      "description": "真实 SDK 依赖 install change proposal，只基于只读脱敏依赖内容预览生成未来安装变更方案模型和不可执行 patch 预览；不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate",
+      "path": "providers/real_sdk_dependency_install_execution_gate.py",
+      "description": "真实 SDK 依赖 install execution gate，只基于已审核安装变更方案生成未来安装执行门禁模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Gate",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package",
+      "path": "providers/real_sdk_dependency_install_authorization_package.py",
+      "description": "真实 SDK 依赖 install authorization package，只基于安装执行门禁生成未来安装授权包模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Authorization Package",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request",
+      "path": "providers/real_sdk_dependency_install_execution_request.py",
+      "description": "真实 SDK 依赖 install execution request，只基于安装授权包生成未来安装执行请求模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Request",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled",
+      "path": "providers/real_sdk_dependency_install_executor_disabled.py",
+      "description": "真实 SDK 依赖 install executor disabled，只基于安装执行请求生成禁用执行器模型；不派发执行器、不启动执行器、不创建执行 run、不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Executor Disabled",
+      "type": "provider_contract",
+      "manualOnly": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "phase5_mock_baseline_md",
+      "path": "delivery/PHASE5_MOCK_BASELINE.md",
+      "requiredForBaseline": true,
+      "localOnly": true
+    },
+    {
+      "id": "phase5_mock_baseline_contract",
+      "path": "delivery/phase5-mock-baseline.json",
+      "requiredForBaseline": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval",
+      "path": "providers/real_sdk_dependency_content_read_approval.py",
+      "description": "真实 SDK 依赖 content read approval 禁用壳，只生成未来依赖文件内容读取审批模型，不读取依赖文件内容、不返回原文、不持久化内容、不写审批产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan",
+      "path": "providers/real_sdk_dependency_content_read_plan.py",
+      "description": "真实 SDK 依赖 content read plan 禁用壳，只生成未来依赖文件内容读取只读审查计划模型，不读取依赖文件内容、不返回原文、不持久化内容、不写计划产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation",
+      "path": "providers/real_sdk_dependency_content_read_final_confirmation.py",
+      "description": "真实 SDK 依赖 content read final confirmation 禁用壳，只生成未来依赖文件内容只读读取前最终确认模型，不读取依赖文件内容、不返回原文、不持久化内容或确认记录、不写确认产物、不创建执行任务、不授权读取执行、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution",
+      "path": "providers/real_sdk_dependency_content_read_readonly_execution.py",
+      "description": "真实 SDK 依赖 content read readonly execution，只在最终确认后读取允许名单内本地依赖文件并返回脱敏预览；不返回原文、不持久化内容或记录、不写产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal",
+      "path": "providers/real_sdk_dependency_install_change_proposal.py",
+      "description": "真实 SDK 依赖 install change proposal，只基于只读脱敏依赖内容预览生成未来安装变更方案模型和不可执行 patch 预览；不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_contract",
+      "path": "providers/real-sdk-dependency-content-read-approval.contract.json",
+      "description": "真实 SDK 依赖 content read approval 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadApprovalArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_contract",
+      "path": "providers/real-sdk-dependency-content-read-plan.contract.json",
+      "description": "真实 SDK 依赖 content read plan 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadPlanArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_contract",
+      "path": "providers/real-sdk-dependency-content-read-final-confirmation.contract.json",
+      "description": "真实 SDK 依赖 content read final confirmation 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadFinalConfirmationArtifactWritten=false、contentReadExecutionTaskCreated=false、contentReadExecutionApprovalGranted=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+      "path": "providers/real-sdk-dependency-content-read-readonly-execution.contract.json",
+      "description": "真实 SDK 依赖 content read readonly execution 机器契约，允许最终确认后的本地只读脱敏预览，并约束 rawDependencyContentReturned=false、dependencyContentPersisted=false、contentReadReadonlyExecutionArtifactWritten=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_contract",
+      "path": "providers/real-sdk-dependency-install-change-proposal.contract.json",
+      "description": "真实 SDK 依赖 install change proposal 机器契约，允许生成计划模型和不可执行 patch 预览，并约束 dependencyInstallPatchPlanGenerated=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "baselineSnapshot": {
+    "deliveryReady": 175,
+    "deliveryRequired": 175,
+    "missingRequired": 0,
+    "phase1CheckPassed": 20,
+    "phase1CheckTotal": 20,
+    "acceptancePassed": 14,
+    "acceptanceRequired": 14,
+    "safetyAssertionPassed": 6,
+    "safetyAssertionTotal": 6,
+    "frontendStaticRouteTotal": 31,
+    "defaultProvider": "mock",
+    "generatedStatus": "WAITING_REVIEW",
+    "mockOnly": true
+  },
+  "frozenCapabilities": [
+    {
+      "id": "dsl_schema_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "cli_json_envelope_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "provider_adapter_mock_only_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_provider_gate",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_provider_shell",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "provider_runtime_guard",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "prompt_manifest_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "workflow_mock_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "review_gate_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "audit_records_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "mcp_mock_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "operations_delivery_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "standalone_agent_mock_delivery_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "access_entrypoints_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "final_signoff_ready",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_llm_dry_run_plan",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_llm_approval_gate",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_provider_sdk_poc",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_enablement",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_minimal_impl",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_env_gate",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_install_plan",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_change_preview",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate",
+      "required": true,
+      "status": "READY"
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled reviewed task plan for future real SDK dependency file changes; no task creation, dependency write, patch materialization, command execution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled approval package for future real SDK dependency file changes; no approval artifact write, task creation, dependency write, command execution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled readonly diff review for future real SDK dependency file changes; no live dependency-file read, diff artifact write, patch generation, dependency write, command execution, package resolution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled final execution confirmation for future real SDK dependency file changes; no execution approval, task creation, dependency write, patch, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled execution task creation for future real SDK dependency file changes; no task persistence, queueing, execution dispatch, dependency write, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled executor shell for future real SDK dependency file changes; no executor start, executor run creation, command materialization, command execution, dependency file mutation, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled dry-run evidence model for future real SDK dependency install command review; no evidence file write, command review persistence, command materialization, dry-run execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled target resolver model for future real SDK dependency manifest and lockfile selection; no live dependency file read, target file write, patch generation, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled readonly snapshot model for future real SDK dependency manifest and lockfile review; no live dependency file read, snapshot content capture, snapshot file write, review persistence, patch generation, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval",
+      "status": "READY",
+      "evidence": "providers/real_sdk_dependency_content_read_approval.py and providers/real-sdk-dependency-content-read-approval.contract.json keep future dependency content read approval local and disabled."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan",
+      "status": "READY",
+      "evidence": "providers/real_sdk_dependency_content_read_plan.py and providers/real-sdk-dependency-content-read-plan.contract.json keep future dependency content read plans local and disabled."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Disabled final confirmation for future dependency content readonly reads; no dependency content read, content return, persistence, artifact write, execution task creation, content read authorization, patch, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Reviewed local readonly dependency content read with redacted preview only; no raw content return, persistence, artifact write, patch, command execution, dependency install, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Reviewed install change proposal model with non-executable patch preview only; no dependency file write, patch file write, patch apply, command materialization, dependency install, package resolution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Reviewed install execution gate model only; no execution authorization, dependency file write, patch file write, patch apply, command materialization, dependency install, package resolution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Reviewed install authorization package model only; no execution authorization, dependency file write, patch file write, patch apply, command materialization, dependency install, package resolution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request",
+      "status": "READY",
+      "mode": "MOCK_ONLY",
+      "description": "Reviewed install execution request model only; no execution authorization, executor dispatch, dependency file write, patch file write, patch apply, command materialization, dependency install, package resolution, secret check, network, or real LLM call."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled",
+      "status": "READY",
+      "description": "Install executor disabled model remains local-only and cannot dispatch executors, start executor runs, materialize commands, install SDK dependencies, check secrets, use network access, or call real LLMs."
+    }
+  ],
+  "llmPocEntryGates": [
+    {
+      "id": "explicit_opt_in_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "default_provider_remains_mock",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "api_keys_from_environment_only",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "first_scope_lab_generate_from_source_only",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "schema_validation_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "generated_status_waiting_review",
+      "required": true,
+      "expected": "WAITING_REVIEW"
+    },
+    {
+      "id": "audit_redaction_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "cli_json_envelope_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "auto_publish_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_cloud_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sandbox_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_mcp_server_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_agent_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_preflight_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_default_disabled",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_preflight_no_network",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_preflight_secret_value_returned",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_shell_disabled",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_shell_no_sdk_import",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_shell_generation_disabled",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "provider_runtime_redaction_applied",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "provider_runtime_concurrency_configured",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "provider_runtime_retry_configured",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "provider_runtime_timeout_configured",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "provider_runtime_guard_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_llm_poc_adapter_disabled",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_llm_poc_adapter_no_sdk_import",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_poc_adapter_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_poc_adapter_no_generated_content",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_dry_run_plan_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_llm_dry_run_plan_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_dry_run_plan_no_task_creation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_approval_gate_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_llm_approval_gate_no_real_call_authorization",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_approval_gate_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_no_sdk_dependency",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_no_contract_change",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_no_implementation_allowed",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_sdk_poc_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_sdk_poc_disabled",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_provider_sdk_poc_no_sdk_import",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_sdk_poc_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_provider_sdk_poc_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_enablement_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_enablement_no_implementation_allowed",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_enablement_no_contract_change",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_enablement_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_enablement_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_minimal_impl_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_disabled",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_no_sdk_import",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_minimal_impl_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_minimal_impl_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_minimal_impl_no_task_creation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Dependency-env gate does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Dependency-env gate does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_no_lockfile_change",
+      "required": true,
+      "expected": false,
+      "description": "Dependency-env gate does not modify dependency lockfiles or pyproject/requirements files."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_no_sdk_import",
+      "required": true,
+      "expected": false,
+      "description": "Dependency-env gate does not import SDK packages."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Dependency-env gate does not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_required",
+      "required": true,
+      "expected": true,
+      "description": "Real SDK dependency and environment-variable changes must pass the design-only gate first."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_required",
+      "required": true,
+      "expected": true,
+      "description": "Real SDK dependency install plan must be reviewed before any future dependency installation task."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_install_command",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not generate install commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not resolve package versions or hashes."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_lockfile_change",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not modify dependency lockfiles or manifest files."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Dependency install plan does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_required",
+      "required": true,
+      "expected": true,
+      "description": "Disabled installer audit must pass before any future SDK dependency installer implementation task."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_command_materialized",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not materialize executable install commands."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_file_change",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not modify dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not resolve package versions or hashes."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Installer audit does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not resolve package versions or hashes."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_diff_generation",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not generate dependency diffs or rollback diffs."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_no_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Dependency change preview does not write dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_required",
+      "required": true,
+      "expected": true,
+      "description": "Dependency change preview must pass before any future manifest or lockfile implementation task."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_dependency_file_change",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not modify dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_diff_artifact",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not write diff artifacts."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_no_patch_write",
+      "required": true,
+      "expected": false,
+      "description": "Dependency patch proposal does not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_required",
+      "required": true,
+      "expected": true,
+      "description": "Dependency patch proposal must pass before any future patch file or patch apply implementation task."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_required",
+      "required": true,
+      "expected": true,
+      "description": "Dependency apply gate must pass before any future dependency patch apply task."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_apply_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not authorize patch application."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_dependency_file_change",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not modify dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not open network connections."
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Dependency apply gate does not check environment secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_task_creation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_dependency_file_change",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_patch_materialization",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_approval_artifact_write",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_manual_approval_grant",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_dependency_file_change",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_package_resolution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_dependency_file_change",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_patch_generation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_diff_artifact_write",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_no_live_dependency_read",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_execution_task_creation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_no_execution_approval",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_execution_dispatch",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_task_queue",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_no_task_persistence",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_executor_start",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_executor_run_creation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_command_materialization",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_evidence_file_write",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_command_review_record_persistence",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_command_materialization",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_dry_run_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_live_dependency_file_read",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_target_file_write",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_patch_generation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_live_dependency_file_read",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_snapshot_content_capture",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_snapshot_file_write",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_snapshot_review_persistence",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_patch_generation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_command_execution",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_dependency_file_mutation",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_dependency_install",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_secret_presence_check",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_network_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_no_real_llm_call",
+      "required": true,
+      "expected": false
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_required",
+      "required": true,
+      "expected": true,
+      "description": "Content read approval model must exist before any future dependency file content read review."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_dependency_content_read",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not authorize or execute dependency content reads."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_dependency_content_return",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not return raw dependency content."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_content_persistence",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not persist dependency content or approval records."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_content_read_approval_artifact_write",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not write approval artifacts."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_patch_generation",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not generate dependency patches."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read approval shell must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_required",
+      "required": true,
+      "expected": true,
+      "description": "Content read plan model must exist before any future dependency content read execution review."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_dependency_content_read",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not authorize or execute dependency content reads."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_dependency_content_return",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not return raw dependency content."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_content_persistence",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not persist dependency content or plan records."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_plan_artifact_write",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not write plan artifacts."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_content_snapshot_write",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not write content snapshots."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_patch_generation",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not generate dependency patches."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read plan shell must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_patch_generation",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not generate dependency patches."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_artifact_write",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not write content read artifacts."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_content_persistence",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not persist dependency content or records."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_no_raw_content_return",
+      "required": true,
+      "expected": false,
+      "description": "Readonly execution must not return raw dependency content."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_redacted_preview_only",
+      "required": true,
+      "expected": true,
+      "description": "Readonly execution may return only redacted previews."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_required",
+      "required": true,
+      "expected": true,
+      "description": "Readonly dependency content read execution model must exist before SDK install planning."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_patch_generation",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not generate dependency patches."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_content_read_execution_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not grant content read execution authorization."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_content_read_execution_task_creation",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not create content read execution tasks."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_final_confirmation_artifact_write",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not write final confirmation artifacts."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_content_persistence",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not persist dependency content or final confirmation records."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_dependency_content_return",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not return raw dependency content."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_no_dependency_content_read",
+      "required": true,
+      "expected": false,
+      "description": "Content read final confirmation shell must not authorize or execute dependency content reads."
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_required",
+      "required": true,
+      "expected": true,
+      "description": "Content read final confirmation model must exist before any future real readonly dependency content read task."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_required",
+      "required": true,
+      "expected": true,
+      "description": "Install change proposal model must exist before future real SDK install execution."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_plan_only",
+      "required": true,
+      "expected": true,
+      "description": "Install change proposal may only generate a plan-only model and non-executable preview."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_dependency_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not write dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_patch_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_command_materialization",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not materialize install commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not resolve package versions or hashes."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Install change proposal must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_required",
+      "required": true,
+      "expected": true,
+      "description": "Install execution gate model must exist before any future real SDK dependency installation."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_gate_only",
+      "required": true,
+      "expected": true,
+      "description": "Install execution gate may only generate a local gate model."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_execution_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not authorize dependency install execution."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_dependency_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not write dependency manifests or lockfiles."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_patch_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_command_materialization",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not materialize install commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not install SDK dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not resolve package versions or hashes."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Install execution gate must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not resolve package metadata."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_command_materialization",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not materialize commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_patch_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_dependency_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not write dependency files."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_no_execution_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Install authorization package must not grant execution authorization."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_package_only",
+      "required": true,
+      "expected": true,
+      "description": "Install authorization package must remain model-only."
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_required",
+      "required": true,
+      "expected": true,
+      "description": "Install authorization package must be present before any future SDK dependency install execution."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_required",
+      "required": true,
+      "expected": true,
+      "description": "Install execution request must be present before any future SDK dependency install executor implementation."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_request_only",
+      "required": true,
+      "expected": true,
+      "description": "Install execution request must remain model-only."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_execution_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not grant execution authorization."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_executor_dispatch",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not dispatch an executor."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_dependency_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not write dependency files."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_patch_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_command_materialization",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not materialize commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not resolve package metadata."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Install execution request must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_real_llm_call",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not call real LLMs."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_network_call",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not use network access."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_secret_presence_check",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not check secret presence."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_package_resolution",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not resolve package metadata."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_dependency_install",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not install dependencies."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_command_execution",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not execute commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_command_materialization",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not materialize commands."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_patch_apply",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not apply patches."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_patch_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not write patch files."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_dependency_file_write",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not write dependency files."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_executor_run_creation",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not create executor runs."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_executor_start",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not start executors."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_executor_dispatch",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not dispatch executors."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_no_execution_authorization",
+      "required": true,
+      "expected": false,
+      "description": "Install executor disabled must not grant execution authorization."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_executor_only",
+      "required": true,
+      "expected": true,
+      "description": "Install executor disabled remains a local disabled executor model only."
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_required",
+      "required": true,
+      "expected": true,
+      "description": "Install executor disabled model is required before any future dependency install executor dry-run command review."
+    }
+  ],
+  "nextAllowedSteps": [
+    "Define a real LLM provider entry gate with provider disabled by default.",
+    "Run python -m pytest tests/test_real_provider_gate.py before any real LLM PoC.",
+    "Implement missing-key and disabled-provider failure paths before any successful real call.",
+    "Limit first real LLM PoC to Lab DSL generation from local Markdown.",
+    "Keep all generated content WAITING_REVIEW and publish-blocked.",
+    "Run python -m pytest tests/test_provider_runtime_guard.py before any real LLM PoC.",
+    "Run python -m pytest tests/test_real_llm_poc_adapter.py before any real LLM PoC.",
+    "Run python -m pytest tests/test_real_llm_dry_run_plan.py before any real LLM PoC.",
+    "Run python -m pytest tests/test_real_llm_approval_gate.py before any real LLM SDK implementation task.",
+    "Run python -m pytest tests/test_real_llm_sdk_task_blueprint.py before any real LLM SDK implementation task.",
+    "Run python -m pytest tests/test_real_provider_sdk_poc.py before any real Provider SDK PoC implementation task.",
+    "Run python -m pytest tests/test_real_sdk_enablement.py before any runtime/provider contract switch review.",
+    "Run python -m pytest tests/test_real_sdk_minimal_impl.py before any future real SDK implementation shell change.",
+    "Use provider real-sdk-poc describe/generate-json as the default-disabled harness check; expected errors remain blueprint, opt-in, or disabled-provider gates.",
+    "Use provider real-sdk-enablement describe/check as the final switch design gate; switchDesignReady never authorizes a real call.",
+    "Use provider real-sdk-impl describe/generate-json as the default-disabled minimal implementation shell check; expected errors remain enablement, implementation opt-in, or implementation-disabled gates.",
+    "Use provider real-sdk-dependency-env describe/check as the design-only SDK dependency and env gate; readyForDependencyImplementationTask never installs SDKs or checks secrets.",
+    "Use provider real-sdk-dependency-install-plan describe/plan as the draft-only install plan; readyForDependencyInstallImplementationReview never generates install commands, installs SDKs, resolves package metadata, or changes lockfiles.",
+    "Use provider real-sdk-dependency-installer-audit describe/audit as the disabled installer audit; readyForInstallerImplementationTask never materializes commands, installs SDKs, resolves packages, changes files, checks secrets, or opens network.",
+    "Use provider real-sdk-dependency-change-preview describe/preview as the disabled dependency change preview; readyForDependencyChangeImplementationTask never writes files, generates diffs, resolves packages, installs SDKs, checks secrets, or opens network.",
+    "Use provider real-sdk-dependency-patch-proposal describe/propose as the disabled dependency patch proposal; readyForDependencyPatchImplementationTask never writes patch files, applies patches, writes dependency files, generates diff artifacts, resolves packages, installs SDKs, checks secrets, or opens network.",
+    "Use provider real-sdk-dependency-apply-gate describe/evaluate as the disabled final apply gate; readyForFutureDependencyPatchApplyTask never authorizes apply, writes dependency files, executes commands, checks secrets, or opens network.",
+    "Use provider real-sdk-blueprint plan output as the scope checklist for the future implementation task.",
+    "Keep timeout, retry, concurrency, redaction, schema validation, audit, and review guards enabled before any real call.",
+    "Run python -m pytest tests/test_real_sdk_dependency_change_preview.py before any future dependency manifest or lockfile implementation task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_patch_proposal.py before any future dependency patch file or patch apply implementation task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_apply_gate.py before any future dependency patch apply task.",
+    "Use provider real-sdk-dependency-readonly-diff-review describe/review as the disabled readonly dependency diff review; readyForReadonlyDependencyDiffReview never reads live dependency files, writes diff artifacts, generates patches, resolves packages, writes dependency files, checks secrets, opens network, or calls real LLMs.",
+    "Run python -m pytest tests/test_real_sdk_dependency_readonly_diff_review.py before any future dependency diff review or dependency file implementation task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_final_execution_confirmation.py before any future reviewed dependency execution task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_execution_task_creation.py before any future dependency execution task persistence or dispatch implementation.",
+    "Run python -m pytest tests/test_real_sdk_dependency_executor_disabled.py before any future dependency executor start, command materialization, dependency install, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_dry_run_evidence.py before any future install command dry-run, evidence persistence, dependency install, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_target_resolver.py before any future live dependency file read, target file write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_readonly_snapshot.py before any future dependency snapshot file read, snapshot content capture, snapshot file write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_approval.py before any future dependency content read, raw content return, content persistence, approval artifact write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_plan.py before any future dependency content read execution, raw content return, content persistence, plan artifact write, content snapshot write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_final_confirmation.py before any future real dependency content readonly read task, raw content return, content persistence, final confirmation artifact write, execution task creation, content read execution authorization, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_readonly_execution.py before any future SDK install patch generation, install command materialization, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_change_proposal.py before any future SDK dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_execution_gate.py before any future SDK dependency execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_authorization_package.py before any future SDK dependency execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_execution_request.py before any future SDK dependency executor implementation, execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_executor_disabled.py before any future SDK dependency install dry-run command review, executor dispatch, executor start, command materialization, dependency install, package resolution, secret check, network call, or real SDK call task."
+  ],
+  "blockedBeforePoc": [
+    "Enable real provider by default",
+    "Read API keys from committed files",
+    "Log or display API keys",
+    "Use real LLM output without schema validation",
+    "Auto-publish generated content",
+    "Start real MCP Server or Agent",
+    "Create real cloud resources",
+    "Execute contestant code or unknown Shell",
+    "Bypass provider runtime guard",
+    "Bypass real LLM PoC adapter",
+    "Bypass real LLM dry-run plan",
+    "Bypass real LLM approval gate",
+    "Modify runtime or provider contracts from a blueprint-only task",
+    "Install a real provider SDK before blueprint and approval review",
+    "Bypass real LLM SDK task blueprint",
+    "Bypass real Provider SDK PoC harness",
+    "Treat real Provider SDK PoC errors as successful generation",
+    "Call a real provider SDK from the PoC adapter",
+    "Log unredacted provider payload or secret-like values",
+    "Check or expose secret presence during dry-run",
+    "Run real provider without timeout, retry, and concurrency limits",
+    "Bypass real SDK enablement switch design gate",
+    "Bypass real SDK minimal implementation shell",
+    "Treat switchDesignReady as real call authorization",
+    "Treat real SDK minimal implementation errors as successful generation",
+    "Import a real SDK or create a real client from the minimal implementation shell",
+    "Apply runtime or provider contract changes from enablement design without a separate reviewed implementation task",
+    "Bypass real SDK dependency and environment design gate",
+    "Install SDK dependencies from the dependency-env gate",
+    "Check or read secret presence from the dependency-env gate",
+    "Modify dependency manifests or lockfiles from the install plan draft",
+    "Modify dependency manifests or lockfiles from installer audit",
+    "Execute SDK install commands from installer audit",
+    "Materialize executable install commands from installer audit",
+    "Bypass real SDK dependency installer audit",
+    "Bypass real SDK dependency change preview",
+    "Bypass real SDK dependency patch proposal",
+    "Bypass real SDK dependency apply gate",
+    "Generate or execute an SDK install command from the install plan draft",
+    "Bypass real SDK dependency install plan draft",
+    "Treat dependency change preview output as permission to write manifests, lockfiles, or diff artifacts",
+    "Treat dependency patch proposal output as permission to write patch files, apply patches, write dependency files, or generate diff artifacts",
+    "Treat dependency apply gate output as permission to apply patches, write dependency files, execute commands, or check secrets",
+    "Generate dependency diffs, rollback commands, or write dependency files from the change preview",
+    "Bypass real SDK dependency readonly diff review",
+    "Treat readonly dependency diff review output as permission to read live dependency files, write diff artifacts, generate patches, resolve packages, write dependency files, check secrets, open network, or call real LLMs",
+    "Treat final execution confirmation output as permission to grant execution approval, create dependency tasks, mutate dependency files, execute commands, install dependencies, check secrets, open network, or call real LLMs",
+    "Treat execution task creation output as permission to persist tasks, queue execution, dispatch execution, mutate dependency files, execute commands, install dependencies, check secrets, open network, or call real LLMs",
+    "Treat disabled dependency executor output as permission to start executors, create executor runs, materialize commands, execute commands, mutate dependency files, install dependencies, check secrets, open network, or call real LLMs",
+    "Treat dry-run evidence output as permission to write evidence files, persist command review records, materialize commands, execute dry-runs, install dependencies, check secrets, open network, or call real LLMs",
+    "Reading live dependency manifest or lockfile targets, writing target files, generating patches, executing commands, installing dependencies, checking secrets, opening network, or calling real LLMs from the dependency target resolver.",
+    "Reading live dependency files, capturing dependency snapshot content, writing snapshot files, persisting snapshot review records, generating patches, executing commands, installing dependencies, checking secrets, opening network, or calling real LLMs from the readonly snapshot shell.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_approval.py before any future dependency content read, raw content return, content persistence, approval artifact write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_plan.py before any future dependency content read execution, raw content return, content persistence, plan artifact write, content snapshot write, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_final_confirmation.py before any future real dependency content readonly read task, raw content return, content persistence, final confirmation artifact write, execution task creation, content read execution authorization, patch generation, command execution, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_content_read_readonly_execution.py before any future SDK install patch generation, install command materialization, dependency install, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_change_proposal.py before any future SDK dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_execution_gate.py before any future SDK dependency execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_authorization_package.py before any future SDK dependency execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_execution_request.py before any future SDK dependency executor implementation, execution authorization, dependency file write, patch file write, patch apply, install command materialization, dependency install, package resolution, secret check, network call, or real SDK call task.",
+    "Run python -m pytest tests/test_real_sdk_dependency_install_executor_disabled.py before any future SDK dependency install dry-run command review, executor dispatch, executor start, command materialization, dependency install, package resolution, secret check, network call, or real SDK call task."
+  ],
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_real_provider_gate",
+    "test_real_provider_shell",
+    "test_provider_runtime_guard",
+    "test_real_llm_poc_adapter",
+    "test_real_llm_dry_run_plan",
+    "test_real_llm_approval_gate",
+    "test_real_llm_sdk_task_blueprint",
+    "test_real_provider_sdk_poc",
+    "test_real_sdk_enablement",
+    "test_real_sdk_minimal_impl",
+    "test_real_sdk_dependency_env_gate",
+    "test_real_sdk_dependency_install_plan",
+    "test_real_sdk_dependency_installer_audit",
+    "test_real_sdk_dependency_change_preview",
+    "test_real_sdk_dependency_patch_proposal",
+    "test_real_sdk_dependency_apply_gate",
+    "test_real_sdk_dependency_implementation_task_plan",
+    "test_real_sdk_dependency_change_approval_package",
+    "test_real_sdk_dependency_readonly_diff_review",
+    "test_real_sdk_dependency_final_execution_confirmation",
+    "test_real_sdk_dependency_execution_task_creation",
+    "test_real_sdk_dependency_executor_disabled",
+    "test_real_sdk_dependency_dry_run_evidence",
+    "test_real_sdk_dependency_target_resolver",
+    "test_real_sdk_dependency_readonly_snapshot",
+    "test_real_sdk_dependency_content_read_approval",
+    "test_real_sdk_dependency_content_read_plan",
+    "test_real_sdk_dependency_content_read_final_confirmation",
+    "test_real_sdk_dependency_content_read_readonly_execution",
+    "test_real_sdk_dependency_install_change_proposal",
+    "test_real_sdk_dependency_install_execution_gate",
+    "test_real_sdk_dependency_install_authorization_package",
+    "test_real_sdk_dependency_install_execution_request",
+    "test_real_sdk_dependency_install_executor_disabled",
+    "test_phase5_mock_baseline",
+    "test_final_signoff",
+    "test_operations_manual",
+    "test_delivery_package_contract",
+    "test_delivery_index",
+    "test_provider_adapter",
+    "test_provider_adapter_workflow",
+    "test_phase2_provider_plan",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "readOnly": true,
+    "realLlmCalled": false,
+    "realProviderEnabled": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realCloudResourceChanged": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false
+  }
+}

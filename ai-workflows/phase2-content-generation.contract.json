@@ -1,0 +1,396 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "workflowId": "phase2_content_generation",
+  "title": "Phase 2 Mock Content Generation Workflow",
+  "description": "MockProvider-first AI Workflow orchestrator for generating Lab, Exam, Grading, and PPT DSL review bundles. Default mode does not call real LLMs, cloud resources, agents, or sandboxes. Explicit real-llm-demo mode can call a real LLM to generate four review-gated DSL artifacts.",
+  "entrypoints": {
+    "cliRun": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json",
+    "cliRunRealLlmMinimalLab": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-workflow-report.json --provider-mode real-llm-minimal --real-lab-output examples/output/phase2-real-llm-lab.json --model <model-name> --explicit-real-call-opt-in --confirm-single-request --confirm-lab-only --confirm-waiting-review --confirm-no-auto-publish",
+    "cliRunRealLlmDemo": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-demo-report.json --provider-mode real-llm-demo --real-demo-lab-output examples/output/demo-real-lab.json --real-demo-exam-output examples/output/demo-real-exam.json --real-demo-grading-output examples/output/demo-real-grading.json --real-demo-ppt-output examples/output/demo-real-ppt.json --model <model-name> --explicit-real-call-opt-in --confirm-demo-real-dsl --confirm-waiting-review --confirm-no-auto-publish",
+    "cliReport": "python lab_cli.py phase2 workflow report --file examples/output/phase2-content-generation-report.json",
+    "pythonHelper": "ai_workflows.provider_adapter_workflow.run_phase2_content_generation"
+  },
+  "providerModes": [
+    {
+      "id": "mock",
+      "default": true,
+      "workflowMode": "MOCK_ONLY",
+      "description": "All Lab / Exam / Grading / PPT DSL generation uses MockProvider.",
+      "realLlmCalled": false
+    },
+    {
+      "id": "real-llm-minimal",
+      "default": false,
+      "workflowMode": "REAL_LLM_MINIMAL_LAB_WORKFLOW",
+      "description": "Only Lab DSL generation uses the minimal real LLM single-request PoC. Exam / Grading / PPT remain MockProvider.",
+      "realLlmCalled": true,
+      "realLlmKinds": [
+        "lab"
+      ],
+      "mockKinds": [
+        "exam",
+        "grading",
+        "ppt"
+      ],
+      "doc": "docs/16_REAL_LLM_WORKFLOW_RECONNECT.md"
+    },
+    {
+      "id": "real-llm-demo",
+      "default": false,
+      "workflowMode": "REAL_LLM_DEMO_WORKFLOW",
+      "description": "Lab / Exam / Grading / PPT DSL generation uses the OpenAI Responses SDK path, one schema-validated request per DSL kind. All outputs remain WAITING_REVIEW.",
+      "realLlmCalled": true,
+      "realLlmKinds": [
+        "lab",
+        "exam",
+        "grading",
+        "ppt"
+      ],
+      "mockKinds": [],
+      "requestCount": 4,
+      "doc": "docs/18_REAL_LLM_DEMO_WORKFLOW.md"
+    }
+  ],
+  "labGenerationControls": [
+    {
+      "id": "targetUsers",
+      "cliFlag": "--target-users",
+      "type": "csv_string",
+      "default": "高职学生",
+      "description": "实验目标用户，支持逗号分隔。"
+    },
+    {
+      "id": "durationMinutes",
+      "cliFlag": "--duration-minutes",
+      "type": "positive_integer",
+      "default": 60,
+      "description": "期望实验时长，单位分钟。"
+    },
+    {
+      "id": "difficulty",
+      "cliFlag": "--difficulty",
+      "type": "enum",
+      "values": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ],
+      "default": "beginner"
+    },
+    {
+      "id": "techTags",
+      "cliFlag": "--tech-tags",
+      "type": "csv_string",
+      "default": "",
+      "description": "实验技术标签，支持逗号分隔。"
+    },
+    {
+      "id": "teachingStyle",
+      "cliFlag": "--teaching-style",
+      "type": "enum",
+      "values": [
+        "guided_practice",
+        "project_based",
+        "challenge_based",
+        "lecture_demo"
+      ],
+      "default": "guided_practice"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "source_material",
+      "path": "examples/input/demo-source.md",
+      "type": "markdown",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_adapter_contract",
+      "path": "providers/provider-adapter.contract.json",
+      "type": "json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "type": "json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "lab_schema",
+      "path": "templates/lab/lab.schema.json",
+      "type": "json_schema",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "exam_schema",
+      "path": "templates/exam/exam.schema.json",
+      "type": "json_schema",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "grading_schema",
+      "path": "templates/grading/grading.schema.json",
+      "type": "json_schema",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "ppt_schema",
+      "path": "templates/ppt/ppt.schema.json",
+      "type": "json_schema",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "lab_dsl",
+      "kind": "Lab",
+      "path": "templates/lab/examples/basic-lab.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true
+    },
+    {
+      "id": "exam_dsl",
+      "kind": "Exam",
+      "path": "templates/exam/examples/notebook-fill-blank.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "answerVisibleToCandidate": false
+    },
+    {
+      "id": "grading_dsl",
+      "kind": "Grading",
+      "path": "templates/grading/examples/python-pytest.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true
+    },
+    {
+      "id": "ppt_dsl",
+      "kind": "PPT",
+      "path": "templates/ppt/examples/course-ppt.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "artifactGenerated": false
+    },
+    {
+      "id": "workflow_report",
+      "kind": "WorkflowReport",
+      "path": "examples/output/phase2-content-generation-report.json",
+      "status": "COMPLETED",
+      "reviewRequired": false,
+      "generated": true
+    },
+    {
+      "id": "real_demo_lab_dsl",
+      "kind": "Lab",
+      "path": "examples/output/demo-real-lab.json",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "generated": true
+    },
+    {
+      "id": "real_demo_exam_dsl",
+      "kind": "Exam",
+      "path": "examples/output/demo-real-exam.json",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "answerVisibleToCandidate": false,
+      "generated": true
+    },
+    {
+      "id": "real_demo_grading_dsl",
+      "kind": "Grading",
+      "path": "examples/output/demo-real-grading.json",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "generated": true
+    },
+    {
+      "id": "real_demo_ppt_dsl",
+      "kind": "PPT",
+      "path": "examples/output/demo-real-ppt.json",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "artifactGenerated": false,
+      "generated": true
+    }
+  ],
+  "steps": [
+    {
+      "name": "validate_input",
+      "status": "COMPLETED",
+      "realLlmCalled": false
+    },
+    {
+      "name": "analyze_material",
+      "status": "COMPLETED",
+      "realLlmCalled": false,
+      "unknownShellExecuted": false
+    },
+    {
+      "name": "generate_lab_dsl",
+      "kind": "lab",
+      "promptId": "lab_generation_v0",
+      "outputKind": "Lab",
+      "status": "WAITING_REVIEW",
+      "provider": "mock"
+    },
+    {
+      "name": "generate_exam_dsl",
+      "kind": "exam",
+      "promptId": "exam_generation_v0",
+      "outputKind": "Exam",
+      "status": "WAITING_REVIEW",
+      "provider": "mock"
+    },
+    {
+      "name": "generate_grading_dsl",
+      "kind": "grading",
+      "promptId": "grading_generation_v0",
+      "outputKind": "Grading",
+      "status": "WAITING_REVIEW",
+      "provider": "mock"
+    },
+    {
+      "name": "generate_ppt_dsl",
+      "kind": "ppt",
+      "promptId": "ppt_generation_v0",
+      "outputKind": "PPT",
+      "status": "WAITING_REVIEW",
+      "provider": "mock"
+    },
+    {
+      "name": "assemble_review_bundle",
+      "status": "COMPLETED",
+      "reviewRequired": true,
+      "publishBlockedUntilApproved": true,
+      "autoPublishAllowed": false
+    }
+  ],
+  "providerAdapter": {
+    "adapterId": "mock_provider_adapter",
+    "interfaceName": "LLMProvider",
+    "activeProvider": "mock",
+    "realProviderEnabled": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false
+  },
+  "reviewGate": {
+    "required": true,
+    "defaultGeneratedStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "autoPublishAllowed": false,
+    "answerVisibleToCandidate": false
+  },
+  "qualitySignals": {
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "status": "READY_FOR_HUMAN_REVIEW",
+    "fields": [
+      "overall",
+      "lab",
+      "lab.matching",
+      "lab.stepGranularity",
+      "lab.teachingStyleSignal",
+      "materialCoverage",
+      "materialCoverage.sourceReference",
+      "materialCoverage.riskReview",
+      "schemaChecks",
+      "reviewHighlights"
+    ],
+    "availableIn": [
+      "workflowReport.qualitySignals",
+      "labArtifact.metadata.qualitySignals",
+      "reviewDetail.reviewPage.qualitySignals"
+    ]
+  },
+  "audit": {
+    "providerCallAuditRequired": true,
+    "workflowRunRequired": true,
+    "artifactManifestRequired": true,
+    "storeKeys": [
+      "providerCallAuditEvents",
+      "workflowRuns",
+      "artifacts",
+      "tasks"
+    ]
+  },
+  "recommendedCommandIds": [
+    "phase2_workflow_run",
+    "phase2_workflow_report",
+    "test_phase2_workflow_orchestrator",
+    "test_provider_adapter_workflow"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "reviewBypassed": false
+  },
+  "failurePolicy": {
+    "providerFailureCreatesAiTask": false,
+    "providerFailurePublishesContent": false,
+    "schemaValidationFailurePublishesContent": false,
+    "includeProviderErrorContext": true
+  },
+  "optionalRealLlmMinimalLabMode": {
+    "providerMode": "real-llm-minimal",
+    "requiresExplicitOptIn": true,
+    "requiresSecretEnv": "OPENAI_API_KEY",
+    "requiresModel": true,
+    "singleRequestOnly": true,
+    "labDslStatus": "WAITING_REVIEW",
+    "examGradingPptRemainMock": true,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false
+  },
+  "optionalRealLlmDemoMode": {
+    "providerMode": "real-llm-demo",
+    "requiresExplicitOptIn": true,
+    "requiresSecretEnv": "OPENAI_API_KEY",
+    "requiresModel": true,
+    "requestCount": 4,
+    "generatedKinds": [
+      "lab",
+      "exam",
+      "grading",
+      "ppt"
+    ],
+    "dslStatus": "WAITING_REVIEW",
+    "schemaValidated": true,
+    "outputs": {
+      "lab": "examples/output/demo-real-lab.json",
+      "exam": "examples/output/demo-real-exam.json",
+      "grading": "examples/output/demo-real-grading.json",
+      "ppt": "examples/output/demo-real-ppt.json"
+    },
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "realPptFileCreated": false,
+    "doc": "docs/18_REAL_LLM_DEMO_WORKFLOW.md"
+  }
+}

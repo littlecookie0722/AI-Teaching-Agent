@@ -1,0 +1,169 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_llm_dry_run_plan_contract",
+  "title": "Real LLM Dry-run Plan Contract",
+  "description": "Machine-testable contract for a local dry-run plan before any real LLM provider PoC. The plan checks the first Lab DSL scope and runtime guard while keeping real SDK imports, client creation, secret reads, network calls, generated content, AI task creation, and publish actions disabled.",
+  "planId": "real_llm_dry_run_plan",
+  "interfaceName": "LLMProvider",
+  "activeProvider": "mock",
+  "inputs": [
+    {
+      "id": "real_llm_dry_run_plan",
+      "path": "providers/real_llm_dry_run_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "env_example",
+      "path": ".env.example",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "lab_schema",
+      "path": "templates/lab/lab.schema.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-dry-run plan --provider openai",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-dry-run plan --provider openai --timeout-seconds 0",
+      "expectedCode": "VALIDATION_ERROR"
+    }
+  ],
+  "allowedScope": {
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "llmPocScope": "lab_generate_from_source_only"
+  },
+  "requiredContext": {
+    "planId": "real_llm_dry_run_plan",
+    "mode": "MOCK_ONLY",
+    "dryRunOnly": true,
+    "defaultProvider": "mock",
+    "providerEnabled": false,
+    "providerContractEnabled": false,
+    "adapterEnabled": false,
+    "runtimeGuardPassed": true,
+    "readyForRealProvider": false,
+    "explicitOptInRequired": true,
+    "preflightRequired": true,
+    "schemaValidationRequired": true,
+    "generatedStatus": "WAITING_REVIEW",
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "plannedSteps": [
+    "validate_prompt_scope",
+    "provider_runtime_guard",
+    "real_provider_preflight",
+    "disabled_real_llm_poc_adapter",
+    "schema_validate_lab_dsl",
+    "create_waiting_review_task",
+    "human_review"
+  ],
+  "blockedOperations": [
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "check_secret_presence_from_environment",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "bypass_runtime_guard",
+    "bypass_preflight",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_llm_dry_run_plan",
+    "test_real_llm_poc_adapter",
+    "test_provider_runtime_guard",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Incident Review Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --warn: #b45309;
+      --danger: #b91c1c;
+      --ok-bg: #e7f8f2;
+      --warn-bg: #fff7ed;
+      --danger-bg: #fef2f2;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #103f4a;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 980px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .action-bar,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(200px, 0.78fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(200px, 0.78fr) 1fr;
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+    }
+
+    .status.fail {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .command {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 940px) {
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill">WorkflowLogViewer</span>
+      <span class="pill warn">异常复盘只读</span>
+    </div>
+    <h1>Audit Incident Review Mock</h1>
+    <p>失败审计记录的本地规则复盘页。数据来自 <code>frontend/mock-data.json.auditIncidentReviewPrototype</code>，只做分类、根因提示和安全 Mock 命令建议，不调用真实大模型、不自动修复、不重试真实工具。</p>
+    <div class="pill-row">
+      <span class="pill">GET /api/provider-audit-events</span>
+      <span class="pill">GET /api/mcp-tool-call-records</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/audit-events</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">异常复盘总览</h2>
+          <p>incidents + incidentRules + actionPolicy + safety。</p>
+        </div>
+        <span class="pill strong">readOnly=true</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Incidents</span>
+          <strong>2</strong>
+        </div>
+        <div class="metric">
+          <span>Provider</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>MCP</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Validation</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Prompt Config</span>
+          <strong>1</strong>
+        </div>
+        <div class="metric">
+          <span>Safe Commands</span>
+          <strong>2</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="incidents-title">
+      <div class="section-head">
+        <div>
+          <h2 id="incidents-title">复盘项</h2>
+          <p>每条建议都只指向本地 Mock 命令；真实 Provider、真实 MCP Server、真实 Agent 和密钥读取保持禁用。</p>
+        </div>
+        <span class="pill">route=/audit/incidents</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>incident_mcp_missing_input_demo</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>sourceRecordId=mcp_call_missing_input_demo</span>
+                <span>category=INPUT_VALIDATION · errorCode=VALIDATION_ERROR · errorField=input</span>
+                <strong class="status warn">MEDIUM</strong>
+              </div>
+              <div class="row compact">
+                <span>rootCauseHint</span>
+                <span class="muted">MCP Tool analyze_material 缺少 input 参数，Backend Mock 未被调用。</span>
+              </div>
+              <div class="row compact">
+                <span>operatorSuggestion</span>
+                <span class="muted">补齐 arguments.input 后重新执行本地 Mock 命令；不要启动真实 MCP Server 或 Agent。</span>
+              </div>
+              <div class="row compact">
+                <span>safeMockCommand</span>
+                <span class="command">python lab_cli.py mcp call --tool analyze_material --arguments "{\"input\":\"examples/input/demo-source.md\"}"</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>incident_provider_missing_prompt_demo</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>sourceRecordId=provider_audit_missing_prompt_demo</span>
+                <span>category=PROMPT_CONFIG · errorCode=PROMPT_NOT_FOUND · promptId=missing_prompt</span>
+                <strong class="status warn">MEDIUM</strong>
+              </div>
+              <div class="row compact">
+                <span>rootCauseHint</span>
+                <span class="muted">Provider Adapter 收到未登记 promptId=missing_prompt，未生成 DSL 或 AI Task。</span>
+              </div>
+              <div class="row compact">
+                <span>operatorSuggestion</span>
+                <span class="muted">检查 prompts/manifest.json，改用已登记 Prompt；不要启用真实 Provider 或读取密钥。</span>
+              </div>
+              <div class="row compact">
+                <span>safeMockCommand</span>
+                <span class="command">python lab_cli.py provider mock-generate --prompt-id lab_generation_v0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>Local Rules</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>rule_mcp_validation_error</span>
+                <span>match status=FAILED + errorCode=VALIDATION_ERROR</span>
+                <strong class="status">MATCHED</strong>
+              </div>
+              <div class="row">
+                <span>rule_provider_prompt_missing</span>
+                <span>match status=FAILED + errorCode=PROMPT_NOT_FOUND</span>
+                <strong class="status">MATCHED</strong>
+              </div>
+              <div class="row compact">
+                <span>blockedActions</span>
+                <span class="muted">retryRealCall · startRealAgent · enableRealProvider · callRealLlm · readSecret · realPublish</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Action Policy</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>viewIncidentDetailEnabled=true</span>
+                <span>viewSourceAuditEnabled=true · copySafeMockCommandEnabled=true</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row compact">
+                <span>exportIncidentReportEnabled=false</span>
+                <span class="muted">Phase 1 不导出真实事故报告。</span>
+              </div>
+              <div class="row compact">
+                <span>autoFixEnabled=false</span>
+                <span class="muted">异常复盘只给建议，不自动修复配置或参数。</span>
+              </div>
+              <div class="row compact">
+                <span>retryRealCallEnabled=false</span>
+                <span class="muted">不得重试真实 Provider / MCP 调用。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar" style="margin-top:16px">
+        <button class="primary">查看复盘项</button>
+        <button>查看源审计</button>
+        <button>复制安全 Mock 命令</button>
+        <button disabled>导出真实事故报告</button>
+        <button disabled>自动修复</button>
+        <button disabled>重试真实调用</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>读取密钥</button>
+        <button disabled>运行真实沙箱</button>
+        <button disabled>执行选手代码</button>
+        <button disabled>自动发布</button>
+        <button disabled>真实发布</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="guardrails-title">
+      <div class="section-head">
+        <div>
+          <h2 id="guardrails-title">Phase 1 安全断言</h2>
+          <p>异常复盘仅依赖本地规则和 Mock 记录，不触发生产侧动作。</p>
+        </div>
+        <span class="pill warn">真实修复：禁用</span>
+      </div>
+      <div class="row-list">
+        <div class="row compact">
+          <span>realLlmCalled=false</span>
+          <span class="muted">真实大模型调用保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>realMcpServerStarted=false</span>
+          <span class="muted">真实 MCP Server 启动保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>realAgentStarted=false</span>
+          <span class="muted">真实智能体启动保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>secretsRead=false</span>
+          <span class="muted">密钥读取保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>networkAccess=false</span>
+          <span class="muted">页面不访问外部网络。</span>
+        </div>
+        <div class="row compact">
+          <span>realCloudResourceChanged=false</span>
+          <span class="muted">真实云资源变更保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>sandboxExecuted=false</span>
+          <span class="muted">真实沙箱执行保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>contestantCodeExecuted=false</span>
+          <span class="muted">选手代码执行保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>autoPublishAllowed=false</span>
+          <span class="muted">自动发布保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>realPublish=false</span>
+          <span class="muted">真实发布保持禁用。</span>
+        </div>
+        <div class="row compact">
+          <span>secretVisibleInFrontend=false</span>
+          <span class="muted">密钥前端展示保持禁用。</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

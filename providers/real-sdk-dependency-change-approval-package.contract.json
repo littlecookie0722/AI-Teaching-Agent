@@ -1,0 +1,184 @@
+{
+  "id": "real_sdk_dependency_change_approval_package_contract",
+  "gateId": "real_sdk_dependency_change_approval_package",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled approval-package model for future real SDK dependency file changes. It only prepares local approval evidence and does not write approval artifacts, create tasks, write dependency files, materialize patches, apply patches, execute commands, install packages, import SDKs, check secrets, use network access, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_change_approval_package_module",
+      "path": "providers/real_sdk_dependency_change_approval_package.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_contract",
+      "path": "providers/real-sdk-dependency-change-approval-package.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_module",
+      "path": "providers/real_sdk_dependency_implementation_task_plan.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_contract",
+      "path": "providers/real-sdk-dependency-implementation-task-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-change-approval-package describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "approvalPackageOnly": true,
+        "approvalPackageWritten": false,
+        "dependencyFileChanged": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-change-approval-package package --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "implementationTaskPlanReady": false,
+        "approvalPackageReady": false,
+        "readyForManualDependencyChangeApproval": false,
+        "approvalPackageWritten": false,
+        "dependencyFileChanged": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "implementationTaskPlanRequired": true,
+    "implementationTaskPlanReady": false,
+    "approvalPackageOnly": true,
+    "approvalPackageReady": false,
+    "readyForManualDependencyChangeApproval": false,
+    "manualApprovalGranted": false,
+    "approvalPackageWritten": false,
+    "approvalRecordMaterialized": false,
+    "approvalTicketCreated": false,
+    "dependencyChangeApproved": false,
+    "dependencyChangeExecutionAuthorized": false,
+    "dependencyFileChangeAuthorized": false,
+    "dependencyManifestWriteAuthorized": false,
+    "dependencyLockfileWriteAuthorized": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "patchApplyAuthorized": false,
+    "commandExecutionAuthorized": false,
+    "dependencyFileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallBeforeApprovalAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "write_approval_artifact",
+    "materialize_approval_record",
+    "create_approval_ticket",
+    "grant_manual_dependency_change_approval",
+    "create_dependency_implementation_task",
+    "create_ai_task_from_real_output",
+    "authorize_dependency_file_change",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "write_patch_file",
+    "materialize_patch",
+    "apply_patch",
+    "authorize_patch_apply",
+    "execute_command",
+    "generate_executable_install_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_before_approval",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_change_approval_package",
+    "test_real_sdk_dependency_implementation_task_plan",
+    "test_real_sdk_dependency_apply_gate",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "approvalPackageOnly": true,
+    "manualApprovalGranted": false,
+    "approvalPackageWritten": false,
+    "approvalRecordMaterialized": false,
+    "approvalTicketCreated": false,
+    "dependencyChangeApproved": false,
+    "dependencyChangeExecutionAuthorized": false,
+    "dependencyFileChangeAuthorized": false,
+    "dependencyManifestWriteAuthorized": false,
+    "dependencyLockfileWriteAuthorized": false,
+    "patchMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "patchApplyAuthorized": false,
+    "commandExecutionAuthorized": false,
+    "dependencyFileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallBeforeApprovalAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

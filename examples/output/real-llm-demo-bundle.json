@@ -1,0 +1,758 @@
+{
+  "id": "real_llm_demo_bundle_public",
+  "workflowId": "phase2_real_llm_demo_bundle",
+  "sourceWorkflowId": "phase2_content_generation",
+  "phase": "Phase 2",
+  "mode": "REAL_LLM_DEMO_REPLAY_AND_READONLY_SANDBOX_BUNDLE",
+  "title": "Real LLM Demo Replay And Readonly Sandbox Bundle",
+  "reviewer": "teacher_1",
+  "input": "examples/input/demo-source.md",
+  "sourceWorkflowReportPath": "examples/output/phase2-real-llm-report.json",
+  "reportPath": "examples/output/real-llm-demo-bundle.json",
+  "provider": {
+    "providerAdapter": "openai_responses_sdk_adapter",
+    "providerMode": "real-llm",
+    "model": "mimo-v2.5-pro",
+    "realLlmGeneratedKinds": [
+      "lab",
+      "exam",
+      "grading",
+      "ppt"
+    ],
+    "realLlmRequestCount": 4,
+    "providers": {
+      "lab": {
+        "providerId": "openai",
+        "adapterId": "openai_responses_sdk_adapter",
+        "mode": "REAL_LLM_DSL_GENERATION",
+        "model": "mimo-v2.5-pro",
+        "realLlmCalled": true,
+        "networkAccess": true,
+        "requestCount": 1,
+        "responseId": "resp_demo_lab",
+        "providerCallAuditEventId": "provider_audit_demo_lab"
+      },
+      "exam": {
+        "providerId": "openai",
+        "adapterId": "openai_responses_sdk_adapter",
+        "mode": "REAL_LLM_DSL_GENERATION",
+        "model": "mimo-v2.5-pro",
+        "realLlmCalled": true,
+        "networkAccess": true,
+        "requestCount": 1,
+        "responseId": "resp_demo_exam",
+        "providerCallAuditEventId": "provider_audit_demo_exam"
+      },
+      "grading": {
+        "providerId": "openai",
+        "adapterId": "openai_responses_sdk_adapter",
+        "mode": "REAL_LLM_DSL_GENERATION",
+        "model": "mimo-v2.5-pro",
+        "realLlmCalled": true,
+        "networkAccess": true,
+        "requestCount": 1,
+        "responseId": "resp_demo_grading",
+        "providerCallAuditEventId": "provider_audit_demo_grading"
+      },
+      "ppt": {
+        "providerId": "openai",
+        "adapterId": "openai_responses_sdk_adapter",
+        "mode": "REAL_LLM_DSL_GENERATION",
+        "model": "mimo-v2.5-pro",
+        "realLlmCalled": true,
+        "networkAccess": true,
+        "requestCount": 1,
+        "responseId": "resp_demo_ppt",
+        "providerCallAuditEventId": "provider_audit_demo_ppt"
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "load_real_llm_workflow_report",
+      "status": "COMPLETED",
+      "path": "examples/output/phase2-real-llm-report.json"
+    },
+    {
+      "name": "validate_real_llm_dsl",
+      "status": "COMPLETED",
+      "generatedKinds": [
+        "lab",
+        "exam",
+        "grading",
+        "ppt"
+      ]
+    },
+    {
+      "name": "build_pptx_artifact",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-ppt-artifact.pptx",
+      "manifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+      "slideCount": 4,
+      "bytes": 23437,
+      "preview": {
+        "previewAvailable": true,
+        "renderAttempted": true,
+        "reason": "PREVIEW_RENDERED",
+        "slidePreviews": [
+          {
+            "index": 1,
+            "id": "slide_title",
+            "title": "AI 工具应用入门",
+            "type": "title",
+            "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+            "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+            "bytes": 12653
+          },
+          {
+            "index": 2,
+            "id": "slide_goals",
+            "title": "学习目标",
+            "type": "content",
+            "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+            "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+            "bytes": 18366
+          },
+          {
+            "index": 3,
+            "id": "slide_steps",
+            "title": "实验步骤概览",
+            "type": "content",
+            "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+            "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+            "bytes": 21665
+          },
+          {
+            "index": 4,
+            "id": "slide_summary",
+            "title": "核心要点回顾",
+            "type": "summary",
+            "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+            "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+            "bytes": 20732
+          }
+        ],
+        "contactSheet": {
+          "path": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+          "bytes": 65097,
+          "slideCount": 4
+        },
+        "firstSlide": {
+          "id": "slide_title",
+          "title": "AI 工具应用入门",
+          "type": "title",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+          "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+          "bytes": 12653
+        }
+      },
+      "contactSheetPath": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+      "reviewRequired": true
+    },
+    {
+      "name": "build_candidate_preview",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-candidate-preview.json",
+      "answerVisibleToCandidate": false
+    },
+    {
+      "name": "normalize_grading_dsl",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-grading-normalized.json",
+      "patchCount": 0
+    },
+    {
+      "name": "real_sandbox_precheck",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-grading-precheck.json",
+      "readiness": {
+        "status": "READY_FOR_MANUAL_SANDBOX_REVIEW",
+        "readyForRealSandboxImplementation": true,
+        "readyForRealSandboxExecution": false,
+        "manualReviewRequired": true,
+        "blockers": [],
+        "warnings": [
+          {
+            "code": "REAL_EVIDENCE_NOT_COLLECTED",
+            "field": "checks[].mockEvidence",
+            "reason": "mock evidence placeholders are expected; collect real evidence only after sandbox implementation."
+          }
+        ]
+      }
+    },
+    {
+      "name": "readonly_sandbox_run",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-readonly-sandbox-report.json",
+      "executionSummary": {
+        "total": 1,
+        "executed": 0,
+        "passed": 0,
+        "failed": 0,
+        "deferred": 1,
+        "byType": {
+          "file_exists": 0,
+          "stdout_contains": 1,
+          "pytest": 0,
+          "notebook_cell": 0,
+          "json_field": 0,
+          "log_keyword": 0
+        }
+      },
+      "score": {
+        "totalScore": 100,
+        "executableScore": 0,
+        "earnedScore": 0,
+        "deferredScore": 100
+      }
+    },
+    {
+      "name": "readonly_evidence_demo_run",
+      "status": "COMPLETED",
+      "gradingPath": "examples/output/real-llm-demo-readonly-evidence-grading.json",
+      "reportPath": "examples/output/real-llm-demo-readonly-evidence-report.json",
+      "executionSummary": {
+        "total": 2,
+        "executed": 2,
+        "passed": 2,
+        "failed": 0,
+        "deferred": 0,
+        "byType": {
+          "file_exists": 1,
+          "stdout_contains": 0,
+          "pytest": 0,
+          "notebook_cell": 0,
+          "json_field": 1,
+          "log_keyword": 0
+        }
+      },
+      "score": {
+        "totalScore": 70,
+        "executableScore": 70,
+        "earnedScore": 70,
+        "deferredScore": 0
+      }
+    },
+    {
+      "name": "assemble_demo_bundle",
+      "status": "COMPLETED",
+      "path": "examples/output/real-llm-demo-bundle.json"
+    }
+  ],
+  "generatedDsl": {
+    "lab": {
+      "kind": "lab",
+      "dslKind": "Lab",
+      "dslId": "ai-tools-intro-lab",
+      "title": "AI 工具应用入门实验",
+      "status": "WAITING_REVIEW",
+      "path": "examples/output/real-llm-lab.json",
+      "schemaValidated": true,
+      "reviewRequired": true,
+      "source": "real_llm_demo_output",
+      "durationMinutes": 60,
+      "difficulty": "beginner",
+      "objectiveCount": 1,
+      "stepCount": 4,
+      "tags": [
+        "AI工具",
+        "编程助手",
+        "代码修改",
+        "入门实验"
+      ]
+    },
+    "exam": {
+      "kind": "exam",
+      "dslKind": "Exam",
+      "dslId": "exam_real_llm_demo",
+      "title": "AI 工具应用入门考核",
+      "status": "WAITING_REVIEW",
+      "path": "examples/output/real-llm-exam.json",
+      "schemaValidated": true,
+      "reviewRequired": true,
+      "source": "real_llm_demo_output",
+      "sourceLabId": "ai-tools-intro-lab",
+      "questionType": "coding_task",
+      "questionCount": 1,
+      "totalScore": 100,
+      "answerVisibleToCandidate": false
+    },
+    "grading": {
+      "kind": "grading",
+      "dslKind": "Grading",
+      "dslId": "grading_real_llm_demo",
+      "title": "真实 LLM Demo 评分",
+      "status": "WAITING_REVIEW",
+      "path": "examples/output/real-llm-grading.json",
+      "schemaValidated": true,
+      "reviewRequired": true,
+      "source": "real_llm_demo_output",
+      "sourceExamId": "exam_real_llm_demo",
+      "checkCount": 1,
+      "assessmentPlanCount": 1,
+      "totalScore": 100,
+      "checkTypes": {
+        "stdout_contains": 1
+      },
+      "sandboxRequiredBeforeRealExecution": true,
+      "normalizedPath": "examples/output/real-llm-demo-grading-normalized.json",
+      "normalization": {
+        "applied": false,
+        "patches": [],
+        "mode": "DETERMINISTIC_DSL_SHAPE_NORMALIZATION"
+      },
+      "normalizedCheckTypes": {
+        "stdout_contains": 1
+      }
+    },
+    "ppt": {
+      "kind": "ppt",
+      "dslKind": "PPT",
+      "dslId": "ppt_real_llm_demo",
+      "title": "AI 工具应用入门演示",
+      "status": "WAITING_REVIEW",
+      "path": "examples/output/real-llm-ppt.json",
+      "schemaValidated": true,
+      "reviewRequired": true,
+      "source": "real_llm_demo_output",
+      "audience": "高职学生",
+      "durationMinutes": 5,
+      "slideCount": 4,
+      "artifactGenerated": true,
+      "pptxPath": "examples/output/real-llm-demo-ppt-artifact.pptx",
+      "pptxManifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+      "pptxPreviewPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+      "pptxPreviewDir": "examples/output/real-llm-demo-ppt-artifact-slides",
+      "pptxContactSheetPath": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+      "pptxBytes": 23437,
+      "pptxArtifactStatus": "WAITING_REVIEW",
+      "pptxPreviewAvailable": true,
+      "firstSlidePreview": {
+        "id": "slide_title",
+        "title": "AI 工具应用入门",
+        "type": "title",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+        "bytes": 12653
+      },
+      "slidePreviewCount": 4
+    }
+  },
+  "candidatePreview": {
+    "kind": "ExamCandidatePreview",
+    "mode": "LOCAL_DSL_REDACTION",
+    "sourceExamId": "exam_real_llm_demo",
+    "sourceStatus": "WAITING_REVIEW",
+    "questionCount": 1,
+    "totalScore": 100,
+    "answersRemoved": true,
+    "answerVisibleToCandidate": false,
+    "answerFieldsRemoved": 0,
+    "answerLeakDetected": false,
+    "reviewRequired": true,
+    "path": "examples/output/real-llm-demo-candidate-preview.json"
+  },
+  "pptArtifact": {
+    "mode": "LOCAL_PPTX_ARTIFACT_POC",
+    "kind": "PPTX_FILE",
+    "status": "WAITING_REVIEW",
+    "path": "examples/output/real-llm-demo-ppt-artifact.pptx",
+    "manifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+    "previewPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+    "previewDir": "examples/output/real-llm-demo-ppt-artifact-slides",
+    "contactSheetPath": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+    "sourceDslPath": "examples/output/real-llm-ppt.json",
+    "sourceDslId": "ppt_real_llm_demo",
+    "title": "AI 工具应用入门演示 PPTX Artifact",
+    "slideCount": 4,
+    "bytes": 23437,
+    "generator": "@oai/artifact-tool/presentation-jsx",
+    "preview": {
+      "previewAvailable": true,
+      "renderAttempted": true,
+      "reason": "PREVIEW_RENDERED",
+      "slidePreviews": [
+        {
+          "index": 1,
+          "id": "slide_title",
+          "title": "AI 工具应用入门",
+          "type": "title",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+          "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+          "bytes": 12653
+        },
+        {
+          "index": 2,
+          "id": "slide_goals",
+          "title": "学习目标",
+          "type": "content",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+          "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+          "bytes": 18366
+        },
+        {
+          "index": 3,
+          "id": "slide_steps",
+          "title": "实验步骤概览",
+          "type": "content",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+          "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+          "bytes": 21665
+        },
+        {
+          "index": 4,
+          "id": "slide_summary",
+          "title": "核心要点回顾",
+          "type": "summary",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+          "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+          "bytes": 20732
+        }
+      ],
+      "contactSheet": {
+        "path": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+        "bytes": 65097,
+        "slideCount": 4
+      },
+      "firstSlide": {
+        "id": "slide_title",
+        "title": "AI 工具应用入门",
+        "type": "title",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+        "bytes": 12653
+      }
+    },
+    "previewAvailable": true,
+    "firstSlidePreview": {
+      "id": "slide_title",
+      "title": "AI 工具应用入门",
+      "type": "title",
+      "imagePath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+      "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+      "bytes": 12653
+    },
+    "slidePreviews": [
+      {
+        "index": 1,
+        "id": "slide_title",
+        "title": "AI 工具应用入门",
+        "type": "title",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-01.png",
+        "bytes": 12653
+      },
+      {
+        "index": 2,
+        "id": "slide_goals",
+        "title": "学习目标",
+        "type": "content",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-02.png",
+        "bytes": 18366
+      },
+      {
+        "index": 3,
+        "id": "slide_steps",
+        "title": "实验步骤概览",
+        "type": "content",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-03.png",
+        "bytes": 21665
+      },
+      {
+        "index": 4,
+        "id": "slide_summary",
+        "title": "核心要点回顾",
+        "type": "summary",
+        "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+        "thumbnailPath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-04.png",
+        "bytes": 20732
+      }
+    ],
+    "contactSheet": {
+      "path": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
+      "bytes": 65097,
+      "slideCount": 4
+    },
+    "reviewRequired": true,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "realLlmCalled": false,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false
+  },
+  "gradingNormalization": {
+    "mode": "REAL_LLM_DEMO_DSL_NORMALIZATION",
+    "schemaValidated": true,
+    "dslId": "grading_real_llm_demo",
+    "outputPath": "examples/output/real-llm-demo-grading-normalized.json",
+    "normalization": {
+      "applied": false,
+      "patches": [],
+      "mode": "DETERMINISTIC_DSL_SHAPE_NORMALIZATION"
+    }
+  },
+  "sandboxPrecheck": {
+    "mode": "REAL_SANDBOX_PRECHECK_ONLY",
+    "reportPath": "examples/output/real-llm-demo-grading-precheck.json",
+    "readiness": {
+      "status": "READY_FOR_MANUAL_SANDBOX_REVIEW",
+      "readyForRealSandboxImplementation": true,
+      "readyForRealSandboxExecution": false,
+      "manualReviewRequired": true,
+      "blockers": [],
+      "warnings": [
+        {
+          "code": "REAL_EVIDENCE_NOT_COLLECTED",
+          "field": "checks[].mockEvidence",
+          "reason": "mock evidence placeholders are expected; collect real evidence only after sandbox implementation."
+        }
+      ]
+    },
+    "summary": {
+      "totalScore": 100,
+      "checkTotal": 1,
+      "plannedOnly": 1,
+      "executed": 0,
+      "scoreTotalMatchesSpec": true,
+      "checkTypes": {
+        "file_exists": 0,
+        "stdout_contains": 1,
+        "pytest": 0,
+        "notebook_cell": 0,
+        "json_field": 0,
+        "log_keyword": 0
+      },
+      "supportedCheckTypes": [
+        "file_exists",
+        "stdout_contains",
+        "pytest",
+        "notebook_cell",
+        "json_field",
+        "log_keyword"
+      ],
+      "riskLevels": [
+        "MEDIUM"
+      ],
+      "assessmentPlan": {
+        "source": "grading.spec.assessmentPlan",
+        "planTotal": 1,
+        "checkTotal": 1,
+        "checkIds": [
+          "check_waiting_review"
+        ],
+        "alignedWithChecks": true,
+        "missingPlanForChecks": [],
+        "orphanPlanCheckIds": [],
+        "executionStrategies": [
+          "MOCK_PLAN_ONLY"
+        ],
+        "mockEvidenceStatuses": [
+          "MOCK_EVIDENCE_NOT_COLLECTED"
+        ],
+        "riskLevels": [
+          "low"
+        ],
+        "realSandboxEvidenceRequired": true,
+        "sandboxRequiredBeforeRealExecution": true
+      },
+      "sandboxPolicy": {
+        "executorBoundary": "SandboxExecutor",
+        "mode": "MOCK_ONLY",
+        "hostExecutionAllowed": false,
+        "realSandboxRunEnabled": false,
+        "networkEnabled": false,
+        "filesystemIsolationRequired": true,
+        "cpuLimitRequired": true,
+        "memoryLimitRequired": true,
+        "timeoutRequired": true,
+        "processLimitRequired": true,
+        "stdoutCapturedRequired": true,
+        "stderrCapturedRequired": true,
+        "auditLogRequired": true
+      }
+    },
+    "safety": {
+      "sandboxExecuted": false,
+      "realSandboxRunEnabled": false,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "networkEnabled": false,
+      "hostExecutionAllowed": false,
+      "realPublish": false
+    }
+  },
+  "readonlySandbox": {
+    "mode": "READONLY_REAL_SANDBOX_POC",
+    "reportPath": "examples/output/real-llm-demo-readonly-sandbox-report.json",
+    "runner": {
+      "id": "readonly_submission_sandbox_executor",
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "supportedCheckTypes": [
+        "file_exists",
+        "json_field",
+        "notebook_cell"
+      ],
+      "deferredCheckTypes": [
+        "stdout_contains",
+        "pytest",
+        "log_keyword"
+      ],
+      "strategy": "READONLY_STATIC_FILE_INSPECTION_ONLY",
+      "realSandboxExecuted": true,
+      "hostExecutionAllowed": false
+    },
+    "submissionRoot": "examples/submissions/readonly-demo",
+    "executionSummary": {
+      "total": 1,
+      "executed": 0,
+      "passed": 0,
+      "failed": 0,
+      "deferred": 1,
+      "byType": {
+        "file_exists": 0,
+        "stdout_contains": 1,
+        "pytest": 0,
+        "notebook_cell": 0,
+        "json_field": 0,
+        "log_keyword": 0
+      }
+    },
+    "score": {
+      "totalScore": 100,
+      "executableScore": 0,
+      "earnedScore": 0,
+      "deferredScore": 100
+    },
+    "passed": false,
+    "safety": {
+      "sandboxExecuted": false,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "pytestExecuted": false,
+      "notebookExecuted": false,
+      "networkEnabled": false,
+      "hostExecutionAllowed": false,
+      "realPublish": false
+    }
+  },
+  "readonlyEvidenceDemo": {
+    "mode": "READONLY_REAL_SANDBOX_POC",
+    "purpose": "Low-risk readable evidence demo; source real LLM grading remains unchanged.",
+    "sourceGradingId": "grading_real_llm_demo",
+    "doesNotModifySourceGrading": true,
+    "gradingPath": "examples/output/real-llm-demo-readonly-evidence-grading.json",
+    "reportPath": "examples/output/real-llm-demo-readonly-evidence-report.json",
+    "runner": {
+      "id": "readonly_submission_sandbox_executor",
+      "mode": "READONLY_REAL_SANDBOX_POC",
+      "supportedCheckTypes": [
+        "file_exists",
+        "json_field",
+        "notebook_cell"
+      ],
+      "deferredCheckTypes": [
+        "stdout_contains",
+        "pytest",
+        "log_keyword"
+      ],
+      "strategy": "READONLY_STATIC_FILE_INSPECTION_ONLY",
+      "realSandboxExecuted": true,
+      "hostExecutionAllowed": false
+    },
+    "submissionRoot": "examples/submissions/readonly-demo",
+    "executionSummary": {
+      "total": 2,
+      "executed": 2,
+      "passed": 2,
+      "failed": 0,
+      "deferred": 0,
+      "byType": {
+        "file_exists": 1,
+        "stdout_contains": 0,
+        "pytest": 0,
+        "notebook_cell": 0,
+        "json_field": 1,
+        "log_keyword": 0
+      }
+    },
+    "score": {
+      "totalScore": 70,
+      "executableScore": 70,
+      "earnedScore": 70,
+      "deferredScore": 0
+    },
+    "passed": true,
+    "safety": {
+      "sandboxExecuted": true,
+      "readonlyOnly": true,
+      "contestantCodeExecuted": false,
+      "commandExecuted": false,
+      "unknownShellExecuted": false,
+      "pytestExecuted": false,
+      "notebookExecuted": false,
+      "networkEnabled": false,
+      "hostExecutionAllowed": false,
+      "realPublish": false
+    }
+  },
+  "reviewSummary": {
+    "generatedStatus": "WAITING_REVIEW",
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "answerVisibleToCandidate": false,
+    "autoPublishAllowed": false,
+    "manualReviewRequired": true,
+    "reviewHighlights": [
+      "真实 LLM 已产出 Lab/Exam/Grading/PPT 四类 DSL",
+      "四类 DSL 已通过本地 Schema 校验，状态仍为 WAITING_REVIEW",
+      "候选人预览已脱敏，不返回标准答案",
+      "Grading DSL 已归一化并通过真实沙箱前预检",
+      "PPT DSL 已导出本地 PPTX Artifact，仍需人工审核",
+      "只读沙箱仅执行文件/JSON 字段类检查，其它检查延期",
+      "Readonly evidence demo 使用独立 Grading DSL 展示低风险自动评分证据，不篡改真实 Grading"
+    ]
+  },
+  "acceptanceSignals": {
+    "realLlmDslArtifactsPresent": true,
+    "allGeneratedDslWaitingReview": true,
+    "schemasValidated": true,
+    "candidatePreviewAnswerSafe": true,
+    "gradingNormalized": true,
+    "precheckReadyForManualSandboxReview": true,
+    "readonlySandboxExecuted": false,
+    "readonlyEvidenceDemoExecuted": true,
+    "readonlyEvidenceDemoEarnedScore": 70,
+    "pptxArtifactGenerated": true,
+    "pptxArtifactWaitingReview": true,
+    "contestantCodeExecuted": false,
+    "realPublish": false
+  },
+  "safety": {
+    "realLlmCalled": true,
+    "replayedExistingLlmArtifacts": true,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "secretValueReturned": false,
+    "secretValueLogged": false,
+    "networkAccess": false,
+    "pptxArtifactGenerated": true,
+    "pptxArtifactAutoPublishAllowed": false,
+    "sandboxExecuted": true,
+    "readonlyOnly": true,
+    "contestantCodeExecuted": false,
+    "commandExecuted": false,
+    "pytestExecuted": false,
+    "notebookExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "reviewBypassed": false
+  },
+  "traceId": "trace_demo_bundle"
+}

@@ -1,0 +1,56 @@
+name: Backend Core PostgreSQL Smoke
+
+"on":
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/backend-core-postgresql-smoke.yml"
+      - "backend/core_*.py"
+      - "backend/app.py"
+      - "backend/asgi_app.py"
+      - "cli/lab_cli.py"
+      - "requirements.txt"
+      - "pytest.ini"
+      - "tests/fakes_backend_postgres.py"
+      - "tests/test_backend_core_postgres_*.py"
+
+permissions:
+  contents: read
+
+jobs:
+  backend-core-postgresql-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: lab_core_smoke
+          POSTGRES_USER: lab_core
+          POSTGRES_PASSWORD: ci_ephemeral_only
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U lab_core -d lab_core_smoke"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      LAB_BACKEND_CORE_POSTGRESQL_SMOKE: "1"
+      LAB_BACKEND_CORE_DATABASE_URL: "postgresql://lab_core:ci_ephemeral_only@127.0.0.1:5432/lab_core_smoke"
+      LAB_BACKEND_CORE_POSTGRESQL_SMOKE_REVIEWER: "postgresql_smoke_ci"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run PostgreSQL backend core smoke
+        run: python -m pytest tests/test_backend_core_postgres_real_smoke.py -q

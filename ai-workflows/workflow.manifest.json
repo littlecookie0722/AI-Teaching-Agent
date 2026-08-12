@@ -1,0 +1,240 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Phase 1 mock workflow contract. Workflows orchestrate local DSL examples through the mock-only Provider Adapter, Backend Mock, CLI Mock, AI Task records, and review gates.",
+  "providerAdapter": {
+    "adapterId": "mock_provider_adapter",
+    "interfaceName": "LLMProvider",
+    "helper": "ai_workflows/provider_adapter_workflow.py",
+    "contract": "providers/provider-adapter.contract.json",
+    "activeProvider": "mock",
+    "operation": "generateJson",
+    "streamGenerateEnabled": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false
+  },
+  "globalSafety": {
+    "realLlmCalled": false,
+    "realCloudResourceCreated": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "reviewRequiredForGeneratedContent": true,
+    "defaultGeneratedStatus": "WAITING_REVIEW",
+    "answerVisibleToCandidate": false
+  },
+  "workflows": [
+    {
+      "id": "phase1_main_demo",
+      "title": "Phase 1 Mock main chain",
+      "entrypoint": {
+        "cli": "python lab_cli.py workflow demo --input <input> --reviewer <reviewer>",
+        "backend": {"method": "POST", "path": "/api/workflow/demo"}
+      },
+      "inputs": [
+        {"name": "input", "type": "local_file", "required": true, "allowedExtensions": [".md"]},
+        {"name": "reviewer", "type": "string", "required": true}
+      ],
+      "outputs": [
+        {"name": "materialAnalysis", "kind": "MockAnalysis", "status": "COMPLETED"},
+        {"name": "labDsl", "kind": "Lab", "path": "templates/lab/examples/basic-lab.yaml", "status": "WAITING_REVIEW"},
+        {
+          "name": "examDsl",
+          "kind": "Exam",
+          "path": "templates/exam/examples/notebook-fill-blank.yaml",
+          "status": "WAITING_REVIEW"
+        },
+        {
+          "name": "gradingDsl",
+          "kind": "Grading",
+          "path": "templates/grading/examples/python-pytest.yaml",
+          "status": "WAITING_REVIEW"
+        },
+        {"name": "pptDsl", "kind": "PPT", "path": "templates/ppt/examples/course-ppt.yaml", "status": "WAITING_REVIEW"},
+        {"name": "gradingReport", "kind": "MockReport", "status": "COMPLETED"}
+      ],
+      "steps": [
+        {"name": "validate_input", "type": "validation", "required": true},
+        {
+          "name": "analyze_material",
+          "type": "static_analysis",
+          "required": true,
+          "realLlmCalled": false,
+          "remoteContentFetched": false,
+          "unknownShellExecuted": false,
+          "sandboxExecuted": false
+        },
+        {
+          "name": "generate_lab_dsl",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "lab_generation_v0",
+          "createsAiTask": true,
+          "taskType": "LAB_GENERATION"
+        },
+        {
+          "name": "generate_exam_dsl",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "exam_generation_v0",
+          "createsAiTask": true,
+          "taskType": "EXAM_GENERATION"
+        },
+        {
+          "name": "generate_grading_dsl",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "grading_generation_v0",
+          "createsAiTask": true,
+          "taskType": "GRADING_GENERATION"
+        },
+        {
+          "name": "generate_ppt_dsl",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "ppt_generation_v0",
+          "createsAiTask": true,
+          "taskType": "PPT_GENERATION"
+        },
+        {"name": "mock_grade_run", "type": "mock_grading", "createsAiTask": false}
+      ],
+      "reviewGate": {
+        "required": true,
+        "publishBlockedUntilApproved": true,
+        "allowedActions": ["approve", "reject"],
+        "rejectRequiresReason": true
+      },
+      "runLog": {
+        "enabled": true,
+        "cliList": "python lab_cli.py workflow list --workflow-id phase1_main_demo",
+        "cliGet": "python lab_cli.py workflow get --id <id>",
+        "backendList": {"method": "GET", "path": "/api/workflow-runs"},
+        "backendGet": {"method": "GET", "path": "/api/workflow-runs/{id}"},
+        "recordsTraceId": true,
+        "recordsStepOrder": true,
+        "mode": "MOCK_ONLY"
+      },
+      "safety": {
+        "realLlmCalled": false,
+        "sandboxExecuted": false,
+        "unknownShellExecuted": false,
+        "remoteContentFetched": false,
+        "autoPublishAllowed": false,
+        "answerVisibleToCandidate": false
+      }
+    },
+    {
+      "id": "lab_generation_mock",
+      "title": "Mock Lab DSL generation",
+      "entrypoint": {
+        "cli": "python lab_cli.py lab generate-from-source --input <input>",
+        "backend": {"method": "POST", "path": "/api/labs/generate"}
+      },
+      "inputs": [
+        {"name": "input", "type": "local_file", "required": true, "allowedExtensions": [".md", ".markdown", ".txt", ".sh", ".bash"]}
+      ],
+      "outputs": [
+        {"name": "labDsl", "kind": "Lab", "path": "templates/lab/examples/basic-lab.yaml", "status": "WAITING_REVIEW"}
+      ],
+      "steps": [
+        {"name": "validate_source_file", "type": "validation", "required": true},
+        {
+          "name": "analyze_material",
+          "type": "static_analysis",
+          "required": true,
+          "realLlmCalled": false,
+          "remoteContentFetched": false,
+          "unknownShellExecuted": false,
+          "sandboxExecuted": false
+        },
+        {
+          "name": "generate_lab_dsl_via_provider_adapter",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "lab_generation_v0",
+          "required": true
+        },
+        {"name": "validate_lab_schema", "type": "schema_validation", "schema": "templates/lab/lab.schema.json"},
+        {"name": "create_ai_task", "type": "state", "status": "WAITING_REVIEW", "taskType": "LAB_GENERATION"}
+      ],
+      "reviewGate": {"required": true, "publishBlockedUntilApproved": true, "rejectRequiresReason": true},
+      "safety": {"realLlmCalled": false, "autoPublishAllowed": false}
+    },
+    {
+      "id": "exam_generation_mock",
+      "title": "Mock Exam and Grading DSL generation",
+      "entrypoint": {
+        "cli": "python lab_cli.py exam generate-from-lab --lab-id <labId>",
+        "backend": {"method": "POST", "path": "/api/exams/generate-from-lab"}
+      },
+      "inputs": [
+        {"name": "labId", "type": "string", "required": true}
+      ],
+      "outputs": [
+        {
+          "name": "examDsl",
+          "kind": "Exam",
+          "path": "templates/exam/examples/notebook-fill-blank.yaml",
+          "status": "WAITING_REVIEW"
+        },
+        {
+          "name": "gradingDsl",
+          "kind": "Grading",
+          "path": "templates/grading/examples/python-pytest.yaml",
+          "status": "WAITING_REVIEW"
+        }
+      ],
+      "steps": [
+        {"name": "validate_lab_id", "type": "validation", "required": true},
+        {
+          "name": "generate_exam_dsl_via_provider_adapter",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "exam_generation_v0",
+          "required": true
+        },
+        {
+          "name": "generate_grading_dsl_via_provider_adapter",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "grading_generation_v0",
+          "required": true
+        },
+        {"name": "validate_exam_schema", "type": "schema_validation", "schema": "templates/exam/exam.schema.json"},
+        {"name": "validate_grading_schema", "type": "schema_validation", "schema": "templates/grading/grading.schema.json"},
+        {"name": "create_ai_task", "type": "state", "status": "WAITING_REVIEW", "taskType": "EXAM_GENERATION"}
+      ],
+      "reviewGate": {"required": true, "publishBlockedUntilApproved": true, "rejectRequiresReason": true},
+      "safety": {"realLlmCalled": false, "autoPublishAllowed": false, "answerVisibleToCandidate": false}
+    },
+    {
+      "id": "ppt_generation_mock",
+      "title": "Mock PPT DSL generation",
+      "entrypoint": {
+        "cli": "python lab_cli.py ppt generate --input <input>",
+        "backend": {"method": "POST", "path": "/api/ppt/generate"}
+      },
+      "inputs": [
+        {"name": "input", "type": "local_file", "required": true, "allowedExtensions": [".md"]}
+      ],
+      "outputs": [
+        {"name": "pptDsl", "kind": "PPT", "path": "templates/ppt/examples/course-ppt.yaml", "status": "WAITING_REVIEW"}
+      ],
+      "steps": [
+        {"name": "validate_source_file", "type": "validation", "required": true},
+        {
+          "name": "generate_ppt_dsl_via_provider_adapter",
+          "type": "provider_adapter_generation",
+          "providerAdapter": "mock_provider_adapter",
+          "promptId": "ppt_generation_v0",
+          "required": true
+        },
+        {"name": "validate_ppt_schema", "type": "schema_validation", "schema": "templates/ppt/ppt.schema.json"},
+        {"name": "create_ai_task", "type": "state", "status": "WAITING_REVIEW", "taskType": "PPT_GENERATION"}
+      ],
+      "reviewGate": {"required": true, "publishBlockedUntilApproved": true, "rejectRequiresReason": true},
+      "safety": {"realLlmCalled": false, "autoPublishAllowed": false, "artifactGenerated": false}
+    }
+  ]
+}

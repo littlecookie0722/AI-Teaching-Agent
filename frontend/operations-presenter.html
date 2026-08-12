@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations Presenter View Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1b2430;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --brand: #0f766e;
+      --brand-dark: #115e59;
+      --accent: #2563eb;
+      --warn: #b45309;
+      --ok-bg: #e7f8f2;
+      --info-bg: #eef4ff;
+      --warn-bg: #fff7ed;
+      --shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #143d46;
+      color: #ffffff;
+      padding: 26px 28px 22px;
+    }
+
+    main {
+      width: min(1220px, calc(100% - 32px));
+      margin: 24px auto 42px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    header p {
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 1060px;
+      margin-bottom: 18px;
+    }
+
+    section {
+      margin-top: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .topbar,
+    .section-head,
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-head {
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      color: var(--brand-dark);
+      background: var(--ok-bg);
+      border-color: #9ad8cb;
+    }
+
+    .pill.info {
+      color: var(--accent);
+      background: var(--info-bg);
+      border-color: #bfdbfe;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-color: #fed7aa;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 25px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.82fr);
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .row-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(185px, 0.42fr) minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .row.compact {
+      grid-template-columns: minmax(210px, 0.55fr) minmax(260px, 1fr);
+    }
+
+    .row span:nth-child(2),
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--ok-bg);
+      color: var(--brand-dark);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status.info {
+      background: var(--info-bg);
+      color: var(--accent);
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .command,
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    a {
+      color: var(--brand-dark);
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: var(--brand);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      color: #98a2b3;
+      background: #f2f4f7;
+      border-color: #e4e7ec;
+    }
+
+    @media (max-width: 980px) {
+      .summary-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <span class="pill strong">MOCK_ONLY</span>
+      <span class="pill">Phase 1</span>
+      <span class="pill">Presenter View</span>
+      <span class="pill">ConsoleNavPanel</span>
+      <span class="pill">DeliveryChecklistPanel</span>
+      <span class="pill">AuditTrailPanel</span>
+      <span class="pill warn">manualOnly=true</span>
+      <span class="pill warn">readOnly=true</span>
+    </div>
+    <h1>Operations Presenter View Mock</h1>
+    <p>运营讲解台。数据来自 <code>frontend/mock-data.json.operationsPresenterPrototype</code>、<code>frontend/mock-data.json.operationsDemoScriptPrototype</code>、<code>frontend/mock-data.json.operationsSignoffPrototype</code>、<code>frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath</code>、<code>delivery/phase1-demo-script-checklist.json</code> 和 <code>delivery/DEMO_SCRIPT_CHECKLIST.md</code>，把 14 步演示、speakerCue、验收信号、CLI / Backend / MCP 三链路 <code>reviewPriorityQueue</code>、<code>CoreBusinessDemoPath</code> 和禁止动作放在一页，不运行命令、不上传交付包、不启动真实智能体。</p>
+    <div class="pill-row">
+      <span class="pill">route=/operations/presenter</span>
+      <span class="pill">GET /api/health</span>
+      <span class="pill">GET /api/review-task-summary</span>
+      <span class="pill">GET /api/workflow-runs</span>
+      <span class="pill">GET /api/artifacts</span>
+      <span class="pill">GET /api/audit-events</span>
+      <span class="pill">MCP get_review_task_summary</span>
+      <span class="pill">CoreBusinessDemoPath</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">讲解台总览</h2>
+          <p>presenterSections + speakerTimeline + acceptanceSignals + blockedActions + safeCommands + safety。</p>
+        </div>
+        <span class="pill strong">runCommandEnabled=false</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Steps</span>
+          <strong>14</strong>
+        </div>
+        <div class="metric">
+          <span>Speaker Cues</span>
+          <strong>14</strong>
+        </div>
+        <div class="metric">
+          <span>Signals</span>
+          <strong>8</strong>
+        </div>
+        <div class="metric">
+          <span>Blocked Actions</span>
+          <strong>8</strong>
+        </div>
+        <div class="metric">
+          <span>Delivery Ready</span>
+          <strong>175 / 175</strong>
+        </div>
+        <div class="metric">
+          <span>Phase1 Checks</span>
+          <strong>20 / 20</strong>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="presenter-title">
+      <div class="section-head">
+        <div>
+          <h2 id="presenter-title">Presenter Timeline</h2>
+          <p>按讲解顺序推进：先声明 Phase 1 边界，再打开页面，随后跑本地 JSON CLI 验收，最后确认 WAITING_REVIEW 和所有真实动作禁用。</p>
+        </div>
+        <span class="pill info">delivery/DEMO_SCRIPT_CHECKLIST.md</span>
+      </div>
+      <div class="content-grid">
+        <div class="stack">
+          <div class="panel">
+            <h3>speakerTimeline</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>read_rules</span>
+                <span>speakerCue: 先说明本轮只做 Phase 1，允许目录、文档、Schema、CLI Mock、AI Task Mock、审核状态和测试。</span>
+                <strong class="status">1</strong>
+              </div>
+              <div class="row">
+                <span>open_launchpad</span>
+                <span><a href="operations-launchpad.html">/operations/launchpad</a> · speakerCue: 从统一入口看 Entry Cards、Validation Commands 和 175 / 175。</span>
+                <strong class="status">2</strong>
+              </div>
+              <div class="row">
+                <span>open_demo_map</span>
+                <span><a href="operations-demo-map.html">/operations/demo-map</a> · speakerCue: 解释角色路径和 28 个 route entries。</span>
+                <strong class="status">3</strong>
+              </div>
+              <div class="row">
+                <span>open_runbook</span>
+                <span><a href="operations-runbook.html">/operations/runbook</a> · speakerCue: 强调 scripts/manifest.json 的 allowlist。</span>
+                <strong class="status">4</strong>
+              </div>
+              <div class="row">
+                <span>run_phase1_check</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+                <strong class="status">20 / 20</strong>
+              </div>
+              <div class="row">
+                <span>export_delivery_package</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+                <strong class="status">JSON</strong>
+              </div>
+              <div class="row">
+                <span>render_acceptance_report</span>
+                <span class="command">python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</span>
+                <strong class="status">REPORT</strong>
+              </div>
+              <div class="row">
+                <span>open_acceptance</span>
+                <span><a href="operations-acceptance.html">/operations/acceptance</a> · speakerCue: 验收页展示 Delivery Manifest ready=127 required=127。</span>
+                <strong class="status">8</strong>
+              </div>
+              <div class="row">
+                <span>open_delivery</span>
+                <span><a href="delivery.html">/delivery</a> · speakerCue: 交付页展示 127 个 required deliverables 和安全断言。</span>
+                <strong class="status">9</strong>
+              </div>
+              <div class="row">
+                <span>open_incident_review</span>
+                <span><a href="audit-incidents.html">/audit/incidents</a> · speakerCue: 失败记录只用于复盘，不自动修复。</span>
+                <strong class="status">10</strong>
+              </div>
+              <div class="row">
+                <span>validate_cli_review_priority_queue</span>
+                <span class="command">python lab_cli.py review batch-summary · speakerCue: reviewPriorityQueue 只做人工审核排序，autoApproveAllowed=false。</span>
+                <strong class="status info">11</strong>
+              </div>
+              <div class="row">
+                <span>validate_backend_mcp_review_priority_queue</span>
+                <span class="command">GET /api/review-task-summary · MCP get_review_task_summary · speakerCue: 三链路同源，batchStateChangeAllowed=false。</span>
+                <strong class="status info">12</strong>
+              </div>
+              <div class="row">
+                <span>confirm_review_gate</span>
+                <span>speakerCue: Lab / Exam / Grading / PPT DSL 继续默认 WAITING_REVIEW，审核前不得发布。</span>
+                <strong class="status warn">GATE</strong>
+              </div>
+              <div class="row">
+                <span>confirm_blocked_actions</span>
+                <span>speakerCue: 真实 LLM、真实 Agent、真实云、真实沙箱、选手代码、远程上传、自动发布和真实发布保持 disabled。</span>
+                <strong class="status warn">LOCKED</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Safe Commands</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>打开讲解台</span>
+                <span class="command">start .\frontend\operations-presenter.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开脚本页</span>
+                <span class="command">start .\frontend\operations-demo-script.html</span>
+              </div>
+              <div class="row compact">
+                <span>打开 Launchpad</span>
+                <span class="command">start .\frontend\operations-launchpad.html</span>
+              </div>
+              <div class="row compact">
+                <span>Phase 1 自检</span>
+                <span class="command">python lab_cli.py phase1 check</span>
+              </div>
+              <div class="row compact">
+                <span>导出交付包</span>
+                <span class="command">python lab_cli.py phase1 export --output examples/output/phase1-delivery-package.json</span>
+              </div>
+              <div class="row compact">
+                <span>渲染验收报告</span>
+                <span class="command">python lab_cli.py phase1 report --package examples/output/phase1-delivery-package.json --output examples/output/phase1-acceptance-report.md</span>
+              </div>
+              <div class="row compact">
+                <span>审核优先队列 CLI</span>
+                <span class="command">python lab_cli.py review batch-summary</span>
+              </div>
+              <div class="row compact">
+                <span>审核优先队列 MCP</span>
+                <span class="command">python lab_cli.py mcp call --tool get_review_task_summary --arguments "{}"</span>
+              </div>
+              <div class="row compact">
+                <span>前端契约测试</span>
+                <span class="command">python -m pytest tests/test_frontend_manifest.py</span>
+              </div>
+              <div class="row compact">
+                <span>三链路队列测试</span>
+                <span class="command">python -m pytest tests/test_backend_mock_api.py tests/test_mcp_mock_tools.py tests/test_cli.py</span>
+              </div>
+              <div class="row compact">
+                <span>全量测试</span>
+                <span class="command">python -m pytest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h3>Acceptance Signals</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>launchpad_first</span>
+                <span>frontend/operations-launchpad.html 是第一入口，Presenter 只辅助讲解。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>phase1_check_passed</span>
+                <span>phase1 check 返回 success=true 和 data.passed=true。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>delivery_manifest_ready</span>
+                <span>deliveryManifest.summary.missingRequired=0。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>acceptance_report_ready</span>
+                <span>acceptancePassed=true 且 safetyAssertionsPassed=true。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>review_gate_visible</span>
+                <span>WAITING_REVIEW 在审核与交付叙事中可见。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>review_priority_queue_visible</span>
+                <span>CLI review batch-summary、GET /api/review-task-summary、MCP get_review_task_summary 同源展示 reviewPriorityQueue，autoApproveAllowed=false，batchStateChangeAllowed=false。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>real_actions_disabled</span>
+                <span>真实执行、上传、Provider、Agent、发布操作全部 disabled。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row">
+                <span>assessment_plan_audit_trace_visible</span>
+                <span>AssessmentPlanAuditSignal · gradingReport.assessmentPlanSummary -> operationAuditEvents.detail.assessmentPlanSummary · assessmentPlanSummary.source=grading.spec.assessmentPlan。</span>
+                <strong class="status">PASS</strong>
+              </div>
+              <div class="row compact">
+                <span>speakerCue: 评分计划追溯</span>
+                <span class="muted">讲解时从 Grading Report 跳到 Audit，确认 MOCK_GRADING_RUN、checkPlans[].assessmentPlanSourceField 和 assessmentPlanAlignedWithChecks=true。</span>
+              </div>
+              <div class="row compact">
+                <span>speakerCue: 审核优先队列</span>
+                <span class="muted">讲解时从 CLI、Backend Mock、MCP Mock 三处确认 topPriorityTaskId=task_grading_demo、reasonCode=HIGH_RISK_MOCK_EVIDENCE_REQUIRED 和 recommendedAction=review_grading_plan_before_publish。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>CoreBusinessDemoPath</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>source=realDemoPrototype.coreBusinessDemoPath</span>
+                <span>bundlePath=examples/output/real-llm-demo-bundle.json</span>
+                <strong class="status info">VISIBLE</strong>
+              </div>
+              <div class="row compact">
+                <span>route</span>
+                <span><a href="real-demo.html">/real-demo</a> -&gt; <a href="review-center.html">/review-center</a> -&gt; /ppt/:id/review -&gt; /grading/:id/report</span>
+              </div>
+              <div class="row compact">
+                <span>routeText</span>
+                <span>/real-demo -&gt; /review-center -&gt; /ppt/:id/review -&gt; /grading/:id/report</span>
+              </div>
+              <div class="row compact">
+                <span>stepTotal=6</span>
+                <span>dslValidatedTotal=4 · waitingReviewDslTotal=4 · readonlyEvidenceDemoExecuted=true · readonlyEvidenceDemoEarnedScore=70</span>
+              </div>
+              <div class="row compact">
+                <span>reviewCenterLinked=true</span>
+                <span>pptPageReviewActionVisible=true · reviewRequiredBeforePublish=true</span>
+              </div>
+              <div class="row compact">
+                <span>autoApproveAllowed=false</span>
+                <span>autoPublishAllowed=false · realPublish=false</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>RealDemoAcceptanceSummary</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>source=realDemoPrototype.realDemoAcceptanceSummary</span>
+                <span>summaryPath=examples/output/real-llm-demo-acceptance-summary.json</span>
+                <strong class="status info">7 / 7</strong>
+              </div>
+              <div class="row compact">
+                <span>acceptancePassed=true</span>
+                <span>passedCount=7 · total=7 · failedStepIds=[]</span>
+              </div>
+              <div class="row compact">
+                <span>contractAndEvidence</span>
+                <span>mcpOutputContractIncludesRealDemoReviewQueue=true · readonlyEvidenceCollectedTotal=2 · gradingEvidenceCoverage=100/100</span>
+              </div>
+              <div class="row compact">
+                <span>reviewSignals</span>
+                <span>pptPageReviewActionVisible=true · candidatePreviewAnswerSafe=true · route=/real-demo -&gt; /review-center -&gt; /ppt/:id/review -&gt; /grading/:id/report</span>
+              </div>
+              <div class="row compact">
+                <span>safety</span>
+                <span>newLlmRequestSent=false · secretsRead=false · networkAccess=false · batchStateChangeAllowed=false · realPublishAllowed=false</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Action Policy</h3>
+            <div class="row-list">
+              <div class="row">
+                <span>viewPresenterSummaryEnabled=true</span>
+                <span>openLinkedStaticPageEnabled=true · copySafeCommandEnabled=true</span>
+                <strong class="status">LOCAL</strong>
+              </div>
+              <div class="row compact">
+                <span>runCommandEnabled=false</span>
+                <span class="muted">页面不执行命令。</span>
+              </div>
+              <div class="row compact">
+                <span>uploadPackageEnabled=false</span>
+                <span class="muted">不上传交付包。</span>
+              </div>
+              <div class="row compact">
+                <span>batchStateChangeEnabled=false</span>
+                <span class="muted">不批量变更任务状态。</span>
+              </div>
+              <div class="row compact">
+                <span>startRealAgentEnabled=false</span>
+                <span class="muted">不启动真实 Agent。</span>
+              </div>
+              <div class="row compact">
+                <span>enableRealProviderEnabled=false</span>
+                <span class="muted">不启用真实 Provider。</span>
+              </div>
+              <div class="row compact">
+                <span>callRealLlmEnabled=false</span>
+                <span class="muted">不调用真实大模型。</span>
+              </div>
+              <div class="row compact">
+                <span>runRealSandboxEnabled=false</span>
+                <span class="muted">不运行真实沙箱。</span>
+              </div>
+              <div class="row compact">
+                <span>executeContestantCodeEnabled=false</span>
+                <span class="muted">不执行选手代码。</span>
+              </div>
+              <div class="row compact">
+                <span>autoPublishAllowed=false</span>
+                <span class="muted">不自动发布。</span>
+              </div>
+              <div class="row compact">
+                <span>realPublish=false</span>
+                <span class="muted">不真实发布。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Blocked Actions</h3>
+            <div class="row-list">
+              <div class="row compact">
+                <span>Do not run unknown Shell scripts</span>
+                <span class="muted">unknownShellExecuted=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not execute contestant code</span>
+                <span class="muted">contestantCodeExecuted=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not start a real agent</span>
+                <span class="muted">realAgentStarted=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not start a real MCP server</span>
+                <span class="muted">realMcpServerStarted=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not call a real LLM provider</span>
+                <span class="muted">realLlmCalled=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not create or delete real cloud resources</span>
+                <span class="muted">realCloudResourceChanged=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not run a real sandbox</span>
+                <span class="muted">sandboxExecuted=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not upload delivery packages</span>
+                <span class="muted">remoteUploadAllowed=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not auto-publish or real-publish generated content</span>
+                <span class="muted">autoPublishAllowed=false · realPublish=false</span>
+              </div>
+              <div class="row compact">
+                <span>Do not show secrets or candidate-hidden answers</span>
+                <span class="muted">secretVisibleInFrontend=false · answerVisibleToCandidate=false</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pill-row">
+        <button class="primary">查看 Presenter Timeline</button>
+        <button>查看 speakerCue</button>
+        <button>复制命令文本</button>
+        <button disabled>运行命令</button>
+        <button disabled>上传交付包</button>
+        <button disabled>批量状态变更</button>
+        <button disabled>启动真实 Agent</button>
+        <button disabled>启用真实 Provider</button>
+        <button disabled>调用真实大模型</button>
+        <button disabled>运行真实沙箱</button>
+        <button disabled>执行选手代码</button>
+        <button disabled>真实发布</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

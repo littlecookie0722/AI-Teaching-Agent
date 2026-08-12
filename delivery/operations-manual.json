@@ -1,0 +1,846 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 5",
+  "mode": "MOCK_ONLY",
+  "id": "phase5_operations_manual",
+  "title": "Phase 5 Operations Manual Package",
+  "description": "Machine-testable operations manual for local mock platform handoff. It documents operator roles, local previews, allowlisted commands, review gates, generated evidence, and safety boundaries without enabling real providers, agents, MCP servers, cloud resources, sandboxes, or publish actions.",
+  "inputs": [
+    {
+      "id": "operations_launchpad",
+      "path": "frontend/operations-launchpad.html",
+      "required": true
+    },
+    {
+      "id": "access_preview",
+      "path": "frontend/access.html",
+      "required": true
+    },
+    {
+      "id": "operations_signoff",
+      "path": "frontend/operations-signoff.html",
+      "required": true
+    },
+    {
+      "id": "delivery_preview",
+      "path": "frontend/delivery.html",
+      "required": true
+    },
+    {
+      "id": "handoff_markdown",
+      "path": "delivery/HANDOFF.md",
+      "required": true
+    },
+    {
+      "id": "final_signoff_markdown",
+      "path": "delivery/FINAL_SIGNOFF.md",
+      "required": true
+    },
+    {
+      "id": "high_risk_mcp_handoff",
+      "path": "delivery/HIGH_RISK_MCP_HANDOFF.md",
+      "required": true
+    },
+    {
+      "id": "demo_runbook",
+      "path": "scripts/phase1-demo.runbook.md",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    },
+    {
+      "id": "operations_skill_pack",
+      "path": "skills/operations-skill-pack/SKILL.md",
+      "required": true
+    },
+    {
+      "id": "operations_skill_pack_contract",
+      "path": "skills/operations-skill-pack.contract.json",
+      "required": true
+    },
+    {
+      "id": "standalone_agent_delivery",
+      "path": "delivery/STANDALONE_AGENT_DELIVERY.md",
+      "required": true
+    },
+    {
+      "id": "standalone_agent_delivery_contract",
+      "path": "delivery/standalone-agent-delivery.json",
+      "required": true
+    },
+    {
+      "id": "access_entrypoints",
+      "path": "delivery/ACCESS_ENTRYPOINTS.md",
+      "required": true
+    },
+    {
+      "id": "access_entrypoints_contract",
+      "path": "delivery/access-entrypoints.json",
+      "required": true
+    },
+    {
+      "id": "phase5_mock_baseline",
+      "path": "delivery/PHASE5_MOCK_BASELINE.md",
+      "required": true
+    },
+    {
+      "id": "phase5_mock_baseline_contract",
+      "path": "delivery/phase5-mock-baseline.json",
+      "required": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "path": "providers/provider_runtime_guard.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_dry_run_plan_contract",
+      "path": "providers/real-llm-dry-run-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_dry_run_plan",
+      "path": "providers/real_llm_dry_run_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_approval_gate_contract",
+      "path": "providers/real-llm-approval-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_approval_gate",
+      "path": "providers/real_llm_approval_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_contract",
+      "path": "providers/real-llm-sdk-task-blueprint.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "path": "providers/real_llm_sdk_task_blueprint.py",
+      "required": true
+    },
+    {
+      "id": "real_provider_sdk_poc_contract",
+      "path": "providers/real-provider-sdk-poc.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_provider_sdk_poc",
+      "path": "providers/real_provider_sdk_poc.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_enablement_contract",
+      "path": "providers/real-sdk-enablement.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_enablement",
+      "path": "providers/real_sdk_enablement.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_minimal_impl_contract",
+      "path": "providers/real-sdk-minimal-impl.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_minimal_impl",
+      "path": "providers/real_sdk_minimal_impl.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate_contract",
+      "path": "providers/real-sdk-dependency-env-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate",
+      "path": "providers/real_sdk_dependency_apply_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan_contract",
+      "path": "providers/real-sdk-dependency-implementation-task-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_implementation_task_plan",
+      "path": "providers/real_sdk_dependency_implementation_task_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package_contract",
+      "path": "providers/real-sdk-dependency-change-approval-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_approval_package",
+      "path": "providers/real_sdk_dependency_change_approval_package.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review_contract",
+      "path": "providers/real-sdk-dependency-readonly-diff-review.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_diff_review",
+      "path": "providers/real_sdk_dependency_readonly_diff_review.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation_contract",
+      "path": "providers/real-sdk-dependency-final-execution-confirmation.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_final_execution_confirmation",
+      "path": "providers/real_sdk_dependency_final_execution_confirmation.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation_contract",
+      "path": "providers/real-sdk-dependency-execution-task-creation.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_execution_task_creation",
+      "path": "providers/real_sdk_dependency_execution_task_creation.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled_contract",
+      "path": "providers/real-sdk-dependency-executor-disabled.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_executor_disabled",
+      "path": "providers/real_sdk_dependency_executor_disabled.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence_contract",
+      "path": "providers/real-sdk-dependency-dry-run-evidence.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver",
+      "path": "providers/real_sdk_dependency_target_resolver.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_target_resolver_contract",
+      "path": "providers/real-sdk-dependency-target-resolver.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot",
+      "path": "providers/real_sdk_dependency_readonly_snapshot.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval",
+      "path": "providers/real_sdk_dependency_content_read_approval.py",
+      "description": "真实 SDK 依赖 content read approval 禁用壳，只生成未来依赖文件内容读取审批模型，不读取依赖文件内容、不返回原文、不持久化内容、不写审批产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan",
+      "path": "providers/real_sdk_dependency_content_read_plan.py",
+      "description": "真实 SDK 依赖 content read plan 禁用壳，只生成未来依赖文件内容读取只读审查计划模型，不读取依赖文件内容、不返回原文、不持久化内容、不写计划产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation",
+      "path": "providers/real_sdk_dependency_content_read_final_confirmation.py",
+      "description": "真实 SDK 依赖 content read final confirmation 禁用壳，只生成未来依赖文件内容只读读取前最终确认模型，不读取依赖文件内容、不返回原文、不持久化内容或确认记录、不写确认产物、不创建执行任务、不授权读取执行、不生成 patch、不执行命令、不安装 SDK、不检查密钥。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution",
+      "path": "providers/real_sdk_dependency_content_read_readonly_execution.py",
+      "description": "真实 SDK 依赖 content read readonly execution，只在最终确认后读取允许名单内本地依赖文件并返回脱敏预览；不返回原文、不持久化内容或记录、不写产物、不生成 patch、不执行命令、不安装 SDK、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal",
+      "path": "providers/real_sdk_dependency_install_change_proposal.py",
+      "description": "真实 SDK 依赖 install change proposal，只基于只读脱敏依赖内容预览生成未来安装变更方案模型和不可执行 patch 预览；不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate",
+      "path": "providers/real_sdk_dependency_install_execution_gate.py",
+      "description": "真实 SDK 依赖 install execution gate，只基于已审核安装变更方案生成未来安装执行门禁模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Gate",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package",
+      "path": "providers/real_sdk_dependency_install_authorization_package.py",
+      "description": "真实 SDK 依赖 install authorization package，只基于安装执行门禁生成未来安装授权包模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Authorization Package",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request",
+      "path": "providers/real_sdk_dependency_install_execution_request.py",
+      "description": "真实 SDK 依赖 install execution request，只基于安装授权包生成未来安装执行请求模型；不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Request",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled",
+      "path": "providers/real_sdk_dependency_install_executor_disabled.py",
+      "description": "真实 SDK 依赖 install executor disabled，只基于安装执行请求生成禁用执行器模型；不派发执行器、不启动执行器、不创建执行 run、不授权执行、不写依赖文件、不写 patch 文件、不应用 patch、不物化或执行命令、不安装 SDK、不解析包、不检查密钥、不联网。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Executor Disabled",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_readonly_snapshot_contract",
+      "path": "providers/real-sdk-dependency-readonly-snapshot.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_approval_contract",
+      "path": "providers/real-sdk-dependency-content-read-approval.contract.json",
+      "description": "真实 SDK 依赖 content read approval 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadApprovalArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_plan_contract",
+      "path": "providers/real-sdk-dependency-content-read-plan.contract.json",
+      "description": "真实 SDK 依赖 content read plan 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadPlanArtifactWritten=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_contract",
+      "path": "providers/real-sdk-dependency-content-read-final-confirmation.contract.json",
+      "description": "真实 SDK 依赖 content read final confirmation 机器契约，约束 dependencyContentReadAuthorized=false、dependencyContentReadExecuted=false、dependencyContentReturned=false、contentReadFinalConfirmationArtifactWritten=false、contentReadExecutionTaskCreated=false、contentReadExecutionApprovalGranted=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+      "path": "providers/real-sdk-dependency-content-read-readonly-execution.contract.json",
+      "description": "真实 SDK 依赖 content read readonly execution 机器契约，允许最终确认后的本地只读脱敏预览，并约束 rawDependencyContentReturned=false、dependencyContentPersisted=false、contentReadReadonlyExecutionArtifactWritten=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_change_proposal_contract",
+      "path": "providers/real-sdk-dependency-install-change-proposal.contract.json",
+      "description": "真实 SDK 依赖 install change proposal 机器契约，允许生成计划模型和不可执行 patch 预览，并约束 dependencyInstallPatchPlanGenerated=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_gate_contract",
+      "path": "providers/real-sdk-dependency-install-execution-gate.contract.json",
+      "description": "真实 SDK 依赖 install execution gate 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Gate Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_authorization_package_contract",
+      "path": "providers/real-sdk-dependency-install-authorization-package.contract.json",
+      "description": "真实 SDK 依赖 install authorization package 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Authorization Package Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_execution_request_contract",
+      "path": "providers/real-sdk-dependency-install-execution-request.contract.json",
+      "description": "真实 SDK 依赖 install execution request 机器契约，约束 dependencyInstallExecutionAuthorized=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、patchGenerated=false、patchFileWritten=false、patchApplied=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Execution Request Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_executor_disabled_contract",
+      "path": "providers/real-sdk-dependency-install-executor-disabled.contract.json",
+      "description": "真实 SDK 依赖 install executor disabled 机器契约，约束 executorDispatched=false、executorStarted=false、executorRunCreated=false、executionAuthorized=false、dependencyFileWriteAuthorized=false、commandExecuted=false、dependencyInstallExecuted=false、secretPresenceChecked=false、networkAccess=false、realLlmCalled=false。",
+      "required": true,
+      "localOnly": true,
+      "title": "Real SDK Dependency Install Executor Disabled Contract",
+      "type": "provider_contract",
+      "manualOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_dry_run_evidence",
+      "path": "providers/real_sdk_dependency_dry_run_evidence.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_apply_gate_contract",
+      "path": "providers/real-sdk-dependency-apply-gate.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_env_gate",
+      "path": "providers/real_sdk_dependency_env_gate.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_contract",
+      "path": "providers/real-sdk-dependency-install-plan.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan",
+      "path": "providers/real_sdk_dependency_install_plan.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_contract",
+      "path": "providers/real-sdk-dependency-installer-audit.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit",
+      "path": "providers/real_sdk_dependency_installer_audit.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_contract",
+      "path": "providers/real-sdk-dependency-change-preview.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview",
+      "path": "providers/real_sdk_dependency_change_preview.py",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal_contract",
+      "path": "providers/real-sdk-dependency-patch-proposal.contract.json",
+      "required": true
+    },
+    {
+      "id": "real_sdk_dependency_patch_proposal",
+      "path": "providers/real_sdk_dependency_patch_proposal.py",
+      "required": true
+    },
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "demo_source",
+      "path": "examples/input/demo-source.md",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "operations_manual_markdown",
+      "path": "delivery/OPERATIONS_MANUAL.md",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    },
+    {
+      "id": "operations_manual_contract",
+      "path": "delivery/operations-manual.json",
+      "generated": false,
+      "localOnly": true,
+      "requiredForOperation": true
+    }
+  ],
+  "generatedEvidence": [
+    {
+      "id": "delivery_package",
+      "path": "examples/output/phase1-delivery-package.json",
+      "commandId": "phase1_export",
+      "trackedInGit": false,
+      "requiredForOperation": true
+    },
+    {
+      "id": "acceptance_report",
+      "path": "examples/output/phase1-acceptance-report.md",
+      "commandId": "phase1_report",
+      "trackedInGit": false,
+      "requiredForOperation": true
+    },
+    {
+      "id": "content_generation_report",
+      "path": "examples/output/phase2-content-generation-report.json",
+      "commandId": "phase2_workflow_run",
+      "trackedInGit": false,
+      "requiredForOperation": false
+    },
+    {
+      "id": "exam_conversion_report",
+      "path": "examples/output/phase2-exam-conversion-report.json",
+      "commandId": "phase2_exam_convert_run",
+      "trackedInGit": false,
+      "requiredForOperation": false
+    },
+    {
+      "id": "ppt_generation_report",
+      "path": "examples/output/phase2-ppt-generation-report.json",
+      "commandId": "phase2_ppt_generate_run",
+      "trackedInGit": false,
+      "requiredForOperation": false
+    }
+  ],
+  "operatorRoles": [
+    {
+      "id": "operator",
+      "title": "Operations User",
+      "allowedActions": [
+        "Open local static previews",
+        "Run allowlisted local validation commands",
+        "Collect local generated evidence",
+        "Submit AI outputs for human review"
+      ],
+      "blockedActions": [
+        "Start real Agent",
+        "Enable real Provider",
+        "Publish generated content",
+        "Create or destroy real cloud resources"
+      ]
+    },
+    {
+      "id": "reviewer",
+      "title": "Human Reviewer",
+      "allowedActions": [
+        "Review WAITING_REVIEW DSL output",
+        "Approve or reject through review-gated mock flows",
+        "Record reject reason"
+      ],
+      "blockedActions": [
+        "Bypass review",
+        "Reveal candidate-hidden answers",
+        "Turn high-risk MCP intent into real execution"
+      ]
+    }
+  ],
+  "manualWorkflows": [
+    {
+      "id": "daily_readiness_check",
+      "title": "Daily local readiness check",
+      "required": true,
+      "recommendedCommandIds": [
+        "phase1_check",
+        "phase1_export",
+        "phase1_report"
+      ],
+      "expectedSignals": [
+        "phase1 check returns success=true and data.passed=true.",
+        "delivery package reports missingRequired=0.",
+        "acceptance report reports acceptancePassed=true and safetyAssertionsPassed=true."
+      ]
+    },
+    {
+      "id": "content_generation_review",
+      "title": "Content generation and review gate",
+      "required": true,
+      "recommendedCommandIds": [
+        "phase2_workflow_run",
+        "phase2_exam_convert_run",
+        "phase2_ppt_generate_run"
+      ],
+      "expectedSignals": [
+        "Generated Lab, Exam, Grading, and PPT DSL stay WAITING_REVIEW.",
+        "Candidate-facing exam previews do not reveal standard answers.",
+        "publishBlockedUntilApproved remains true."
+      ]
+    },
+    {
+      "id": "high_risk_mcp_review",
+      "title": "High-risk MCP handoff review",
+      "required": true,
+      "recommendedCommandIds": [
+        "test_high_risk_mcp_safety_contract",
+        "test_high_risk_mcp_handoff"
+      ],
+      "expectedSignals": [
+        "publish_lab and publish_exam only create review intent.",
+        "destroy_environment requires second confirmation and never destroys a real environment.",
+        "get_second_confirmation_status remains read-only."
+      ]
+    },
+    {
+      "id": "real_llm_poc_readiness_review",
+      "title": "Review real LLM PoC readiness gates",
+      "required": true,
+      "recommendedCommandIds": [
+        "test_phase5_mock_baseline",
+        "test_phase2_provider_plan",
+        "test_provider_adapter",
+        "test_provider_runtime_guard",
+        "test_real_llm_poc_adapter",
+        "test_real_llm_dry_run_plan",
+        "test_real_llm_approval_gate",
+        "test_real_llm_sdk_task_blueprint",
+        "test_real_provider_sdk_poc",
+        "test_real_sdk_enablement",
+        "test_real_sdk_minimal_impl",
+        "test_real_sdk_dependency_env_gate",
+        "test_real_sdk_dependency_install_plan",
+        "test_real_sdk_dependency_installer_audit",
+        "test_real_sdk_dependency_change_preview",
+        "test_real_sdk_dependency_patch_proposal",
+        "test_real_sdk_dependency_apply_gate",
+        "test_real_sdk_dependency_readonly_diff_review",
+        "test_real_sdk_dependency_final_execution_confirmation",
+        "test_real_sdk_dependency_execution_task_creation"
+      ],
+      "expectedSignals": [
+        "Phase 5 mock baseline is frozen at 175/175.",
+        "Default provider remains mock.",
+        "Real LLM PoC is limited to explicit opt-in Lab DSL generation.",
+        "Provider runtime guard keeps timeout/retry/concurrency/redaction/schema/review gates enabled and real calls disabled.",
+        "Real LLM PoC adapter remains disabled after runtime guard and preflight checks.",
+        "Real LLM dry-run plan passes locally without checking secret presence or creating tasks.",
+        "Real LLM approval gate can mark implementation task ready without authorizing a real call.",
+        "Real Provider SDK PoC harness requires the SDK task blueprint and still stops at opt-in or disabled-provider gates without importing SDKs, checking secrets, opening network, or creating tasks.",
+        "Real SDK enablement switch design may be ready for a future implementation task but still does not authorize real calls.",
+        "Real SDK minimal implementation shell requires enablement and explicit implementation opt-in, then still stops at the implementation-disabled gate without importing SDKs, checking secrets, opening network, or creating tasks.",
+        "Real SDK dependency and environment gate can mark a future dependency task ready but still does not install SDKs, import SDKs, check secret presence, or call network.",
+        "Real SDK dependency install plan can mark a future install implementation review ready but still does not generate install commands, install SDKs, resolve package metadata, modify lockfiles, check secret presence, or call network.",
+        "Real SDK dependency installer audit can mark a future disabled installer implementation task ready but still does not materialize commands, install SDKs, resolve packages, modify files, check secret presence, or call network.",
+        "Real SDK dependency change preview can mark a future dependency change implementation task ready but still does not write files, generate diffs, install SDKs, resolve package metadata, check secret presence, or call network.",
+        "Real SDK dependency patch proposal can mark a future patch implementation task ready but still does not write patch files, apply patches, write dependency files, generate diff artifacts, resolve package metadata, check secret presence, or call network.",
+        "Real SDK dependency readonly diff review can mark a future readonly diff review ready but still does not read live dependency files, write diff artifacts, generate patches, resolve package metadata, modify dependency files, check secret presence, or call network.",
+        "Real SDK dependency final execution confirmation can mark a future reviewed dependency execution task ready but still does not grant execution approval, create tasks, mutate dependency files, execute commands, install dependencies, check secrets, call network, or call real LLMs.",
+        "Real SDK dependency execution task creation can mark a local disabled task creation model ready but still does not persist tasks, queue work, dispatch execution, mutate dependency files, execute commands, install dependencies, check secrets, call network, or call real LLMs."
+      ]
+    }
+  ],
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "phase2_workflow_run",
+    "phase2_exam_convert_run",
+    "phase2_ppt_generate_run",
+    "test_operations_skill_pack",
+    "test_standalone_agent_delivery",
+    "test_access_entrypoints",
+    "test_real_provider_shell",
+    "test_provider_runtime_guard",
+    "test_real_llm_poc_adapter",
+    "test_real_llm_dry_run_plan",
+    "test_real_llm_approval_gate",
+    "test_real_llm_sdk_task_blueprint",
+    "test_real_provider_sdk_poc",
+    "test_real_sdk_enablement",
+    "test_real_sdk_minimal_impl",
+    "test_real_sdk_dependency_env_gate",
+    "test_real_sdk_dependency_install_plan",
+    "test_real_sdk_dependency_installer_audit",
+    "test_real_sdk_dependency_change_preview",
+    "test_real_sdk_dependency_patch_proposal",
+    "test_real_sdk_dependency_apply_gate",
+    "test_real_sdk_dependency_implementation_task_plan",
+    "test_real_sdk_dependency_change_approval_package",
+    "test_real_sdk_dependency_readonly_diff_review",
+    "test_real_sdk_dependency_final_execution_confirmation",
+    "test_real_sdk_dependency_execution_task_creation",
+    "test_real_sdk_dependency_executor_disabled",
+    "test_real_sdk_dependency_dry_run_evidence",
+    "test_real_sdk_dependency_target_resolver",
+    "test_real_sdk_dependency_readonly_snapshot",
+    "test_real_sdk_dependency_content_read_approval",
+    "test_real_sdk_dependency_content_read_plan",
+    "test_real_sdk_dependency_content_read_final_confirmation",
+    "test_real_sdk_dependency_content_read_readonly_execution",
+    "test_real_sdk_dependency_install_change_proposal",
+    "test_real_sdk_dependency_install_execution_gate",
+    "test_real_sdk_dependency_install_authorization_package",
+    "test_real_sdk_dependency_install_execution_request",
+    "test_real_sdk_dependency_install_executor_disabled",
+    "test_phase5_mock_baseline",
+    "test_operations_manual",
+    "test_final_signoff",
+    "test_delivery_handoff",
+    "test_delivery_index",
+    "test_delivery_package_contract",
+    "test_scripts_manifest",
+    "test_all"
+  ],
+  "manualChecklist": [
+    {
+      "id": "open_launchpad",
+      "title": "Open operations launchpad",
+      "path": "frontend/operations-launchpad.html",
+      "required": true,
+      "expectedSignal": "Local entry cards and disabled real actions are visible."
+    },
+    {
+      "id": "open_access_preview",
+      "title": "Open access entrypoints page",
+      "path": "frontend/access.html",
+      "required": true,
+      "expectedSignal": "Local static access page shows disabled IP and port placeholders."
+    },
+    {
+      "id": "run_phase1_validation",
+      "title": "Run Phase 1 validation commands",
+      "required": true,
+      "commandIds": [
+        "phase1_check",
+        "phase1_export",
+        "phase1_report"
+      ],
+      "expectedSignal": "Generated evidence is local, acceptance passes, and missingRequired=0."
+    },
+    {
+      "id": "confirm_review_gate",
+      "title": "Confirm generated outputs require review",
+      "required": true,
+      "expectedSignal": "All AI-generated DSL outputs remain WAITING_REVIEW until human approval."
+    },
+    {
+      "id": "confirm_high_risk_mcp_limits",
+      "title": "Confirm high-risk MCP tools remain non-executing",
+      "required": true,
+      "expectedSignal": "High-risk tools create review intent or read-only status only."
+    },
+    {
+      "id": "run_operations_manual_tests",
+      "title": "Run operations manual contract tests",
+      "required": true,
+      "commandIds": [
+        "test_operations_manual"
+      ],
+      "expectedSignal": "pytest passes for tests/test_operations_manual.py."
+    },
+    {
+      "id": "run_operations_skill_pack_tests",
+      "title": "Run operations Skill pack contract tests",
+      "required": true,
+      "commandIds": [
+        "test_operations_skill_pack"
+      ],
+      "expectedSignal": "pytest passes for tests/test_operations_skill_pack.py."
+    },
+    {
+      "id": "run_standalone_agent_delivery_tests",
+      "title": "Run Standalone Agent delivery contract tests",
+      "required": true,
+      "commandIds": [
+        "test_standalone_agent_delivery"
+      ],
+      "expectedSignal": "pytest passes for tests/test_standalone_agent_delivery.py."
+    },
+    {
+      "id": "run_access_entrypoints_tests",
+      "title": "Run access entrypoints contract tests",
+      "required": true,
+      "commandIds": [
+        "test_access_entrypoints"
+      ],
+      "expectedSignal": "pytest passes for tests/test_access_entrypoints.py."
+    },
+    {
+      "id": "run_real_sdk_dependency_executor_disabled_tests",
+      "title": "Run real SDK dependency executor disabled shell tests",
+      "required": true,
+      "commandId": "test_real_sdk_dependency_executor_disabled",
+      "expectedSignal": "pytest passes while disabled executor shell stays non-executing and mock-only.",
+      "evidenceType": "allowlisted_command"
+    },
+    {
+      "id": "run_real_sdk_dependency_dry_run_evidence_tests",
+      "title": "Run real SDK dependency dry-run evidence tests",
+      "required": true,
+      "commandId": "test_real_sdk_dependency_dry_run_evidence",
+      "expectedSignal": "pytest passes while dry-run evidence stays non-writing, non-executing, and mock-only.",
+      "evidenceType": "allowlisted_command"
+    },
+    {
+      "id": "run_real_sdk_dependency_target_resolver_tests",
+      "title": "Run real SDK dependency target resolver tests",
+      "required": true,
+      "commandId": "test_real_sdk_dependency_target_resolver",
+      "expectedSignal": "pytest passes while target resolver stays non-reading, non-writing, non-patching, non-executing, and mock-only.",
+      "evidenceType": "allowlisted_command"
+    },
+    {
+      "id": "run_real_sdk_dependency_readonly_snapshot_tests",
+      "title": "Run real SDK dependency readonly snapshot tests",
+      "required": true,
+      "commandId": "test_real_sdk_dependency_readonly_snapshot",
+      "expectedSignal": "pytest passes while readonly snapshot stays non-reading, non-writing, non-persisting, non-patching, non-executing, and mock-only.",
+      "evidenceType": "allowlisted_command"
+    }
+  ],
+  "safety": {
+    "manualOnly": true,
+    "readOnly": true,
+    "realLlmCalled": false,
+    "realProviderEnabled": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realCloudResourceChanged": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false
+  },
+  "recommendedCommands": [
+    "python -m pytest tests/test_real_sdk_dependency_install_change_proposal.py",
+    "python -m pytest tests/test_real_sdk_dependency_install_execution_gate.py",
+    "python -m pytest tests/test_real_sdk_dependency_install_execution_request.py",
+    "python -m pytest tests/test_real_sdk_dependency_install_executor_disabled.py"
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "version": "0.1.0",
+  "kind": "BackendDeploymentManifest",
+  "status": "LOCAL_STAGING_READY",
+  "scope": "core-business-backend-api",
+  "description": "Minimal deployment registration for Backend Core API staging. This is not a production deployment descriptor.",
+  "entrypoints": [
+    {
+      "id": "standard_library_http_dev",
+      "type": "local_http_dev_server",
+      "module": "backend.mock_http_server",
+      "command": "python -m backend.mock_http_server --host 127.0.0.1 --port 8000",
+      "defaultHost": "127.0.0.1",
+      "defaultPort": 8000,
+      "purpose": "Local browser/API demo for review center, platform entities, Backend Core APIs, grading jobs, and static frontend pages.",
+      "productionReady": false
+    },
+    {
+      "id": "framework_neutral_backend_app",
+      "type": "python_app_boundary",
+      "module": "backend.app",
+      "class": "BackendApiApp",
+      "callable": "BackendApiApp.handle",
+      "purpose": "Framework-neutral request/response boundary reused by the standard-library HTTP server and the ASGI adapter.",
+      "productionReady": false
+    },
+    {
+      "id": "asgi_app",
+      "type": "asgi",
+      "module": "backend.asgi_app",
+      "callable": "app",
+      "target": "backend.asgi_app:app",
+      "exampleCommand": "uvicorn backend.asgi_app:app --host 127.0.0.1 --port 8000",
+      "requiresExternalAsgiServer": true,
+      "purpose": "Mount point for future FastAPI, Starlette, Uvicorn, or platform gateway integration.",
+      "productionReady": false
+    }
+  ],
+  "runtime": {
+    "python": "3.11+",
+    "dependenciesFile": "requirements.txt",
+    "requiredPackages": [
+      "PyYAML",
+      "pytest",
+      "openai>=1.0.0,<2.0.0",
+      "psycopg[binary]>=3.1,<4.0"
+    ]
+  },
+  "environmentVariables": [
+    {
+      "name": "LAB_BACKEND_API_TOKEN",
+      "required": false,
+      "secret": true,
+      "purpose": "Optional local/staging Bearer token for /api/* except /api/health.",
+      "responseEchoAllowed": false
+    },
+    {
+      "name": "LAB_BACKEND_CORE_DATABASE_URL",
+      "required": false,
+      "secret": true,
+      "purpose": "Backend Core repository URL. sqlite:/// is local staging; postgresql:// requires explicit adapter registration and test/staging database only.",
+      "allowedSchemes": [
+        "sqlite",
+        "postgresql",
+        "postgres",
+        "mysql",
+        "mariadb"
+      ],
+      "responseEchoAllowed": false
+    },
+    {
+      "name": "LAB_BACKEND_CORE_REPOSITORY_KIND",
+      "required": false,
+      "secret": false,
+      "purpose": "Optional explicit repository kind.",
+      "allowedValues": [
+        "sqlite-local",
+        "postgresql",
+        "mysql"
+      ]
+    },
+    {
+      "name": "LAB_BACKEND_GRADING_DB_PATH",
+      "required": false,
+      "secret": false,
+      "purpose": "Optional local SQLite staging path for grading jobs and records."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_POSTGRESQL_SMOKE",
+      "required": false,
+      "secret": false,
+      "purpose": "Set to 1 only for optional PostgreSQL smoke tests."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_POSTGRESQL_SMOKE_REVIEWER",
+      "required": false,
+      "secret": false,
+      "purpose": "Reviewer label used by optional PostgreSQL smoke tests."
+    }
+  ],
+  "storage": {
+    "defaultJsonStore": "cli/.lab_cli_store.json",
+    "localCoreSqliteExample": "sqlite:///./examples/output/backend-core-local.sqlite3",
+    "localGradingSqliteExample": "examples/output/grading-local.sqlite3",
+    "externalDatabasePolicy": "Only registered test/staging adapters may connect to external databases. Production database writes are not enabled by this manifest."
+  },
+  "ci": {
+    "postgresqlSmokeWorkflow": ".github/workflows/backend-core-postgresql-smoke.yml",
+    "coreRegressionMatrixWorkflow": ".github/workflows/core-regression-matrix.yml",
+    "usesEphemeralPostgresService": true,
+    "requiresRepositorySecrets": false,
+    "smokeCommand": "python -m pytest tests/test_backend_core_postgres_real_smoke.py -q",
+    "coreRegressionMatrixCommand": "python lab_cli.py quality regression-matrix --profile core --stop-on-failure --output examples/output/regression-matrix-core.json",
+    "coreRegressionMatrixArtifact": "core-regression-matrix-report",
+    "asgiMountSmokeCommand": "python -m pytest tests/test_backend_asgi_mount_smoke.py -q",
+    "asgiMountSmokeEvidenceCommand": "python lab_cli.py backend-core asgi-smoke --output examples/output/backend-asgi-smoke-report.json",
+    "externalCiResultRecorded": false
+  },
+  "testEnvironmentMount": {
+    "status": "IN_PROCESS_ASGI_SMOKE_READY",
+    "target": "backend.asgi_app:app",
+    "smokeTest": "tests/test_backend_asgi_mount_smoke.py",
+    "smokeEvidenceCommand": "python lab_cli.py backend-core asgi-smoke --output examples/output/backend-asgi-smoke-report.json",
+    "coveredApiGroups": [
+      "health",
+      "backend-core-readiness",
+      "backend-core-db",
+      "mcp-server",
+      "ai-tasks-auth"
+    ],
+    "networkListenerStartedBySmoke": false,
+    "productionDatabaseWritten": false,
+    "requiresRepositorySecrets": false,
+    "stopLine": "This smoke proves the current ASGI target can be mounted in-process for core APIs. Do not add another ASGI mount shell unless a real test environment reports a concrete incompatibility."
+  },
+  "apiGroups": [
+    "health",
+    "backend-core-readiness",
+    "backend-core-db",
+    "backend-core-tasks",
+    "ai-tasks",
+    "artifacts",
+    "review",
+    "platform-entities",
+    "grading-jobs",
+    "grading-records",
+    "audit"
+  ],
+  "safety": {
+    "productionDatabaseWritten": false,
+    "productionQueueUsed": false,
+    "realCloudResourceCreated": false,
+    "contestantCodeExecutedWithoutSandbox": false,
+    "autoPublishAllowed": false,
+    "secretLoggingAllowed": false,
+    "standardAnswerVisibleToCandidate": false
+  },
+  "notIncluded": [
+    "production Kubernetes or Docker deployment",
+    "production RBAC",
+    "production database migrations",
+    "public network exposure",
+    "real cloud resource management",
+    "automatic publish execution"
+  ],
+  "stopLine": "Do not add another deployment shell for the same local/ASGI boundary. Next work should record real CI results, mount this ASGI target in a test environment, or fill real platform API fields when the contract is available."
+}

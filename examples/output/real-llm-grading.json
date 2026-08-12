@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "kind": "Grading",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "sourceExamId": "exam_real_llm_demo",
+    "id": "grading_real_llm_demo",
+    "title": "真实 LLM Demo 评分"
+  },
+  "spec": {
+    "totalScore": 100,
+    "checks": [
+      {
+        "id": "check_waiting_review",
+        "type": "stdout_contains",
+        "score": 100,
+        "command": "python calculator.py",
+        "expected": [
+          "10 + 5 = 15",
+          "3 * 4 = 12"
+        ]
+      }
+    ],
+    "assessmentPlan": [
+      {
+        "checkId": "check_waiting_review",
+        "type": "stdout_contains",
+        "runner": "StdoutContainsGrader",
+        "score": 100,
+        "inputSummary": "Check that running 'python calculator.py' produces the expected addition and multiplication outputs.",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "1",
+            "memory": "256MB",
+            "timeout": "30s",
+            "network": "disabled_by_default",
+            "filesystem": "read-write",
+            "process": "single"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      }
+    ],
+    "timeoutSeconds": 30
+  }
+}

@@ -1,0 +1,230 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "phase2_readiness_gate",
+  "title": "Phase 2 Readiness Gate",
+  "description": "Machine-testable gate that defines when Phase 1 local mock delivery is ready for Phase 2 planning and mock workflow design. It does not authorize real LLMs, real cloud resources, real agents, real sandbox execution, or real publish.",
+  "inputs": [
+    {
+      "id": "delivery_contract",
+      "path": "config/delivery-package.contract.json",
+      "required": true
+    },
+    {
+      "id": "delivery_index",
+      "path": "delivery/phase1-delivery-index.json",
+      "required": true
+    },
+    {
+      "id": "handoff_contract",
+      "path": "delivery/phase1-handoff.json",
+      "required": true
+    },
+    {
+      "id": "faq_contract",
+      "path": "delivery/phase1-faq.json",
+      "required": true
+    },
+    {
+      "id": "scripts_manifest",
+      "path": "scripts/manifest.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "readiness_markdown",
+      "path": "delivery/PHASE2_READINESS.md",
+      "generated": false,
+      "localOnly": true
+    },
+    {
+      "id": "delivery_package",
+      "path": "examples/output/phase1-delivery-package.json",
+      "generated": true,
+      "localOnly": true
+    },
+    {
+      "id": "acceptance_report",
+      "path": "examples/output/phase1-acceptance-report.md",
+      "generated": true,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "phase1_check",
+    "phase1_export",
+    "phase1_report",
+    "test_phase2_readiness",
+    "test_provider_adapter_workflow",
+    "test_delivery_handoff",
+    "test_delivery_faq",
+    "test_delivery_package_contract",
+    "test_all"
+  ],
+  "gateChecks": [
+    {
+      "id": "phase1_check_passed",
+      "category": "validation",
+      "title": "Phase 1 CLI self-check passes",
+      "required": true,
+      "source": {
+        "type": "command",
+        "commandId": "phase1_check",
+        "expected": "success=true and data.passed=true"
+      }
+    },
+    {
+      "id": "delivery_package_ready",
+      "category": "delivery",
+      "title": "Delivery package has no missing required deliverables",
+      "required": true,
+      "source": {
+        "type": "package_field",
+        "path": "deliveryManifest.summary.missingRequired",
+        "expected": 0
+      }
+    },
+    {
+      "id": "acceptance_summary_passed",
+      "category": "acceptance",
+      "title": "Acceptance summary passes",
+      "required": true,
+      "source": {
+        "type": "package_field",
+        "path": "acceptanceSummary.passed",
+        "expected": true
+      }
+    },
+    {
+      "id": "safety_assertions_passed",
+      "category": "safety",
+      "title": "Safety assertions pass",
+      "required": true,
+      "source": {
+        "type": "package_field",
+        "path": "acceptanceSummary.safetyAssertionsPassed",
+        "expected": true
+      }
+    },
+    {
+      "id": "generated_content_review_gated",
+      "category": "review",
+      "title": "Generated content remains review-gated",
+      "required": true,
+      "source": {
+        "type": "package_field",
+        "path": "workflowReport.reviewRequired",
+        "expected": true
+      }
+    },
+    {
+      "id": "publish_blocked_until_approved",
+      "category": "review",
+      "title": "Publish remains blocked until approval",
+      "required": true,
+      "source": {
+        "type": "package_field",
+        "path": "workflowReport.publishBlockedUntilApproved",
+        "expected": true
+      }
+    },
+    {
+      "id": "handoff_contract_present",
+      "category": "handoff",
+      "title": "Operation handoff checklist is present",
+      "required": true,
+      "source": {
+        "type": "local_file",
+        "path": "delivery/phase1-handoff.json"
+      }
+    },
+    {
+      "id": "faq_contract_present",
+      "category": "operations",
+      "title": "Troubleshooting FAQ is present",
+      "required": true,
+      "source": {
+        "type": "local_file",
+        "path": "delivery/phase1-faq.json"
+      }
+    },
+    {
+      "id": "test_phase2_readiness_passes",
+      "category": "validation",
+      "title": "Readiness gate contract test passes",
+      "required": true,
+      "source": {
+        "type": "command",
+        "commandId": "test_phase2_readiness",
+        "expected": "pytest passes for tests/test_phase2_readiness_gate.py"
+      }
+    }
+  ],
+  "allowedNextSteps": [
+    {
+      "id": "phase2_mock_provider_design",
+      "title": "Design Phase 2 provider wiring with MockProvider first",
+      "allowed": true,
+      "requiresHumanApproval": true
+    },
+    {
+      "id": "phase2_prompt_workflow_design",
+      "title": "Refine prompt and workflow design while keeping outputs schema-validated",
+      "allowed": true,
+      "requiresHumanApproval": true
+    },
+    {
+      "id": "phase2_mock_workflow_extension",
+      "title": "Extend mock workflow tests before enabling any real integration",
+      "allowed": true,
+      "requiresHumanApproval": true
+    }
+  ],
+  "blockedNextSteps": [
+    {
+      "id": "enable_real_llm",
+      "title": "Enable real LLM providers",
+      "blocked": true,
+      "reason": "Requires explicit user approval and a separate Phase 2 provider implementation task."
+    },
+    {
+      "id": "create_real_cloud_resource",
+      "title": "Create real VM or Notebook resources",
+      "blocked": true,
+      "reason": "Requires sandbox/cloud design, credentials policy, and human approval."
+    },
+    {
+      "id": "run_real_sandbox_or_contestant_code",
+      "title": "Run real sandbox or contestant code",
+      "blocked": true,
+      "reason": "Phase 1 only has a mock executor; real execution requires later sandbox work."
+    },
+    {
+      "id": "auto_publish_generated_content",
+      "title": "Automatically publish generated content",
+      "blocked": true,
+      "reason": "AI outputs must remain WAITING_REVIEW until a human approves them."
+    },
+    {
+      "id": "start_real_agent",
+      "title": "Start a real autonomous agent",
+      "blocked": true,
+      "reason": "The project sequence is DSL to CLI to Mock to Workflow before Agent."
+    }
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false
+  }
+}

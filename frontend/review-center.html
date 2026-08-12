@@ -1,0 +1,1632 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>本地核心审核中心</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --line: #d8dee9;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --warn: #b45309;
+      --blocked: #991b1b;
+      --ok: #166534;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .status-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: #ecfdf5;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .section-head p,
+    .queue-item p,
+    .signal-item p,
+    .intent-item p,
+    .timeline li {
+      overflow-wrap: anywhere;
+    }
+
+    .queue-list {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .queue-item {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      text-align: left;
+      color: inherit;
+      cursor: default;
+    }
+
+    .queue-item[data-api-task-id] {
+      cursor: pointer;
+    }
+
+    .queue-item[data-api-task-id]:hover {
+      border-color: #14b8a6;
+      background: #f8fffd;
+    }
+
+    .queue-item[aria-current="true"] {
+      border-color: #5eead4;
+      background: #f0fdfa;
+    }
+
+    .meta-row,
+    .detail-grid {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .meta-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding: 16px;
+    }
+
+    .metric {
+      min-width: 0;
+      min-height: 72px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 16px;
+      padding: 0 16px 16px;
+    }
+
+    .dsl-preview,
+    .timeline,
+    .intent-panel,
+    .confirmation-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .intent-panel {
+      margin: 0 16px 16px;
+      background: #fff7ed;
+    }
+
+    .confirmation-panel {
+      margin: 0 16px 16px;
+      background: #f8fafc;
+    }
+
+    .intent-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .intent-item {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .signal-item {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .priority-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #111827;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .dsl-preview pre {
+      margin: 0;
+      min-height: 300px;
+      padding: 14px;
+      overflow: auto;
+      background: #111827;
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .timeline ol {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 14px 14px 14px 34px;
+    }
+
+    .timeline li {
+      padding-left: 4px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button,
+    .button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: #0f766e;
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.danger {
+      border-color: #fecaca;
+      color: var(--blocked);
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .warning {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .blocked {
+      color: var(--blocked);
+      font-weight: 700;
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .runtime-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px 18px 0;
+      min-width: 0;
+    }
+
+    .workspace-strip {
+      margin-top: 12px;
+      padding: 14px 18px;
+      border-width: 1px 0;
+      border-radius: 0;
+      background: #ffffff;
+    }
+
+    .workspace-strip .section-head {
+      padding: 0 0 12px;
+      border-bottom: 0;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .workspace-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding-top: 12px;
+    }
+
+    .workspace-link[aria-disabled="true"] {
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    @media (max-width: 920px) {
+      header,
+      main,
+      .content-grid,
+      .detail-grid,
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .status-strip {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>审核中心</h1>
+      <p class="pill strong">LOCAL_CORE_MVP</p>
+    </div>
+    <div class="status-strip" aria-label="Local core review safety state">
+      <span class="pill">真实 LLM 产物：只读加载</span>
+      <span class="pill">真实 LLM 请求：本页不发起</span>
+      <span class="pill">真实云资源：禁用</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+    </div>
+  </header>
+
+  <div class="runtime-strip" aria-label="Review center runtime data state">
+    <span class="pill strong" id="review-center-api-status">STATIC_HTML_FALLBACK</span>
+    <span class="pill" id="review-center-api-source">frontend/mock-data.json + static HTML</span>
+    <span class="pill" id="review-center-api-detail">api loader keeps actions read-only</span>
+    <span class="pill" id="review-center-selected-task">task_grading_demo</span>
+  </div>
+
+  <section class="workspace-strip" aria-labelledby="mvp-workspace-title">
+    <div class="section-head">
+      <div>
+        <h2 id="mvp-workspace-title">MVP Review Workspace</h2>
+        <p id="mvp-workspace-summary">source=GET /api/review-task-summary + GET /api/review-tasks/{id} + GET /api/review-tasks/{id}/core-readiness · waiting for dynamic read-only review workspace</p>
+      </div>
+      <span class="pill strong" id="mvp-workspace-state">WAITING_REVIEW</span>
+    </div>
+    <div class="workspace-grid" aria-label="MVP review workspace metrics">
+      <div class="metric">
+        <span>真实 DSL 批次</span>
+        <strong id="mvp-workspace-real-dsl-total">4/4</strong>
+      </div>
+      <div class="metric">
+        <span>当前审核任务</span>
+        <strong id="mvp-workspace-selected-task">task_grading_demo</strong>
+      </div>
+      <div class="metric">
+        <span>评分证据</span>
+        <strong id="mvp-workspace-evidence-state">waiting</strong>
+      </div>
+      <div class="metric">
+        <span>本地导入</span>
+        <strong id="mvp-workspace-import-state">preview waiting</strong>
+      </div>
+    </div>
+    <div class="workspace-actions">
+      <a class="pill strong workspace-link" id="mvp-workspace-review-link" href="review-center.html?taskId=task_grading_demo">打开当前审核页</a>
+      <a class="pill workspace-link" id="mvp-workspace-grading-report-link" aria-disabled="true">等待评分 evidence</a>
+      <span class="pill strong" id="mvp-workspace-next-action">nextAction=review_current_task</span>
+      <span class="pill" id="mvp-workspace-safety">autoApproveAllowed=false · realPublishAllowed=false · commandExecuted=false</span>
+    </div>
+  </section>
+
+  <main>
+    <section aria-labelledby="queue-title">
+      <div class="section-head">
+        <div>
+          <h2 id="queue-title">待审核队列</h2>
+          <p class="warning">WAITING_REVIEW：<span id="review-center-queue-total">2</span></p>
+        </div>
+        <span class="pill">GET /api/review-task-summary</span>
+      </div>
+      <div class="queue-list">
+        <div class="signal-item" id="review-center-dynamic-queue-panel" aria-live="polite">
+          <h3>API 动态队列</h3>
+          <p id="review-center-dynamic-queue-status">waiting for GET /api/review-task-summary?limit=3&amp;detailMode=light</p>
+          <div class="queue-list" id="review-center-dynamic-queue"></div>
+        </div>
+        <button class="queue-item" type="button" aria-current="true">
+          <h3><span class="priority-rank">3</span> Mock Lab DSL generation</h3>
+          <div class="meta-row">
+            <span class="pill">LAB_GENERATION</span>
+            <span class="pill strong">WAITING_REVIEW</span>
+            <span class="pill">priority=NORMAL</span>
+            <span class="pill">NEEDS_REVIEW</span>
+          </div>
+          <p>templates/lab/examples/basic-lab.yaml</p>
+        </button>
+        <button class="queue-item" type="button">
+          <h3><span class="priority-rank">2</span> Mock Exam DSL generation</h3>
+          <div class="meta-row">
+            <span class="pill">EXAM_GENERATION</span>
+            <span class="pill strong">WAITING_REVIEW</span>
+            <span class="pill strong">priority=HIGH</span>
+            <span class="pill strong">coverage=MATCHED</span>
+          </div>
+          <p>candidateSafeExamPreview.answersRemoved=true · questionGradingRefCoverage.status=MATCHED · scoreCoverage.status=MATCHED</p>
+        </button>
+        <button class="queue-item" type="button">
+          <h3><span class="priority-rank">1</span> Mock Grading DSL generation</h3>
+          <div class="meta-row">
+            <span class="pill">GRADING_GENERATION</span>
+            <span class="pill strong">WAITING_REVIEW</span>
+            <span class="pill strong">priority=URGENT</span>
+            <span class="pill">assessmentPlan=1</span>
+          </div>
+          <p>templates/grading/examples/python-pytest.yaml · reviewDetail.assessmentPlan.summary · gradingRefCoverage.status=MATCHED · scoreCoverage.status=MATCHED</p>
+        </button>
+      </div>
+      <div class="action-bar">
+        <button type="button" disabled title="Phase 1 禁用批量通过">批量通过</button>
+        <button type="button" disabled title="Phase 1 禁用批量驳回">批量驳回</button>
+        <button type="button" disabled title="审核通过前禁止发布">批量发布</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="detail-title">
+      <div class="section-head">
+        <div>
+          <h2 id="detail-title">任务详情</h2>
+          <p id="review-detail-subtitle">task_lab_demo</p>
+        </div>
+        <span class="pill">GET /api/review-tasks/{id}</span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="metric">
+          <span>产物</span>
+          <strong id="review-detail-artifact-total">2</strong>
+        </div>
+        <div class="metric">
+          <span>Workflow Steps</span>
+          <strong id="review-detail-workflow-step-total" class="blocked">1</strong>
+        </div>
+        <div class="metric">
+          <span>审核状态</span>
+          <strong id="review-detail-status" class="warning">WAITING_REVIEW</strong>
+        </div>
+        <div class="metric">
+          <span>自动通过</span>
+          <strong id="review-detail-auto-approve" class="blocked">false</strong>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-api-summary-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-api-summary-title">API Review Detail Summary</h3>
+            <p id="review-detail-api-summary">source=GET /api/review-tasks/{id} · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-task-type">LAB_GENERATION</span>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-core-readiness-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-core-readiness-title">CoreWorkflowReadiness</h3>
+            <p id="review-detail-core-readiness-summary">source=GET /api/review-tasks/{id}/core-readiness · gradingManualReviewChecklistStatus=waiting · gradingScorePreviewStatus=waiting · gradingScorePreviewReadyForDecisionNote=waiting · gradingDecisionNoteRecommendation=waiting · waiting for read-only core readiness report</p>
+          </div>
+          <span class="pill strong" id="review-detail-core-readiness-status">CORE_DEMO_NEEDS_ACTION</span>
+        </div>
+        <div class="signal-list" id="review-detail-core-readiness-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">C</span> core workflow next action</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="review-detail-core-readiness-next-action">recommendedNextAction=approve_generated_content_after_manual_review</span>
+              <span class="pill" id="review-detail-core-readiness-progress">ready=0/1</span>
+            </div>
+            <p id="review-detail-core-readiness-safety">readOnly=true · autoApproveAllowed=false · autoPublishAllowed=false · realPublish=false</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">G</span> next single-step action guide</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="review-detail-core-next-step-guide-status">canContinueWithSameCommand=false</span>
+              <span class="pill" id="review-detail-core-next-step-guide-tool">nextTool=manual_action</span>
+            </div>
+            <p id="review-detail-core-next-step-guide-command">suggestedCliCommand=waiting_for_core_readiness · requiresHumanManualAction=true · autoExecuteAllowed=false</p>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button id="review-detail-core-next-step-copy" type="button" disabled title="仅复制建议命令，不执行命令">复制建议命令</button>
+          <button id="review-detail-core-review-url-copy" type="button" disabled title="复制执行后回看 Agent 报告的审核中心链接">复制执行后回看链接</button>
+          <span class="pill" id="review-detail-core-next-step-copy-status">copyCommandEnabled=false · commandExecuted=false · stateChanged=false</span>
+          <span class="pill" id="review-detail-core-review-url-copy-status">copyReviewUrlEnabled=false · commandExecuted=false · stateChanged=false</span>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-agent-core-execution-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-agent-core-execution-title">AgentCoreNextToolExecutionReport</h3>
+            <p id="review-detail-agent-core-execution-summary">source=GET /api/workflow/report?file={agentReport} · waiting for optional agentReport query param · readOnly=true</p>
+          </div>
+          <span class="pill strong" id="review-detail-agent-core-execution-status">NO_AGENT_REPORT_LOADED</span>
+        </div>
+        <div class="signal-list" id="review-detail-agent-core-execution-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">A</span> no execution report selected</h3>
+            <p>Run the copied CLI command with --output, then reopen review-center.html with agentReport={outputPath}. This panel only reads the report.</p>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button id="review-detail-agent-core-next-step-copy" type="button" disabled title="仅复制 Agent 报告里的下一步命令，不执行命令">复制报告下一步命令</button>
+          <span class="pill" id="review-detail-agent-core-next-step-copy-status">copyAgentReportCommandEnabled=false · commandExecuted=false · stateChanged=false</span>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-pre-approve-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-pre-approve-title">PreApproveReviewCheck</h3>
+            <p id="review-detail-pre-approve-summary">source=GET /api/review-tasks/{id}.reviewDetail · applicable=false · scorePreviewStatus=waiting · scorePreviewReadyForDecisionNote=waiting · approvalStillAllowed=true</p>
+          </div>
+          <span class="pill strong" id="review-detail-pre-approve-status">READY_FOR_HUMAN_APPROVE</span>
+        </div>
+        <div class="signal-list" id="review-detail-pre-approve-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> no pre approve warnings</h3>
+            <p>Grading tasks will show merged evidence and decision note readiness here.</p>
+          </div>
+        </div>
+        <div class="signal-list" id="review-detail-decision-note-next-step-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">N</span> DecisionNoteNextStep · WAITING_FOR_EVIDENCE</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="review-detail-decision-note-next-step-status">nextRequiredAction=wait_for_grading_evidence</span>
+              <span class="pill" id="review-detail-decision-note-next-step-api">api=POST /api/review-tasks/{id}/decision-note</span>
+            </div>
+            <p id="review-detail-decision-note-next-step-summary">evidenceReady=false · reviewDecisionNoteRecorded=false · latestDecision=none · approveReadyDecision=false · warningTotal=0 · autoApproveAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-grading-record-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-grading-record-title">GradingRecordReviewIntegration</h3>
+            <p id="review-detail-grading-record-summary">source=GET /api/review-tasks/{id}.reviewDetail.gradingRecords.reviewIntegration · state=NO_GRADING_RECORD · readyForAgentReview=false · localOnly=true</p>
+          </div>
+          <span class="pill strong" id="review-detail-grading-record-status">NO_GRADING_RECORD</span>
+        </div>
+        <div class="signal-list" id="review-detail-grading-record-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">R</span> waiting for grading record review</h3>
+            <div class="meta-row">
+              <span class="pill">api=GET /api/grading/records?taskId={id}</span>
+              <span class="pill">cli=python lab_cli.py grade record-review</span>
+              <span class="pill strong">taskStatusChanged=false</span>
+            </div>
+            <p>评分记录复核只读取本地 GradingRecord，不发送平台请求、不自动通过、不发布。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-final-approve-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-final-approve-title">FinalHumanApproveReadiness</h3>
+            <p id="review-detail-final-approve-summary">source=PreApproveReviewCheck + DecisionNoteNextStep · finalReviewState=WAITING_EVIDENCE · humanApproveReady=false · approveReadyDecision=false · scorePreviewStatus=waiting · scorePreviewReadyForDecisionNote=waiting · approveApiNotCalled=true</p>
+          </div>
+          <span class="pill strong" id="review-detail-final-approve-status">WAITING_REVIEW_INPUTS</span>
+        </div>
+        <div class="signal-list" id="review-detail-final-approve-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">F</span> final human approval boundary</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="review-detail-final-approve-next-action">nextRequiredAction=complete_evidence_and_decision_note</span>
+              <span class="pill">approveApi=POST /api/ai-tasks/{id}/approve</span>
+              <span class="pill strong">approveApiCalled=false</span>
+            </div>
+            <p id="review-detail-final-approve-safety">autoApproveAllowed=false · batchStateChangeAllowed=false · autoPublishAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-evidence-readiness-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-evidence-readiness-title">GradingEvidenceReadiness</h3>
+            <p id="review-detail-evidence-readiness-summary">source=GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.checkEvidenceReviewItems · summarySource=GET /api/review-task-summary.reviewTaskSummary.gradingEvidenceReadinessSignal · mode=GRADING_EVIDENCE_READINESS · readExistingReportsOnly=true</p>
+          </div>
+          <span class="pill strong" id="review-detail-evidence-readiness-total">evidenceReadyTotal=0</span>
+        </div>
+        <div class="signal-list" id="review-detail-evidence-readiness-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for grading evidence readiness</h3>
+            <p>sandboxExecutedByReadiness=false · contestantCodeExecutedByReadiness=false · autoApproveAllowed=false</p>
+          </div>
+        </div>
+        <div class="signal-list" id="review-detail-evidence-action-guide-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">A</span> GradingEvidenceActionGuide · EVIDENCE_COLLECTION_RECOMMENDED</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="review-detail-evidence-action-primary">primaryAction=run_grade_evidence_auto_then_review_report</span>
+              <span class="pill" id="review-detail-evidence-action-api">api=POST /api/grading/evidence-auto</span>
+              <span class="pill" id="review-detail-evidence-action-cli">cli=python lab_cli.py grade evidence-auto</span>
+            </div>
+            <p id="review-detail-evidence-action-summary">followUp=open_latest_grading_report,verify_grading_evidence_readiness,record_review_decision_note_before_manual_approve · controlledCommandOptInRequired=true · autoApproveAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-grading-report-entry-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-grading-report-entry-title">Grading Report Entry</h3>
+            <p id="review-detail-grading-report-entry-summary">source=GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence.summary.latestReportPath · target=GET /api/grading/report?file={file}&amp;taskId={id} · readonly=true</p>
+          </div>
+          <a class="pill strong workspace-link" id="review-detail-grading-report-entry-link" aria-disabled="true">等待评分 evidence</a>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-artifacts-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-artifacts-title">API Artifact Groups</h3>
+            <p id="review-detail-artifacts-summary">source=GET /api/review-tasks/{id}.reviewPage.artifactGroups · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-artifacts-total">artifactGroups=0</span>
+        </div>
+        <div class="signal-list" id="review-detail-artifacts-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for artifact detail</h3>
+            <p>artifact groups will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-quality-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-quality-title">API Quality Signals</h3>
+            <p id="review-detail-quality-summary">source=GET /api/review-tasks/{id}.reviewPage.qualitySignals · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-quality-available">available=false</span>
+        </div>
+        <div class="signal-list" id="review-detail-quality-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for quality signals</h3>
+            <p>quality signals will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-content-quality-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-content-quality-title">RealDslContentQualityDecision</h3>
+            <p id="review-detail-content-quality-summary">source=GET /api/review-tasks/{id}.reviewDetail.contentQualitySummary · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-content-quality-status">decisionStatus=UNKNOWN</span>
+        </div>
+        <div class="signal-list" id="review-detail-content-quality-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for content quality decision</h3>
+            <p>真实 LLM DSL 内容质量决策会在这里展示：requiresRevisionBeforeImportPreview、requiresEvidenceBeforeFinalApproval、readyForImportPreviewKinds、blockers 和 warnings。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-import-actions-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-import-actions-title">API Platform Import Preview Actions</h3>
+            <p id="review-detail-import-actions-summary">source=GET /api/review-tasks/{id}.reviewPage.platformImportPreviewActions · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-import-actions-total">enabledTotal=0</span>
+        </div>
+        <div class="signal-list" id="review-detail-import-actions-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for import preview actions</h3>
+            <p>platform import preview actions will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-import-preview-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-import-preview-title">API Platform Import Preview Summary</h3>
+            <p id="review-detail-import-preview-summary">source=GET /api/review-tasks/{id}.reviewPage.platformImportPreview · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-import-preview-total">previewTotal=0</span>
+        </div>
+        <div class="signal-list" id="review-detail-import-preview-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for import preview summary</h3>
+            <p>platform draft previews will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-import-signoff-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-import-signoff-title">API Platform Import Signoff</h3>
+            <p id="review-detail-import-signoff-summary">source=GET /api/review-tasks/{id}.reviewPage.platformImportPreviewSignoff · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-import-signoff-ready">readyForHumanSignoff=false</span>
+        </div>
+        <div class="signal-list" id="review-detail-import-signoff-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for import signoff</h3>
+            <p>human signoff gaps will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-platform-entity-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-platform-entity-title">API Platform Entity Mock Import</h3>
+            <p id="review-detail-platform-entity-summary">source=GET /api/review-tasks/{id}.reviewPage.agentEntityMockImport · waiting for dynamic detail</p>
+          </div>
+          <span class="pill strong" id="review-detail-platform-entity-total">mockImportTotal=0</span>
+        </div>
+        <div class="signal-list" id="review-detail-platform-entity-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for platform entity mock import</h3>
+            <p>local mock platform entity records will be loaded from the read-only detail API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="review-detail-platform-readiness-title">
+        <div class="section-head">
+          <div>
+            <h3 id="review-detail-platform-readiness-title">API Platform Entity Readiness</h3>
+            <p id="review-detail-platform-readiness-summary">source=GET /api/platform-entities/readiness-report?sourceTaskId={id} · waiting for read-only readiness report</p>
+          </div>
+          <span class="pill strong" id="review-detail-platform-readiness-total">ready=0/4</span>
+        </div>
+        <div class="signal-list" id="review-detail-platform-readiness-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">0</span> waiting for platform entity readiness</h3>
+            <p>readiness report will be loaded from the read-only platform entity API.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="real-demo-review-title">
+        <div class="section-head">
+          <div>
+            <h3 id="real-demo-review-title">RealDemoReviewQueue</h3>
+            <p class="warning">source=realDemoPrototype.generatedDsl + realDemoPrototype.coreBusinessDemoPath + realDemoPrototype.readonlyEvidenceDemo.reportDetail · route=/real-demo -&gt; /review-center -&gt; /ppt/:id/review -&gt; /grading/:id/report</p>
+          </div>
+          <span class="pill strong">WAITING_REVIEW=4</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> real_demo_lab · LAB_DSL</h3>
+            <div class="meta-row">
+              <span class="pill strong">status=WAITING_REVIEW</span>
+              <span class="pill">schemaValidated=true</span>
+              <span class="pill">path=examples/output/real-llm-lab.json</span>
+              <span class="pill">entryRoute=/labs/:id/review</span>
+              <span class="pill strong" id="real-demo-lab-review-entry-href">entryHref=lab-review.html?taskId=real_demo_lab</span>
+            </div>
+            <p>recommendedAction=review_lab_objectives_and_steps</p>
+            <a class="pill strong" id="real-demo-lab-review-link" href="lab-review.html?taskId=real_demo_lab">打开 Lab 审核</a>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> real_demo_exam · EXAM_DSL</h3>
+            <div class="meta-row">
+              <span class="pill strong">status=WAITING_REVIEW</span>
+              <span class="pill strong">candidatePreview.answersRemoved=true</span>
+              <span class="pill">answerVisibleToCandidate=false</span>
+              <span class="pill">path=examples/output/real-llm-exam.json</span>
+              <span class="pill">entryRoute=/exams/:id/review</span>
+              <span class="pill strong" id="real-demo-exam-review-entry-href">entryHref=exam-review.html?taskId=real_demo_exam</span>
+            </div>
+            <p>recommendedAction=verify_candidate_preview_and_grading_refs</p>
+            <a class="pill strong" id="real-demo-exam-review-link" href="exam-review.html?taskId=real_demo_exam">打开 Exam 审核</a>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> real_demo_grading · GRADING_DSL</h3>
+            <div class="meta-row">
+              <span class="pill strong">status=WAITING_REVIEW</span>
+              <span class="pill">path=examples/output/real-llm-grading.json</span>
+              <span class="pill">sourcePreserved=true</span>
+              <span class="pill strong">readonlyEvidenceReportDetailSource=realDemoPrototype.readonlyEvidenceDemo.reportDetail</span>
+              <span class="pill strong">readonlyEvidenceCollectedTotal=2</span>
+              <span class="pill">entryRoute=/grading/:id/review</span>
+              <span class="pill strong" id="real-demo-grading-review-entry-href">entryHref=grading-review.html?taskId=real_demo_grading</span>
+              <span class="pill">reportRoute=/grading/:id/report</span>
+              <span class="pill strong">entryHref=grading-report.html?file=examples/output/merged-evidence-report.json&amp;taskId=real_demo_grading</span>
+            </div>
+            <p>readonlyEvidence.status=COLLECTED · recommendedAction=review_assessment_plan_and_readonly_evidence_before_approval · autoApproveAllowed=false</p>
+            <a class="pill strong" id="real-demo-grading-review-link" href="grading-review.html?taskId=real_demo_grading">打开 Grading 审核</a>
+            <a class="pill strong" href="grading-report.html?file=examples%2Foutput%2Fmerged-evidence-report.json&amp;taskId=real_demo_grading">打开评分报告</a>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">4</span> real_demo_ppt · PPT_DSL_AND_PPTX_FILE</h3>
+            <div class="meta-row">
+              <span class="pill strong">status=WAITING_REVIEW</span>
+              <span class="pill">path=examples/output/real-llm-ppt.json</span>
+              <span class="pill">pptxArtifactPath=examples/output/real-llm-demo-ppt-artifact.pptx</span>
+              <span class="pill strong">pptPageReviewActionVisible=true</span>
+              <span class="pill">entryRoute=/ppt/:id/review</span>
+              <span class="pill strong" id="real-demo-ppt-review-entry-href">entryHref=ppt-review.html?taskId=real_demo_ppt</span>
+            </div>
+            <p>recommendedAction=review_pptx_artifact_and_page_status · manualReviewRequired=true · realPublishAllowed=false</p>
+            <a class="pill strong" id="real-demo-ppt-review-link" href="ppt-review.html?taskId=real_demo_ppt">打开 PPT 审核</a>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button type="button" disabled title="演示产物仍需逐项人工审核">自动通过真实演示产物</button>
+          <button type="button" disabled title="审核前禁止发布">发布真实演示产物</button>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="controlled-evidence-review-title">
+        <div class="section-head">
+          <div>
+            <h3 id="controlled-evidence-review-title">ControlledDockerEvidenceReviewSignal</h3>
+            <p class="warning">source=reviewDetail.controlledGradingEvidence · dynamicSource=GET /api/review-tasks/{id}.reviewDetail.controlledGradingEvidence · fallbackSource=realDemoPrototype.controlledDockerEvidenceDemo · route=/real-demo -&gt; /review-center -&gt; /grading/:id/report · planPath=examples/output/mimo-real-demo-controlled-plan.json · reportPath=examples/output/mimo-real-demo-controlled-sandbox-report.json</p>
+          </div>
+          <span class="pill strong">PARTIAL_CONTROLLED_EVIDENCE_COLLECTED</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> controlled-command · CONTROLLED_DOCKER_SANDBOX_POC</h3>
+            <div class="meta-row">
+              <span class="pill strong">taskId=real_demo_grading</span>
+              <span class="pill">sourceMode=STATIC_DEMO_FALLBACK</span>
+              <span class="pill">available=true</span>
+              <span class="pill">planTotal=1 · reportTotal=1</span>
+              <span class="pill">imageTag=ai-grading-python:0.1</span>
+              <span class="pill">submissionPath=examples/submissions/real-demo-controlled</span>
+              <span class="pill">imageVerifyPath=examples/output/grading-sandbox-image-verify.json</span>
+            </div>
+            <p>coveredCheckIds=check_q1,check_q4 · coveredCheckTypes=stdout_contains,pytest · <span id="controlled-evidence-summary">executed=2 · passed=2 · earnedScore=40/40</span></p>
+            <p id="controlled-evidence-detail-visible">reviewDetail.controlledGradingEvidence.visible=false</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> static notebook evidence · STATIC_NOTEBOOK_EVIDENCE_READY_FOR_REVIEW</h3>
+            <div class="meta-row">
+              <span class="pill strong">remainingCheckIds=check_q2,check_q3</span>
+              <span class="pill">remainingCheckTypes=notebook_cell</span>
+              <span class="pill">remainingScore=60</span>
+              <span class="pill">sourceGradingModified=false</span>
+            </div>
+            <p>notebookEvidenceReviewPlanSource=reviewTaskSummary.notebookEvidenceReviewPlan · remainingReviewPlanStatus=NOTEBOOK_STATIC_EVIDENCE_COLLECTED · recommendedAction=review_container_and_static_notebook_evidence_before_approval · manualReviewRequired=true</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> review policy · MANUAL_ONLY</h3>
+            <div class="meta-row">
+              <span class="pill strong">autoApproveAllowed=false</span>
+              <span class="pill">batchStateChangeAllowed=false</span>
+              <span class="pill">realPublishAllowed=false</span>
+              <span class="pill">hostExecutionAllowed=false</span>
+              <span class="pill">networkAllowed=false</span>
+              <span class="pill" id="controlled-evidence-source-mode">STATIC_DEMO_FALLBACK</span>
+            </div>
+            <p>pageReadOnly=true · secretVisibleInFrontend=false · answerVisibleToCandidate=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="merged-evidence-review-title">
+        <div class="section-head">
+          <div>
+            <h3 id="merged-evidence-review-title">MergedGradingEvidenceReviewSignal</h3>
+            <p class="warning">source=reviewDetail.mergedGradingEvidence · dynamicSource=GET /api/review-tasks/{id}.reviewDetail.mergedGradingEvidence · route=/review-center -&gt; /grading/:id/report · reportType=GRADING_EVIDENCE_MERGE</p>
+          </div>
+          <span class="pill strong" id="merged-evidence-status">NO_MERGED_EVIDENCE_REPORT</span>
+        </div>
+        <div class="action-bar">
+          <button class="primary" id="run-evidence-auto-button" type="button">生成评分证据报告</button>
+          <span class="pill" id="run-evidence-auto-status">POST /api/grading/evidence-auto · ready</span>
+          <a class="pill strong" id="run-evidence-auto-report-link" href="grading-report.html?file=examples%2Foutput%2Fgrading-evidence-auto.json&amp;taskId=real_demo_grading">打开最新证据报告</a>
+        </div>
+        <div class="action-bar">
+          <button class="primary" id="record-decision-approve-ready-button" type="button">记录可复核通过</button>
+          <button id="record-decision-needs-revision-button" type="button">记录需修改</button>
+          <button id="record-decision-needs-evidence-button" type="button">记录需补证据</button>
+          <span class="pill" id="record-decision-note-status">POST /api/review-tasks/{id}/decision-note · ready</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> merged evidence · GRADING_EVIDENCE_MERGE_REPORT</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="merged-evidence-source-mode">sourceMode=NO_MERGED_EVIDENCE_REPORT</span>
+              <span class="pill strong" id="merged-evidence-report-type">reportType=none</span>
+              <span class="pill" id="merged-evidence-available">available=false</span>
+              <span class="pill" id="merged-evidence-report-total">reportTotal=0</span>
+              <span class="pill" id="merged-evidence-coverage-ratio">coverageRatio=0</span>
+            </div>
+            <p id="merged-evidence-summary">executed=0 · passed=0 · failed=0 · deferred=0 · earnedScore=0/0</p>
+            <p id="merged-evidence-detail-visible">reviewDetail.mergedGradingEvidence.visible=false</p>
+            <p id="merged-evidence-auto-summary">autoEvidenceReport=false · stepTotal=0 · warningTotal=0</p>
+            <p id="merged-evidence-review-decision-summary">reviewDecisionHint=NEEDS_EVIDENCE · hintTotal=0 · autoApproveAllowed=false</p>
+            <p id="review-decision-note-summary">reviewDecisionNoteTotal=0 · latestDecision=none · statusChanged=false</p>
+            <div id="merged-evidence-auto-step-list" class="artifact-list">
+              <div class="artifact-item">
+                <strong>no auto evidence steps</strong>
+                <span>等待 GRADING_EVIDENCE_AUTO_REPORT。</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> evidence source mix · READONLY_PLUS_CONTROLLED</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="merged-evidence-controlled-total">controlledDockerCheckTotal=0</span>
+              <span class="pill strong" id="merged-evidence-readonly-total">readonlyStaticCheckTotal=0</span>
+              <span class="pill" id="merged-evidence-covered-checks">coveredCheckIds=none</span>
+            </div>
+            <p>recommendedAction=run_grade_evidence_merge_before_final_grading_review · manualReviewRequired=false · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> merge safety · READ_EXISTING_REPORTS_ONLY</h3>
+            <div class="meta-row">
+              <span class="pill strong">mergeExecutedOnlyExistingReports=true</span>
+              <span class="pill">hostExecutionAllowed=false</span>
+              <span class="pill" id="merged-evidence-network">networkAllowed=false</span>
+              <span class="pill">secretVisibleInFrontend=false</span>
+            </div>
+            <p>不启动 Docker、不运行 pytest、不执行 Notebook、不调用真实 LLM、不自动通过、不发布。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">4</span> check evidence review · CHECK_LEVEL_EVIDENCE</h3>
+            <div class="meta-row">
+              <span class="pill strong" id="merged-evidence-check-total">checkEvidenceReviewItemTotal=0</span>
+              <span class="pill strong" id="merged-evidence-manual-check-total">manualCheckReviewTotal=0</span>
+              <span class="pill">autoApproveAllowed=false</span>
+            </div>
+            <div id="merged-evidence-check-list" class="artifact-list">
+              <div class="artifact-item">
+                <strong>no merged check evidence</strong>
+                <span>等待运行 merge_grading_evidence_reports 或 grade evidence-merge。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="real-dsl-review-preview-title">
+        <div class="section-head">
+          <div>
+            <h3 id="real-dsl-review-preview-title">RealDslReviewPreview</h3>
+            <p class="warning">source=realDemoPrototype.realDslReviewPreview · contentSource=examples/output/real-llm-lab.json + real-llm-exam.json + real-llm-grading.json + real-llm-ppt.json</p>
+          </div>
+          <span class="pill strong">STATIC_REAL_LLM_DSL_REVIEW_PREVIEW</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> LabReview · AI 工具应用入门实验</h3>
+            <div class="meta-row">
+              <span class="pill strong">stepTotal=4</span>
+              <span class="pill">objectiveTotal=1</span>
+              <span class="pill">duration=60</span>
+              <span class="pill">difficulty=beginner</span>
+            </div>
+            <p>steps=环境检查 / 阅读示例代码 / 使用 AI 辅助修改代码 / 应用修改并运行测试；qualityIssue=lab_objective_depth。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> ExamReview · Candidate Safe Preview</h3>
+            <div class="meta-row">
+              <span class="pill strong">questionTotal=1</span>
+              <span class="pill">totalScore=100</span>
+              <span class="pill strong">answerVisibleToCandidate=false</span>
+              <span class="pill strong">gradingRefVisibleToCandidate=false</span>
+            </div>
+            <p>candidateQuestions=q1 · removedFields=questions[].gradingRef。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> TeacherOnlyGradingRefs</h3>
+            <div class="meta-row">
+              <span class="pill strong">teacherOnly=true</span>
+              <span class="pill">candidateVisible=false</span>
+              <span class="pill">standardAnswerRevealToCandidate=false</span>
+            </div>
+            <p>教师审核可见评分引用，用于核查 q1 的 WAITING_REVIEW 审核状态说明；选手端不展示。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">4</span> GradingReview · WAITING_REVIEW</h3>
+            <div class="meta-row">
+              <span class="pill strong">assessmentPlanTotal=1</span>
+              <span class="pill">checkTotal=1</span>
+              <span class="pill">totalScore=100</span>
+              <span class="pill">precheck=READY_FOR_MANUAL_SANDBOX_REVIEW</span>
+            </div>
+            <p>allChecks=stdout_contains · strategy=MOCK_PLAN_ONLY · commandExecutedFromPage=false · realSandboxRunEnabled=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">5</span> PptReview · PPTX Artifact</h3>
+            <div class="meta-row">
+              <span class="pill strong">slideTotal=4</span>
+              <span class="pill">artifactPath=examples/output/real-llm-demo-ppt-artifact.pptx</span>
+              <span class="pill">pageReviewActionVisible=true</span>
+            </div>
+            <p>slides=标题页 / 学习目标 / 演示步骤 / 总结 · pageReviewStatus=NEEDS_REVIEW。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">6</span> QualitySignals · NEEDS_REVIEW</h3>
+            <div class="meta-row">
+              <span class="pill strong">qualityIssueTotal=3</span>
+              <span class="pill">blockingIssueTotal=0</span>
+              <span class="pill">revisionSuggestionTotal=3</span>
+              <span class="pill">autoApproveAllowed=false</span>
+            </div>
+            <p>reviewIssues=lab_objective_depth / grading_sandbox_execution_required / ppt_slide_depth；建议生成新的 WAITING_REVIEW 修订草稿。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">7</span> ProviderQualitySummary · Lab Real LLM</h3>
+            <div class="meta-row">
+              <span class="pill strong">source=reviewDetail.reviewPage.providerSummary.qualitySummary</span>
+              <span class="pill strong">readyForReview=true</span>
+              <span class="pill">realLlmCalled=true</span>
+              <span class="pill">apiSurface=chat.completions</span>
+              <span class="pill">responseId=resp_demo_lab_quality</span>
+              <span class="pill strong">normalizationPatchCount=1</span>
+              <span class="pill">schemaRepairApplied=false</span>
+              <span class="pill">requestCount=1</span>
+            </div>
+            <p>calls[0].qualitySummary.normalizationPatches=set.metadata.category · totalTokens=1234 · providerAdapter=openai_responses_sdk_adapter。</p>
+            <p class="warning">qualitySummary 只辅助人工审核排序；autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="real-dsl-revision-diff-preview-title">
+        <div class="section-head">
+          <div>
+            <h3 id="real-dsl-revision-diff-preview-title">RealDslRevisionDiffPreview</h3>
+            <p class="warning">source=realDemoPrototype.realDslRevisionDiffPreview · file=examples/output/real-llm-demo-revision-diff-preview.json · api=GET /api/review/real-dsl-revision-diff-preview</p>
+          </div>
+          <span class="pill strong">LOCAL_REAL_DSL_REVISION_DIFF_PREVIEW</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> Revision Summary · WAITING_REVIEW</h3>
+            <div class="meta-row">
+              <span class="pill strong">draftTotal=3</span>
+              <span class="pill">diffTotal=12</span>
+              <span class="pill">schemaValidatedTotal=3</span>
+              <span class="pill strong">allDraftsWaitingReview=true</span>
+            </div>
+            <p>manualReviewRequired=true · autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> Lab Revision · revise_lab_objective_depth</h3>
+            <div class="meta-row">
+              <span class="pill strong">changedFieldTotal=4</span>
+              <span class="pill">$.spec.steps[0].instruction</span>
+              <span class="pill">sourceObjectiveTotal=1</span>
+            </div>
+            <p>revisedTitle=AI 工具应用入门实验（修订草稿） · revisedStatus=WAITING_REVIEW。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> Grading Revision · sandbox review note</h3>
+            <div class="meta-row">
+              <span class="pill strong">changedFieldTotal=4</span>
+              <span class="pill">$.spec.assessmentPlan[0].inputSummary</span>
+              <span class="pill">sandboxExecuted=false</span>
+            </div>
+            <p>修订草稿只补充受控沙箱、超时、网络和文件系统限制说明；原始评分 DSL 不自动发布。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">4</span> PPT Revision · slide bullets</h3>
+            <div class="meta-row">
+              <span class="pill strong">changedFieldTotal=4</span>
+              <span class="pill">$.spec.slides[].bullets</span>
+              <span class="pill">slideTotal=4</span>
+            </div>
+            <p>reviewRecommendation=REVIEW_BEFORE_APPROVAL · newLlmRequestSent=false · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">5</span> Revision Decision · revise_lab_objective_depth</h3>
+            <div class="meta-row">
+              <span class="pill strong">REVISION_APPROVED_FOR_MANUAL_MERGE</span>
+              <span class="pill">decision=approve</span>
+              <span class="pill">manualMergeRequired=true</span>
+              <span class="pill">sourceDslModified=false</span>
+            </div>
+            <p>source=realDemoPrototype.realDslRevisionDecision · file=examples/output/real-llm-demo-revision-decision-report.json · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">6</span> Revision Promotion · WAITING_REVIEW candidate</h3>
+            <div class="meta-row">
+              <span class="pill strong">promotedStatus=WAITING_REVIEW</span>
+              <span class="pill">schemaValidated=true</span>
+              <span class="pill">promotedCandidateWritten=true</span>
+              <span class="pill">autoApproveAllowed=false</span>
+            </div>
+            <p>source=realDemoPrototype.realDslRevisionPromotion · file=examples/output/real-llm-demo-revision-promotion-report.json · sourceDslModified=false · revisedDslModified=false · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">7</span> Promotion Review Queue · LAB_GENERATION_REVISION</h3>
+            <div class="meta-row">
+              <span class="pill strong">taskStatus=WAITING_REVIEW</span>
+              <span class="pill">artifactKind=LAB_DSL</span>
+              <span class="pill">reviewDetailAvailable=true</span>
+              <span class="pill">autoPublishAllowed=false</span>
+            </div>
+            <p>source=realDemoPrototype.realDslRevisionPromotionReviewQueueItem · api=POST /api/review/real-dsl-revision-enqueue · detail=GET /api/review-tasks/{id} · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">8</span> Promotion Review Disposition · approved mock-only</h3>
+            <div class="meta-row">
+              <span class="pill strong">state=APPROVED_FOR_MOCK_PUBLISH_ONLY</span>
+              <span class="pill">mockPublishAvailable=true</span>
+              <span class="pill">realPublishAllowed=false</span>
+              <span class="pill">autoPublishAllowed=false</span>
+            </div>
+            <p>source=realDemoPrototype.realDslRevisionPromotionReviewDisposition · reviewDetail.promotionReviewDisposition · nextRequiredAction=optional_mock_publish_or_manual_platform_import。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">9</span> LabTemplateImportPreview · local platform draft</h3>
+            <div class="meta-row">
+              <span class="pill strong">sourceTaskStatus=APPROVED</span>
+              <span class="pill">agentEntity=lab_template</span>
+              <span class="pill">draftStatus=DRAFT_PENDING_PLATFORM_IMPORT_REVIEW</span>
+              <span class="pill strong">databaseWritten=false</span>
+              <span class="pill strong">realAgentImport=false</span>
+            </div>
+            <p>source=realDemoPrototype.labTemplateImportPreview · api=POST /api/labs/import-preview · mcp=create_lab_template_import_preview · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">10</span> AgentImportPreviewActionPanel · import preview entrypoints</h3>
+            <div class="meta-row">
+              <span class="pill strong">component=AgentImportPreviewActionPanel</span>
+              <span class="pill">source=GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewActions</span>
+              <span class="pill">reviewPage.platformImportPreviewActions</span>
+              <span class="pill strong">enabledTotal=3</span>
+              <span class="pill">previewAlreadyCreatedTotal=1</span>
+              <span class="pill">taskStatus=APPROVED</span>
+            </div>
+            <p>Lab=python lab_cli.py lab import-preview --task-id task_3b98ff60d482 --reviewer &lt;reviewer&gt; --output examples/output/lab-template-import-preview.json · api=POST /api/labs/import-preview · mcp=create_lab_template_import_preview · previewAlreadyCreated=true。</p>
+            <p>Exam=python lab_cli.py exam import-preview --task-id task_exam_demo --reviewer &lt;reviewer&gt; --output examples/output/exam-question-import-preview.json · api=POST /api/exams/import-preview · mcp=create_exam_question_import_preview · previewAlreadyCreated=false。</p>
+            <p>Grading=python lab_cli.py grade import-preview --task-id task_grading_demo --reviewer &lt;reviewer&gt; --output examples/output/grading-rule-import-preview.json · api=POST /api/grading/import-preview · mcp=create_grading_rule_import_preview · previewAlreadyCreated=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">11</span> AgentImportPreviewSummary · review detail aggregation</h3>
+            <div class="meta-row">
+              <span class="pill strong">component=AgentImportPreviewSummary</span>
+              <span class="pill">source=GET /api/review-tasks/{id}.reviewDetail.platformImportPreview</span>
+              <span class="pill">reviewPage.platformImportPreview</span>
+              <span class="pill strong">total=3</span>
+              <span class="pill">agentEntities=lab_template,exam_question,grading_rule</span>
+              <span class="pill">sourceArtifactKinds=LAB_DSL,EXAM_DSL,GRADING_DSL</span>
+            </div>
+            <p>统一展示 Lab / Exam / Grading 已审核 DSL 的本地平台草稿导入预览；databaseWritten=false · realAgentImport=false · realPublishAllowed=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">12</span> ExamQuestionImportPreview · candidate safe draft</h3>
+            <div class="meta-row">
+              <span class="pill strong">api=POST /api/exams/import-preview</span>
+              <span class="pill">mcp=create_exam_question_import_preview</span>
+              <span class="pill">agentEntity=exam_question</span>
+              <span class="pill">sourceArtifactKind=EXAM_DSL</span>
+              <span class="pill strong">candidateAnswerVisible=false</span>
+              <span class="pill">draftStatus=DRAFT_PENDING_PLATFORM_IMPORT_REVIEW</span>
+            </div>
+            <p>source=reviewCenterPrototype.examQuestionImportPreviewSignal · nextRequiredAction=review_exam_question_draft_before_platform_import · answerVisibleToCandidate=false。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">13</span> AgentImportPreviewSignoffChecklist · manual import signoff</h3>
+            <div class="meta-row">
+              <span class="pill strong">component=AgentImportPreviewSignoffChecklist</span>
+              <span class="pill">source=GET /api/review-tasks/{id}.reviewDetail.platformImportPreviewSignoff</span>
+              <span class="pill">reviewPage.platformImportPreviewSignoff</span>
+              <span class="pill strong">readyForHumanSignoff=true</span>
+              <span class="pill">missingPreviewTotal=0</span>
+              <span class="pill">needsHumanSignoffTotal=3</span>
+            </div>
+            <p>signoff checks=confirm_source_dsl_and_schema · confirm_no_database_write_or_publish · confirm_candidate_answer_hidden_and_grading_refs_teacher_only · confirm_sandbox_required_before_real_execution。</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">14</span> GradingRuleImportPreview · sandbox review draft</h3>
+            <div class="meta-row">
+              <span class="pill strong">api=POST /api/grading/import-preview</span>
+              <span class="pill">mcp=create_grading_rule_import_preview</span>
+              <span class="pill">agentEntity=grading_rule</span>
+              <span class="pill">sourceArtifactKind=GRADING_DSL</span>
+              <span class="pill strong">sandboxRequiredBeforeRealExecution=true</span>
+              <span class="pill">draftStatus=DRAFT_PENDING_PLATFORM_IMPORT_REVIEW</span>
+            </div>
+            <p>source=reviewCenterPrototype.gradingRuleImportPreviewSignal · nextRequiredAction=review_grading_rule_draft_before_platform_import · contestantCodeExecuted=false。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="notebook-evidence-plan-title">
+        <div class="section-head">
+          <div>
+            <h3 id="notebook-evidence-plan-title">NotebookEvidenceReviewPlan</h3>
+            <p class="warning">source=realDemoPrototype.generatedDsl.grading.spec.assessmentPlan + reviewTaskSummary.controlledDockerEvidenceReviewSignal · route=/real-demo -&gt; /review-center -&gt; /grading/:id/report · sourceGradingPath=examples/output/real-llm-grading.json</p>
+          </div>
+          <span class="pill strong">NOTEBOOK_STATIC_EVIDENCE_COLLECTED</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> check_q2 · NotebookGrader</h3>
+            <div class="meta-row">
+              <span class="pill strong">type=notebook_cell</span>
+              <span class="pill">score=30</span>
+              <span class="pill">strategy=STATIC_NOTEBOOK_JSON_PARSE_REVIEW</span>
+              <span class="pill">evidenceStatus=STATIC_NOTEBOOK_EVIDENCE_COLLECTED</span>
+              <span class="pill">staticEvidenceMethod=STATIC_NOTEBOOK_JSON_PARSE</span>
+            </div>
+            <p>inputSummary=检查指定单元格中的文本内容是否包含类型提示相关关键词 · requiredAction=verify_notebook_cell_targets</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> check_q3 · NotebookGrader</h3>
+            <div class="meta-row">
+              <span class="pill strong">type=notebook_cell</span>
+              <span class="pill">score=30</span>
+              <span class="pill">action=run_notebook_cell_and_match_output</span>
+              <span class="pill">sandboxRequiredBeforeRealExecution=true</span>
+              <span class="pill">earnedScore=60/60</span>
+            </div>
+            <p>inputSummary=验证函数参数重命名是否正确且保持功能不变 · requiredAction=verify_expected_output_tokens</p>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> notebook safety · READ_ONLY_PLAN</h3>
+            <div class="meta-row">
+              <span class="pill strong">notebookKernelStarted=false</span>
+              <span class="pill">notebookExecuted=false</span>
+              <span class="pill">contestantCodeExecuted=false</span>
+              <span class="pill">commandExecuted=false</span>
+              <span class="pill">realPublishAllowed=false</span>
+            </div>
+            <p>requiredReviewerActions=verify_notebook_cell_targets,verify_expected_output_tokens,review_static_notebook_evidence_matches_expected_tokens,confirm_no_notebook_kernel_started</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="priority-queue-title">
+        <div class="section-head">
+          <div>
+            <h3 id="priority-queue-title">ReviewPriorityQueue</h3>
+            <p class="warning">source=reviewTaskSummary.items + reviewDetail.qualitySignals + reviewDetail.assessmentPlan + reviewDetail.assessmentPlan.manualReviewChecklist · defaultSort=priorityRankAsc · queueTotal=<span id="review-center-priority-total">3</span> · autoApproveAllowed=false</p>
+          </div>
+          <span class="pill strong">运营优先级</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> task_grading_demo · URGENT</h3>
+            <div class="meta-row">
+              <span class="pill strong">reasonCode=HIGH_RISK_MOCK_EVIDENCE_REQUIRED</span>
+              <span class="pill">riskLevel=high</span>
+              <span class="pill">mockEvidenceStatus=MOCK_EVIDENCE_NOT_COLLECTED</span>
+              <span class="pill strong">manualReviewChecklistSummary.needsHumanReviewTotal=5</span>
+              <span class="pill">recommendedAction=review_assessment_plan_before_approval</span>
+            </div>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">2</span> task_exam_demo · HIGH</h3>
+            <div class="meta-row">
+              <span class="pill strong">reasonCode=CANDIDATE_SAFE_EXAM_PREVIEW</span>
+              <span class="pill">candidateSafeExamPreview.answersRemoved=true</span>
+              <span class="pill">questionGradingRefCoverage.status=MATCHED</span>
+              <span class="pill">recommendedAction=verify_candidate_preview_and_grading_refs</span>
+            </div>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">3</span> task_lab_demo · NORMAL</h3>
+            <div class="meta-row">
+              <span class="pill">reasonCode=LAB_QUALITY_NEEDS_REVIEW</span>
+              <span class="pill">qualitySignalStatus=NEEDS_REVIEW</span>
+              <span class="pill strong">providerQuality.readyForReview=true</span>
+              <span class="pill">providerQuality.normalizationPatchCount=1</span>
+              <span class="pill">recommendedAction=review_generation_profile_and_material_coverage</span>
+              <span class="pill">batchStateChangeAllowed=false</span>
+            </div>
+          </div>
+          <div class="signal-item">
+            <h3><span class="priority-rank">4</span> task_ppt_demo · PPT_PAGE_REVIEW</h3>
+            <div class="meta-row">
+              <span class="pill strong">component=PptPageReviewUpdateAction</span>
+              <span class="pill">entryRoute=/ppt/:id/review?taskId=task_ppt_demo</span>
+              <span class="pill">entryApi=POST /api/review-tasks/{id}/ppt-page-review-status</span>
+              <span class="pill">cli=python lab_cli.py review ppt-page-update</span>
+            </div>
+            <p>slideIndex=4 · reviewStatus=REVISE_REQUIRED · reviseRequiresComment=true · writesOperationAudit=true · operationAuditAction=PPT_PAGE_REVIEW_UPDATE · taskStatusChanged=false · autoPublishAllowed=false · realPublishAllowed=false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="next-manual-review-title">
+        <div class="section-head">
+          <div>
+            <h3 id="next-manual-review-title">NextManualReviewAction</h3>
+            <p class="warning">source=reviewCenterPrototype.reviewPriorityQueue.items[0] · checklistSource=reviewCenterPrototype.reviewPriorityQueue.items[0].manualReviewChecklistSummary · entryRoute=/review-center?taskId=task_grading_demo · entryApi=GET /api/review-tasks/{id}</p>
+          </div>
+          <span class="pill strong">MANUAL_ONLY</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3><span class="priority-rank">1</span> open_task_grading_demo_review_detail</h3>
+            <div class="meta-row">
+              <span class="pill strong">taskId=task_grading_demo</span>
+              <span class="pill strong">priority=URGENT</span>
+              <span class="pill">primaryReviewFocus=review_assessment_plan_before_approval</span>
+              <span class="pill strong">checklistTotal=5</span>
+              <span class="pill strong">needsHumanReviewTotal=5</span>
+              <span class="pill">reasonCode=HIGH_RISK_MOCK_EVIDENCE_REQUIRED</span>
+            </div>
+            <p>requiredEvidence=reviewDetail.assessmentPlan.summary / gradingReviewPrototype.assessmentPlanSummary / mockEvidence.status=MOCK_EVIDENCE_NOT_COLLECTED</p>
+          </div>
+          <div class="signal-item">
+            <h3>operatorChecklist</h3>
+            <div class="meta-row">
+              <span class="pill">verify_assessment_plan_aligned_with_checks</span>
+              <span class="pill">confirm_mock_evidence_not_collected</span>
+              <span class="pill">confirm_real_sandbox_evidence_required_before_real_execution</span>
+              <span class="pill">verify_required_limits_present</span>
+              <span class="pill">confirm_no_execution_or_publish</span>
+              <span class="pill">autoApproveAllowed=false</span>
+              <span class="pill">batchStateChangeAllowed=false</span>
+              <span class="pill">realPublishAllowed=false</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="assessment-plan-title">
+        <div class="section-head">
+          <div>
+            <h3 id="assessment-plan-title">AssessmentPlanQueueSignal</h3>
+            <p class="warning">GET /api/review-tasks/{id}.reviewDetail.assessmentPlan · source=gradingReviewPrototype.assessmentPlanSummary</p>
+          </div>
+          <span class="pill strong">GRADING_GENERATION</span>
+        </div>
+        <div class="intent-list">
+          <div class="intent-item">
+            <h3>check_pytest · PytestGrader</h3>
+            <div class="meta-row">
+              <span class="pill strong">planTotal=1</span>
+              <span class="pill strong">alignedWithChecks=true</span>
+              <span class="pill">riskLevel=high</span>
+              <span class="pill">realSandboxEvidenceRequired=true</span>
+            </div>
+            <p>executionStrategy=MOCK_PLAN_ONLY · mockEvidence.status=MOCK_EVIDENCE_NOT_COLLECTED · requiredLimits=timeout/cpu/memory/network/filesystem/process · sandboxRequiredBeforeRealExecution=true</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="quality-signal-title">
+        <div class="section-head">
+          <div>
+            <h3 id="quality-signal-title">QualitySignalQueueSummary</h3>
+            <p class="warning">source=examReviewPrototype.qualitySignals + gradingReviewPrototype.qualitySignals · readOnly=true</p>
+          </div>
+          <span class="pill strong">EXAM / GRADING</span>
+        </div>
+        <div class="signal-list">
+          <div class="signal-item">
+            <h3>task_exam_demo · EXAM_GENERATION</h3>
+            <div class="meta-row">
+              <span class="pill strong">questionGradingRefCoverage.status=MATCHED</span>
+              <span class="pill strong">scoreCoverage.status=MATCHED</span>
+              <span class="pill strong">explainability.status=EXPLAINABLE</span>
+              <span class="pill strong">candidateSafeExamPreview.answersRemoved=true</span>
+            </div>
+            <p>reviewFocus=candidateSafeExamPreview.answersRemoved / qualitySignals.coverage.questionGradingRefCoverage / qualitySignals.coverage.scoreCoverage</p>
+          </div>
+          <div class="signal-item">
+            <h3>task_grading_demo · GRADING_GENERATION</h3>
+            <div class="meta-row">
+              <span class="pill strong">gradingRefCoverage.status=MATCHED</span>
+              <span class="pill strong">scoreCoverage.status=MATCHED</span>
+              <span class="pill strong">assessmentPlanAlignedWithChecks=true</span>
+              <span class="pill">MOCK_EVIDENCE_NOT_COLLECTED</span>
+            </div>
+            <p>matchedCoverageTotal=4 · explainablePlanTotal=2 · candidateSafeExamPreviewTotal=1 · 质量信号只辅助人工审核，不自动通过或发布。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="dsl-preview">
+          <div class="section-head">
+            <h3 id="review-detail-dsl-title">Lab DSL Preview</h3>
+            <span class="pill" id="review-detail-dsl-status">WAITING_REVIEW</span>
+          </div>
+          <pre id="review-detail-dsl-preview">version: "1.0"
+kind: "Lab"
+metadata:
+  id: "lab_demo"
+  title: "AI 编码助手入门实验"
+status: "WAITING_REVIEW"
+spec:
+  objectives:
+    - "理解 AI 编码助手的基本使用方式"
+  grading:
+    ref: "grading_demo"</pre>
+        </div>
+
+        <div class="timeline">
+          <div class="section-head">
+            <h3>Timeline</h3>
+            <span class="pill" id="review-detail-timeline-trace">trace_demo</span>
+          </div>
+          <ol id="review-detail-timeline-list">
+            <li>AI Task created：WAITING_REVIEW</li>
+            <li>generate_lab_dsl：COMPLETED</li>
+            <li>Artifact LAB_DSL：WAITING_REVIEW</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="revision-loop-title">
+        <div class="section-head">
+          <div>
+            <h3 id="revision-loop-title">ReviewRevisionLoopPanel</h3>
+            <p class="warning">frontend/mock-data.json.reviewRevisionPrototype · request_revision · regenerate-mock · sourceTaskStatusUnchanged=true</p>
+            <p>POST /api/review-tasks/{id}/revision-request · GET /api/review-tasks/{id}/revision-requests</p>
+          </div>
+          <span class="pill">POST /api/review-tasks/{id}/regenerate-mock</span>
+        </div>
+        <div class="intent-list">
+          <div class="intent-item">
+            <h3>修改意见</h3>
+            <div class="meta-row">
+              <span class="pill strong">REVIEW_REVISION_REQUEST</span>
+              <span class="pill">op_audit_review_revision_request_demo</span>
+              <span class="pill strong">priority=HIGH</span>
+            </div>
+            <p>comment=步骤 2 需要补充截图验收标准。 · targetSections=steps · beforeState=WAITING_REVIEW · afterState=WAITING_REVIEW</p>
+            <p>taskStatusChanged=false · newLlmRequestSent=false · realLlmCalled=false · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="intent-item">
+            <h3>Mock 再生成结果</h3>
+            <div class="meta-row">
+              <span class="pill strong">REVIEW_MOCK_REGENERATE</span>
+              <span class="pill">task_lab_demo_revision</span>
+              <span class="pill strong">WAITING_REVIEW</span>
+            </div>
+            <p>newTaskType=LAB_GENERATION_REVISION · workflowRunId=workflow_run_review_mock_regeneration_demo · artifactId=artifact_lab_revision_demo</p>
+            <p>newDslPath=examples/output/task_lab_demo-lab-revision.json · schemaValidated=true · sourceRevisionRequestId=op_audit_review_revision_request_demo</p>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button class="primary" type="button" title="Mock regenerate requires reviewer and revision request">Mock 再生成</button>
+          <button type="button" disabled title="Mock 修订后仍需人工审核">自动通过</button>
+          <button type="button" disabled title="不触发真实 LLM 请求">真实 LLM 再生成</button>
+          <button type="button" disabled title="禁止真实发布">真实发布</button>
+        </div>
+      </div>
+
+      <div class="intent-panel" aria-labelledby="mcp-intent-title">
+        <div class="section-head">
+          <div>
+            <h3 id="mcp-intent-title">HighRiskMcpIntentPanel</h3>
+            <p class="warning">reviewIntentOnly=true · postReviewDisposition：WAITING_HUMAN_REVIEW / APPROVED_EXECUTION_BLOCKED / APPROVED_PENDING_SECOND_CONFIRMATION</p>
+          </div>
+          <span class="pill">frontend/mock-data.json.highRiskMcpIntentPrototype</span>
+        </div>
+        <div class="intent-list">
+          <div class="intent-item">
+            <h3>publish_lab</h3>
+            <div class="meta-row">
+              <span class="pill">MCP_PUBLISH_LAB_INTENT</span>
+              <span class="pill strong">WAITING_REVIEW</span>
+              <span class="pill">WAITING_HUMAN_REVIEW</span>
+            </div>
+            <p>LAB · lab_demo · nextRequiredAction=approve_or_reject · realPublish=false · executeRealPublishEnabled=false</p>
+          </div>
+          <div class="intent-item">
+            <h3>publish_exam</h3>
+            <div class="meta-row">
+              <span class="pill">MCP_PUBLISH_EXAM_INTENT</span>
+              <span class="pill strong">APPROVED</span>
+              <span class="pill">APPROVED_EXECUTION_BLOCKED</span>
+            </div>
+            <p>EXAM · exam_demo · nextRequiredAction=mock_disposition_only · autoPublishAllowed=false · realActionExecuted=false</p>
+          </div>
+          <div class="intent-item">
+            <h3>destroy_environment</h3>
+            <div class="meta-row">
+              <span class="pill">MCP_DESTROY_ENVIRONMENT_INTENT</span>
+              <span class="pill strong">APPROVED_PENDING_SECOND_CONFIRMATION</span>
+              <span class="pill strong">requiresSecondConfirmation=true</span>
+            </div>
+            <p>ENVIRONMENT · env_vm_demo · secondConfirmationSatisfied=false · environmentDestroyed=false · destroyRealEnvironmentEnabled=false</p>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button type="button" disabled title="Phase 4 仅创建高风险审核意图">执行真实发布</button>
+          <button type="button" disabled title="Phase 4 禁止真实销毁环境">销毁真实环境</button>
+          <button type="button" disabled title="不得绕过人工审核">绕过审核</button>
+        </div>
+      </div>
+
+      <div class="confirmation-panel" aria-labelledby="second-confirmation-title">
+        <div class="section-head">
+          <div>
+            <h3 id="second-confirmation-title">SecondConfirmationStatusPanel</h3>
+            <p class="warning">frontend/mock-data.json.secondConfirmationStatusPrototype · get_second_confirmation_status · readOnly=true</p>
+          </div>
+          <span class="pill">GET /api/review-tasks/{id}/second-confirmation-status</span>
+        </div>
+        <div class="intent-list">
+          <div class="intent-item">
+            <h3>task_mcp_destroy_environment_intent_demo</h3>
+            <div class="meta-row">
+              <span class="pill strong">APPROVED_PENDING_SECOND_CONFIRMATION</span>
+              <span class="pill strong">secondConfirmationRequired=true</span>
+              <span class="pill">mcp_call_get_second_confirmation_status_demo</span>
+            </div>
+            <p>secondConfirmationSatisfied=false · confirmationActionAvailable=false · confirmationEndpointEnabled=false · destroyRealEnvironmentEnabled=false · environmentDestroyed=false</p>
+          </div>
+        </div>
+        <div class="action-bar">
+          <button type="button" disabled title="Mock 查询只读，不提供二次确认入口">二次确认</button>
+          <button type="button" disabled title="Phase 4 禁止真实销毁环境">销毁真实环境</button>
+          <button type="button" disabled title="不得绕过人工审核">绕过审核</button>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="primary" type="button" title="Mock approve requires reviewer">通过</button>
+        <button class="danger" type="button" title="Mock reject requires reviewer and reason">驳回</button>
+        <button type="button" disabled title="Phase 1 不发布真实实验">发布</button>
+      </div>
+    </section>
+  </main>
+  <script src="review-center-data.js"></script>
+</body>
+</html>

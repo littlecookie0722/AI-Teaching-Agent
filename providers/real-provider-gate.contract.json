@@ -1,0 +1,123 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_provider_gate_contract",
+  "title": "Real Provider Preflight Gate Contract",
+  "description": "Machine-testable preflight gate for future real LLM provider PoC. The gate is local-only, disabled by default, and never calls a real LLM or returns secret values.",
+  "inputs": [
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_adapter_contract",
+      "path": "providers/provider-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "phase5_mock_baseline",
+      "path": "delivery/phase5-mock-baseline.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "env_example",
+      "path": ".env.example",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-preflight --provider openai",
+      "expectedCode": "REAL_PROVIDER_OPT_IN_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-preflight --provider openai --explicit-opt-in",
+      "expectedCode": "REAL_PROVIDER_DISABLED"
+    }
+  ],
+  "allowedScope": {
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "llmPocScope": "lab_generate_from_source_only"
+  },
+  "preflightRules": [
+    {
+      "id": "explicit_opt_in_required",
+      "required": true,
+      "errorCode": "REAL_PROVIDER_OPT_IN_REQUIRED"
+    },
+    {
+      "id": "contract_keeps_real_provider_disabled",
+      "required": true,
+      "errorCode": "REAL_PROVIDER_DISABLED"
+    },
+    {
+      "id": "secret_env_name_only",
+      "required": true,
+      "secretValueReturned": false
+    },
+    {
+      "id": "schema_validation_required",
+      "required": true,
+      "expected": true
+    },
+    {
+      "id": "generated_status_waiting_review",
+      "required": true,
+      "expected": "WAITING_REVIEW"
+    }
+  ],
+  "errorCodes": [
+    "REAL_PROVIDER_OPT_IN_REQUIRED",
+    "REAL_PROVIDER_DISABLED",
+    "MISSING_PROVIDER_SECRET",
+    "UNSUPPORTED_OPERATION",
+    "VALIDATION_ERROR",
+    "NOT_FOUND"
+  ],
+  "requiredContext": {
+    "mode": "MOCK_ONLY",
+    "defaultProvider": "mock",
+    "readyForRealProvider": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "secretValueReturned": false
+  },
+  "recommendedCommandIds": [
+    "test_real_provider_gate",
+    "test_provider_adapter",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "realLlmCalled": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

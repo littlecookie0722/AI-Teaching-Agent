@@ -1,0 +1,181 @@
+{
+  "id": "real_sdk_dependency_change_preview_contract",
+  "previewId": "real_sdk_dependency_change_preview",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled dependency change preview for a future real SDK dependency manifest and lockfile task. It does not write dependency files, generate diffs, install packages, resolve package metadata, import SDKs, check secrets, use network access, create AI tasks, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_change_preview_module",
+      "path": "providers/real_sdk_dependency_change_preview.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_module",
+      "path": "providers/real_sdk_dependency_installer_audit.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_installer_audit_contract",
+      "path": "providers/real-sdk-dependency-installer-audit.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_install_plan_contract",
+      "path": "providers/real-sdk-dependency-install-plan.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-change-preview describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "dependencyChangePreviewOnly": true,
+        "dependencyFileChanged": false,
+        "lockfileDiffGenerated": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-change-preview preview --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "installerAuditReady": false,
+        "changePreviewChecklistPassed": false,
+        "readyForDependencyChangeImplementationTask": false,
+        "dependencyFileChanged": false,
+        "dependencyDiffGenerated": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "installerAuditRequired": true,
+    "installerAuditReady": false,
+    "changePreviewChecklistPassed": false,
+    "readyForDependencyChangeImplementationTask": false,
+    "dependencyChangePreviewOnly": true,
+    "dependencyChangePreviewReady": false,
+    "dependencyFileWritePlannedNow": false,
+    "dependencyFileChanged": false,
+    "requirementsChanged": false,
+    "pyprojectChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "lockfileDiffGenerated": false,
+    "dependencyDiffGenerated": false,
+    "diffArtifactWritten": false,
+    "rollbackDiffGenerated": false,
+    "rollbackCommandGenerated": false,
+    "offlineCiExecuted": false,
+    "installerExecutionEnabled": false,
+    "installCommandMaterialized": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstallAllowed": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "generate_dependency_diff",
+    "write_diff_artifact",
+    "generate_rollback_diff",
+    "generate_executable_install_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "execute_offline_ci",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_change_preview",
+    "test_real_sdk_dependency_installer_audit",
+    "test_real_sdk_dependency_install_plan",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "dependencyChangePreviewOnly": true,
+    "dependencyFileWritePlannedNow": false,
+    "dependencyFileChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "lockfileDiffGenerated": false,
+    "dependencyDiffGenerated": false,
+    "diffArtifactWritten": false,
+    "rollbackDiffGenerated": false,
+    "rollbackCommandGenerated": false,
+    "offlineCiExecuted": false,
+    "installerExecutionEnabled": false,
+    "installCommandMaterialized": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

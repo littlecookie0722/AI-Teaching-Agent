@@ -1,0 +1,135 @@
+{
+  "tasks": {},
+  "environments": {},
+  "reviewAuditEvents": {},
+  "operationAuditEvents": {},
+  "providerCallAuditEvents": {},
+  "gradingJobs": {},
+  "gradingRecords": {},
+  "mcpToolCallRecords": {
+    "mcp_call_6dc0fa28722e": {
+      "toolName": "analyze_material",
+      "status": "SUCCESS",
+      "actor": "lab-cli-mcp-stdio-client-smoke",
+      "backendMethod": "POST",
+      "backendPath": "/api/materials/analyze",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "argumentKeys": [
+        "input"
+      ],
+      "argumentPreview": {
+        "input": "examples/input/demo-source.md"
+      },
+      "backendCalled": true,
+      "responseCode": "OK",
+      "responseMessage": "素材分析完成",
+      "backendTraceId": "trace_0abad0fef7a5",
+      "errorCode": null,
+      "errorField": null,
+      "errorMessage": null,
+      "id": "mcp_call_6dc0fa28722e",
+      "occurredAt": "2026-07-07T15:11:58.853671Z",
+      "traceId": "trace_04e27e99bb5a",
+      "mode": "MOCK_ONLY",
+      "realMcpServerStarted": false,
+      "realAgentStarted": false,
+      "realLlmCalled": false,
+      "secretsRead": false,
+      "networkAccess": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "autoPublishAllowed": false,
+      "realPublish": false
+    },
+    "mcp_call_7aebc3733933": {
+      "toolName": "analyze_material",
+      "status": "SUCCESS",
+      "actor": "lab-cli-mcp-stdio-client-smoke",
+      "backendMethod": "POST",
+      "backendPath": "/api/materials/analyze",
+      "riskLevel": "low",
+      "reviewRequired": false,
+      "argumentKeys": [
+        "input"
+      ],
+      "argumentPreview": {
+        "input": "examples/input/demo-source.md"
+      },
+      "backendCalled": true,
+      "responseCode": "OK",
+      "responseMessage": "素材分析完成",
+      "backendTraceId": "trace_62b9f4e2c7f2",
+      "errorCode": null,
+      "errorField": null,
+      "errorMessage": null,
+      "id": "mcp_call_7aebc3733933",
+      "occurredAt": "2026-07-09T14:49:25.339762Z",
+      "traceId": "trace_ed766aba2a92",
+      "mode": "MOCK_ONLY",
+      "realMcpServerStarted": false,
+      "realAgentStarted": false,
+      "realLlmCalled": false,
+      "secretsRead": false,
+      "networkAccess": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "autoPublishAllowed": false,
+      "realPublish": false
+    }
+  },
+  "platformEntities": {},
+  "workflowRuns": {},
+  "artifacts": {
+    "artifact_32bdccece083": {
+      "kind": "MATERIAL_ANALYSIS",
+      "path": "examples/input/demo-source.md",
+      "title": "AI 工具应用入门",
+      "status": "COMPLETED",
+      "id": "artifact_32bdccece083",
+      "taskId": null,
+      "workflowRunId": null,
+      "sourceRef": "examples/input/demo-source.md",
+      "traceId": "trace_0abad0fef7a5",
+      "metadata": {
+        "fileType": "markdown",
+        "riskCount": 0,
+        "unknownShellExecuted": false
+      },
+      "mode": "MOCK_ONLY",
+      "realLlmCalled": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "realPublish": false,
+      "createdAt": "2026-07-07T15:11:58.852825Z",
+      "updatedAt": "2026-07-07T15:11:58.852841Z"
+    },
+    "artifact_f6b9767018d1": {
+      "kind": "MATERIAL_ANALYSIS",
+      "path": "examples/input/demo-source.md",
+      "title": "AI 工具应用入门",
+      "status": "COMPLETED",
+      "id": "artifact_f6b9767018d1",
+      "taskId": null,
+      "workflowRunId": null,
+      "sourceRef": "examples/input/demo-source.md",
+      "traceId": "trace_62b9f4e2c7f2",
+      "metadata": {
+        "fileType": "markdown",
+        "riskCount": 0,
+        "unknownShellExecuted": false
+      },
+      "mode": "MOCK_ONLY",
+      "realLlmCalled": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "realPublish": false,
+      "createdAt": "2026-07-09T14:49:25.338373Z",
+      "updatedAt": "2026-07-09T14:49:25.338389Z"
+    }
+  }
+}

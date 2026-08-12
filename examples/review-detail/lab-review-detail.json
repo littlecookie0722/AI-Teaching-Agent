@@ -1,0 +1,170 @@
+{
+  "mode": "MOCK_ONLY",
+  "task": {
+    "id": "task_lab_demo",
+    "taskType": "LAB_GENERATION",
+    "title": "Mock Lab DSL generation",
+    "inputType": "markdown",
+    "inputRef": "examples/input/demo-source.md",
+    "status": "WAITING_REVIEW",
+    "modelName": "mock",
+    "promptVersion": "phase1-mock",
+    "finalResultPath": "templates/lab/examples/basic-lab.yaml",
+    "traceId": "trace_demo"
+  },
+  "artifacts": [
+    {
+      "id": "artifact_material_demo",
+      "kind": "MATERIAL_ANALYSIS",
+      "path": "examples/input/demo-source.md",
+      "title": "AI 编码助手入门实验素材",
+      "status": "COMPLETED",
+      "taskId": "task_lab_demo",
+      "workflowRunId": "workflow_run_demo",
+      "metadata": {
+        "fileType": "markdown",
+        "riskCount": 0,
+        "unknownShellExecuted": false
+      },
+      "mode": "MOCK_ONLY",
+      "realLlmCalled": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "realPublish": false
+    },
+    {
+      "id": "artifact_lab_demo",
+      "kind": "LAB_DSL",
+      "path": "templates/lab/examples/basic-lab.yaml",
+      "title": "Mock Lab DSL",
+      "status": "WAITING_REVIEW",
+      "taskId": "task_lab_demo",
+      "workflowRunId": "workflow_run_demo",
+      "metadata": {
+        "dslKind": "Lab",
+        "reviewRequired": true
+      },
+      "mode": "MOCK_ONLY",
+      "realLlmCalled": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "realPublish": false
+    }
+  ],
+  "workflowRuns": [
+    {
+      "id": "workflow_run_demo",
+      "workflowId": "phase1_main_demo",
+      "status": "COMPLETED",
+      "mode": "MOCK_ONLY",
+      "reviewRequired": true,
+      "publishBlockedUntilApproved": true,
+      "realLlmCalled": false,
+      "realCloudResourceChanged": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "realPublish": false
+    }
+  ],
+  "workflowSteps": [
+    {
+      "workflowRunId": "workflow_run_demo",
+      "workflowId": "phase1_main_demo",
+      "name": "generate_lab_dsl",
+      "status": "COMPLETED",
+      "order": 1,
+      "detail": {
+        "taskId": "task_lab_demo",
+        "generatedStatus": "WAITING_REVIEW"
+      }
+    }
+  ],
+  "reviewAuditEvents": [],
+  "operationAuditEvents": [],
+  "reviewPolicy": {
+    "reviewRequired": true,
+    "rejectRequiresReason": true,
+    "publishBlockedUntilApproved": true,
+    "autoPublishAllowed": false,
+    "realPublishAllowed": false,
+    "allowedActions": ["approve", "reject"],
+    "generatedContentStatus": "WAITING_REVIEW"
+  },
+  "reviewPage": {
+    "header": {
+      "taskId": "task_lab_demo",
+      "taskType": "LAB_GENERATION",
+      "title": "Mock Lab DSL generation",
+      "status": "WAITING_REVIEW",
+      "promptVersion": "phase1-mock",
+      "traceId": "trace_demo"
+    },
+    "source": {
+      "inputType": "markdown",
+      "inputRef": "examples/input/demo-source.md",
+      "finalResultPath": "templates/lab/examples/basic-lab.yaml"
+    },
+    "dslPreview": {
+      "kind": "Lab",
+      "artifactKind": "LAB_DSL",
+      "artifactId": "artifact_lab_demo",
+      "path": "templates/lab/examples/basic-lab.yaml",
+      "status": "WAITING_REVIEW"
+    },
+    "artifactGroups": [
+      {"kind": "LAB_DSL", "total": 1},
+      {"kind": "MATERIAL_ANALYSIS", "total": 1}
+    ],
+    "riskSummary": {
+      "riskCount": 0,
+      "requiresHumanReview": true,
+      "unknownShellExecuted": false,
+      "answerVisibleToCandidate": false
+    },
+    "timeline": [
+      {
+        "type": "TASK_CREATED",
+        "title": "AI Task created",
+        "status": "WAITING_REVIEW",
+        "refId": "task_lab_demo"
+      },
+      {
+        "type": "WORKFLOW_STEP",
+        "title": "generate_lab_dsl",
+        "status": "COMPLETED",
+        "refId": "workflow_run_demo",
+        "order": 1
+      }
+    ],
+    "actionBar": {
+      "approve": {"enabled": true, "requiresReviewer": true},
+      "reject": {"enabled": true, "requiresReviewer": true, "requiresReason": true},
+      "mockPublish": {"enabled": false, "blockedUntilApproved": true, "realPublish": false}
+    },
+    "emptyStates": {
+      "noArtifacts": false,
+      "noWorkflowSteps": false,
+      "noAuditEvents": true
+    }
+  },
+  "safety": {
+    "mode": "MOCK_ONLY",
+    "realLlmCalled": false,
+    "realCloudResourceChanged": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "realPublish": false,
+    "autoPublishAllowed": false,
+    "answerVisibleToCandidate": false
+  },
+  "summary": {
+    "artifactTotal": 2,
+    "workflowRunTotal": 1,
+    "workflowStepTotal": 1,
+    "reviewAuditEventTotal": 0,
+    "operationAuditEventTotal": 0
+  }
+}

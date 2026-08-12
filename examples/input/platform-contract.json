@@ -1,0 +1,161 @@
+{
+  "statusPathTemplate": "/open/staging/draft-imports/{draftImportId}/state",
+  "draftIdResponseKeys": [
+    "draftImportId",
+    "draftId",
+    "id"
+  ],
+  "statusResponseKeys": [
+    "agentStatus",
+    "status",
+    "state"
+  ],
+  "statusMapping": {
+    "QUEUED": "PENDING_MANUAL_PLATFORM_REVIEW",
+    "WAITING_REVIEW": "PENDING_MANUAL_PLATFORM_REVIEW",
+    "IN_REVIEW": "PENDING_MANUAL_PLATFORM_REVIEW",
+    "DONE": "ACCEPTED_FOR_DRAFT",
+    "ACCEPTED": "ACCEPTED_FOR_DRAFT",
+    "REJECTED": "REJECTED_BY_PLATFORM",
+    "FAILED": "FAILED"
+  },
+  "requestBodyMapping": {
+    "workflow.idempotencyKey": "idempotencyKey",
+    "workflow.operation": "operation",
+    "source.agentEntityId": {
+      "source": "source.agentEntityId",
+      "required": true
+    },
+    "source.sourceTaskId": {
+      "source": "source.sourceTaskId",
+      "required": true
+    },
+    "source.sourcePreviewArtifactId": "source.sourcePreviewArtifactId",
+    "source.sourceArtifactKind": "source.sourceArtifactKind",
+    "source.sourceDslPath": "source.sourceDslPath",
+    "review.status": {
+      "source": "payload.reviewStatus",
+      "default": "PENDING_MANUAL_PLATFORM_REVIEW"
+    }
+  },
+  "entities": {
+    "lab_template": {
+      "draftImportPath": "/open/staging/lab-template-draft-imports",
+      "statusPathTemplate": "/open/staging/lab-template-draft-imports/{agentDraftId}/state",
+      "requestBodyMapping": {
+        "lab.externalId": "payload.externalId",
+        "lab.title": {
+          "source": "payload.title",
+          "required": true
+        },
+        "lab.category": "payload.category",
+        "lab.difficulty": "payload.difficulty",
+        "lab.durationMinutes": "payload.durationMinutes",
+        "lab.tags": {
+          "source": "payload.tags",
+          "default": []
+        },
+        "lab.objectiveTotal": "payload.objectiveTotal",
+        "lab.stepTotal": "payload.stepTotal",
+        "lab.materialTotal": "payload.materialTotal",
+        "lab.environment.type": "payload.environment.type",
+        "lab.environment.image": "payload.environment.image",
+        "lab.environment.resources": {
+          "source": "payload.environment.resources",
+          "default": {}
+        },
+        "lab.gradingRef": "payload.gradingRef"
+      }
+    },
+    "exam_question": {
+      "draftImportPath": "/open/staging/exam-question-draft-imports",
+      "statusPathTemplate": "/open/staging/exam-question-draft-imports/{agentDraftId}/state",
+      "requestBodyMapping": {
+        "exam.externalId": "payload.externalId",
+        "exam.title": {
+          "source": "payload.title",
+          "required": true
+        },
+        "exam.sourceLabId": "payload.sourceLabId",
+        "exam.difficulty": "payload.difficulty",
+        "exam.questionType": "payload.questionType",
+        "exam.totalScore": "payload.totalScore",
+        "exam.questionTotal": "payload.questionTotal",
+        "exam.questionIds": {
+          "source": "payload.questionIds",
+          "default": []
+        },
+        "exam.gradingRefs": {
+          "source": "payload.gradingRefs",
+          "default": []
+        },
+        "exam.answerStoragePolicy": "payload.answerStoragePolicy",
+        "exam.candidateAnswerVisible": {
+          "source": "payload.candidateAnswerVisible",
+          "default": false
+        }
+      }
+    },
+    "grading_rule": {
+      "draftImportPath": "/open/staging/grading-rule-draft-imports",
+      "statusPathTemplate": "/open/staging/grading-rule-draft-imports/{agentDraftId}/state",
+      "requestBodyMapping": {
+        "grading.externalId": "payload.externalId",
+        "grading.title": {
+          "source": "payload.title",
+          "required": true
+        },
+        "grading.sourceExamId": "payload.sourceExamId",
+        "grading.totalScore": "payload.totalScore",
+        "grading.timeoutSeconds": "payload.timeoutSeconds",
+        "grading.checkTotal": "payload.checkTotal",
+        "grading.checkIds": {
+          "source": "payload.checkIds",
+          "default": []
+        },
+        "grading.runnerTypes": {
+          "source": "payload.runnerTypes",
+          "default": []
+        },
+        "grading.assessmentPlanTotal": "payload.assessmentPlanTotal",
+        "grading.sandboxRequiredBeforeRealExecution": {
+          "source": "payload.sandboxRequiredBeforeRealExecution",
+          "default": true
+        }
+      }
+    },
+    "ppt_deck": {
+      "draftImportPath": "/open/staging/ppt-deck-draft-imports",
+      "statusPathTemplate": "/open/staging/ppt-deck-draft-imports/{agentDraftId}/state",
+      "requestBodyMapping": {
+        "ppt.externalId": "payload.externalId",
+        "ppt.title": {
+          "source": "payload.title",
+          "required": true
+        },
+        "ppt.audience": "payload.audience",
+        "ppt.durationMinutes": "payload.durationMinutes",
+        "ppt.theme.style": "payload.theme.style",
+        "ppt.theme.language": "payload.theme.language",
+        "ppt.slideTotal": "payload.slideTotal",
+        "ppt.slideIds": {
+          "source": "payload.slideIds",
+          "default": []
+        },
+        "ppt.slideTypes": {
+          "source": "payload.slideTypes",
+          "default": []
+        },
+        "ppt.firstSlideTitle": "payload.firstSlideTitle",
+        "ppt.pptxArtifactRequiredBeforePublish": {
+          "source": "payload.pptxArtifactRequiredBeforePublish",
+          "default": true
+        },
+        "ppt.pptxArtifactImported": {
+          "source": "payload.pptxArtifactImported",
+          "default": false
+        }
+      }
+    }
+  }
+}

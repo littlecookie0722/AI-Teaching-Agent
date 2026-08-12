@@ -1,0 +1,58 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+
+# Local mock stores
+cli/.lab_cli_store.json
+*.lab_cli_store.json
+
+# Phase 1 generated reports and exports
+examples/output/*.json
+examples/output/*.md
+!examples/output/README.md
+# Sanitized, read-only fixtures required by the clean-checkout regression suite.
+!examples/output/real-llm-lab.json
+!examples/output/real-llm-exam.json
+!examples/output/real-llm-grading.json
+!examples/output/real-llm-ppt.json
+!examples/output/real-llm-demo-candidate-preview.json
+!examples/output/real-llm-demo-real-dsl-review-preview.json
+!examples/output/real-llm-demo-bundle.json
+!examples/output/real-llm-demo-acceptance-summary.json
+!examples/output/real-llm-demo-checklist.json
+!examples/output/mimo-real-demo-grading.json
+!examples/output/mimo-real-demo-notebook-static-plan.json
+codex_ai_platform_full_package.zip
+
+# Build and temp artifacts
+build/
+dist/
+*.egg-info/
+*.log
+!examples/submissions/readonly-demo/logs/train.log
+!examples/submissions/mixed-checks-pass/logs/train.log
+*.tmp
+*.bak
+tmp/
+temp/
+.cache/
+
+# Local editor metadata and debug artifacts. Existing tracked files still need
+# to be excluded from a clean public export; this prevents new local state from
+# being added.
+.idea/
+.trae/
+outputs/
+.vscode/
+examples/output/*.sqlite3
+examples/output/browser-*.png

@@ -1,0 +1,169 @@
+{
+  "id": "real_sdk_dependency_patch_proposal_contract",
+  "proposalId": "real_sdk_dependency_patch_proposal",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Disabled dependency patch proposal for a future real SDK dependency implementation task. It does not write patch files, apply patches, write dependency files, generate real diff artifacts, install packages, resolve package metadata, import SDKs, check secrets, use network access, create AI tasks, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_patch_proposal_module",
+      "path": "providers/real_sdk_dependency_patch_proposal.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_module",
+      "path": "providers/real_sdk_dependency_change_preview.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_change_preview_contract",
+      "path": "providers/real-sdk-dependency-change-preview.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-patch-proposal describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "dependencyPatchProposalOnly": true,
+        "patchFileWritten": false,
+        "patchApplied": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-patch-proposal propose --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "changePreviewReady": false,
+        "patchProposalChecklistPassed": false,
+        "readyForDependencyPatchImplementationTask": false,
+        "patchFileWritten": false,
+        "patchApplied": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "changePreviewRequired": true,
+    "changePreviewReady": false,
+    "patchProposalChecklistPassed": false,
+    "readyForDependencyPatchImplementationTask": false,
+    "dependencyPatchProposalOnly": true,
+    "dependencyPatchProposalReady": false,
+    "patchProposalMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "dependencyPatchGenerated": false,
+    "dependencyFileChanged": false,
+    "lockfileDiffGenerated": false,
+    "dependencyDiffGenerated": false,
+    "diffArtifactWritten": false,
+    "dependencyInstallExecuted": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "write_patch_file",
+    "apply_patch",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "generate_real_dependency_diff",
+    "write_diff_artifact",
+    "generate_rollback_diff",
+    "generate_executable_install_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "resolve_package_version",
+    "resolve_package_hash",
+    "execute_offline_ci",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_patch_proposal",
+    "test_real_sdk_dependency_change_preview",
+    "test_real_sdk_dependency_installer_audit",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "dependencyPatchProposalOnly": true,
+    "patchProposalMaterialized": false,
+    "patchFileWritten": false,
+    "patchApplied": false,
+    "dependencyPatchGenerated": false,
+    "dependencyFileChanged": false,
+    "lockfileChanged": false,
+    "dependencyLockfileChanged": false,
+    "lockfileDiffGenerated": false,
+    "dependencyDiffGenerated": false,
+    "diffArtifactWritten": false,
+    "rollbackDiffGenerated": false,
+    "rollbackCommandGenerated": false,
+    "offlineCiExecuted": false,
+    "installerExecutionEnabled": false,
+    "installCommandMaterialized": false,
+    "dependencyInstallAllowed": false,
+    "dependencyInstallCommandGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "packageVersionResolved": false,
+    "packageHashResolved": false,
+    "packageDownloaded": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "workflowId": "phase2_exam_conversion",
+  "title": "Phase 2 Mock Exam Conversion Workflow",
+  "description": "MockProvider-first workflow for converting an existing Lab DSL and Notebook into Exam and Grading DSL review bundles. It parses Notebook JSON without executing cells.",
+  "entrypoints": {
+    "cliRun": "python lab_cli.py phase2 exam-convert run --lab templates/lab/examples/basic-lab.yaml --notebook examples/notebooks/demo-lab.ipynb --reviewer teacher_1 --output examples/output/phase2-exam-conversion-report.json",
+    "cliReport": "python lab_cli.py phase2 exam-convert report --file examples/output/phase2-exam-conversion-report.json",
+    "backendRun": "POST /api/phase2/workflows/exam-conversion/run",
+    "pythonHelper": "ai_workflows.exam_conversion_workflow.run_phase2_exam_conversion"
+  },
+  "inputs": [
+    {
+      "id": "lab_dsl",
+      "path": "templates/lab/examples/basic-lab.yaml",
+      "type": "LabDsl",
+      "required": true,
+      "localOnly": true,
+      "schema": "templates/lab/lab.schema.json"
+    },
+    {
+      "id": "notebook",
+      "path": "examples/notebooks/demo-lab.ipynb",
+      "type": "Notebook",
+      "required": true,
+      "localOnly": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "prompt_manifest",
+      "path": "prompts/manifest.json",
+      "type": "json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_adapter_contract",
+      "path": "providers/provider-adapter.contract.json",
+      "type": "json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "exam_dsl",
+      "kind": "Exam",
+      "path": "templates/exam/examples/notebook-fill-blank.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "answerVisibleToCandidate": false
+    },
+    {
+      "id": "grading_dsl",
+      "kind": "Grading",
+      "path": "templates/grading/examples/python-pytest.yaml",
+      "status": "WAITING_REVIEW",
+      "reviewRequired": true,
+      "sandboxRequiredBeforeRealExecution": true
+    },
+    {
+      "id": "workflow_report",
+      "kind": "WorkflowReport",
+      "path": "examples/output/phase2-exam-conversion-report.json",
+      "status": "COMPLETED",
+      "generated": true
+    }
+  ],
+  "steps": [
+    {
+      "name": "validate_lab_dsl",
+      "status": "COMPLETED",
+      "schema": "templates/lab/lab.schema.json",
+      "realLlmCalled": false
+    },
+    {
+      "name": "analyze_notebook",
+      "status": "COMPLETED",
+      "notebookExecuted": false,
+      "contestantCodeExecuted": false,
+      "unknownShellExecuted": false
+    },
+    {
+      "name": "generate_exam_dsl",
+      "kind": "exam",
+      "promptId": "exam_generation_v0",
+      "outputKind": "Exam",
+      "status": "WAITING_REVIEW",
+      "provider": "mock",
+      "answerVisibleToCandidate": false
+    },
+    {
+      "name": "generate_grading_dsl",
+      "kind": "grading",
+      "promptId": "grading_generation_v0",
+      "outputKind": "Grading",
+      "status": "WAITING_REVIEW",
+      "provider": "mock",
+      "sandboxRequiredBeforeRealExecution": true
+    },
+    {
+      "name": "assemble_exam_review_bundle",
+      "status": "COMPLETED",
+      "reviewRequired": true,
+      "publishBlockedUntilApproved": true,
+      "autoPublishAllowed": false
+    }
+  ],
+  "reviewGate": {
+    "required": true,
+    "defaultGeneratedStatus": "WAITING_REVIEW",
+    "publishBlockedUntilApproved": true,
+    "autoPublishAllowed": false,
+    "answerVisibleToCandidate": false
+  },
+  "audit": {
+    "providerCallAuditRequired": true,
+    "workflowRunRequired": true,
+    "artifactManifestRequired": true,
+    "storeKeys": [
+      "providerCallAuditEvents",
+      "workflowRuns",
+      "artifacts",
+      "tasks"
+    ]
+  },
+  "recommendedCommandIds": [
+    "phase2_exam_convert_run",
+    "phase2_exam_convert_report",
+    "test_phase2_exam_conversion_workflow",
+    "test_provider_adapter_workflow"
+  ],
+  "candidateDataPolicy": {
+    "standardAnswerStoredInDsl": true,
+    "candidatePreviewRemovesAnswer": true,
+    "answerVisibleToCandidate": false
+  },
+  "qualitySignals": {
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "status": "READY_FOR_HUMAN_REVIEW",
+    "fields": [
+      "overall",
+      "exam",
+      "grading",
+      "coverage.questionGradingRefCoverage",
+      "coverage.scoreCoverage",
+      "coverage.explainability",
+      "grading.assessmentPlan",
+      "coverage.explainability.assessmentPlanAlignedWithChecks",
+      "coverage.explainability.assessmentPlanHasReportDetailFields",
+      "reviewHighlights"
+    ],
+    "availableIn": [
+      "workflowReport.qualitySignals",
+      "examArtifact.metadata.workflowQualitySignals",
+      "gradingArtifact.metadata.workflowQualitySignals",
+      "workflowReport.summary.qualitySignals"
+    ]
+  },
+  "safety": {
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "reviewBypassed": false
+  },
+  "failurePolicy": {
+    "invalidLabDslCreatesAiTask": false,
+    "invalidNotebookCreatesAiTask": false,
+    "providerFailureCreatesAiTask": false,
+    "providerFailurePublishesContent": false,
+    "includeProviderErrorContext": true
+  }
+}

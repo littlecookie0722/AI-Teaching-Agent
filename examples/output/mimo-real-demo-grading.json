@@ -1,0 +1,136 @@
+{
+  "kind": "Grading",
+  "version": "1.0",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "sourceExamId": "exam_real_llm_demo",
+    "title": "AI 工具应用入门考试 - 评分方案",
+    "id": "grading_real_llm_demo"
+  },
+  "spec": {
+    "totalScore": 100,
+    "passingScore": 60,
+    "gradingMethod": "deterministic_checks",
+    "checks": [
+      {
+        "id": "check_q1",
+        "type": "stdout_contains",
+        "score": 20
+      },
+      {
+        "id": "check_q2",
+        "type": "notebook_cell",
+        "score": 30
+      },
+      {
+        "id": "check_q3",
+        "type": "notebook_cell",
+        "score": 30
+      },
+      {
+        "id": "check_q4",
+        "type": "pytest",
+        "score": 20
+      }
+    ],
+    "assessmentPlan": [
+      {
+        "checkId": "check_q1",
+        "type": "stdout_contains",
+        "runner": "终端输出检查器",
+        "score": 20,
+        "inputSummary": "运行Python版本命令并验证输出格式是否正确包含版本号",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "100m",
+            "memory": "128Mi",
+            "timeout": "30s",
+            "network": "disabled_by_default",
+            "filesystem": "read_only",
+            "process": "subprocess_only"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      },
+      {
+        "checkId": "check_q2",
+        "type": "notebook_cell",
+        "runner": "Notebook单元格内容分析器",
+        "score": 30,
+        "inputSummary": "检查指定单元格中的文本内容是否包含类型提示相关关键词",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "50m",
+            "memory": "64Mi",
+            "timeout": "10s",
+            "network": "disabled_by_default",
+            "filesystem": "read_only",
+            "process": "none"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      },
+      {
+        "checkId": "check_q3",
+        "type": "notebook_cell",
+        "runner": "代码模式匹配器",
+        "score": 30,
+        "inputSummary": "验证函数参数重命名是否正确且保持功能不变",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "100m",
+            "memory": "128Mi",
+            "timeout": "15s",
+            "network": "disabled_by_default",
+            "filesystem": "read_only",
+            "process": "none"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "low",
+        "sandboxRequiredBeforeRealExecution": true
+      },
+      {
+        "checkId": "check_q4",
+        "type": "pytest",
+        "runner": "Pytest测试执行器",
+        "score": 20,
+        "inputSummary": "执行测试套件验证代码修改未引入错误",
+        "executionPlan": {
+          "strategy": "MOCK_PLAN_ONLY",
+          "requiredLimits": {
+            "cpu": "200m",
+            "memory": "256Mi",
+            "timeout": "60s",
+            "network": "disabled_by_default",
+            "filesystem": "read_write",
+            "process": "subprocess_only"
+          },
+          "wouldRunInsideRealSandbox": true
+        },
+        "mockEvidence": {
+          "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+        },
+        "riskLevel": "medium",
+        "sandboxRequiredBeforeRealExecution": true
+      }
+    ],
+    "timeoutSeconds": 30
+  }
+}

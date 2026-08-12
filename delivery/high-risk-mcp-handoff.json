@@ -1,0 +1,185 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 5",
+  "mode": "MOCK_ONLY",
+  "id": "high_risk_mcp_handoff",
+  "title": "High-Risk MCP Operation Handoff",
+  "description": "Operation-facing handoff checklist for Phase 4 high-risk MCP Mock tools. It is documentation and validation only, not runtime enablement.",
+  "sourceSafetyMatrix": "mcp-server/high-risk-tool-safety.contract.json",
+  "sourceManifest": "mcp-server/tools.manifest.json",
+  "scope": [
+    "publish_lab",
+    "publish_exam",
+    "destroy_environment",
+    "get_second_confirmation_status"
+  ],
+  "inputs": [
+    {
+      "id": "handoff_markdown",
+      "path": "delivery/HIGH_RISK_MCP_HANDOFF.md",
+      "required": true
+    },
+    {
+      "id": "safety_matrix",
+      "path": "mcp-server/high-risk-tool-safety.contract.json",
+      "required": true
+    },
+    {
+      "id": "mcp_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    },
+    {
+      "id": "review_center",
+      "path": "frontend/review-center.html",
+      "required": true
+    },
+    {
+      "id": "audit_observability",
+      "path": "frontend/audit.html",
+      "required": true
+    },
+    {
+      "id": "mcp_spec",
+      "path": "docs/07_MCP_SPEC.md",
+      "required": true
+    },
+    {
+      "id": "operations_guide",
+      "path": "docs/10_OPERATIONS_GUIDE.md",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "operator_confirmation",
+      "description": "Manual confirmation that high-risk MCP tools remain review-intent-only or read-only.",
+      "generated": false,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "test_high_risk_mcp_handoff",
+    "test_high_risk_mcp_safety_contract",
+    "test_mcp_manifest",
+    "test_mcp_mock_tools",
+    "test_frontend_contract"
+  ],
+  "handoffItems": [
+    {
+      "id": "read_safety_matrix",
+      "category": "documentation",
+      "title": "Read the high-risk MCP safety matrix",
+      "required": true,
+      "evidenceType": "local_file",
+      "path": "mcp-server/high-risk-tool-safety.contract.json",
+      "expectedSignal": "The matrix covers publish_lab, publish_exam, destroy_environment, and get_second_confirmation_status."
+    },
+    {
+      "id": "confirm_publish_intents_review_only",
+      "category": "safety",
+      "title": "Confirm publish tools create review intents only",
+      "required": true,
+      "evidenceType": "safety_matrix",
+      "tools": [
+        "publish_lab",
+        "publish_exam"
+      ],
+      "expectedSignal": "reviewIntentOnly=true, realPublish=false, and autoPublishAllowed=false."
+    },
+    {
+      "id": "confirm_destroy_intent_blocked",
+      "category": "safety",
+      "title": "Confirm destroy_environment remains blocked after review",
+      "required": true,
+      "evidenceType": "safety_matrix",
+      "tools": [
+        "destroy_environment"
+      ],
+      "expectedSignal": "requiresSecondConfirmation=true, confirmationEndpointEnabled=false, realCloudResourceChanged=false, and environmentDestroyed=false."
+    },
+    {
+      "id": "confirm_second_confirmation_query_read_only",
+      "category": "safety",
+      "title": "Confirm second confirmation status is read-only",
+      "required": true,
+      "evidenceType": "safety_matrix",
+      "tools": [
+        "get_second_confirmation_status"
+      ],
+      "expectedSignal": "readOnly=true, confirmationActionAvailable=false, and destroyRealEnvironmentEnabled=false."
+    },
+    {
+      "id": "open_review_center",
+      "category": "preview",
+      "title": "Open review center high-risk panel",
+      "required": true,
+      "evidenceType": "static_preview",
+      "path": "frontend/review-center.html",
+      "manualOnly": true,
+      "expectedSignal": "HighRiskMcpIntentPanel and SecondConfirmationStatusPanel are visible as Mock-only read/review surfaces."
+    },
+    {
+      "id": "open_audit_observability",
+      "category": "preview",
+      "title": "Open audit observability MCP records",
+      "required": true,
+      "evidenceType": "static_preview",
+      "path": "frontend/audit.html",
+      "manualOnly": true,
+      "expectedSignal": "mcpToolCallRecords show high-risk intent calls and the read-only second-confirmation query."
+    },
+    {
+      "id": "run_safety_matrix_tests",
+      "category": "validation",
+      "title": "Run high-risk MCP safety matrix tests",
+      "required": true,
+      "evidenceType": "allowlisted_command",
+      "commandId": "test_high_risk_mcp_safety_contract",
+      "expectedSignal": "pytest passes for tests/test_high_risk_mcp_safety_contract.py."
+    },
+    {
+      "id": "run_handoff_tests",
+      "category": "validation",
+      "title": "Run high-risk MCP handoff tests",
+      "required": true,
+      "evidenceType": "allowlisted_command",
+      "commandId": "test_high_risk_mcp_handoff",
+      "expectedSignal": "pytest passes for tests/test_high_risk_mcp_handoff.py."
+    }
+  ],
+  "operationPolicy": {
+    "allowedReadOnlyActions": [
+      "readSafetyMatrix",
+      "openReviewCenter",
+      "openAuditObservability",
+      "runAllowlistedTests"
+    ],
+    "blockedActions": [
+      "startRealMcpServer",
+      "startRealAgent",
+      "callRealLlm",
+      "executeRealPublish",
+      "destroyRealEnvironment",
+      "confirmSecondFactor",
+      "bypassHumanReview"
+    ],
+    "requiresNewTaskBeforeRealEnablement": true
+  },
+  "safety": {
+    "manualOnly": true,
+    "readOnly": true,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realLlmCalled": false,
+    "networkAccess": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "realActionExecuted": false,
+    "environmentDestroyed": false,
+    "bypassReviewEnabled": false
+  }
+}

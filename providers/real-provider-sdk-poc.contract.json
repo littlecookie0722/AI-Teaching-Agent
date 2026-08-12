@@ -1,0 +1,204 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "id": "real_provider_sdk_poc_contract",
+  "title": "Default Disabled Real Provider SDK PoC Harness Contract",
+  "description": "Machine-testable contract for the default-disabled SDK PoC harness. It requires the local SDK task blueprint before reaching the disabled PoC adapter and still prevents SDK installation, SDK imports, client creation, secret presence checks, secret reads, network calls, generated content, AI task creation, and publish actions.",
+  "pocId": "real_provider_sdk_poc",
+  "interfaceName": "LLMProvider",
+  "activeProvider": "mock",
+  "inputs": [
+    {
+      "id": "real_provider_sdk_poc",
+      "path": "providers/real_provider_sdk_poc.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "path": "providers/real_llm_sdk_task_blueprint.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_sdk_task_blueprint_contract",
+      "path": "providers/real-llm-sdk-task-blueprint.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter",
+      "path": "providers/real_llm_poc_adapter.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_llm_poc_adapter_contract",
+      "path": "providers/real-llm-poc-adapter.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_runtime_guard_contract",
+      "path": "providers/provider-runtime-guard.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_provider_gate_contract",
+      "path": "providers/real-provider-gate.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-poc describe",
+      "expectedCode": "OK"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-poc generate-json --provider openai",
+      "expectedCode": "REAL_LLM_SDK_BLUEPRINT_REQUIRED"
+    },
+    {
+      "type": "cli",
+      "command": "python lab_cli.py provider real-sdk-poc generate-json --provider openai --explicit-opt-in --approval-ref APPROVAL-001 --reviewer teacher_1 --confirm-dry-run-plan --confirm-runtime-guard --confirm-schema-review --confirm-human-review-policy --confirm-audit-redaction",
+      "expectedCode": "REAL_PROVIDER_DISABLED"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "real_llm_sdk_task_blueprint",
+      "required": true,
+      "mustPassBeforeAdapter": true
+    },
+    {
+      "id": "provider_runtime_guard",
+      "required": true,
+      "mustPassBeforePreflight": true
+    },
+    {
+      "id": "real_provider_preflight",
+      "required": true,
+      "mustFailWhileProviderDisabled": true
+    },
+    {
+      "id": "disabled_real_provider_shell",
+      "required": true,
+      "generationEnabled": false
+    },
+    {
+      "id": "sdk_call_disabled",
+      "required": true,
+      "enabled": false
+    }
+  ],
+  "allowedScope": {
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "llmPocScope": "lab_generate_from_source_only",
+    "generatedStatus": "WAITING_REVIEW"
+  },
+  "requiredContext": {
+    "pocId": "real_provider_sdk_poc",
+    "mode": "MOCK_ONLY",
+    "defaultProvider": "mock",
+    "sdkPocEnabled": false,
+    "sdkPocPassed": false,
+    "blueprintRequired": true,
+    "sdkDependencyInstalled": false,
+    "providerContractChangeApplied": false,
+    "runtimeContractChangeApplied": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretValueReturned": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "reviewBypassed": false,
+    "realCallAuthorized": false,
+    "realLlmCalled": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "networkAccessEnabledNow": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "errorCodes": [
+    "REAL_LLM_SDK_BLUEPRINT_REQUIRED",
+    "REAL_PROVIDER_OPT_IN_REQUIRED",
+    "REAL_PROVIDER_DISABLED",
+    "REAL_PROVIDER_SDK_POC_DISABLED",
+    "VALIDATION_ERROR",
+    "UNSUPPORTED_OPERATION",
+    "NOT_FOUND"
+  ],
+  "blockedOperations": [
+    "install_sdk_dependency",
+    "import_real_sdk",
+    "create_real_client",
+    "read_secret_value",
+    "check_secret_presence",
+    "network_call",
+    "generate_real_content",
+    "create_ai_task_from_real_output",
+    "bypass_blueprint",
+    "bypass_runtime_guard",
+    "bypass_preflight",
+    "bypass_schema",
+    "bypass_review",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_provider_sdk_poc",
+    "test_real_llm_sdk_task_blueprint",
+    "test_real_llm_poc_adapter",
+    "test_provider_runtime_guard",
+    "test_real_provider_gate",
+    "test_real_provider_shell",
+    "test_phase2_provider_plan",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "realLlmCalled": false,
+    "realCallAuthorized": false,
+    "sdkPocEnabled": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "unknownShellExecuted": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "remoteUploadAllowed": false,
+    "secretVisibleInFrontend": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "secretsRead": false,
+    "networkAccess": false
+  }
+}

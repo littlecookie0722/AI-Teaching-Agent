@@ -1,0 +1,67 @@
+{
+  "component": "LabTemplateImportPreview",
+  "mode": "LOCAL_PLATFORM_IMPORT_PREVIEW",
+  "sourceTaskId": "task_8bda83d21433",
+  "sourceTaskStatus": "APPROVED",
+  "sourceArtifactId": "artifact_5d056b99c45c",
+  "sourceArtifactKind": "LAB_DSL",
+  "sourceDslPath": "examples/output/task_8bda83d21433-lab.json",
+  "reviewer": "teacher_1",
+  "schemaValidated": true,
+  "agentEntity": "lab_template",
+  "labTemplateDraft": {
+    "id": "lab_demo",
+    "title": "AI 工具应用入门实验",
+    "category": "AI 工具应用",
+    "difficulty": "beginner",
+    "durationMinutes": 60,
+    "tags": [
+      "AI",
+      "工具应用"
+    ],
+    "status": "DRAFT_PENDING_PLATFORM_IMPORT_REVIEW",
+    "sourceTaskId": "task_8bda83d21433",
+    "sourceDslPath": "examples/output/task_8bda83d21433-lab.json",
+    "objectiveTotal": 3,
+    "stepTotal": 4,
+    "materialTotal": 1,
+    "environment": {
+      "type": "ubuntu-vm",
+      "image": "ubuntu-22.04",
+      "resources": {
+        "cpu": 2,
+        "memoryGb": 4
+      }
+    },
+    "gradingRef": "grading_demo",
+    "reviewChecklist": [
+      "confirm_objectives_are_measurable",
+      "confirm_steps_are_teachable",
+      "confirm_environment_matches_platform_capacity",
+      "confirm_grading_ref_is_available_or_planned",
+      "confirm_no_auto_publish"
+    ]
+  },
+  "importPlan": {
+    "strategy": "manual_platform_import_after_review",
+    "writeTarget": "local_preview_only",
+    "databaseWritePlanned": false,
+    "apiCallPlanned": false,
+    "realAgentImport": false,
+    "manualReviewRequired": true,
+    "nextRequiredAction": "review_lab_template_draft_before_platform_import"
+  },
+  "safety": {
+    "realLlmCalled": false,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "databaseWritten": false,
+    "realAgentImport": false,
+    "autoPublishAllowed": false,
+    "realPublishAllowed": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false
+  },
+  "traceId": "trace_b5b242439b87"
+}

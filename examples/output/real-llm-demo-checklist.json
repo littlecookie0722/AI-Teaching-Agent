@@ -1,0 +1,218 @@
+{
+  "component": "RealDemoOneClickChecklist",
+  "mode": "REAL_LLM_DEMO_CHECKLIST_STATIC",
+  "source": "phase2 demo-bundle checklist",
+  "bundlePath": "examples/output/real-llm-demo-bundle.json",
+  "acceptanceSummaryPath": "examples/output/real-llm-demo-acceptance-summary.json",
+  "checklistPath": "examples/output/real-llm-demo-checklist.json",
+  "route": "/real-demo -> /review-center -> /ppt/:id/review -> /grading/:id/report",
+  "summary": {
+    "readyForDemo": true,
+    "acceptancePassed": true,
+    "acceptancePassedCount": 7,
+    "acceptanceTotal": 7,
+    "failedStepIds": [],
+    "sectionPassedCount": 6,
+    "sectionTotal": 6,
+    "waitingReviewDslTotal": 4,
+    "readonlyEvidenceCollectedTotal": 2,
+    "gradingEvidenceCoverageEarnedScore": 100,
+    "gradingEvidenceCoverageTotalScore": 100,
+    "gradingEvidenceCoverageStatus": "GRADING_EVIDENCE_COVERAGE_COMPLETE",
+    "pptxArtifactGenerated": true,
+    "manualReviewRequired": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false
+  },
+  "sections": [
+    {
+      "id": "generated_dsl",
+      "title": "Generated DSL artifacts are ready for manual review",
+      "status": "WAITING_REVIEW",
+      "passed": true,
+      "source": "examples/output/real-llm-demo-bundle.json",
+      "evidence": {
+        "dslTotal": 4,
+        "waitingReviewDslTotal": 4,
+        "items": [
+          {
+            "kind": "lab",
+            "path": "examples/output/real-llm-lab.json",
+            "status": "WAITING_REVIEW",
+            "schemaValidated": true
+          },
+          {
+            "kind": "exam",
+            "path": "examples/output/real-llm-exam.json",
+            "status": "WAITING_REVIEW",
+            "schemaValidated": true
+          },
+          {
+            "kind": "grading",
+            "path": "examples/output/real-llm-grading.json",
+            "status": "WAITING_REVIEW",
+            "schemaValidated": true
+          },
+          {
+            "kind": "ppt",
+            "path": "examples/output/real-llm-ppt.json",
+            "status": "WAITING_REVIEW",
+            "schemaValidated": true
+          }
+        ]
+      },
+      "route": "/real-demo",
+      "command": "python lab_cli.py phase2 demo-bundle report --file examples/output/real-llm-demo-bundle.json"
+    },
+    {
+      "id": "candidate_preview",
+      "title": "Candidate preview hides answers",
+      "status": "CANDIDATE_SAFE",
+      "passed": true,
+      "source": "bundle.candidatePreview",
+      "evidence": {
+        "answersRemoved": true,
+        "answerVisibleToCandidate": false,
+        "standardAnswerRevealToCandidate": null
+      },
+      "route": "/real-demo"
+    },
+    {
+      "id": "grading_evidence_coverage",
+      "title": "Grading evidence coverage reaches 100 points",
+      "status": "GRADING_EVIDENCE_COVERAGE_COMPLETE",
+      "passed": true,
+      "source": "acceptanceSummary.gradingEvidenceCoverage",
+      "evidence": {
+        "controlledDockerScore": 40,
+        "controlledDockerTotal": 40,
+        "notebookStaticScore": 60,
+        "notebookStaticTotal": 60,
+        "earnedScore": 100,
+        "totalScore": 100,
+        "coveragePercent": 100.0,
+        "coveredCheckIds": [
+          "check_q1",
+          "check_q4"
+        ],
+        "staticNotebookCheckIds": [
+          "check_q2",
+          "check_q3"
+        ],
+        "manualReviewRequired": true,
+        "autoApproveAllowed": false
+      },
+      "route": "/grading/:id/report"
+    },
+    {
+      "id": "pptx_artifact",
+      "title": "PPTX artifact remains visible for page-level review",
+      "status": "WAITING_REVIEW",
+      "passed": true,
+      "source": "bundle.pptArtifact",
+      "evidence": {
+        "path": "examples/output/real-llm-demo-ppt-artifact.pptx",
+        "manifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+        "previewAvailable": true,
+        "slideCount": 4,
+        "autoPublishAllowed": false,
+        "realPublish": false
+      },
+      "route": "/ppt/:id/review"
+    },
+    {
+      "id": "review_and_mcp",
+      "title": "Review center and MCP summary expose the same demo queue",
+      "status": "VISIBLE",
+      "passed": true,
+      "source": "acceptanceSummary.steps",
+      "evidence": {
+        "realDemoReviewQueueTaskTotal": 4,
+        "mcpOutputContractIncludesRealDemoReviewQueue": true,
+        "stepIds": [
+          "real_demo_bundle_valid",
+          "real_demo_page_visible",
+          "review_center_real_demo_queue_visible",
+          "mcp_get_review_task_summary_contract_visible",
+          "grading_report_readonly_report_detail_visible",
+          "grading_evidence_coverage_complete",
+          "ppt_artifact_review_action_visible"
+        ],
+        "failedStepIds": []
+      },
+      "route": "/review-center",
+      "command": "python lab_cli.py mcp call --tool get_review_task_summary --arguments \"{}\""
+    },
+    {
+      "id": "safety_boundaries",
+      "title": "Checklist is read-only and keeps publish boundaries closed",
+      "status": "READONLY_BOUNDARIES_CLOSED",
+      "passed": true,
+      "source": "acceptanceSummary.safety",
+      "evidence": {
+        "sourceBundleRealLlmCalled": true,
+        "newLlmRequestSent": false,
+        "secretsRead": false,
+        "networkAccess": false,
+        "sandboxExecutedByChecklist": false,
+        "commandExecutedByChecklist": false,
+        "pytestExecutedByChecklist": false,
+        "notebookExecutedByChecklist": false,
+        "contestantCodeExecutedByChecklist": false,
+        "autoApproveAllowed": false,
+        "batchStateChangeAllowed": false,
+        "realPublishAllowed": false
+      }
+    }
+  ],
+  "recommendedDemoOrder": [
+    "/real-demo",
+    "/review-center",
+    "/ppt/:id/review",
+    "/grading/:id/report",
+    "python lab_cli.py review batch-summary",
+    "python lab_cli.py mcp call --tool get_review_task_summary --arguments \"{}\""
+  ],
+  "safeCommands": [
+    "python lab_cli.py phase2 demo-bundle report --file examples/output/real-llm-demo-bundle.json",
+    "python lab_cli.py phase2 demo-bundle acceptance --bundle examples/output/real-llm-demo-bundle.json --output examples/output/real-llm-demo-acceptance-summary.json",
+    "python lab_cli.py phase2 demo-bundle checklist --bundle examples/output/real-llm-demo-bundle.json --acceptance-summary examples/output/real-llm-demo-acceptance-summary.json --output examples/output/real-llm-demo-checklist.json",
+    "start ./frontend/real-demo.html",
+    "start ./frontend/review-center.html",
+    "start ./frontend/grading-report.html"
+  ],
+  "blockedActions": [
+    "newRealLlmRequest",
+    "secretRead",
+    "networkAccess",
+    "executeGradingCommand",
+    "runRealPytest",
+    "executeNotebook",
+    "executeContestantCode",
+    "standardAnswerRevealToCandidate",
+    "autoApprove",
+    "batchStateChange",
+    "autoPublish",
+    "realPublish"
+  ],
+  "safety": {
+    "sourceBundleRealLlmCalled": true,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "sandboxExecutedByChecklist": false,
+    "commandExecutedByChecklist": false,
+    "pytestExecutedByChecklist": false,
+    "notebookExecutedByChecklist": false,
+    "contestantCodeExecutedByChecklist": false,
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false,
+    "realPublishAllowed": false
+  },
+  "readonlyEvidenceSummary": {
+    "doesNotModifySourceGrading": true,
+    "executed": 2,
+    "earnedScore": 70,
+    "reportPath": "examples/output/real-llm-demo-readonly-evidence-report.json"
+  }
+}

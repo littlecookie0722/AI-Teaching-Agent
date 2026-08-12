@@ -1,0 +1,24 @@
+{
+  "kind": "Exam",
+  "version": "1.0",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "sourceLabId": "ai-tools-intro-lab",
+    "difficulty": "beginner",
+    "title": "AI 工具应用入门考核",
+    "id": "exam_real_llm_demo"
+  },
+  "spec": {
+    "totalScore": 100,
+    "questionType": "coding_task",
+    "questions": [
+      {
+        "id": "q1",
+        "title": "审核状态确认",
+        "stem": "请说明生成内容为什么必须进入 WAITING_REVIEW。",
+        "score": 100,
+        "gradingRef": "check_waiting_review"
+      }
+    ]
+  }
+}

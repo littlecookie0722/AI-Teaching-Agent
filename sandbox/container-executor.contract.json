@@ -1,0 +1,80 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 3",
+  "mode": "CONTAINER_PLAN_ONLY",
+  "description": "Dry-run container sandbox adapter contract. It converts sandbox execution requests into container plans without starting containers or executing contestant code.",
+  "executor": {
+    "id": "container_sandbox_executor_dry_run",
+    "module": "sandbox.container_executor",
+    "class": "ContainerSandboxExecutor",
+    "entrypoint": "build_container_sandbox_plan",
+    "runtime": "container",
+    "dryRun": true
+  },
+  "input": {
+    "sourceContract": "sandbox/execution-contract.json",
+    "requestMode": "REAL_SANDBOX_REQUIRED",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "mode",
+      "gradingId",
+      "checkId",
+      "checkType",
+      "action",
+      "traceId",
+      "workspace",
+      "limits",
+      "network",
+      "command",
+      "evidenceRequired",
+      "safety"
+    ]
+  },
+  "output": {
+    "name": "containerPlan",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "mode",
+      "status",
+      "executor",
+      "request",
+      "containerPlan",
+      "safety",
+      "resultPlaceholder"
+    ],
+    "planFields": [
+      "image",
+      "workingDirectory",
+      "mounts",
+      "limits",
+      "network",
+      "commandPreview",
+      "evidenceRequired"
+    ],
+    "placeholderStatus": "NOT_EXECUTED"
+  },
+  "safetyAssertions": {
+    "containerStarted": false,
+    "sandboxExecuted": false,
+    "contestantCodeExecuted": false,
+    "commandExecuted": false,
+    "hostExecutionAllowed": false,
+    "unknownShellAllowed": false,
+    "networkEnabled": false,
+    "secretPassthroughAllowed": false
+  },
+  "blockedOperations": [
+    "start_container_from_plan",
+    "invoke_docker_or_podman",
+    "execute_unknown_shell",
+    "execute_contestant_code_on_host",
+    "enable_network_by_default",
+    "mount_host_sensitive_paths",
+    "write_outside_workspace",
+    "pass_runtime_secrets_to_submission"
+  ],
+  "recommendedTests": [
+    "python -m pytest tests/test_container_sandbox_executor.py",
+    "python -m pytest tests/test_sandbox_execution_contract.py"
+  ]
+}

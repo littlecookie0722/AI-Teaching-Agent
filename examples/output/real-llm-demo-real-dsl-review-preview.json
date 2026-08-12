@@ -1,0 +1,386 @@
+{
+  "component": "RealDslReviewPreview",
+  "mode": "STATIC_REAL_LLM_DSL_REVIEW_PREVIEW",
+  "source": "real_llm_dsl_files",
+  "route": "/real-demo -> /review-center -> /labs/:id/review -> /exams/:id/review -> /grading/:id/review -> /ppt/:id/review",
+  "summary": {
+    "labTitle": "AI 工具应用入门实验",
+    "labStepTotal": 4,
+    "labObjectiveTotal": 1,
+    "examTitle": "AI 工具应用入门考核",
+    "examQuestionTotal": 1,
+    "examTotalScore": 100,
+    "gradingPlanTotal": 1,
+    "gradingCheckTotal": 1,
+    "gradingTotalScore": 100,
+    "pptTitle": "AI 工具应用入门演示",
+    "pptSlideTotal": 4,
+    "manualReviewRequired": true,
+    "allDslWaitingReview": true,
+    "qualityStatus": "NEEDS_REVIEW",
+    "qualityIssueTotal": 3,
+    "blockingIssueTotal": 0,
+    "revisionSuggestionTotal": 3
+  },
+  "qualitySignals": {
+    "summary": {
+      "status": "NEEDS_REVIEW",
+      "issueTotal": 3,
+      "blockingIssueTotal": 0,
+      "revisionSuggestionTotal": 3,
+      "manualReviewRequired": true,
+      "autoApproveAllowed": false,
+      "realPublishAllowed": false
+    },
+    "coverage": {
+      "labObjectiveTotal": 1,
+      "labStepTotal": 4,
+      "examQuestionTotal": 1,
+      "examScoreMatched": true,
+      "gradingCheckTotal": 1,
+      "gradingPlanTotal": 1,
+      "gradingRefsCovered": true,
+      "gradingScoreMatched": true,
+      "pptSlideTotal": 4,
+      "candidatePreviewAnswerSafe": true
+    },
+    "issues": [
+      {
+        "id": "lab_objective_depth",
+        "severity": "MEDIUM",
+        "kind": "lab",
+        "field": "$.spec.objectives",
+        "message": "实验学习目标偏少，审核时较难判断知识点覆盖面。",
+        "suggestedAction": "补充至少 2 个可观察、可验收的学习目标。",
+        "targetSection": "objectives"
+      },
+      {
+        "id": "grading_sandbox_execution_required",
+        "severity": "MEDIUM",
+        "kind": "grading",
+        "field": "$.spec.checks",
+        "message": "评分包含需要受控沙箱执行的检查类型：stdout_contains。",
+        "suggestedAction": "进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。",
+        "targetSection": "assessmentPlan"
+      },
+      {
+        "id": "ppt_slide_depth",
+        "severity": "LOW",
+        "kind": "ppt",
+        "field": "$.spec.slides",
+        "message": "PPT 页数偏少，可能不足以覆盖导入、讲解、示例、练习和总结。",
+        "suggestedAction": "补充课堂练习或总结页，让演示结构更完整。",
+        "targetSection": "slides"
+      }
+    ],
+    "revisionSuggestions": [
+      {
+        "id": "revise_lab_objective_depth",
+        "kind": "lab",
+        "targetSection": "objectives",
+        "comment": "补充至少 2 个可观察、可验收的学习目标。",
+        "defaultReviewer": "teacher_1",
+        "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind lab --reviewer teacher_1 --comment \"补充至少 2 个可观察、可验收的学习目标。\" --target-section objectives",
+        "requiresNewLlmRequest": false,
+        "keepsWaitingReview": true,
+        "autoPublishAllowed": false
+      },
+      {
+        "id": "revise_grading_sandbox_execution_required",
+        "kind": "grading",
+        "targetSection": "assessmentPlan",
+        "comment": "进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。",
+        "defaultReviewer": "teacher_1",
+        "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind grading --reviewer teacher_1 --comment \"进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。\" --target-section assessmentPlan",
+        "requiresNewLlmRequest": false,
+        "keepsWaitingReview": true,
+        "autoPublishAllowed": false
+      },
+      {
+        "id": "revise_ppt_slide_depth",
+        "kind": "ppt",
+        "targetSection": "slides",
+        "comment": "补充课堂练习或总结页，让演示结构更完整。",
+        "defaultReviewer": "teacher_1",
+        "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind ppt --reviewer teacher_1 --comment \"补充课堂练习或总结页，让演示结构更完整。\" --target-section slides",
+        "requiresNewLlmRequest": false,
+        "keepsWaitingReview": true,
+        "autoPublishAllowed": false
+      }
+    ]
+  },
+  "reviewIssues": [
+    {
+      "id": "lab_objective_depth",
+      "severity": "MEDIUM",
+      "kind": "lab",
+      "field": "$.spec.objectives",
+      "message": "实验学习目标偏少，审核时较难判断知识点覆盖面。",
+      "suggestedAction": "补充至少 2 个可观察、可验收的学习目标。",
+      "targetSection": "objectives"
+    },
+    {
+      "id": "grading_sandbox_execution_required",
+      "severity": "MEDIUM",
+      "kind": "grading",
+      "field": "$.spec.checks",
+      "message": "评分包含需要受控沙箱执行的检查类型：stdout_contains。",
+      "suggestedAction": "进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。",
+      "targetSection": "assessmentPlan"
+    },
+    {
+      "id": "ppt_slide_depth",
+      "severity": "LOW",
+      "kind": "ppt",
+      "field": "$.spec.slides",
+      "message": "PPT 页数偏少，可能不足以覆盖导入、讲解、示例、练习和总结。",
+      "suggestedAction": "补充课堂练习或总结页，让演示结构更完整。",
+      "targetSection": "slides"
+    }
+  ],
+  "revisionSuggestions": [
+    {
+      "id": "revise_lab_objective_depth",
+      "kind": "lab",
+      "targetSection": "objectives",
+      "comment": "补充至少 2 个可观察、可验收的学习目标。",
+      "defaultReviewer": "teacher_1",
+      "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind lab --reviewer teacher_1 --comment \"补充至少 2 个可观察、可验收的学习目标。\" --target-section objectives",
+      "requiresNewLlmRequest": false,
+      "keepsWaitingReview": true,
+      "autoPublishAllowed": false
+    },
+    {
+      "id": "revise_grading_sandbox_execution_required",
+      "kind": "grading",
+      "targetSection": "assessmentPlan",
+      "comment": "进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。",
+      "defaultReviewer": "teacher_1",
+      "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind grading --reviewer teacher_1 --comment \"进入真实执行前先绑定受控沙箱、超时和网络/文件系统限制。\" --target-section assessmentPlan",
+      "requiresNewLlmRequest": false,
+      "keepsWaitingReview": true,
+      "autoPublishAllowed": false
+    },
+    {
+      "id": "revise_ppt_slide_depth",
+      "kind": "ppt",
+      "targetSection": "slides",
+      "comment": "补充课堂练习或总结页，让演示结构更完整。",
+      "defaultReviewer": "teacher_1",
+      "safeCommandExample": "python lab_cli.py review real-dsl-revision --kind ppt --reviewer teacher_1 --comment \"补充课堂练习或总结页，让演示结构更完整。\" --target-section slides",
+      "requiresNewLlmRequest": false,
+      "keepsWaitingReview": true,
+      "autoPublishAllowed": false
+    }
+  ],
+  "labReview": {
+    "path": "examples/output/real-llm-lab.json",
+    "id": "ai-tools-intro-lab",
+    "title": "AI 工具应用入门实验",
+    "durationMinutes": 60,
+    "difficulty": "beginner",
+    "targetUsers": [
+      "高职学生"
+    ],
+    "objectives": [
+      "完成真实 LLM 生成内容的人工审核演示"
+    ],
+    "environment": {
+      "type": "notebook",
+      "image": "python:3.11"
+    },
+    "materials": [
+      {
+        "type": "markdown",
+        "path": "examples/input/demo-source.md"
+      }
+    ],
+    "steps": [
+      {
+        "id": "step-1",
+        "title": "检查开发环境",
+        "instructionPreview": "1. 打开你的代码编辑器（如 VS Code）。\n2. 确认已安装必要的编程语言运行时（如 Python 或 Node.js）。\n3. 确认网络连接正常，以便后续访问 AI 服务。",
+        "expectedResult": "编辑器可正常启动，终端可执行基本命令（如 `python --version` 或 `node --version`）且无报错。"
+      },
+      {
+        "id": "step-2",
+        "title": "阅读并分析示例代码",
+        "instructionPreview": "1. 创建一个名为 `calculator.py` 的新文件。\n2. 输入以下示例代码：\n```python\ndef add(a, b):\n    return a + b\n\ndef subtract(a, b):\n    return a - b\n\n# 这是一个待完成的函数\ndef multiply(a, b):\n    # 请使用 AI 助手来补全这个函数\n    pass\n\nresult = add(10, 5)\nprint...",
+        "expectedResult": "文件创建成功，代码结构清晰，包含一个未完成的 `multiply` 函数。"
+      },
+      {
+        "id": "step-3",
+        "title": "使用 AI 辅助修改代码",
+        "instructionPreview": "1. 选中 `multiply` 函数的 `pass` 语句。\n2. 使用你的 AI 编程助手（如 GitHub Copilot、Cursor 或内置 AI 功能）获取代码补全建议。\n3. 观察 AI 提供的建议，选择并采纳一个正确的 `multiply` 函数实现。\n4. 在代码末尾添加一行，调用 `multiply(3, 4)` 并打印结果。",
+        "expectedResult": "`multiply` 函数被正确补全（应包含 `return a * b` 或类似逻辑），代码末尾新增了乘法运算的打印语句。"
+      },
+      {
+        "id": "step-4",
+        "title": "运行测试并验证结果",
+        "instructionPreview": "1. 在终端中运行命令 `python calculator.py`。\n2. 观察程序输出。\n3. 验证 `add`、`subtract`（如果调用）和 `multiply` 函数的结果是否符合预期。",
+        "expectedResult": "程序成功运行，输出应包含类似以下内容：\n`10 + 5 = 15`\n`3 * 4 = 12`"
+      }
+    ]
+  },
+  "examReview": {
+    "sourceDslPath": "examples/output/real-llm-exam.json",
+    "candidatePreviewPath": "examples/output/real-llm-demo-candidate-preview.json",
+    "id": "exam_real_llm_demo",
+    "title": "AI 工具应用入门考核",
+    "questionType": "coding_task",
+    "totalScore": 100,
+    "candidateQuestions": [
+      {
+        "id": "q1",
+        "title": "审核状态确认",
+        "stemPreview": "请说明生成内容为什么必须进入 WAITING_REVIEW。",
+        "blankCodePresent": false,
+        "score": 100,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false
+      }
+    ],
+    "teacherQuestionRefs": [
+      {
+        "id": "q1",
+        "title": "审核状态确认",
+        "score": 100,
+        "gradingRefPreview": "check_waiting_review",
+        "teacherOnly": true,
+        "candidateVisible": false
+      }
+    ],
+    "candidateSafety": {
+      "answersRemoved": true,
+      "answerVisibleToCandidate": false,
+      "gradingRefVisibleToCandidate": false,
+      "removedFields": [
+        "questions[].gradingRef"
+      ],
+      "answerLeakDetected": false
+    }
+  },
+  "gradingReview": {
+    "path": "examples/output/real-llm-grading.json",
+    "normalizedPath": "examples/output/real-llm-demo-grading-normalized.json",
+    "precheckPath": "examples/output/real-llm-demo-grading-precheck.json",
+    "id": "grading_real_llm_demo",
+    "title": "真实 LLM Demo 评分",
+    "sourceExamId": "exam_real_llm_demo",
+    "totalScore": 100,
+    "assessmentPlan": [
+      {
+        "checkId": "check_waiting_review",
+        "type": "stdout_contains",
+        "runner": "StdoutContainsGrader",
+        "score": 100,
+        "inputSummary": "Check that running 'python calculator.py' produces the expected addition and multiplication outputs.",
+        "strategy": "MOCK_PLAN_ONLY",
+        "requiredLimits": {
+          "cpu": "1",
+          "memory": "256MB",
+          "timeout": "30s",
+          "network": "disabled_by_default",
+          "filesystem": "read-write",
+          "process": "single"
+        },
+        "mockEvidenceStatus": "MOCK_EVIDENCE_NOT_COLLECTED",
+        "sandboxRequiredBeforeRealExecution": true,
+        "riskLevel": "low"
+      }
+    ],
+    "checks": [
+      {
+        "id": "check_waiting_review",
+        "type": "stdout_contains",
+        "score": 100,
+        "commandPreview": "python calculator.py",
+        "expected": [
+          "10 + 5 = 15",
+          "3 * 4 = 12"
+        ],
+        "commandExecutionAllowedFromPage": false
+      }
+    ],
+    "precheckStatus": "READY_FOR_MANUAL_SANDBOX_REVIEW",
+    "realSandboxExecutionAllowedFromPage": false,
+    "commandExecutionAllowedFromPage": false
+  },
+  "pptReview": {
+    "sourceDslPath": "examples/output/real-llm-ppt.json",
+    "artifactPath": "examples/output/real-llm-demo-ppt-artifact.pptx",
+    "manifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
+    "firstSlidePreviewPath": "examples/output/real-llm-demo-ppt-artifact-slide-01.png",
+    "title": "AI 工具应用入门演示",
+    "audience": "高职学生",
+    "durationMinutes": 5,
+    "theme": {
+      "style": "professional",
+      "language": "中文"
+    },
+    "slideTotal": 4,
+    "slides": [
+      {
+        "index": 1,
+        "id": "slide_title",
+        "type": "title",
+        "title": "AI 工具应用入门",
+        "bulletCount": 0,
+        "bullets": [],
+        "reviewStatus": "NEEDS_REVIEW"
+      },
+      {
+        "index": 2,
+        "id": "slide_goals",
+        "type": "content",
+        "title": "学习目标",
+        "bulletCount": 3,
+        "bullets": [
+          "理解 AI 编程助手的核心用途",
+          "通过实践完成一次代码修改",
+          "验证 AI 辅助生成的代码结果"
+        ],
+        "reviewStatus": "NEEDS_REVIEW"
+      },
+      {
+        "index": 3,
+        "id": "slide_steps",
+        "type": "content",
+        "title": "实验步骤概览",
+        "bulletCount": 4,
+        "bullets": [
+          "第一步：检查开发环境",
+          "第二步：阅读并分析示例代码",
+          "第三步：使用 AI 辅助修改代码",
+          "第四步：运行测试并验证结果"
+        ],
+        "reviewStatus": "NEEDS_REVIEW"
+      },
+      {
+        "index": 4,
+        "id": "slide_summary",
+        "type": "summary",
+        "title": "核心要点回顾",
+        "bulletCount": 3,
+        "bullets": [
+          "AI 助手能快速补全或生成代码",
+          "所有生成内容必须经过人工审核（WAITING_REVIEW）",
+          "通过运行代码验证功能正确性"
+        ],
+        "reviewStatus": "NEEDS_REVIEW"
+      }
+    ],
+    "pageReviewActionVisible": true
+  },
+  "safety": {
+    "answerVisibleToCandidate": false,
+    "gradingRefVisibleToCandidate": false,
+    "teacherOnlyGradingRefVisibleInReview": true,
+    "commandExecutedFromPage": false,
+    "realSandboxRunEnabled": false,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false,
+    "secretVisibleInFrontend": false
+  },
+  "traceId": "trace_f4bc67096138"
+}

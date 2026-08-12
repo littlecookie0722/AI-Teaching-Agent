@@ -1,0 +1,160 @@
+{
+  "workflowId": "phase2_real_llm_demo_acceptance",
+  "mode": "REAL_LLM_DEMO_ACCEPTANCE_STATIC",
+  "sourceBundleMode": "REAL_LLM_DEMO_REPLAY_AND_READONLY_SANDBOX_BUNDLE",
+  "bundlePath": "examples/output/real-llm-demo-bundle.json",
+  "outputPath": "examples/output/real-llm-demo-acceptance-summary.json",
+  "route": "/real-demo -> /review-center -> /ppt/:id/review -> /grading/:id/report",
+  "sources": {
+    "bundle": "examples/output/real-llm-demo-bundle.json",
+    "realDemo": "frontend/mock-data.json.realDemoPrototype",
+    "reviewCenter": "frontend/mock-data.json.reviewCenterPrototype.realDemoReviewQueue",
+    "reviewTaskSummary": "reviewTaskSummary.realDemoReviewQueue",
+    "mcpContract": "mcp-server/tools.manifest.json.get_review_task_summary.outputContract.realDemoReviewQueue",
+    "gradingReport": "frontend/mock-data.json.gradingReportPrototype.readonlyReportDetailSummary"
+  },
+  "signals": {
+    "dslValidatedTotal": 4,
+    "waitingReviewDslTotal": 4,
+    "realDemoReviewQueueTaskTotal": 4,
+    "reviewCenterLinked": true,
+    "mcpOutputContractIncludesRealDemoReviewQueue": true,
+    "readonlyEvidenceCollectedTotal": 2,
+    "readonlyEvidenceDemoEarnedScore": 70,
+    "controlledDockerEvidenceEarnedScore": 40,
+    "notebookStaticEvidenceEarnedScore": 60,
+    "gradingEvidenceCoverageEarnedScore": 100,
+    "gradingEvidenceCoverageTotalScore": 100,
+    "gradingEvidenceCoveragePercent": 100.0,
+    "gradingEvidenceCoverageStatus": "GRADING_EVIDENCE_COVERAGE_COMPLETE",
+    "pptxArtifactGenerated": true,
+    "pptPageReviewActionVisible": true,
+    "reviewRequiredBeforePublish": true,
+    "candidatePreviewAnswerSafe": true,
+    "answerVisibleToCandidate": false
+  },
+  "safety": {
+    "realLlmCalledInSourceBundle": true,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "autoApproveAllowed": false,
+    "batchStateChangeAllowed": false,
+    "realPublishAllowed": false,
+    "contestantCodeExecuted": false,
+    "commandExecuted": false,
+    "pytestExecuted": false,
+    "notebookExecuted": false
+  },
+  "gradingEvidenceCoverage": {
+    "status": "GRADING_EVIDENCE_COVERAGE_COMPLETE",
+    "source": "controlledDockerEvidenceDemo + notebookEvidenceReviewPlan",
+    "controlledDockerReportPath": "examples/output/mimo-real-demo-controlled-sandbox-report.json",
+    "notebookStaticReportPath": "examples/output/mimo-real-demo-notebook-static-report.json",
+    "coveredCheckIds": [
+      "check_q1",
+      "check_q4"
+    ],
+    "staticNotebookCheckIds": [
+      "check_q2",
+      "check_q3"
+    ],
+    "coveredCheckTypes": [
+      "stdout_contains",
+      "pytest",
+      "notebook_cell"
+    ],
+    "controlledDockerScore": 40,
+    "controlledDockerTotal": 40,
+    "notebookStaticScore": 60,
+    "notebookStaticTotal": 60,
+    "earnedScore": 100,
+    "totalScore": 100,
+    "coveragePercent": 100.0,
+    "manualReviewRequired": true,
+    "autoApproveAllowed": false,
+    "realPublishAllowed": false,
+    "safety": {
+      "sourceGradingModified": false,
+      "hostExecutionAllowed": false,
+      "networkEnabled": false,
+      "notebookKernelStarted": false,
+      "notebookExecuted": false,
+      "autoApproveAllowed": false,
+      "realPublishAllowed": false
+    }
+  },
+  "steps": [
+    {
+      "id": "real_demo_bundle_valid",
+      "title": "Real LLM demo bundle validated",
+      "source": "examples/output/real-llm-demo-bundle.json",
+      "passed": true,
+      "expectedSignal": "Four generated DSL artifacts are schema validated and WAITING_REVIEW.",
+      "command": "python lab_cli.py phase2 demo-bundle report --file examples/output/real-llm-demo-bundle.json"
+    },
+    {
+      "id": "real_demo_page_visible",
+      "title": "Real demo page links core business path",
+      "source": "frontend/mock-data.json.realDemoPrototype.coreBusinessDemoPath",
+      "passed": true,
+      "expectedSignal": "CoreBusinessDemoPath is available and keeps manual review required.",
+      "route": "/real-demo"
+    },
+    {
+      "id": "review_center_real_demo_queue_visible",
+      "title": "Review center exposes real demo queue",
+      "source": "frontend/mock-data.json.reviewCenterPrototype.realDemoReviewQueue",
+      "passed": true,
+      "expectedSignal": "Review queue shows four WAITING_REVIEW artifacts and disables batch state changes.",
+      "route": "/review-center",
+      "command": "python lab_cli.py review batch-summary"
+    },
+    {
+      "id": "mcp_get_review_task_summary_contract_visible",
+      "title": "MCP review task summary contract includes real demo queue",
+      "source": "mcp-server/tools.manifest.json.get_review_task_summary.outputContract.realDemoReviewQueue",
+      "passed": true,
+      "expectedSignal": "MCP output contract requires realDemoReviewQueue and fixed safety fields.",
+      "command": "python lab_cli.py mcp call --tool get_review_task_summary --arguments \"{}\""
+    },
+    {
+      "id": "grading_report_readonly_report_detail_visible",
+      "title": "Grading report shows readonly evidence detail",
+      "source": "frontend/mock-data.json.realDemoPrototype.readonlyEvidenceDemo.reportDetail",
+      "passed": true,
+      "expectedSignal": "Readonly evidence report detail is collected and reused by grading report.",
+      "route": "/grading/:id/report"
+    },
+    {
+      "id": "grading_evidence_coverage_complete",
+      "title": "Grading evidence coverage reaches 100 points",
+      "source": "controlledDockerEvidenceDemo + notebookEvidenceReviewPlan",
+      "passed": true,
+      "expectedSignal": "Controlled Docker evidence covers 40 points and static Notebook evidence covers 60 points.",
+      "route": "/grading/:id/report",
+      "command": "python lab_cli.py grade sandbox-run --grading examples/output/mimo-real-demo-notebook-static-plan.json --submission examples/submissions/real-demo-notebook --output examples/output/mimo-real-demo-notebook-static-report.json"
+    },
+    {
+      "id": "ppt_artifact_review_action_visible",
+      "title": "PPT artifact is visible for page-level review",
+      "source": "frontend/mock-data.json.reviewCenterPrototype.realDemoReviewQueue.items[ppt]",
+      "passed": true,
+      "expectedSignal": "PPTX artifact remains WAITING_REVIEW and page review action is visible.",
+      "route": "/ppt/:id/review"
+    }
+  ],
+  "acceptance": {
+    "passed": true,
+    "passedCount": 7,
+    "total": 7,
+    "failedStepIds": []
+  },
+  "recommendedCommands": [
+    "start ./frontend/real-demo.html",
+    "start ./frontend/review-center.html",
+    "python lab_cli.py review batch-summary",
+    "python lab_cli.py mcp call --tool get_review_task_summary --arguments \"{}\"",
+    "start ./frontend/grading-report.html"
+  ]
+}

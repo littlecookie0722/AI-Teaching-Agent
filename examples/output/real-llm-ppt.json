@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "kind": "PPT",
+  "status": "WAITING_REVIEW",
+  "metadata": {
+    "title": "AI 工具应用入门演示",
+    "audience": "高职学生",
+    "durationMinutes": 5,
+    "id": "ppt_real_llm_demo"
+  },
+  "spec": {
+    "theme": {
+      "style": "professional",
+      "language": "中文"
+    },
+    "slides": [
+      {
+        "id": "slide_title",
+        "type": "title",
+        "title": "AI 工具应用入门"
+      },
+      {
+        "id": "slide_goals",
+        "type": "content",
+        "title": "学习目标",
+        "bullets": [
+          "理解 AI 编程助手的核心用途",
+          "通过实践完成一次代码修改",
+          "验证 AI 辅助生成的代码结果"
+        ]
+      },
+      {
+        "id": "slide_steps",
+        "type": "content",
+        "title": "实验步骤概览",
+        "bullets": [
+          "第一步：检查开发环境",
+          "第二步：阅读并分析示例代码",
+          "第三步：使用 AI 辅助修改代码",
+          "第四步：运行测试并验证结果"
+        ]
+      },
+      {
+        "id": "slide_summary",
+        "type": "summary",
+        "title": "核心要点回顾",
+        "bullets": [
+          "AI 助手能快速补全或生成代码",
+          "所有生成内容必须经过人工审核（WAITING_REVIEW）",
+          "通过运行代码验证功能正确性"
+        ]
+      }
+    ]
+  }
+}

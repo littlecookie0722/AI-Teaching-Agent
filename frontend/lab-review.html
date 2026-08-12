@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 1 Lab Review Mock</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d7dde6;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --warn: #b45309;
+      --danger: #991b1b;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.strong {
+      border-color: #99f6e4;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .pill.blocked {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    .metric,
+    .card,
+    .timeline,
+    .dsl-preview {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 12px;
+    }
+
+    .kv {
+      display: grid;
+      gap: 7px;
+    }
+
+    .kv p {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #eef2f7;
+      padding-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .kv p:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .kv strong,
+    .mono {
+      color: var(--text);
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+
+    .metric span,
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong,
+    .card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .content-grid > * {
+      min-width: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 0 0 8px 8px;
+      background: var(--code);
+      color: #d1fae5;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .timeline ol {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 14px 14px 14px 34px;
+    }
+
+    .timeline li {
+      padding-left: 4px;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.danger {
+      border-color: #fecaca;
+      color: var(--danger);
+    }
+
+    button:disabled {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ok {
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .danger-text {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .patch-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .patch-list li {
+      padding: 4px 8px;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      background: #f0fdf4;
+      color: #166534;
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 1080px) {
+      header,
+      .summary-grid,
+      .signal-grid,
+      .content-grid,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      main {
+        padding: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Lab 审核详情 Mock</h1>
+      <p class="pill strong">MOCK_ONLY</p>
+    </div>
+    <div class="pill-row" aria-label="Phase 1 safety state">
+      <span class="pill">真实大模型结果：只读</span>
+      <span class="pill">真实云资源：禁用</span>
+      <span class="pill">providerSummary：只读</span>
+      <span class="pill">qualitySummary：只读</span>
+      <span class="pill">qualitySignals：只读</span>
+      <span class="pill">自动发布：禁用</span>
+      <span class="pill">真实发布：禁用</span>
+      <span class="pill">批量状态变更：禁用</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="pill-row" aria-label="Review detail runtime data state">
+      <span class="pill strong" id="review-detail-api-status">STATIC_HTML_FALLBACK</span>
+      <span class="pill" id="review-detail-api-source">static HTML</span>
+      <span class="pill" id="review-detail-api-detail">api loader keeps actions read-only</span>
+      <span class="pill" id="review-detail-selected-task">task_lab_demo</span>
+    </div>
+
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <div>
+          <h2 id="summary-title">审核任务</h2>
+          <p>GET /api/review-tasks/{id}</p>
+        </div>
+        <span class="pill warn" id="review-detail-status">WAITING_REVIEW</span>
+      </div>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Task ID</span>
+          <strong id="review-detail-task-id">task_lab_demo</strong>
+        </div>
+        <div class="metric">
+          <span>Task Type</span>
+          <strong id="review-detail-task-type">LAB_GENERATION</strong>
+        </div>
+        <div class="metric">
+          <span>Artifact</span>
+          <strong id="review-detail-artifact-total">2</strong>
+        </div>
+        <div class="metric">
+          <span>Risk Count</span>
+          <strong class="ok">0</strong>
+        </div>
+        <div class="metric">
+          <span>Quality Signals</span>
+          <strong>NEEDS_REVIEW</strong>
+        </div>
+        <div class="metric">
+          <span>Publish</span>
+          <strong class="danger-text">blocked</strong>
+        </div>
+      </div>
+      <div class="signal-grid" aria-label="Lab generation review evidence">
+        <div class="card">
+          <h3>generationProfile</h3>
+          <div class="kv">
+            <p><span>targetUsers</span><strong>高职学生, 教师</strong></p>
+            <p><span>durationMinutes</span><strong>90</strong></p>
+            <p><span>difficulty</span><strong>intermediate</strong></p>
+            <p><span>teachingStyle</span><strong>project_based</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>qualitySignals.lab.matching</h3>
+          <div class="kv">
+            <p><span>matching.status</span><strong>NEEDS_REVIEW</strong></p>
+            <p><span>targetUsers.matched</span><strong>false</strong></p>
+            <p><span>durationMinutes.matched</span><strong>false</strong></p>
+            <p><span>stepGranularity.matched</span><strong>true</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>providerSummary</h3>
+          <div class="kv">
+            <p><span>providerAdapters</span><strong>openai_responses_sdk_adapter</strong></p>
+            <p><span>providerIds</span><strong>openai</strong></p>
+            <p><span>realLlmCalled</span><strong>true</strong></p>
+            <p><span>responseIds</span><strong>resp_demo_lab_quality</strong></p>
+            <p><span>apiSurface</span><strong>chat.completions</strong></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>providerSummary.qualitySummary</h3>
+          <div class="kv">
+            <p><span>readyForReview</span><strong class="ok">true</strong></p>
+            <p><span>normalizationApplied</span><strong>true</strong></p>
+            <p><span>normalizationPatchCount</span><strong>1</strong></p>
+            <p><span>schemaRepairApplied</span><strong>false</strong></p>
+            <p><span>requestCount</span><strong>1</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="review-title">
+      <div class="section-head">
+        <div>
+          <h2 id="review-title"><span id="review-detail-title">Lab DSL 审核</span></h2>
+          <p id="review-detail-dsl-path">templates/lab/examples/basic-lab.yaml</p>
+        </div>
+        <span class="pill">trace_demo</span>
+      </div>
+      <div class="content-grid">
+        <div class="dsl-preview">
+          <div class="section-head">
+            <h3 id="review-detail-dsl-title">LabDslPreview</h3>
+            <span class="pill warn" id="review-detail-dsl-status">WAITING_REVIEW</span>
+          </div>
+          <pre id="review-detail-dsl-preview">version: "1.0"
+kind: "Lab"
+metadata:
+  id: "lab_demo"
+  title: "AI 编码助手入门实验"
+  category: "AI 工具应用"
+  difficulty: "beginner"
+status: "WAITING_REVIEW"
+spec:
+  objectives:
+    - "理解 AI 编码助手的基本使用方式"
+    - "掌握用 AI 修改代码的基本流程"
+  materials:
+    - type: "markdown"
+      path: "examples/input/demo-source.md"
+  grading:
+    ref: "grading_demo"</pre>
+        </div>
+
+        <aside class="stack">
+          <div class="card">
+            <h3>审核策略</h3>
+            <p class="ok">reviewRequired=true</p>
+            <p class="ok">rejectRequiresReason=true</p>
+            <p class="ok">auditTrailRequired=true</p>
+            <p class="danger-text">autoPublishAllowed=false</p>
+            <p class="danger-text">realPublishAllowed=false</p>
+          </div>
+          <div class="card">
+            <h3>审核重点</h3>
+            <p>reviewPage.generationProfile.context</p>
+            <p>reviewPage.qualitySignals.materialCoverage.status=LINKED</p>
+            <p>reviewPage.providerSummary.qualitySummary.readyForReview=true</p>
+            <p>reviewPage.providerSummary.calls[0].qualitySummary.normalizationPatchCount=1</p>
+            <p>reviewHighlights：确认课时/难度/技术标签/教学风格是否符合生成参数</p>
+            <p class="danger-text">qualitySummary / qualitySignals 只辅助人工审核，不自动驳回或发布</p>
+          </div>
+          <div class="card">
+            <h3>Provider 调用质量卡片</h3>
+            <div class="kv">
+              <p><span>calls[0].responseId</span><strong>resp_demo_lab_quality</strong></p>
+              <p><span>calls[0].totalTokens</span><strong>1234</strong></p>
+              <p><span>calls[0].apiSurface</span><strong>chat.completions</strong></p>
+              <p><span>calls[0].qualitySummary.readyForReview</span><strong class="ok">true</strong></p>
+              <p><span>calls[0].qualitySummary.schemaRepairApplied</span><strong>false</strong></p>
+            </div>
+            <ul class="patch-list" aria-label="normalization patches">
+              <li>set.metadata.category</li>
+            </ul>
+            <p class="danger-text">autoApproveAllowed=false · autoPublishAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="card">
+            <h3>操作接口</h3>
+            <p>POST /api/ai-tasks/{id}/approve</p>
+            <p>POST /api/ai-tasks/{id}/reject</p>
+            <p>POST /api/review-tasks/{id}/revision-request</p>
+            <p>POST /api/review-tasks/{id}/regenerate-mock</p>
+            <p class="danger-text">mockPublishEnabled=false</p>
+          </div>
+          <div class="card">
+            <h3>修改意见与 Mock 再生成</h3>
+            <p>reviewPage.actionBar.requestRevision.enabled=true</p>
+            <p>reviewRevisionPrototype.revisionRequests[0].priority=HIGH</p>
+            <p>sourceRevisionRequestId=op_audit_review_revision_request_demo</p>
+            <p>newTaskId=task_lab_demo_revision · newTaskStatus=WAITING_REVIEW</p>
+            <p>newDslPath=examples/output/task_lab_demo-lab-revision.json</p>
+            <p class="ok">sourceTaskStatusUnchanged=true</p>
+            <p class="danger-text">newLlmRequestSent=false · realLlmCalled=false · autoApproveAllowed=false · realPublishAllowed=false</p>
+          </div>
+          <div class="card">
+            <h3>来源与产物</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span>inputRef</span>
+                <strong>examples/input/demo-source.md</strong>
+              </div>
+              <div class="field">
+                <span>finalResultPath</span>
+                <strong>templates/lab/examples/basic-lab.yaml</strong>
+              </div>
+              <div class="field">
+                <span>Artifact</span>
+                <strong>LAB_DSL</strong>
+              </div>
+              <div class="field">
+                <span>Material</span>
+                <strong>MATERIAL_ANALYSIS</strong>
+              </div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="section-head">
+              <h3>AiTaskTimeline</h3>
+              <span class="pill">workflow_run_demo</span>
+            </div>
+            <ol id="review-detail-timeline-list">
+              <li>AI Task created：WAITING_REVIEW</li>
+              <li>generate_lab_dsl：COMPLETED</li>
+              <li>Artifact LAB_DSL：WAITING_REVIEW</li>
+              <li>REVIEW_REVISION_REQUEST：op_audit_review_revision_request_demo</li>
+              <li>REVIEW_MOCK_REGENERATE：workflow_run_review_mock_regeneration_demo</li>
+            </ol>
+          </div>
+          <div class="card" aria-label="Manual review action panel">
+            <h3>ManualReviewAction</h3>
+            <p class="ok" id="review-action-status">ACTION_STATIC_FALLBACK</p>
+            <p id="review-action-detail">POST /api/ai-tasks/{id}/approve · POST /api/ai-tasks/{id}/reject · rejectRequiresReason=true</p>
+            <div class="field-grid">
+              <label class="field">
+                <span>reviewer</span>
+                <input id="review-action-reviewer" type="text" value="teacher_1" aria-label="reviewer">
+              </label>
+              <label class="field">
+                <span>reject reason</span>
+                <textarea id="review-action-reason" rows="3" aria-label="reject reason">请补充人工审核意见后再驳回</textarea>
+              </label>
+            </div>
+            <p class="danger-text">autoPublishAllowed=false · realPublishAllowed=false · commandExecutedFromPage=false</p>
+          </div>
+          <div class="card" aria-label="Platform import preview action panel">
+            <h3>AgentImportPreviewAction</h3>
+            <p class="ok" id="agent-import-preview-status">IMPORT_PREVIEW_STATIC_FALLBACK</p>
+            <p id="agent-import-preview-detail">POST /api/labs/import-preview · requiresApprovedTask=true · databaseWritten=false</p>
+            <button id="agent-import-preview-button" type="button">生成 Lab 平台导入预览</button>
+            <p class="danger-text">realAgentImport=false · realPublishAllowed=false · mockStoreWritten=false</p>
+          </div>
+          <div class="card" aria-label="Platform entity mock import action panel">
+            <h3>AgentEntityMockImportAction</h3>
+            <p class="ok" id="agent-mock-import-status">MOCK_IMPORT_STATIC_FALLBACK</p>
+            <p id="agent-mock-import-detail">POST /api/labs/mock-import · requiresImportPreview=true · mockStoreWritten=true</p>
+            <button id="agent-mock-import-button" type="button" disabled>Mock 入库 Lab 草稿</button>
+            <a class="pill strong" id="agent-mock-import-link" href="agent-entities.html?entityKind=lab">查看平台实体页</a>
+            <p class="danger-text">databaseWritten=false · realAgentImport=false · realPublish=false</p>
+          </div>
+        </aside>
+      </div>
+      <div class="action-bar">
+        <button class="primary" type="button" title="Mock approve requires reviewer" data-review-action="approve">通过</button>
+        <button class="danger" type="button" title="Mock reject requires reviewer and reason" data-review-action="reject">驳回</button>
+        <button type="button" title="Mock regenerate requires reviewer and revision request">Mock 再生成</button>
+        <button type="button" disabled title="Phase 1 禁止 Mock publish 之前绕过审核">Mock 发布</button>
+        <button type="button" disabled title="Phase 1 禁止真实发布">真实发布</button>
+        <button type="button" disabled title="Phase 1 禁止批量状态变更">批量审核</button>
+      </div>
+    </section>
+  </main>
+  <script src="review-detail-data.js" data-review-kind="lab" data-default-task-id="task_lab_demo"></script>
+  <script src="review-action-data.js"></script>
+  <script src="review-import-preview-data.js" data-import-kind="lab"></script>
+</body>
+</html>

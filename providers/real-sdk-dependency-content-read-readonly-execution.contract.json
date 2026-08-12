@@ -1,0 +1,172 @@
+{
+  "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+  "gateId": "real_sdk_dependency_content_read_readonly_execution",
+  "phase": "Phase 1",
+  "targetPhase": "Phase 2",
+  "mode": "MOCK_ONLY",
+  "activeProvider": "mock",
+  "supportedProvider": "openai",
+  "targetPackage": "openai",
+  "description": "Reviewed readonly dependency manifest and lockfile content read with redacted preview only. It may read allowlisted local dependency files after final confirmation, but must not return raw dependency content, persist content or records, write artifacts, generate patches, materialize or execute commands, install packages, import SDKs, check secrets, use network access, call real LLMs, or publish content.",
+  "inputs": [
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_module",
+      "path": "providers/real_sdk_dependency_content_read_readonly_execution.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_readonly_execution_contract",
+      "path": "providers/real-sdk-dependency-content-read-readonly-execution.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_module",
+      "path": "providers/real_sdk_dependency_content_read_final_confirmation.py",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "real_sdk_dependency_content_read_final_confirmation_contract",
+      "path": "providers/real-sdk-dependency-content-read-final-confirmation.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "provider_contract",
+      "path": "providers/provider.contract.json",
+      "required": true,
+      "localOnly": true
+    },
+    {
+      "id": "runtime_contract",
+      "path": "config/runtime.contract.json",
+      "required": true,
+      "localOnly": true
+    }
+  ],
+  "entrypoints": [
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-content-read-readonly-execution describe",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "contentReadReadonlyExecutionOnly": true,
+        "contentReadReadonlyExecutionModelReady": false,
+        "dependencyContentReadExecuted": false,
+        "dependencyContentReturned": false,
+        "rawDependencyContentReturned": false
+      }
+    },
+    {
+      "command": "python lab_cli.py provider real-sdk-dependency-content-read-readonly-execution read --provider openai",
+      "cwd": "cli",
+      "expectedCode": "OK",
+      "expectedFlags": {
+        "contentReadFinalConfirmationModelReady": false,
+        "contentReadReadonlyExecutionModelReady": false,
+        "dependencyContentReadExecuted": false,
+        "dependencyContentReturned": false,
+        "rawDependencyContentReturned": false,
+        "commandExecuted": false
+      }
+    }
+  ],
+  "allowedScope": {
+    "provider": "openai",
+    "operation": "generateJson",
+    "promptId": "lab_generation_v0",
+    "outputKind": "Lab",
+    "inputRef": "examples/input/demo-source.md",
+    "generatedStatus": "WAITING_REVIEW",
+    "allowlistedFiles": [
+      "pyproject.toml",
+      "requirements.txt",
+      "uv.lock",
+      "poetry.lock",
+      "requirements.lock"
+    ]
+  },
+  "requiredContext": {
+    "contentReadFinalConfirmationRequired": true,
+    "contentReadFinalConfirmationModelReady": false,
+    "contentReadReadonlyExecutionOnly": true,
+    "contentReadReadonlyExecutionModelReady": false,
+    "dependencyContentReadAuthorized": false,
+    "dependencyContentReadExecuted": false,
+    "dependencyContentReturned": false,
+    "rawDependencyContentReturned": false,
+    "redactedDependencyContentPreviewReturned": false,
+    "dependencyContentPersisted": false,
+    "contentReadReadonlyExecutionRecordPersisted": false,
+    "contentReadReadonlyExecutionArtifactWritten": false,
+    "commandExecuted": false,
+    "dependencyFileMutationAuthorized": false,
+    "dependencyFileChanged": false,
+    "patchGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realCallAfterContentReadReadonlyExecutionAuthorized": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
+  "blockedOperations": [
+    "return_raw_dependency_content",
+    "persist_dependency_content",
+    "write_content_read_artifact",
+    "persist_content_read_record",
+    "write_dependency_manifest",
+    "write_dependency_lockfile",
+    "generate_dependency_patch",
+    "materialize_patch_file",
+    "apply_dependency_patch",
+    "materialize_install_command",
+    "execute_command",
+    "execute_install_command",
+    "install_sdk_dependency",
+    "download_sdk_package",
+    "import_real_sdk",
+    "create_real_client",
+    "check_secret_presence",
+    "read_secret_value",
+    "network_call",
+    "generate_real_content",
+    "call_real_llm_after_content_read",
+    "auto_publish"
+  ],
+  "recommendedCommandIds": [
+    "test_real_sdk_dependency_content_read_readonly_execution",
+    "test_real_sdk_dependency_content_read_final_confirmation",
+    "test_phase5_mock_baseline",
+    "test_all"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "readonlyReadAllowedAfterConfirmation": true,
+    "redactedPreviewOnly": true,
+    "rawDependencyContentReturned": false,
+    "dependencyContentPersisted": false,
+    "contentReadReadonlyExecutionRecordPersisted": false,
+    "contentReadReadonlyExecutionArtifactWritten": false,
+    "commandExecuted": false,
+    "dependencyFileChanged": false,
+    "patchGenerated": false,
+    "dependencyInstallExecuted": false,
+    "sdkDependencyInstalled": false,
+    "sdkImported": false,
+    "clientCreated": false,
+    "secretPresenceChecked": false,
+    "secretValueRead": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

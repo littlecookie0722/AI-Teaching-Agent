@@ -1,0 +1,428 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 1",
+  "mode": "MOCK_ONLY",
+  "description": "Runtime configuration contract for Phase 1. Real providers must remain disabled unless a later phase explicitly enables them.",
+  "envExamplePath": ".env.example",
+  "defaults": {
+    "APP_PHASE": "Phase 1",
+    "APP_MODE": "MOCK_ONLY",
+    "ENABLE_REAL_LLM": "false",
+    "ENABLE_REAL_PROVIDER_PREFLIGHT": "false",
+    "ENABLE_REAL_CLOUD": "false",
+    "ENABLE_REAL_SANDBOX": "false",
+    "ENABLE_AUTO_PUBLISH": "false",
+    "ENABLE_REAL_LLM_SDK_BOUNDARY": "false",
+    "ENABLE_REAL_LLM_SDK_CLIENT_BOUNDARY": "false",
+    "ENABLE_REAL_LLM_REQUEST_REVIEW_PACKAGE": "false",
+    "ENABLE_REAL_LLM_FIRST_CALL_APPROVAL_GATE": "false",
+    "ENABLE_REAL_LLM_FIRST_CALL_EXECUTOR_DISABLED": "false",
+    "ENABLE_REAL_LLM_PRE_SEND_DRY_RUN_RECORD": "false",
+    "ENABLE_REAL_LLM_MINIMAL_CALL_POC_REVIEW": "false",
+    "ENABLE_REAL_LLM_MINIMAL_CALL_SEND_EXECUTOR_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_PACKAGE": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTION_REQUEST_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_FINAL_APPROVAL_REVIEW": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_TASK_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_RECORD_WRITE_GATE": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_RUNTIME_GATE_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_CREATION_GATE_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_DISPATCH_GATE_DISABLED": "false",
+    "ENABLE_REAL_LLM_REQUEST_SEND_ATTEMPT_GATE_DISABLED": "false",
+    "REAL_LLM_DRY_RUN_ONLY": "true"
+  },
+  "variables": [
+    {
+      "name": "APP_PHASE",
+      "required": true,
+      "secret": false,
+      "default": "Phase 1",
+      "allowedValues": ["Phase 1"]
+    },
+    {
+      "name": "APP_MODE",
+      "required": true,
+      "secret": false,
+      "default": "MOCK_ONLY",
+      "allowedValues": ["MOCK_ONLY"]
+    },
+    {
+      "name": "LAB_CLI_STORE",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Optional local JSON store path for CLI and Backend Mock."
+    },
+    {
+      "name": "ENABLE_REAL_LLM",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"]
+    },
+    {
+      "name": "ENABLE_REAL_PROVIDER_PREFLIGHT",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"]
+    },
+    {
+      "name": "ENABLE_REAL_CLOUD",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"]
+    },
+    {
+      "name": "ENABLE_REAL_SANDBOX",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"]
+    },
+    {
+      "name": "ENABLE_AUTO_PUBLISH",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"]
+    },
+    {
+      "name": "ENABLE_REAL_LLM_SDK_BOUNDARY",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real SDK boundary; CLI still requires explicit command opt-in."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_SDK_CLIENT_BOUNDARY",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real SDK client construction boundary; CLI still requires explicit command opt-in and confirmations."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_REVIEW_PACKAGE",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request review package; CLI still requires explicit command opt-in and confirmations and does not send requests."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_FIRST_CALL_APPROVAL_GATE",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM first-call approval gate; CLI still requires explicit confirmations and does not send requests."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_FIRST_CALL_EXECUTOR_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM first-call disabled executor; CLI still requires explicit confirmations and does not dispatch or send requests."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_PRE_SEND_DRY_RUN_RECORD",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM pre-send dry-run record; CLI still requires explicit confirmations and does not execute dry-runs, write records, dispatch, or send requests."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_MINIMAL_CALL_POC_REVIEW",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM minimal call PoC implementation review; CLI still requires explicit confirmations and does not send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_MINIMAL_CALL_SEND_EXECUTOR_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM minimal call disabled send executor; CLI still requires explicit confirmations and does not materialize executors, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_PACKAGE",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send authorization package; CLI still requires explicit confirmations and does not grant approval, authorize real calls, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTION_REQUEST_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send execution request disabled model; CLI still requires explicit confirmations and does not persist, queue, dispatch, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send executor disabled model; CLI still requires explicit confirmations and does not create, start, run, dispatch, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_FINAL_APPROVAL_REVIEW",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send final approval review model; CLI still requires explicit confirmations and does not grant approval, authorize real calls, write approval records, dispatch executors, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_TASK_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send authorization task disabled model; CLI still requires explicit confirmations and does not create, persist, queue, or dispatch tasks, write authorization records, grant approval, authorize real calls, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_AUTHORIZATION_RECORD_WRITE_GATE",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send authorization record write gate; CLI still requires explicit confirmations and does not write authorization or approval records, grant approval, authorize real calls, dispatch executors, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_RUNTIME_GATE_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send runtime gate disabled model; CLI still requires explicit confirmations and does not open runtime gates, disable kill switches, reserve budget, open network egress, create clients or executors, authorize real calls, send requests, read secrets, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_CREATION_GATE_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send executor creation gate disabled model; CLI still requires explicit confirmations and does not materialize factories, create or persist executors, start executors, create runs, dispatch executors, send requests, read secrets, create clients, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_EXECUTOR_DISPATCH_GATE_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send executor dispatch gate disabled model; CLI still requires explicit confirmations and does not write dispatch queues, persist dispatch records, dispatch executors, start executors, create runs, send requests, read secrets, create clients, access network, create tasks, or publish."
+    },
+    {
+      "name": "ENABLE_REAL_LLM_REQUEST_SEND_ATTEMPT_GATE_DISABLED",
+      "required": true,
+      "secret": false,
+      "default": "false",
+      "allowedValues": ["false"],
+      "description": "Documentation-only default for the real LLM request send attempt gate disabled model; CLI still requires explicit confirmations and does not persist attempt records, attempt sends, send requests, read secrets, create clients, access network, call real LLMs, create tasks, or publish."
+    },
+    {
+      "name": "REAL_LLM_DRY_RUN_ONLY",
+      "required": true,
+      "secret": false,
+      "default": "true",
+      "allowedValues": ["true"],
+      "description": "Real LLM boundary must remain dry-run only until a later explicit implementation task."
+    },
+    {
+      "name": "OPENAI_API_KEY",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only"
+    },
+    {
+      "name": "ANTHROPIC_API_KEY",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only"
+    },
+    {
+      "name": "LOCAL_MODEL_ENDPOINT",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only"
+    },
+    {
+      "name": "CLOUD_PROVIDER_TOKEN",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only"
+    },
+    {
+      "name": "DATABASE_URL",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only"
+    },
+    {
+      "name": "OPENAI_MODEL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Future OpenAI model alias placeholder; not used by the current boundary check."
+    },
+    {
+      "name": "OPENAI_BASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Optional future SDK base URL placeholder; not used by the current boundary check."
+    },
+    {
+      "name": "AGENT_API_BASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Optional real platform draft import API base URL. Only used by the explicit platform-entity import-send PoC."
+    },
+    {
+      "name": "AGENT_API_TOKEN",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only",
+      "description": "Bearer token for the explicit platform-entity import-send PoC. Must never be committed, logged, returned in CLI/API output, or exposed to frontend code."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE",
+      "required": false,
+      "secret": false,
+      "default": "0",
+      "description": "Enable real LLM online smoke test. Set to 1 only for explicit online smoke testing."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE_MODEL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Model name for real LLM online smoke test."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE_BASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Base URL for real LLM online smoke test."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE_API_SURFACE",
+      "required": false,
+      "secret": false,
+      "default": "chat.completions",
+      "description": "API surface for real LLM online smoke test."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE_MAX_OUTPUT_TOKENS",
+      "required": false,
+      "secret": false,
+      "default": "1200",
+      "description": "Max output tokens for real LLM online smoke test."
+    },
+    {
+      "name": "LAB_REAL_LLM_ONLINE_SMOKE_TIMEOUT_SECONDS",
+      "required": false,
+      "secret": false,
+      "default": "60",
+      "description": "Timeout in seconds for real LLM online smoke test."
+    },
+    {
+      "name": "LAB_BACKEND_API_TOKEN",
+      "required": false,
+      "secret": true,
+      "default": "",
+      "phase1Allowed": false,
+      "source": "environment_only",
+      "description": "Bearer token for backend core API. Must never be committed."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_DATABASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Database URL for backend core repository."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_REPOSITORY_KIND",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Repository kind for backend core (sqlite, postgres, mysql)."
+    },
+    {
+      "name": "LAB_BACKEND_GRADING_DB_PATH",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Path to grading database file."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_POSTGRESQL_SMOKE",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Enable PostgreSQL smoke test."
+    },
+    {
+      "name": "LAB_BACKEND_CORE_POSTGRESQL_SMOKE_REVIEWER",
+      "required": false,
+      "secret": false,
+      "default": "",
+      "description": "Reviewer for PostgreSQL smoke test."
+    },
+    {
+      "name": "BACKEND_BASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "http://localhost:8000"
+    },
+    {
+      "name": "FRONTEND_BASE_URL",
+      "required": false,
+      "secret": false,
+      "default": "http://localhost:3000"
+    }
+  ],
+  "blockedConfigValues": [
+    "sk-",
+    "xoxb-",
+    "AKIA",
+    "BEGIN PRIVATE KEY",
+    "password=",
+    "token=",
+    "secret="
+  ],
+  "rules": {
+    "realSecretsMustNotBeCommitted": true,
+    "envFilesOtherThanExampleMustNotBeCommitted": true,
+    "frontendMustNotExposeSecrets": true,
+    "logsMustNotPrintSecrets": true
+  }
+}

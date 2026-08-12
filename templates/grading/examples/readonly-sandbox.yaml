@@ -1,0 +1,134 @@
+version: "1.0"
+kind: "Grading"
+metadata:
+  id: "grading_readonly_sandbox_demo"
+  title: "Readonly Sandbox Demo Grading"
+  sourceExamId: "exam_demo"
+status: "WAITING_REVIEW"
+spec:
+  totalScore: 150
+  timeoutSeconds: 30
+  assessmentPlan:
+    - checkId: "check_result_file"
+      type: "file_exists"
+      runner: "FileExistsGrader"
+      score: 30
+      inputSummary: "Check that result.csv exists in the isolated submission directory"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_accuracy_metric"
+      type: "json_field"
+      runner: "JsonFieldGrader"
+      score: 40
+      inputSummary: "Check metrics.json $.accuracy in the isolated submission directory"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_pytest_deferred"
+      type: "pytest"
+      runner: "PytestGrader"
+      score: 30
+      inputSummary: "Keep pytest deferred until command execution sandbox is implemented"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "limited"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "medium"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_notebook_static"
+      type: "notebook_cell"
+      runner: "NotebookGrader"
+      score: 30
+      inputSummary: "Statically inspect notebooks/analysis.ipynb cell 0 for expected review token"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "none"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+    - checkId: "check_training_log"
+      type: "log_keyword"
+      runner: "LogKeywordGrader"
+      score: 20
+      inputSummary: "Statically scan logs/train.log for expected training completion keyword"
+      executionPlan:
+        strategy: "MOCK_PLAN_ONLY"
+        requiredLimits:
+          cpu: "required"
+          memory: "required"
+          timeout: "30s"
+          network: "disabled_by_default"
+          filesystem: "isolated_workspace_required"
+          process: "none"
+        wouldRunInsideRealSandbox: true
+      mockEvidence:
+        status: "MOCK_EVIDENCE_NOT_COLLECTED"
+      riskLevel: "low"
+      sandboxRequiredBeforeRealExecution: true
+  checks:
+    - id: "check_result_file"
+      type: "file_exists"
+      path: "result.csv"
+      score: 30
+    - id: "check_accuracy_metric"
+      type: "json_field"
+      path: "metrics.json"
+      jsonPath: "$.accuracy"
+      expectedValue: 0.9
+      score: 40
+    - id: "check_notebook_static"
+      type: "notebook_cell"
+      notebookPath: "notebooks/analysis.ipynb"
+      cellIndex: 0
+      expected:
+        - "review-safe notebook evidence"
+      score: 30
+    - id: "check_training_log"
+      type: "log_keyword"
+      path: "logs/train.log"
+      expected:
+        - "training complete"
+      score: 20
+    - id: "check_pytest_deferred"
+      type: "pytest"
+      path: "tests/test_main.py"
+      score: 30

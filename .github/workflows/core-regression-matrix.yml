@@ -1,0 +1,65 @@
+name: Core Regression Matrix
+
+"on":
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/core-regression-matrix.yml"
+      - "quality/**"
+      - "cli/**"
+      - "backend/**"
+      - "frontend/**"
+      - "mcp-server/**"
+      - "mcp_server/**"
+      - "providers/**"
+      - "sandbox/**"
+      - "templates/**"
+      - "examples/input/**"
+      - "tests/**"
+      - "pytest.ini"
+      - "requirements.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  core-regression-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONIOENCODING: "utf-8"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run core regression matrix
+        run: |
+          mkdir -p examples/output
+          python lab_cli.py quality regression-matrix --profile core --stop-on-failure --output examples/output/regression-matrix-core.json | tee examples/output/regression-matrix-core-cli.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("examples/output/regression-matrix-core-cli.json").read_text(encoding="utf-8"))
+          if payload.get("success") is not True:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload regression matrix report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-regression-matrix-report
+          path: |
+            examples/output/regression-matrix-core.json
+            examples/output/regression-matrix-core-cli.json
+          if-no-files-found: ignore

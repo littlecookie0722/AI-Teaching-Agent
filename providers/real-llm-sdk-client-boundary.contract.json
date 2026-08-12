@@ -1,0 +1,55 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2",
+  "mode": "REAL_SDK_CLIENT_BOUNDARY_ONLY",
+  "description": "Real LLM SDK client construction boundary. With explicit operator opt-in it may import the installed OpenAI SDK, read OPENAI_API_KEY only for client construction, and construct a local client object. It must not send model requests, access network, create generated content, create tasks, or publish content.",
+  "supportedProvider": "openai",
+  "dependencyManifestPath": "requirements.txt",
+  "targetPackage": "openai",
+  "sdkImportName": "openai",
+  "clientClass": "OpenAI",
+  "secretEnv": "OPENAI_API_KEY",
+  "envExamplePath": ".env.example",
+  "allowedOperations": [
+    "sdk_import",
+    "secret_value_read_for_client_constructor_only",
+    "client_object_construction"
+  ],
+  "blockedOperations": [
+    "model_request",
+    "network_request",
+    "real_llm_call",
+    "prompt_execution",
+    "content_creation",
+    "task_creation",
+    "auto_publish"
+  ],
+  "rules": {
+    "requiresExplicitSdkBoundaryOptIn": true,
+    "requiresExplicitClientBoundaryOptIn": true,
+    "requiresSdkImportConfirmation": true,
+    "requiresClientConstructionConfirmation": true,
+    "requiresSecretValueHandlingConfirmation": true,
+    "requiresNoNetworkConfirmation": true,
+    "requiresNoRealLlmCallConfirmation": true,
+    "secretValueMustNotBeReturned": true,
+    "secretValueMustNotBeLogged": true,
+    "realCallAuthorized": false,
+    "generatedContentDefaultStatus": "WAITING_REVIEW"
+  },
+  "assertions": {
+    "sdkImportAttempted": true,
+    "sdkImported": true,
+    "clientConstructionAttempted": true,
+    "clientCreated": true,
+    "secretValueRead": true,
+    "secretValueReturned": false,
+    "secretValueLogged": false,
+    "networkAccess": false,
+    "realLlmCalled": false,
+    "generatedContentCreated": false,
+    "taskCreated": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  }
+}

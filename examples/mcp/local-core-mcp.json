@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ai-training-platform-local-core": {
+      "command": "python",
+      "args": ["-m", "mcp_server.stdio_server"],
+      "cwd": "<PROJECT_ROOT>"
+    }
+  }
+}

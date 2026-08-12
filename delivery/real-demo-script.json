@@ -1,0 +1,256 @@
+{
+  "version": "0.1.0",
+  "phase": "Phase 2 Demo",
+  "mode": "REAL_LLM_DEMO_REPLAY_STATIC",
+  "id": "real_demo_script_checklist",
+  "title": "Real LLM Demo Operator Script",
+  "description": "Machine-testable checklist for an operator-led real LLM output demo. It replays existing real DSL artifacts, evidence summaries, and static frontend pages without sending new model requests or publishing generated content.",
+  "inputs": [
+    {
+      "id": "project_rules",
+      "path": "AGENTS.md",
+      "required": true
+    },
+    {
+      "id": "real_demo_bundle_doc",
+      "path": "docs/21_REAL_LLM_DEMO_BUNDLE.md",
+      "required": true
+    },
+    {
+      "id": "real_demo_bundle",
+      "path": "examples/output/real-llm-demo-bundle.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_acceptance_summary",
+      "path": "examples/output/real-llm-demo-acceptance-summary.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_one_click_checklist",
+      "path": "examples/output/real-llm-demo-checklist.json",
+      "required": true
+    },
+    {
+      "id": "real_demo_page",
+      "path": "frontend/real-demo.html",
+      "required": true
+    },
+    {
+      "id": "review_center_page",
+      "path": "frontend/review-center.html",
+      "required": true
+    },
+    {
+      "id": "ppt_review_page",
+      "path": "frontend/ppt-review.html",
+      "required": true
+    },
+    {
+      "id": "grading_report_page",
+      "path": "frontend/grading-report.html",
+      "required": true
+    },
+    {
+      "id": "frontend_mock_data",
+      "path": "frontend/mock-data.json",
+      "required": true
+    },
+    {
+      "id": "mcp_tool_manifest",
+      "path": "mcp-server/tools.manifest.json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "real_demo_script_markdown",
+      "path": "delivery/REAL_DEMO_SCRIPT.md",
+      "generated": false,
+      "localOnly": true
+    }
+  ],
+  "recommendedCommandIds": [
+    "test_cli",
+    "test_frontend_contract"
+  ],
+  "demoFlow": [
+    {
+      "id": "read_real_demo_boundary",
+      "order": 1,
+      "stage": "precheck",
+      "title": "Read real demo boundary",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "docs/21_REAL_LLM_DEMO_BUNDLE.md",
+      "expectedSignal": "The source bundle may contain real LLM outputs, but this script only replays existing files and static pages.",
+      "speakerCue": "Start by saying this is a real-output demo replay, not a new model call or publish flow."
+    },
+    {
+      "id": "open_real_demo",
+      "order": 2,
+      "stage": "entry",
+      "title": "Open Real Demo page",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\real-demo.html",
+      "commandId": null,
+      "evidencePath": "frontend/real-demo.html",
+      "expectedSignal": "RealDemoOneClickChecklist shows readyForDemo=true, acceptance=7/7, sections=6/6, and gradingEvidenceCoverage=100/100.",
+      "speakerCue": "Use this as the first screen: it proves the real DSL artifacts, evidence, PPTX artifact, review queue, and safety boundary are linked."
+    },
+    {
+      "id": "confirm_generated_dsl_waiting_review",
+      "order": 3,
+      "stage": "content",
+      "title": "Confirm generated DSL artifacts wait for review",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "examples/output/real-llm-demo-checklist.json",
+      "expectedSignal": "generated_dsl section passes and Lab, Exam, Grading, and PPT are all WAITING_REVIEW.",
+      "speakerCue": "Explain that real model output is converted to DSL first and stays blocked until manual review."
+    },
+    {
+      "id": "open_review_center",
+      "order": 4,
+      "stage": "review",
+      "title": "Open Review Center",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\review-center.html",
+      "commandId": null,
+      "evidencePath": "frontend/review-center.html",
+      "expectedSignal": "RealDemoReviewQueue shows four WAITING_REVIEW artifacts and keeps autoApproveAllowed=false and batchStateChangeAllowed=false.",
+      "speakerCue": "Show that reviewers see the real demo queue but cannot batch approve or publish."
+    },
+    {
+      "id": "open_ppt_review",
+      "order": 5,
+      "stage": "ppt",
+      "title": "Open PPT page review",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\ppt-review.html",
+      "commandId": null,
+      "evidencePath": "frontend/ppt-review.html",
+      "expectedSignal": "PPTX Artifact is visible for page-level review and remains WAITING_REVIEW.",
+      "speakerCue": "Point out that PPT files can be inspected page by page, but no generated slide is published automatically."
+    },
+    {
+      "id": "open_grading_report",
+      "order": 6,
+      "stage": "grading",
+      "title": "Open Grading Report",
+      "manualOnly": true,
+      "operatorAction": "start .\\frontend\\grading-report.html",
+      "commandId": null,
+      "evidencePath": "frontend/grading-report.html",
+      "expectedSignal": "Controlled Docker evidence covers 40/40 and static Notebook evidence covers 60/60, totaling gradingEvidenceCoverage=100/100.",
+      "speakerCue": "Explain the evidence split: controlled container checks plus static Notebook JSON parsing, still requiring human review."
+    },
+    {
+      "id": "demo_mcp_review_revision_loop",
+      "order": 7,
+      "stage": "review",
+      "title": "Demo MCP review revision loop",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py mcp call --tool request_review_revision --arguments \"{\\\"taskId\\\":\\\"<task_id>\\\",\\\"reviewer\\\":\\\"teacher_1\\\",\\\"comment\\\":\\\"补充步骤截图验收标准。\\\",\\\"priority\\\":\\\"HIGH\\\",\\\"targetSections\\\":[\\\"steps\\\"]}\"",
+      "commandId": null,
+      "evidencePath": "mcp-server/tools.manifest.json",
+      "expectedSignal": "MCP tools request_review_revision and regenerate_from_revision_mock are available; source task remains WAITING_REVIEW and regenerated mock task is also WAITING_REVIEW.",
+      "speakerCue": "Show that an Agent can ask for reviewer changes and a revised draft through tools, while still keeping review and publish blocked."
+    },
+    {
+      "id": "validate_one_click_checklist",
+      "order": 8,
+      "stage": "validation",
+      "title": "Validate one-click checklist JSON",
+      "manualOnly": true,
+      "operatorAction": "python lab_cli.py phase2 demo-bundle checklist --bundle examples/output/real-llm-demo-bundle.json --acceptance-summary examples/output/real-llm-demo-acceptance-summary.json --output examples/output/real-llm-demo-checklist.json",
+      "commandId": "test_cli",
+      "secondaryCommandId": "test_frontend_contract",
+      "generatedEvidencePath": "examples/output/real-llm-demo-checklist.json",
+      "expectedSignal": "CLI returns success=true and demoChecklist.summary.readyForDemo=true; frontend contract keeps RealDemoOneClickChecklist visible.",
+      "speakerCue": "Use this command only to regenerate the local checklist JSON; it does not call the model or run grading."
+    },
+    {
+      "id": "confirm_blocked_actions",
+      "order": 9,
+      "stage": "safety",
+      "title": "Confirm blocked actions",
+      "manualOnly": true,
+      "operatorAction": null,
+      "commandId": null,
+      "evidencePath": "examples/output/real-llm-demo-checklist.json",
+      "expectedSignal": "newLlmRequestSent=false, secretsRead=false, networkAccess=false, sandboxExecutedByChecklist=false, commandExecutedByChecklist=false, and realPublishAllowed=false.",
+      "speakerCue": "Close by saying the demo proves real outputs can be reviewed, not that they can bypass review or publish."
+    }
+  ],
+  "acceptanceSignals": [
+    {
+      "id": "real_demo_ready_for_demo",
+      "expected": "RealDemoOneClickChecklist.summary.readyForDemo=true."
+    },
+    {
+      "id": "acceptance_7_of_7",
+      "expected": "RealDemoAcceptanceSummary.acceptance.passed=true and passedCount=7."
+    },
+    {
+      "id": "sections_6_of_6",
+      "expected": "RealDemoOneClickChecklist.summary.sectionPassedCount=6 and sectionTotal=6."
+    },
+    {
+      "id": "generated_dsl_waiting_review",
+      "expected": "Lab, Exam, Grading, and PPT DSL artifacts are schemaValidated=true and WAITING_REVIEW."
+    },
+    {
+      "id": "candidate_preview_safe",
+      "expected": "candidate_preview section passes and answerVisibleToCandidate=false."
+    },
+    {
+      "id": "grading_coverage_complete",
+      "expected": "gradingEvidenceCoverage reaches 100/100 with manualReviewRequired=true and autoApproveAllowed=false."
+    },
+    {
+      "id": "review_mcp_visible",
+      "expected": "Review Center and MCP get_review_task_summary expose the real demo queue for human triage."
+    },
+    {
+      "id": "mcp_revision_loop_mock_only",
+      "expected": "MCP request_review_revision records feedback and regenerate_from_revision_mock creates a new WAITING_REVIEW draft without a real LLM request or publish."
+    },
+    {
+      "id": "real_actions_disabled",
+      "expected": "No new LLM request, secret read, network access, checklist sandbox execution, batch state change, or real publish is allowed."
+    }
+  ],
+  "blockedActions": [
+    "Do not send a new real LLM request during the demo",
+    "Do not read or display API keys or secrets",
+    "Do not access the network from the checklist",
+    "Do not run Docker, pytest, Notebook kernels, or contestant code from this script",
+    "Do not reveal candidate-hidden standard answers",
+    "Do not batch approve, auto approve, auto publish, or real publish generated artifacts"
+  ],
+  "safety": {
+    "manualOnly": true,
+    "sourceBundleRealLlmCalled": true,
+    "newLlmRequestSent": false,
+    "secretsRead": false,
+    "networkAccess": false,
+    "realMcpServerStarted": false,
+    "realAgentStarted": false,
+    "realCloudResourceCreated": false,
+    "realCloudResourceChanged": false,
+    "sandboxExecutedByScript": false,
+    "commandExecutedByScript": false,
+    "pytestExecutedByScript": false,
+    "notebookExecutedByScript": false,
+    "contestantCodeExecutedByScript": false,
+    "batchStateChangeAllowed": false,
+    "autoApproveAllowed": false,
+    "autoPublishAllowed": false,
+    "realPublish": false,
+    "secretVisibleInFrontend": false,
+    "answerVisibleToCandidate": false
+  }
+}
