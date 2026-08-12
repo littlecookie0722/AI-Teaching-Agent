@@ -94,6 +94,10 @@
       font-weight: 700;
     }
 
+    a.pill {
+      text-decoration: none;
+    }
+
     main {
       display: grid;
       grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
@@ -421,6 +425,7 @@
       <p class="pill strong">LOCAL_CORE_MVP</p>
     </div>
     <div class="status-strip" aria-label="Local core review safety state">
+      <a class="pill strong" href="generation-workspace.html">新建生成批次</a>
       <span class="pill">真实 LLM 产物：只读加载</span>
       <span class="pill">真实 LLM 请求：本页不发起</span>
       <span class="pill">真实云资源：禁用</span>

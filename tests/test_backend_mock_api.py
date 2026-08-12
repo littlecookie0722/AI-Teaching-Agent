@@ -5581,6 +5581,7 @@ def test_phase2_content_generation_workflow_creates_review_bundle(tmp_path):
         "assemble_review_bundle",
     ]
     assert {item["status"] for item in payload["data"]["report"]["generatedDsl"].values()} == {"WAITING_REVIEW"}
+    assert payload["data"]["report"]["generatedDsl"]["exam"]["answerVisibleToCandidate"] is False
     assert payload["data"]["reviewSummary"]["publishBlockedUntilApproved"] is True
     assert payload["data"]["safety"]["realLlmCalled"] is False
     assert payload["data"]["safety"]["realAgentStarted"] is False
@@ -5637,6 +5638,34 @@ def test_phase2_content_generation_workflow_creates_review_bundle(tmp_path):
     assert audit["data"]["total"] == 4
     assert {item["detail"]["workflowId"] for item in audit["data"]["items"]} == {"phase2_content_generation"}
     assert runs["data"]["total"] == 1
+
+
+def test_phase2_content_generation_workflow_validates_required_frontend_inputs(tmp_path):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+
+    missing_input = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"reviewer": "teacher_1"},
+    )
+    missing_reviewer = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source)},
+    )
+
+    assert_api_envelope(missing_input)
+    assert missing_input["success"] is False
+    assert missing_input["code"] == "VALIDATION_ERROR"
+    assert missing_input["errors"] == [{"field": "input", "reason": "缺少参数"}]
+    assert_api_envelope(missing_reviewer)
+    assert missing_reviewer["success"] is False
+    assert missing_reviewer["code"] == "VALIDATION_ERROR"
+    assert missing_reviewer["errors"] == [{"field": "reviewer", "reason": "缺少参数"}]
 
 
 def test_core_readiness_prioritizes_content_quality_revision_before_approval(tmp_path):

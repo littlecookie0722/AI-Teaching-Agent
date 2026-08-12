@@ -13,6 +13,43 @@
   },
   "staticPrototypes": [
     {
+      "route": "/generation-workspace",
+      "title": "One-click Generation Workspace",
+      "path": "frontend/generation-workspace.html",
+      "mode": "LOCAL_CORE_MVP",
+      "dataSources": [
+        "frontend/generation-workspace-data.js",
+        "POST /api/phase2/workflows/content-generation/run",
+        "POST /api/phase2/workflows/content-generation/run.createdTasks",
+        "POST /api/phase2/workflows/content-generation/run.generatedDsl",
+        "POST /api/phase2/workflows/content-generation/run.workflowRun",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "review-center.html?taskId={taskId}",
+        "lab-review.html?taskId={taskId}",
+        "exam-review.html?taskId={taskId}",
+        "grading-review.html?taskId={taskId}",
+        "ppt-review.html?taskId={taskId}"
+      ],
+      "blockedActions": [
+        "frontendDirectRealLlmGenerate",
+        "autoApprove",
+        "autoPublish",
+        "realPublish",
+        "unsandboxedCandidateExecution"
+      ],
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "frontendDirectRealLlmCall": false,
+        "backendRealLlmRequestViaExplicitOptIn": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
+    {
       "route": "/access",
       "title": "Access Entrypoints Mock",
       "path": "frontend/access.html",
@@ -1838,6 +1875,10 @@
     "AiTaskTimeline",
     "AiTaskExecutionWorkspace",
     "LocalCoreGenerationWorkspace",
+    "OneClickGenerationWorkspace",
+    "GenerationBatchProgress",
+    "GenerationReviewTaskList",
+    "GenerationWorkspaceDataLoader",
     "LabGenerationCloseLoopAction",
     "ExamGenerationCloseLoopAction",
     "ReviewerReportWorkspace",
@@ -1918,6 +1959,50 @@
     "AgentEntityPausedBackendHandoffNotice"
   ],
   "pages": [
+    {
+      "route": "/generation-workspace",
+      "title": "One-click Generation Workspace",
+      "priority": 1,
+      "purpose": "Generate Lab, Exam, Grading, and PPT DSL from one local teaching source, keep all four tasks in WAITING_REVIEW, and route each artifact into human review.",
+      "apiDependencies": [
+        {
+          "method": "POST",
+          "path": "/api/phase2/workflows/content-generation/run"
+        }
+      ],
+      "components": [
+        "OneClickGenerationWorkspace",
+        "GenerationBatchProgress",
+        "GenerationReviewTaskList",
+        "GenerationWorkspaceDataLoader"
+      ],
+      "dataSources": [
+        "frontend/generation-workspace-data.js",
+        "POST /api/phase2/workflows/content-generation/run.createdTasks",
+        "POST /api/phase2/workflows/content-generation/run.generatedDsl",
+        "POST /api/phase2/workflows/content-generation/run.workflowRun",
+        "frontendDirectRealLlmCall=false",
+        "query: coreDbPath, gradingDbPath, agentReport",
+        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "lab-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "exam-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "ppt-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+      ],
+      "mockDataPath": "frontend/mock-data.json",
+      "prototypePath": "frontend/generation-workspace.html",
+      "safety": {
+        "generatedStatus": "WAITING_REVIEW",
+        "frontendDirectRealLlmCall": false,
+        "backendRealLlmRequestViaExplicitOptIn": true,
+        "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
+        "sandboxExecuted": false,
+        "autoPublishAllowed": false,
+        "realPublish": false,
+        "secretVisibleInFrontend": false
+      }
+    },
     {
       "route": "/ppt/generate",
       "title": "PPT Generation",

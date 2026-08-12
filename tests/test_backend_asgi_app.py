@@ -75,6 +75,20 @@ def test_backend_asgi_app_serves_static_root(tmp_path):
     assert b"review-center-data.js" in sent[1]["body"]
 
 
+def test_backend_asgi_app_serves_one_click_generation_workspace(tmp_path):
+    app = create_asgi_app(store_path=tmp_path / "store.json")
+
+    sent = asyncio.run(_run_asgi(
+        app,
+        _http_scope("GET", "/generation-workspace.html"),
+        [{"type": "http.request", "body": b"", "more_body": False}],
+    ))
+
+    assert sent[0]["status"] == 200
+    assert any(name == b"content-type" and value.startswith(b"text/html") for name, value in sent[0]["headers"])
+    assert b"generation-workspace-data.js" in sent[1]["body"]
+
+
 def test_backend_asgi_app_handles_post_json(tmp_path):
     app = create_asgi_app(store_path=tmp_path / "store.json")
     body = json.dumps({"input": "examples/input/demo-source.md"}).encode("utf-8")
