@@ -94,6 +94,10 @@ SCHEMA_FAILURE_RECOMMENDATIONS = {
     "enum_mismatch": "收敛 Prompt 枚举输出，必要时补充同义词映射。",
     "additional_field": "确认是否为平台不接收字段；若无业务价值则在归一化层移除。",
     "cardinality": "补充最小项数约束或默认可审核条目。",
+    "string_length": "补充非空或长度约束；只有业务语义明确时才生成可审核的默认文本。",
+    "pattern_mismatch": "收敛 Prompt 的字符串格式约束；保留失败样本验证格式归一化。",
+    "numeric_range": "收敛数值范围约束；仅修复可由业务规则确定的越界值。",
+    "composition_mismatch": "检查 oneOf/anyOf/allOf 分支歧义，优先修正输出结构而不是放宽 Schema。",
     "unknown_schema_failure": "保留失败样本，先加入漂移矩阵再决定是否归一化。",
 }
 
@@ -829,6 +833,10 @@ def _classify_schema_failure(error: dict[str, str]) -> str:
     reason = str(error.get("reason", "")).lower()
     if "required field missing" in reason:
         return "missing_required_field"
+    if "expected string matching pattern" in reason:
+        return "pattern_mismatch"
+    if "expected length" in reason:
+        return "string_length"
     if "expected object" in reason:
         return "expected_object"
     if "expected string" in reason:
@@ -843,6 +851,10 @@ def _classify_schema_failure(error: dict[str, str]) -> str:
         return "additional_field"
     if "expected at least" in reason:
         return "cardinality"
+    if any(token in reason for token in ("expected >=", "expected <=", "expected >", "expected <")):
+        return "numeric_range"
+    if "schema in oneof" in reason or "schema in anyof" in reason or "allof" in reason:
+        return "composition_mismatch"
     return "unknown_schema_failure"
 
 

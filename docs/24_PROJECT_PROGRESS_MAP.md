@@ -131,6 +131,16 @@
 | CI / 回归测试 | 已新增本地固定回归测试矩阵：`quality regression-profiles` 可列出 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp` profile；`quality regression-matrix` 可运行预定义 pytest 子集并输出 JSON evidence，默认排除 `integration` 和 `real_llm_online`，不接受任意命令、不使用 shell；`.github/workflows/core-regression-matrix.yml` 已在 PR / 手动触发时调用同一个 `core` profile，并上传 JSON artifact，CLI 返回 `success=false` 时会显式失败；`grading_core` 已纳入受控 Docker evidence、evidence merge、评分 job/record 和 SQLite staging；`quick` profile 已包含 Lab 生成、Exam/Grading 生成、Grading stable v1、Backend ASGI、MCP stdio 和 Frontend core manifest；2026-07-04 已完成本地 `core` profile 实跑，`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`；2026-07-09 本地 `quick` profile 实跑覆盖 `frontend_core_manifest`，`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`、`durationMs=21040`。 | `quality/regression_matrix.py`、`.github/workflows/core-regression-matrix.yml`、`python lab_cli.py quality regression-matrix --profile quick --stop-on-failure --output examples/output/regression-matrix-quick.json`、`examples/output/regression-matrix-quick.json`、`docs/26_CORE_REGRESSION_RUN_EVIDENCE.md`、`tests/test_quality_regression_matrix.py`、`tests/test_cli.py::test_quality_regression_matrix_cli_writes_json_report` | M | 本地 PR 前回归矩阵入口、GitHub Actions 配置和本地 core/quick 实跑 evidence 已完成；后续只记录 GitHub Actions / 外部 CI 实际运行 artifact，或在新增核心能力时向现有 profile 增补必要测试文件，不再新增同义测试矩阵壳、同义 CI 壳或任意命令执行器。 |
 | 部署与运维 | Docker/服务部署、配置、日志、监控、密钥管理、告警。 | XL | P3 | 先部署开发/测试环境，不做生产 SLA 承诺。 |
 
+### 4.1 可复现 DSL 质量基线
+
+2026-08-13 新增 `quality dsl-eval`：用 20 个脱敏 case 覆盖 5 个教学领域、
+中英文和 normal/boundary 变体，并对实际渲染后的 Lab / Exam / Grading / PPT
+DSL 执行 Draft 2020-12、`WAITING_REVIEW`、跨产物引用/总分、候选人脱敏和
+最小内容质量检查。它不接受任意命令，也不运行 pytest、真实 LLM 或选手代码，
+因此是内容质量基线而不是第二套 regression runner。做到默认 corpus 20/20 通过、
+破坏性 fixture 能稳定报错、CLI/CI 可复现后即停止；后续只加入经过脱敏的真实失败
+样本，不继续堆同义 runner 或虚构质量规则。
+
 ---
 
 ## 5. 后续推荐路线

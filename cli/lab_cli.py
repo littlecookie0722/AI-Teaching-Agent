@@ -227,7 +227,14 @@ from mcp_server import (
     run_mcp_stdio_client_smoke,
     run_mcp_stdio_local_core_client,
 )
-from quality import RegressionMatrixError, list_regression_profiles, run_regression_matrix
+from quality import (
+    DEFAULT_MANIFEST_PATH as DEFAULT_DSL_QUALITY_MANIFEST_PATH,
+    DslQualityEvalError,
+    RegressionMatrixError,
+    list_regression_profiles,
+    run_dsl_quality_eval,
+    run_regression_matrix,
+)
 from backend.grading_repository import (
     DEFAULT_CLAIM_LEASE_SECONDS,
     DEFAULT_GRADING_DB_PATH,
@@ -923,6 +930,9 @@ def build_parser() -> argparse.ArgumentParser:
     quality = subparsers.add_parser("quality")
     quality_sub = quality.add_subparsers(dest="command", required=True)
     quality_sub.add_parser("regression-profiles")
+    quality_dsl_eval = quality_sub.add_parser("dsl-eval")
+    quality_dsl_eval.add_argument("--manifest", default=str(DEFAULT_DSL_QUALITY_MANIFEST_PATH))
+    quality_dsl_eval.add_argument("--output")
     quality_regression_matrix = quality_sub.add_parser("regression-matrix")
     quality_regression_matrix.add_argument("--profile", default="quick", choices=["quick", "core", "backend-core", "real-llm-offline", "mcp"])
     quality_regression_matrix.add_argument("--output")
@@ -17592,6 +17602,24 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
     if args.group == "quality" and args.command == "regression-profiles":
         return ok("回归测试矩阵 profile 查询成功", {"regressionProfiles": list_regression_profiles()}, trace_id)
 
+    if args.group == "quality" and args.command == "dsl-eval":
+        try:
+            report = run_dsl_quality_eval(
+                root=ROOT,
+                manifest_path=_path(args.manifest),
+                output_path=_path(args.output) if args.output else None,
+            )
+        except DslQualityEvalError as exc:
+            raise CliError(exc.code, exc.message, exc.errors) from exc
+        if not report["success"]:
+            raise CliError(
+                "DSL_QUALITY_EVAL_FAILED",
+                "DSL 离线质量评测存在失败项",
+                [{"field": "cases", "reason": f"failedTotal={report['summary']['failedTotal']}"}],
+                {"dslQualityEvaluation": report},
+            )
+        return ok("DSL 离线质量评测已执行", {"dslQualityEvaluation": report}, trace_id)
+
     if args.group == "quality" and args.command == "regression-matrix":
         output_path = _path(args.output) if args.output else None
         try:
@@ -18810,6 +18838,12 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    stdout_reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if callable(stdout_reconfigure):
+        try:
+            stdout_reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
     trace_id = make_trace_id()
     parser = build_parser()
     try:

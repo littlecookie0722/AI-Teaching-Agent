@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-teaching-agent.local/evals/dsl-quality/v1/manifest.schema.json",
+  "title": "DSL Quality Corpus Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "description",
+    "baselineBundle",
+    "cases"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baselineBundle": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "domain",
+        "language",
+        "variant",
+        "inputRef",
+        "variables",
+        "overrides",
+        "expected"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "domain": {
+          "enum": [
+            "python-data",
+            "web-api",
+            "linux-ops",
+            "sql-databases",
+            "ml-evaluation"
+          ]
+        },
+        "language": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        },
+        "variant": {
+          "enum": [
+            "normal",
+            "boundary"
+          ]
+        },
+        "inputRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "caseId",
+            "title",
+            "domain",
+            "language",
+            "difficulty"
+          ],
+          "properties": {
+            "caseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "domain": {
+              "type": "string",
+              "minLength": 1
+            },
+            "language": {
+              "type": "string",
+              "minLength": 1
+            },
+            "difficulty": {
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ]
+            }
+          }
+        },
+        "overrides": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^/(lab|exam|grading|ppt|candidatePreview)(/.*)?$"
+          },
+          "additionalProperties": true
+        },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimumObjectives",
+            "minimumSteps",
+            "minimumSlides",
+            "totalScore",
+            "schemaValid",
+            "allWaitingReview",
+            "examGradingRefsCovered",
+            "candidateSafe"
+          ],
+          "properties": {
+            "minimumObjectives": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minimumSteps": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minimumSlides": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "totalScore": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "schemaValid": {
+              "const": true
+            },
+            "allWaitingReview": {
+              "const": true
+            },
+            "examGradingRefsCovered": {
+              "const": true
+            },
+            "candidateSafe": {
+              "const": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

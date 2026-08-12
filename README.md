@@ -57,21 +57,70 @@ automatic publishing system.
 The detailed delivery boundaries, implemented capabilities, and stop lines are
 maintained in [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md).
 
-## Quick Start
+## Installation
 
-Requirements: Python 3.11 or later and a local Git checkout. Docker is only
-needed for the explicit controlled-grading path.
+Requirements: Python 3.11 or later. The default installation contains the
+offline DSL/CLI runtime only; Docker is needed only for explicit controlled
+grading, and no model SDK or database driver is installed unless selected.
 
 ```powershell
-python -m pip install -r requirements.txt
-python lab_cli.py lab generate-from-source --input examples/input/demo-source.md
-python lab_cli.py exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install .
+ai-teaching-agent --help
+ai-teaching-agent quality regression-profiles
+```
+
+Use extras for the capability you are developing or running:
+
+```powershell
+python -m pip install ".[dev]"       # pytest and wheel-build checks
+python -m pip install ".[llm]"       # OpenAI-compatible provider SDK
+python -m pip install ".[postgres]"  # PostgreSQL adapter
+python -m pip install ".[mysql]"     # MySQL adapter
+python -m pip install ".[dev,llm,postgres,mysql]"
+```
+
+`python -m pip install -r requirements.txt` remains the backward-compatible
+all-features development entry point.
+
+## Quick Start
+
+From a Git checkout, the installed console command and the historical
+`python lab_cli.py` shim invoke the same JSON CLI:
+
+```powershell
+ai-teaching-agent lab generate-from-source --input examples/input/demo-source.md
+ai-teaching-agent exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml
+ai-teaching-agent quality dsl-eval --output examples/output/dsl-quality-eval.json
 python -m pytest -q
 ```
+
+Build and inspect the same wheel boundary used by CI with:
+
+```powershell
+python -m pip install ".[dev]"
+python -m build --wheel
+python -m pytest tests/test_packaging.py -q
+```
+
+The wheel includes the schemas, prompts, local runtime contracts, MCP manifest,
+frontend static assets, and controlled-grading image recipe used by installed
+commands. Repository-only historical outputs under `examples/output/` are
+deliberately excluded. Commands that create artifacts still use the project's
+local staging model; run generation workflows from a writable virtual
+environment or a source checkout.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,
 environment-provided credentials, and still creates a `WAITING_REVIEW` task.
+
+The offline quality command evaluates 20 sanitized, review-gated Lab/Exam/
+Grading/PPT bundles across five teaching domains, Chinese and English, and
+normal/boundary variants. It performs the same Draft 2020-12 validation used by
+runtime workflows, plus linked-score, grading-reference, candidate-safety, and
+minimum-content checks. It is deterministic and does not call a model or run
+learner code; see [the quality guide](quality/README.md).
 
 For a controlled local grading example, see
 [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md) and the fixtures

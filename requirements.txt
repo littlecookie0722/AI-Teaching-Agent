@@ -1,5 +1,8 @@
-PyYAML
-pytest
+# Backward-compatible all-features development install. New installations can
+# select smaller dependency sets through pyproject.toml extras.
+PyYAML>=6.0,<7
+jsonschema>=4.23,<5
+pytest>=8.3,<10
 openai>=1.0.0,<2.0.0
 psycopg[binary]>=3.1,<4.0
 mysql-connector-python>=8.0,<10.0
