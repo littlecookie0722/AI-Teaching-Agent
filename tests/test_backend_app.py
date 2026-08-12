@@ -24,6 +24,20 @@ def test_backend_api_app_handles_api_and_static_root(tmp_path):
     assert b"review-center-data.js" in root.body
 
 
+def test_backend_api_app_serves_one_click_generation_workspace(tmp_path):
+    app = BackendApiApp(store_path=tmp_path / "store.json")
+
+    page = app.handle("GET", "/generation-workspace.html")
+    script = app.handle("GET", "/generation-workspace-data.js")
+
+    assert page.status == 200
+    assert page.content_type.startswith("text/html")
+    assert b"generation-workspace-data.js" in page.body
+    assert script.status == 200
+    assert script.content_type.startswith("text/javascript")
+    assert b"/api/phase2/workflows/content-generation/run" in script.body
+
+
 def test_backend_api_app_blocks_static_path_traversal(tmp_path):
     app = BackendApiApp(store_path=tmp_path / "store.json")
 

@@ -5,7 +5,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from quality.regression_matrix import RegressionMatrixError, list_regression_profiles, run_regression_matrix
+from quality.regression_matrix import (
+    REGRESSION_COMMANDS,
+    RegressionMatrixError,
+    list_regression_profiles,
+    run_regression_matrix,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +30,17 @@ def test_regression_profiles_are_predefined_and_safe():
     assert profiles["safety"]["predefinedProfilesOnly"] is True
     assert profiles["safety"]["arbitraryCommandAllowed"] is False
     assert profiles["safety"]["shellExecutionAllowed"] is False
+
+
+def test_regression_matrix_references_existing_test_files():
+    missing_paths = sorted(
+        path
+        for command in REGRESSION_COMMANDS.values()
+        for path in command.paths
+        if not (ROOT / path.split("::", 1)[0]).is_file()
+    )
+
+    assert missing_paths == []
 
 
 def test_regression_matrix_dry_run_writes_report(tmp_path):

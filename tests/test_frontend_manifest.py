@@ -15,6 +15,70 @@ def read_text(path):
     return (ROOT / path).read_text(encoding="utf-8")
 
 
+def test_one_click_generation_workspace_has_single_workflow_request_and_review_routes():
+    html = read_text("frontend/generation-workspace.html")
+    script = read_text("frontend/generation-workspace-data.js")
+    manifest = load_json("frontend/ui.manifest.json")
+    pages = {page["route"]: page for page in manifest["pages"]}
+    prototypes = {prototype["route"]: prototype for prototype in manifest["staticPrototypes"]}
+
+    assert 'id="generation-workspace-form"' in html
+    assert 'id="generation-source"' in html
+    assert 'id="generation-reviewer"' in html
+    assert 'id="generation-provider-mode"' in html
+    assert 'id="generation-real-confirmation"' in html
+    assert 'id="generation-run"' in html
+    assert 'id="generation-api-state"' in html
+    assert 'id="generation-progress-bar"' in html
+    assert '<script src="generation-workspace-data.js"></script>' in html
+    assert "Lab / Exam / Grading / PPT" in html
+    for kind in ("lab", "exam", "grading", "ppt"):
+        assert f'id="generation-{kind}-status"' in html
+        assert f'id="generation-{kind}-task"' in html
+        assert f'id="generation-{kind}-path"' in html
+        assert f'id="generation-{kind}-review"' in html
+
+    assert 'generatePath: "/api/phase2/workflows/content-generation/run"' in script
+    assert script.count('method: "POST"') == 1
+    assert "createdTasks" in script
+    assert "generatedDsl" in script
+    assert "workflowRun" in script
+    assert 'setAllTaskStates("GENERATING"' in script
+    assert 'setAllTaskStates("ERROR"' in script
+    assert 'completed === 4 && waitingReview === 4' in script
+    assert "VALIDATION_ERROR" in script
+    assert "REAL_LLM_CONFIRMATION_REQUIRED" in script
+    assert "lab-review.html" in script
+    assert "exam-review.html" in script
+    assert "grading-review.html" in script
+    assert "ppt-review.html" in script
+    assert "review-center.html" in script
+    assert "autoPublishAllowed: false" in script
+    assert "answerVisibleToCandidate: false" in script
+    assert "frontendDirectRealLlmCall: false" in script
+    assert "apiKey" not in script
+    assert "OPENAI_API_KEY" not in html
+    assert "/import-send" not in html
+    assert "/publish" not in script
+
+    page = pages["/generation-workspace"]
+    prototype = prototypes["/generation-workspace"]
+    assert page["prototypePath"] == "frontend/generation-workspace.html"
+    assert page["apiDependencies"] == [
+        {"method": "POST", "path": "/api/phase2/workflows/content-generation/run"}
+    ]
+    assert "OneClickGenerationWorkspace" in page["components"]
+    assert page["safety"]["generatedStatus"] == "WAITING_REVIEW"
+    assert page["safety"]["frontendDirectRealLlmCall"] is False
+    assert page["safety"]["answerVisibleToCandidate"] is False
+    assert page["safety"]["autoPublishAllowed"] is False
+    assert prototype["path"] == "frontend/generation-workspace.html"
+    assert prototype["safety"] == page["safety"]
+    assert "generation-workspace.html" in read_text("frontend/review-center.html")
+    assert "generation-workspace.html" in read_text("frontend/README.md")
+    assert "generation-workspace.html" in read_text("docs/24_PROJECT_PROGRESS_MAP.md")
+
+
 def test_frontend_manifest_is_phase1_mock_contract():
     manifest = load_json("frontend/ui.manifest.json")
 

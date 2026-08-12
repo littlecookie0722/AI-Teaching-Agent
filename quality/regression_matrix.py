@@ -110,7 +110,7 @@ REGRESSION_COMMANDS: dict[str, RegressionCommand] = {
             "tests/test_backend_core_service.py",
             "tests/test_backend_core_task_service.py",
             "tests/test_backend_audit_query_service.py",
-            "tests/test_backend_platform_entity_service.py",
+            "tests/test_backend_agent_entity_service.py",
         ),
         owner="Backend",
         reason="Repository-backed task, audit, and platform entity service boundaries stay stable.",
@@ -143,7 +143,7 @@ REGRESSION_COMMANDS: dict[str, RegressionCommand] = {
     "platform_api_contract": RegressionCommand(
         id="platform_api_contract",
         label="Platform API contract and adapter",
-        paths=("tests/test_platform_api_contract.py", "tests/test_platform_api_adapter.py"),
+        paths=("tests/test_agent_api_contract.py", "tests/test_agent_api_adapter.py"),
         owner="Platform",
         reason="Draft-import contract mapping and HTTP adapter behavior stay covered.",
     ),
