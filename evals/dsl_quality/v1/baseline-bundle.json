@@ -1,0 +1,286 @@
+{
+  "version": "1.0",
+  "description": "Sanitized deterministic baseline. Replace {{caseId}}, {{title}}, {{domain}}, and {{language}}, then apply manifest JSON Pointer overrides before evaluation.",
+  "lab": {
+    "version": "1.0",
+    "kind": "Lab",
+    "metadata": {
+      "id": "lab_{{caseId}}",
+      "title": "{{title}} Lab",
+      "category": "{{domain}}",
+      "difficulty": "beginner",
+      "durationMinutes": 60,
+      "tags": [
+        "{{domain}}",
+        "{{language}}",
+        "quality-corpus"
+      ]
+    },
+    "status": "WAITING_REVIEW",
+    "spec": {
+      "objectives": [
+        "Explain the core concepts required by {{title}}.",
+        "Complete a reviewable {{domain}} task and interpret its evidence.",
+        "Identify one limitation and propose a safe follow-up check."
+      ],
+      "targetUsers": [
+        "Students working in {{language}}"
+      ],
+      "environment": {
+        "type": "local-container",
+        "image": "python:3.11",
+        "resources": {
+          "cpu": 1,
+          "memoryGb": 2
+        }
+      },
+      "materials": [
+        {
+          "type": "markdown",
+          "path": "sanitized://dsl-quality/v1/{{caseId}}.md"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_1",
+          "title": "Inspect the task",
+          "instruction": "Read the sanitized {{title}} input and list assumptions before making changes.",
+          "commands": [],
+          "expectedResult": "Assumptions and expected artifacts are explicit."
+        },
+        {
+          "id": "step_2",
+          "title": "Produce the artifact",
+          "instruction": "Complete the bounded {{domain}} exercise without accessing external systems.",
+          "commands": [],
+          "expectedResult": "A deterministic local artifact is available for review."
+        },
+        {
+          "id": "step_3",
+          "title": "Verify the result",
+          "instruction": "Run only the documented local checks and record observable evidence.",
+          "commands": [],
+          "expectedResult": "Evidence maps to every assessment reference."
+        },
+        {
+          "id": "step_4",
+          "title": "Reflect and submit",
+          "instruction": "Explain one failure mode and submit the evidence for human review.",
+          "commands": [],
+          "expectedResult": "The submission is complete and remains WAITING_REVIEW."
+        }
+      ],
+      "grading": {
+        "ref": "grading_{{caseId}}"
+      }
+    }
+  },
+  "exam": {
+    "version": "1.0",
+    "kind": "Exam",
+    "metadata": {
+      "id": "exam_{{caseId}}",
+      "title": "{{title}} Assessment",
+      "sourceLabId": "lab_{{caseId}}",
+      "difficulty": "beginner"
+    },
+    "status": "WAITING_REVIEW",
+    "spec": {
+      "questionType": "short_answer",
+      "totalScore": 100,
+      "questions": [
+        {
+          "id": "q1",
+          "title": "Core procedure",
+          "stem": "Describe the deterministic procedure used in {{title}} and name the evidence that proves completion.",
+          "answer": "A correct response identifies the bounded procedure and its observable local evidence.",
+          "score": 40,
+          "gradingRef": "check_procedure"
+        },
+        {
+          "id": "q2",
+          "title": "Failure analysis",
+          "stem": "Analyze a realistic {{domain}} failure and propose a safe verification step.",
+          "answer": "A correct response links a plausible cause to a non-destructive verification step.",
+          "score": 60,
+          "gradingRef": "check_analysis"
+        }
+      ]
+    }
+  },
+  "grading": {
+    "version": "1.0",
+    "kind": "Grading",
+    "metadata": {
+      "id": "grading_{{caseId}}",
+      "title": "{{title}} Grading Plan",
+      "sourceExamId": "exam_{{caseId}}"
+    },
+    "status": "WAITING_REVIEW",
+    "spec": {
+      "totalScore": 100,
+      "timeoutSeconds": 30,
+      "assessmentPlan": [
+        {
+          "checkId": "check_procedure",
+          "type": "file_exists",
+          "runner": "FileExistsGrader",
+          "score": 40,
+          "inputSummary": "Verify that the procedure evidence file exists.",
+          "executionPlan": {
+            "strategy": "MOCK_PLAN_ONLY",
+            "requiredLimits": {
+              "cpu": "required",
+              "memory": "required",
+              "timeout": "30s",
+              "network": "disabled_by_default",
+              "filesystem": "isolated_workspace_required",
+              "process": "limited"
+            },
+            "wouldRunInsideRealSandbox": true
+          },
+          "mockEvidence": {
+            "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+          },
+          "riskLevel": "low",
+          "sandboxRequiredBeforeRealExecution": true
+        },
+        {
+          "checkId": "check_analysis",
+          "type": "file_exists",
+          "runner": "FileExistsGrader",
+          "score": 60,
+          "inputSummary": "Verify that the failure-analysis evidence file exists.",
+          "executionPlan": {
+            "strategy": "MOCK_PLAN_ONLY",
+            "requiredLimits": {
+              "cpu": "required",
+              "memory": "required",
+              "timeout": "30s",
+              "network": "disabled_by_default",
+              "filesystem": "isolated_workspace_required",
+              "process": "limited"
+            },
+            "wouldRunInsideRealSandbox": true
+          },
+          "mockEvidence": {
+            "status": "MOCK_EVIDENCE_NOT_COLLECTED"
+          },
+          "riskLevel": "low",
+          "sandboxRequiredBeforeRealExecution": true
+        }
+      ],
+      "checks": [
+        {
+          "id": "check_procedure",
+          "type": "file_exists",
+          "path": "evidence/procedure.md",
+          "score": 40
+        },
+        {
+          "id": "check_analysis",
+          "type": "file_exists",
+          "path": "evidence/analysis.md",
+          "score": 60
+        }
+      ]
+    }
+  },
+  "ppt": {
+    "version": "1.0",
+    "kind": "PPT",
+    "metadata": {
+      "id": "ppt_{{caseId}}",
+      "title": "{{title}} Teaching Deck",
+      "audience": "Students working in {{language}}",
+      "durationMinutes": 20
+    },
+    "status": "WAITING_REVIEW",
+    "spec": {
+      "theme": {
+        "style": "accessible",
+        "language": "{{language}}"
+      },
+      "slides": [
+        {
+          "id": "slide_1",
+          "type": "title",
+          "title": "{{title}}"
+        },
+        {
+          "id": "slide_2",
+          "type": "content",
+          "title": "Learning objectives",
+          "bullets": [
+            "Understand the bounded {{domain}} task",
+            "Produce deterministic evidence"
+          ]
+        },
+        {
+          "id": "slide_3",
+          "type": "content",
+          "title": "Procedure and checks",
+          "bullets": [
+            "Inspect assumptions",
+            "Create the local artifact",
+            "Verify both grading references"
+          ]
+        },
+        {
+          "id": "slide_4",
+          "type": "content",
+          "title": "Failure mode",
+          "bullets": [
+            "Recognize an expected boundary condition",
+            "Use a safe verification step"
+          ]
+        },
+        {
+          "id": "slide_5",
+          "type": "summary",
+          "title": "Review checklist",
+          "bullets": [
+            "Scores total 100",
+            "Evidence covers each reference",
+            "Human review remains required"
+          ]
+        }
+      ]
+    }
+  },
+  "candidatePreview": {
+    "version": "1.0",
+    "kind": "ExamCandidatePreview",
+    "status": "WAITING_REVIEW",
+    "sourceExamId": "exam_{{caseId}}",
+    "sourceExamTitle": "{{title}} Assessment",
+    "sourceLabId": "lab_{{caseId}}",
+    "sourceStatus": "WAITING_REVIEW",
+    "difficulty": "beginner",
+    "questionType": "short_answer",
+    "totalScore": 100,
+    "questions": [
+      {
+        "id": "q1",
+        "title": "Core procedure",
+        "stem": "Describe the deterministic procedure used in {{title}} and name the evidence that proves completion.",
+        "score": 40
+      },
+      {
+        "id": "q2",
+        "title": "Failure analysis",
+        "stem": "Analyze a realistic {{domain}} failure and propose a safe verification step.",
+        "score": 60
+      }
+    ],
+    "answersRemoved": true,
+    "answerVisibleToCandidate": false,
+    "reviewRequired": true,
+    "publishBlockedUntilApproved": true,
+    "safety": {
+      "standardAnswerRemoved": true,
+      "autoPublishAllowed": false,
+      "reviewBypassed": false
+    }
+  }
+}

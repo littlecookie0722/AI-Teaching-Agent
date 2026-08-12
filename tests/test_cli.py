@@ -3441,6 +3441,23 @@ def test_quality_regression_profiles_cli_returns_json(capsys):
     assert profiles["safety"]["arbitraryCommandAllowed"] is False
 
 
+def test_quality_dsl_eval_cli_writes_json_report(tmp_path, capsys):
+    output = tmp_path / "dsl-quality-eval.json"
+
+    exit_code, payload = run_cli(
+        ["quality", "dsl-eval", "--output", str(output)],
+        capsys,
+    )
+
+    assert exit_code == 0
+    assert_json_envelope(payload)
+    report = payload["data"]["dslQualityEvaluation"]
+    assert report["success"] is True
+    assert report["summary"]["caseTotal"] == 20
+    assert report["summary"]["failedTotal"] == 0
+    assert json.loads(output.read_text(encoding="utf-8")) == report
+
+
 def test_quality_regression_matrix_cli_writes_json_report(tmp_path, monkeypatch, capsys):
     def fake_run(args, **kwargs):
         return subprocess.CompletedProcess(args=args, returncode=0, stdout="1 passed\n", stderr="")

@@ -2,6 +2,31 @@
 
 核心回归测试矩阵目录。当前用于本地和 CI 前置验证：按固定 profile 运行项目内预定义 pytest 子集，并输出 JSON 证据报告。
 
+## DSL 离线质量基线
+
+`quality dsl-eval` 读取 `evals/dsl_quality/v1/manifest.json`，把 20 个已脱敏
+case 渲染为实际 Lab / Exam / Grading / PPT DSL 和候选人预览，再调用项目正式
+Draft 2020-12 校验器与跨产物质量规则。语料覆盖 5 个教学领域、中文/英文和
+normal/boundary 两类输入；每个 case 都会报告产物 id、逐项指标和失败原因。
+
+检查项包括：
+
+- 四类 DSL Schema 与 `WAITING_REVIEW` 状态。
+- Lab → Exam → Grading 的实体引用、题目到评分项/执行计划的引用覆盖。
+- Exam、题目、Grading check 和 assessment plan 的总分一致性。
+- 候选人预览中的 `answer` / `gradingRef` 字段和值泄漏。
+- Lab 学习目标/步骤完整性与 PPT 最小页数。
+
+```powershell
+ai-teaching-agent quality dsl-eval
+ai-teaching-agent quality dsl-eval --output examples/output/dsl-quality-eval.json
+python -m pytest tests/test_dsl_quality_eval.py -q
+```
+
+报告不含运行时间戳，同一 manifest 会生成字节稳定的 JSON 内容。该入口只读取
+本地脱敏 fixture，不联网、不调用真实 LLM、不执行选手代码，也不替代后续真实模型
+失败样本回归；新增真实失败样本时应先脱敏，再作为新 corpus 版本或明确 case 加入。
+
 ## 输入说明
 
 - `profile`: 预定义测试矩阵，当前支持 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`。`quick` / `core` 已包含 `lab_generation_v1`、`exam_grading_generation_v1`、`grading_stable_v1` 和 `frontend_core_manifest`：前三项分别保护 Lab 生成、Exam/Grading 生成和 Grading 稳定闭环，`frontend_core_manifest` 保护核心前端页面契约、数据加载器和本地闭环深链。真实 LLM 生成路径用离线假适配验证显式 opt-in、模型/base URL/API surface 传参、Provider 审计和人工审核边界；`grading_stable_v1` 默认不联网、不读取密钥、不调用真实平台。

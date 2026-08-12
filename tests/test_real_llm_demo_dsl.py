@@ -10,6 +10,7 @@ from providers import (
     build_real_llm_demo_dsl_error_context,
     run_real_llm_demo_dsl_generation,
 )
+from providers.real_llm_demo_dsl import build_real_llm_schema_failure_diagnostic
 from sandbox.grade_runner import GradingRunner
 from sandbox.real_sandbox_precheck import build_real_sandbox_precheck_report
 
@@ -2534,6 +2535,30 @@ def test_real_llm_demo_schema_failure_does_not_retry_by_default(monkeypatch):
         assert context["schemaFailureDiagnostic"] == diagnostic
     else:
         raise AssertionError("expected ProviderError")
+
+
+def test_schema_failure_diagnostic_classifies_standard_validator_constraints():
+    errors = [
+        {"field": "$.name", "reason": "expected length >= 3"},
+        {"field": "$.code", "reason": "expected string matching pattern '^[A-Z]+$'"},
+        {"field": "$.score", "reason": "expected <= 100"},
+        {"field": "$.choice", "reason": "expected exactly one schema in oneOf to match"},
+    ]
+
+    diagnostic = build_real_llm_schema_failure_diagnostic(
+        errors,
+        document={"kind": "Exam", "metadata": {}, "spec": {}},
+        kind="exam",
+        output_kind="Exam",
+    )
+
+    assert diagnostic["suspectedDriftTypes"] == [
+        "composition_mismatch",
+        "numeric_range",
+        "pattern_mismatch",
+        "string_length",
+    ]
+    assert len(diagnostic["recommendedActions"]) == 4
 
 
 def test_real_llm_demo_schema_failure_can_repair_once(monkeypatch):

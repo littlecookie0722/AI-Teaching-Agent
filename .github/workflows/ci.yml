@@ -10,9 +10,13 @@ permissions:
 
 jobs:
   test:
-    name: Python regression suite
+    name: Python ${{ matrix.python-version }} install and regression
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     env:
       ENABLE_REAL_LLM: "false"
       ENABLE_REAL_CLOUD: "false"
@@ -22,9 +26,52 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
           cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements.txt
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[dev,llm,postgres,mysql]"
+      - name: Verify wheel install from outside the checkout
+        run: python -m pytest tests/test_packaging.py -q
+      - name: Verify installed CLI help and JSON contract
+        run: |
+          ai-teaching-agent --help
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          result = subprocess.run(
+              ["ai-teaching-agent", "quality", "regression-profiles"],
+              check=True,
+              capture_output=True,
+              text=True,
+          )
+          payload = json.loads(result.stdout)
+          assert payload["success"] is True
+          assert payload["code"] == "OK"
+          assert payload["data"]["regressionProfiles"]["defaultProfile"] == "quick"
+
+          quality = subprocess.run(
+              [
+                  "ai-teaching-agent",
+                  "quality",
+                  "dsl-eval",
+                  "--output",
+                  os.path.join(os.environ["RUNNER_TEMP"], "dsl-quality-eval.json"),
+              ],
+              check=True,
+              capture_output=True,
+              text=True,
+          )
+          quality_payload = json.loads(quality.stdout)
+          quality_report = quality_payload["data"]["dslQualityEvaluation"]
+          assert quality_report["success"] is True
+          assert quality_report["summary"]["caseTotal"] == 20
+          PY
       - name: Run regression suite
-        run: python -m pytest -q
+        run: python -m pytest -q --ignore=tests/test_packaging.py -m "not integration and not real_llm_online"
