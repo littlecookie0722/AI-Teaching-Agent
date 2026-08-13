@@ -38,8 +38,9 @@ For workflow changes, also run a representative JSON CLI command and verify
 that generated output remains review-gated and schema-valid.
 
 Before pushing a public-release change, also run the tracked-tree security
-scan. It checks text fixtures, Git author/committer identity, PPTX core
-metadata, PNG text chunks, and JPEG EXIF without printing matched values:
+scan. It checks text fixtures, Notebook content, Git author/committer identity,
+PPTX core metadata, PNG text chunks, and JPEG EXIF without printing matched
+values:
 
 ```powershell
 python scripts/security_scan.py

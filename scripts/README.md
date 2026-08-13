@@ -4,8 +4,8 @@ Phase 1 本地脚本安全契约目录。当前只维护允许命令白名单和
 
 `security_scan.py` is the public-release check. It is read-only and only
 reports sanitized rule/path/line information. It checks tracked text files,
-the checked-out commit identity, PPTX core properties, PNG text chunks, and
-JPEG EXIF metadata.
+the checked-out commit identity, Notebook text, PPTX core properties, PNG text
+chunks, and JPEG EXIF metadata.
 
 ## 输入说明
 

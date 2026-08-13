@@ -29,6 +29,7 @@ TEXT_SUFFIXES = {
     ".contract",
     ".csv",
     ".html",
+    ".ipynb",
     ".ini",
     ".js",
     ".json",

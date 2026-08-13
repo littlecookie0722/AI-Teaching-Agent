@@ -40,6 +40,7 @@ def test_security_scan_checks_metadata_extensions() -> None:
     tracked = {path.suffix.lower() for path in security_scan._tracked_files()}
     assert ".pptx" in tracked
     assert ".png" in tracked
+    assert ".ipynb" in tracked
 
 
 def test_security_scan_flags_png_text_metadata(tmp_path: Path) -> None:
