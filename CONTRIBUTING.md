@@ -37,6 +37,22 @@ python -m pytest -q
 For workflow changes, also run a representative JSON CLI command and verify
 that generated output remains review-gated and schema-valid.
 
+Before pushing a public-release change, also run the tracked-tree security
+scan. It checks text fixtures, Git author/committer identity, PPTX core
+metadata, PNG text chunks, and JPEG EXIF without printing matched values:
+
+```powershell
+python scripts/security_scan.py
+```
+
+The repository-level Git identity is intentionally local to this checkout. Do
+not change global Git configuration for this project:
+
+```powershell
+git config --local user.name "littlecookie"
+git config --local user.email "littlecookie0722@users.noreply.github.com"
+```
+
 ## Pull Requests
 
 Describe the problem, the behavioral change, tests run, and any compatibility

@@ -2,6 +2,11 @@
 
 Phase 1 本地脚本安全契约目录。当前只维护允许命令白名单和禁止模式，不提供会操作生产、云资源或执行未知 Shell 的脚本。
 
+`security_scan.py` is the public-release check. It is read-only and only
+reports sanitized rule/path/line information. It checks tracked text files,
+the checked-out commit identity, PPTX core properties, PNG text chunks, and
+JPEG EXIF metadata.
+
 ## 输入说明
 
 - `manifest.json`: 本地验证命令、演示 Runbook 引用和脚本安全限制。
