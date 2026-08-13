@@ -1,6 +1,6 @@
 # Core Regression Run Evidence
 
-> Last updated: 2026-07-09
+> Last updated: 2026-08-13
 
 This document records the current local core regression run for the AI training platform project. It is an evidence note, not a new gate or a new test runner.
 
@@ -101,3 +101,50 @@ durationMs=21436
 ```
 
 The rerun keeps the same `quick` profile and output file, `examples/output/regression-matrix-quick.json`. It confirms the new `ReviewerSafetySummary` Grading Report contract is covered by `frontend_core_manifest` without adding another regression runner or gate.
+
+## Latest Offline Demo And Matrix Rerun
+
+This rerun records the first reproducible offline Demo slice. The Demo command
+and the fixed pytest profile were both executed from the current checkout on
+2026-08-13; earlier `commandTotal=9` entries above remain historical records.
+
+```powershell
+python lab_cli.py demo offline `
+  --output examples/output/offline-demo-summary.json `
+  --workflow-output examples/output/offline-demo-workflow-report.json `
+  --candidate-preview-output examples/output/offline-demo-candidate-preview.json
+```
+
+```text
+success=true
+summary.status=PASS
+summary.mode=offline
+summary.labValidated=true
+summary.examValidated=true
+summary.gradingValidated=true
+summary.pptValidated=true
+summary.candidatePreviewSafe=true
+summary.reviewStatus=WAITING_REVIEW
+summary.blockingIssueTotal=0
+summary.safety.realLlmCalled=false
+summary.safety.networkAccess=false
+summary.safety.sandboxExecuted=false
+summary.safety.realPublish=false
+```
+
+The fixed matrix was then rerun with the new `offline_demo` command:
+
+```powershell
+python lab_cli.py quality regression-matrix --profile quick --stop-on-failure --output examples/output/regression-matrix-quick.json
+python lab_cli.py quality regression-matrix --profile core --stop-on-failure --output examples/output/regression-matrix-core.json
+```
+
+```text
+profile=quick  commandTotal=10  executedTotal=10  passedTotal=10  failedTotal=0
+profile=core   commandTotal=13  executedTotal=13  passedTotal=13  failedTotal=0
+```
+
+The workflow also invokes `demo offline` before the core matrix and uploads its
+summary, workflow report, candidate preview, and CLI envelope as CI artifacts.
+The offline Demo remains deterministic and local: it does not call a model,
+read credentials, access the network, execute learner code, or publish.

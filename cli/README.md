@@ -7,6 +7,7 @@ Phase 1 的 `lab-cli` Mock 实现。该模块只做本地 DSL、状态流转和�
 ## 输入说明
 
 - Markdown 输入：如 `examples/input/demo-source.md`。
+- 无 Key 离线 Demo：`demo offline`，默认输入为 `examples/input/demo-source.md`，可通过 `--output`、`--workflow-output` 和 `--candidate-preview-output` 指定三个 JSON 产物路径。
 - 素材分析输入：本地 `.md`、`.markdown`、`.txt`、`.sh`、`.bash` 文件，最大 256KB。
 - DSL 输入：如 `templates/grading/examples/python-pytest.yaml`。
 - AI Task Mock 存储：默认写入 `cli/.lab_cli_store.json`，测试或本地隔离可通过 `LAB_CLI_STORE` 指定 JSON 文件路径。
@@ -155,6 +156,7 @@ python lab_cli.py backend-core mysql smoke --confirm-test-database --reviewer te
 python lab_cli.py quality regression-profiles
 python lab_cli.py quality regression-matrix --profile quick --output examples/output/regression-matrix-quick.json
 python lab_cli.py quality regression-matrix --profile core --stop-on-failure --output examples/output/regression-matrix-core.json
+python lab_cli.py demo offline
 python lab_cli.py grade normalize --grading examples/output/real-llm-grading.json --exam examples/output/real-llm-exam.json --output examples/output/real-llm-demo-grading-normalized.json
 python lab_cli.py grade report --file examples/output/grading-report.json
 python lab_cli.py audit list
@@ -416,6 +418,7 @@ python -m pytest
 - `phase2 workflow run --provider-mode real-llm-minimal` 是 Workflow 中回接真实 LLM 的最小 Lab 路径；真实调用只发生在 Lab DSL 生成步骤，Exam / Grading / PPT 仍为 Mock，报告、任务、产物、运行记录和审计会保留混合来源。
 - `phase2 workflow run --provider-mode real-llm` 是 Workflow 中正式真实大模型内容生成路径；真实调用发生在 Lab / Exam / Grading / PPT 四类 DSL 生成步骤，默认总计 4 次请求；若 OpenAI-compatible endpoint 不支持 Responses API，或 Responses 调用在兼容端点上表现为 `APIConnectionError`，会降级到 Chat Completions 并继续做本地 Schema 校验。也可显式传 `--api-surface chat.completions` 直接从 Chat Completions 开始；传 `--repair-on-schema-failure` 时，某一类 DSL Schema 校验失败会最多追加一次修复请求，因此总请求数可能超过 4，所有产物仍保持 `WAITING_REVIEW`，不自动发布、不执行沙箱、不生成真实 PPTX。
 - `phase2 workflow run --provider-mode real-llm-demo` 是历史演示路径，保留用于旧演示包和回归测试；后续真实开发默认使用 `real-llm`。
+- `demo offline` 是不依赖 API Key 的本地可复现入口：复用 Phase 2 Mock Workflow 和 Exam 候选人预览，校验四类 DSL、候选人脱敏、`WAITING_REVIEW` 和发布阻断；它不调用模型、不读取密钥、不联网、不执行选手代码、不发布。summary 与候选人预览只有通过校验后才写入指定路径，低级质量 warning 会保留给人工审核。
 - `phase2 demo-bundle acceptance` 只读取本地真实 Demo Bundle、`frontend/mock-data.json` 和 `mcp-server/tools.manifest.json`，生成演示闭环验收摘要；它核对 `/real-demo -> /review-center -> /ppt/:id/review -> /grading/:id/report`、`RealDemoReviewQueue`、MCP `get_review_task_summary` 输出合同和只读 evidence 报告明细，不新增 LLM 请求、不读取密钥、不访问网络、不执行选手代码、不发布。
 - `phase2 real-dsl-demo one-click` 是当前真实 LLM Demo P0 推荐总控入口；它复用已有真实 Workflow Report 和四类 DSL，按顺序生成本地校验报告、Demo Bundle、验收摘要、一键清单，并可在显式 `--run-close-loop` 与三项人工审核确认后继续生成导入预览和可选 mock platform entity readiness。默认不新增 LLM 请求、不读取密钥、不访问网络、不真实导入平台、不发布。
 - `phase2 real-dsl-demo close-loop` 读取已有真实 LLM Workflow Report，复用本地审核任务、人工审批和 `lab/exam/grade import-preview` 能力，生成 `RealLlmDemoCloseLoop` 报告。它要求显式传入 `--confirm-lab-review-approved`、`--confirm-exam-review-approved`、`--confirm-grading-review-approved`，表示审核人已人工确认三类 DSL 可进入导入预览；随后把 Lab / Exam / Grading 三类任务审批为 `APPROVED`，生成本地平台导入预览和 `PlatformImportPreviewSignoffChecklist`；PPT 保持 `WAITING_REVIEW` 进入页级人工审核。不新增 LLM 请求、不读取密钥、不访问网络、不写真实数据库、不真实导入平台、不发布。命令会优先基于 `generatedDsl` 回写和复用四类 taskId，`steps` 只作为工作流明细增强信息，裁剪报告缺少 `steps` 时不会中断本地闭环。若显式传入 `--create-mock-imports`，命令会把三类导入预览写入本地 JSON store 的 `platformEntities`，并在 `platformEntityReadinessReport.scope.platformEntities=lab_template/exam_question/grading_rule` 的 close-loop 导入实体作用域内给出 `allReadyForManualPlatformReview=true`；PPT Deck 不计入这条三类导入闭环 readiness，只在审核页和通用平台实体能力中单独复核。这只表示本地平台实体候选记录已准备好人工复核，不代表真实平台入库。若显式传入 `--controlled-submission`，该命令会额外对真实 Grading DSL 生成受控 Docker plan，并运行 `CONTROLLED_DOCKER_SANDBOX_POC` evidence 报告；此路径会在容器内执行 allowlist Python / pytest 检查，因此输出会标记 `sandboxExecuted=true`、`contestantCodeExecuted=true`，同时保持 `networkEnabled=false`、`hostExecutionAllowed=false`、`realPublishAllowed=false`。

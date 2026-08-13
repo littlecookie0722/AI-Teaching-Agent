@@ -1,6 +1,6 @@
 # examples
 
-Phase 1 示例输入目录。
+本地示例输入和可复现演示入口。
 
 ## 输入说明
 
@@ -15,6 +15,7 @@ Mock CLI 不会把 AI 结果直接发布，只返回示例 DSL 路径和 `WAITIN
 ## 命令示例
 
 ```powershell
+python lab_cli.py demo offline
 python lab_cli.py lab generate-from-source --input examples/input/demo-source.md
 python lab_cli.py material analyze --input examples/input/demo-source.md
 python lab_cli.py ppt generate --input examples/input/demo-source.md
@@ -29,5 +30,6 @@ python -m pytest
 
 ## 限制说明
 
-- 示例输入仅用于 Phase 1 Mock。
-- 不接入真实大模型，也不执行未知 Shell 脚本。
+- `demo offline` 使用本地 deterministic fixture / MockProvider，不读取 API Key、不联网。
+- 生成结果只进入 `WAITING_REVIEW`，不会自动发布；候选人预览不包含答案或内部 `gradingRef`。
+- 示例命令不执行未知 Shell 脚本，也不执行选手代码。

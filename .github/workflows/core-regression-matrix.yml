@@ -44,6 +44,19 @@ jobs:
       - name: Run core regression matrix
         run: |
           mkdir -p examples/output
+          python lab_cli.py demo offline \
+            --output examples/output/offline-demo-summary.json \
+            --workflow-output examples/output/offline-demo-workflow-report.json \
+            --candidate-preview-output examples/output/offline-demo-candidate-preview.json \
+            | tee examples/output/offline-demo-cli.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("examples/output/offline-demo-cli.json").read_text(encoding="utf-8"))
+          if payload.get("success") is not True or payload.get("data", {}).get("summary", {}).get("status") != "PASS":
+              raise SystemExit(1)
+          PY
           python lab_cli.py quality regression-matrix --profile core --stop-on-failure --output examples/output/regression-matrix-core.json | tee examples/output/regression-matrix-core-cli.json
           python - <<'PY'
           import json
@@ -60,6 +73,10 @@ jobs:
         with:
           name: core-regression-matrix-report
           path: |
+            examples/output/offline-demo-summary.json
+            examples/output/offline-demo-workflow-report.json
+            examples/output/offline-demo-candidate-preview.json
+            examples/output/offline-demo-cli.json
             examples/output/regression-matrix-core.json
             examples/output/regression-matrix-core-cli.json
           if-no-files-found: ignore

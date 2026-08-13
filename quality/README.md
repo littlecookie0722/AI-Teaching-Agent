@@ -29,7 +29,7 @@ python -m pytest tests/test_dsl_quality_eval.py -q
 
 ## 输入说明
 
-- `profile`: 预定义测试矩阵，当前支持 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`。`quick` / `core` 已包含 `lab_generation_v1`、`exam_grading_generation_v1`、`grading_stable_v1` 和 `frontend_core_manifest`：前三项分别保护 Lab 生成、Exam/Grading 生成和 Grading 稳定闭环，`frontend_core_manifest` 保护核心前端页面契约、数据加载器和本地闭环深链。真实 LLM 生成路径用离线假适配验证显式 opt-in、模型/base URL/API surface 传参、Provider 审计和人工审核边界；`grading_stable_v1` 默认不联网、不读取密钥、不调用真实平台。
+- `profile`: 预定义测试矩阵，当前支持 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`。`quick` / `core` 已包含 `lab_generation_v1`、`exam_grading_generation_v1`、`offline_demo`、`grading_stable_v1` 和 `frontend_core_manifest`：`offline_demo` 保护无 API Key 的四类 DSL、候选人预览和审核状态闭环；其余核心命令分别保护 Lab 生成、Exam/Grading 生成、Grading 稳定闭环和核心前端页面契约。真实 LLM 生成路径用离线假适配验证显式 opt-in、模型/base URL/API surface 传参、Provider 审计和人工审核边界；`grading_stable_v1` 默认不联网、不读取密钥、不调用真实平台。
 - `output`: 可选 JSON 报告路径，建议写入 `examples/output/` 或临时目录。
 - `timeoutSeconds`: 单条 pytest 命令超时时间。
 - `dryRun`: 只列出将执行的固定命令，不运行测试。
@@ -94,10 +94,11 @@ Workflow 会上传 `regression-matrix-core` JSON 报告；如果 CLI 返回 `suc
 - `grading_core` 覆盖受控 Docker evidence、evidence merge、评分 job/record 和 SQLite staging。
 - 说明：加入 `exam_grading_generation_v1` 后，新的 quick/core 矩阵命令数会增加；需要重新生成证据时继续使用同一个 `quality regression-matrix` 入口，不新增同义 runner。
 
-当前新增第三主功能后的 `quick` profile 已完成一次本地实跑；当前 quick profile 还会运行 `frontend_core_manifest`，用于保护 Review Center、Grading Report、AI Task 和 Platform Entities 等核心页契约：
+当前新增第三主功能后的 `quick` profile 已完成一次本地实跑；当前 quick profile 还会运行 `offline_demo` 和 `frontend_core_manifest`，分别保护无 key Demo 与 Review Center、Grading Report、AI Task 和 Platform Entities 等核心页契约：
 
 - JSON 报告：`examples/output/regression-matrix-quick.json`
-- 结果摘要：`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`
+- 结果摘要：`commandTotal=10`、`executedTotal=10`、`passedTotal=10`、`failedTotal=0`
+- `offline_demo` 覆盖 `python lab_cli.py demo offline` 的四类 DSL Schema 校验、候选人安全预览、`WAITING_REVIEW`、发布阻断和本地安全标记。
 - `exam_grading_generation_v1` 覆盖 Lab DSL 输入、真实 LLM 离线 fake 双请求、任务专属 Exam/Grading 输出、候选人安全预览、`WAITING_REVIEW` 和审核后本地 import-preview。
 - `grading_stable_v1` 覆盖单命令生成受控 evidence、创建 `GradingRecord`、输出 `reviewDetail` 与 `gradingResultPreview`，仍不自动复核、不发布。
 - `frontend_core_manifest` 覆盖核心静态页和渐进增强数据加载器，不启动真实平台、不执行发布。

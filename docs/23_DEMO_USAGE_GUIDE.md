@@ -118,6 +118,43 @@ python lab_cli.py workflow registry list
 python lab_cli.py mcp list
 ```
 
+#### 3.2.1 无 Key 离线 Demo
+
+从干净检出开始，先安装开发依赖，再运行一条不需要 API Key 的本地闭环：
+
+```powershell
+python -m pip install -e ".[dev]"
+python lab_cli.py demo offline
+```
+
+`demo offline` 使用本地 deterministic fixture / MockProvider，依次校验
+Lab、Exam、Grading、PPT 四类 DSL，生成不含 `answer` 和内部 `gradingRef`
+的候选人预览，并确认四类产物保持 `WAITING_REVIEW`、未审核前发布被阻断。
+默认会写入以下本地产物：
+
+```text
+examples/output/offline-demo-summary.json
+examples/output/offline-demo-workflow-report.json
+examples/output/offline-demo-candidate-preview.json
+```
+
+也可以把产物写入临时目录，避免混入仓库工作区：
+
+```powershell
+python lab_cli.py demo offline `
+  --input examples/input/demo-source.md `
+  --reviewer offline-demo `
+  --output .\tmp\offline-demo-summary.json `
+  --workflow-output .\tmp\offline-demo-workflow-report.json `
+  --candidate-preview-output .\tmp\offline-demo-candidate-preview.json
+```
+
+成功摘要的关键字段是 `status=PASS`、四类 `*Validated=true`、
+`candidatePreviewSafe=true`、`reviewStatus=WAITING_REVIEW`、
+`blockingIssueTotal=0`。低级内容 warning 会保留给人工审核，不代表自动通过。
+该命令不调用模型、不读取密钥、不联网、不执行选手代码、不发布；失败时仍返回
+统一 JSON envelope，并且不会写出未通过校验的 summary 或候选人预览。
+
 真实 LLM 成果复放的一键清单：
 
 ```powershell

@@ -1,6 +1,6 @@
 # 项目进度地图与防跑偏清单
 
-> 最后更新：2026-08-04
+> 最后更新：2026-08-13
 > 当前定位：AI 教学智能体（独立版）。真实 LLM 演示闭环已跑通到本地审核、受控评分 evidence、本地实体持久化和状态管理阶段；项目目标不再是接入外部平台，而是作为独立智能体运行。
 > 使用方式：后续每次继续开发前，先看本文件的“下一步路线”和“停止线”，避免在同一个功能点反复加门禁、加展示页或加运营材料。
 
@@ -74,6 +74,7 @@
 | Exam 候选人预览 | 移除答案、阻断标准答案泄漏、生成选手端预览。 | `python lab_cli.py exam candidate-preview ...` | M | 已完成，需接入真实前端。 |
 | PPT DSL 与 PPTX Artifact PoC | 从 PPT DSL 生成本地 `.pptx`、manifest、预览产物，等待审核。 | `python lab_cli.py ppt artifact build ...`、`docs/22_PPTX_ARTIFACT_POC.md` | L | PoC 已完成，版式质量待产品化。 |
 | Demo Bundle | 复放真实 LLM 产物，汇总 Schema 校验、候选预览、只读沙箱证据和 PPTX Artifact。 | `python lab_cli.py phase2 demo-bundle build/report ...`、`docs/21_REAL_LLM_DEMO_BUNDLE.md` | L | 已完成，可作为演示闭环入口。 |
+| 可复现 Offline Demo | `demo offline` 使用本地 deterministic fixture / MockProvider，串联四类 DSL Schema 校验、候选人安全预览、`WAITING_REVIEW` 和质量摘要；默认不需要 API Key，不联网、不执行选手代码、不发布。失败时保持统一 JSON envelope，且不会落盘未通过校验的 summary 或候选人预览。 | `python lab_cli.py demo offline`、`tests/test_offline_demo.py`、`quality regression-matrix --profile quick/core`、`.github/workflows/core-regression-matrix.yml` | S-M | B1 已完成，达到无 Key 可复现停止线；后续不再新增同义 Demo 入口，转入 MCP 契约稳定化或其他核心业务缺口。 |
 | 自动评分 Mock | `file_exists` / `stdout_contains` / `pytest` / `notebook_cell` / `json_field` / `log_keyword` 计划化报告。 | `sandbox/grade_runner.py`、`python lab_cli.py grade run ...` | L | Mock/计划层已完成，真实执行沙箱未生产化。 |
 | 只读沙箱证据 | 只读 evidence demo、真实沙箱前预检、禁止执行选手代码。 | `docs/19_REAL_SANDBOX_PRECHECK.md`、`docs/20_READONLY_SANDBOX_POC.md` | M | 已完成，后续与受控 Docker evidence 合并使用。 |
 | 受控评分沙箱 PoC | Docker 受控执行 `stdout_contains` / `pytest`，submission 只读挂载、网络关闭、只读 rootfs、资源限制、stdout/stderr 捕获、失败/超时样例、审计隔离摘要和本地镜像供应链审计；报告会透出 `imageSupplyChain`，包含本地 `docker image inspect` 的 imageId/digest、allowlist 匹配、禁止自动 pull、未使用 registry auth 和未访问生产 registry；报告还会透出 `isolationQuality`，汇总网络关闭、只读挂载、只读 rootfs、资源限制、输出捕获、本地镜像检查和 registry 网络未使用等本地质量信号。 | `sandbox/controlled_command_executor.py`、`python lab_cli.py grade sandbox-run --execution-mode controlled-command ...`、`/api/grading/controlled-evidence` | L | 本地 evidence 质量摘要已完成；不是生产队列/多租户沙箱/镜像签名强校验。后续只做真实生产化接入或具体隔离缺陷修复，不再新增同义门禁或同义质量摘要。 |
@@ -128,7 +129,7 @@
 | MCP Server 真部署 | 启动真实 MCP Server，暴露稳定工具，接入工具权限、审计、审核；本地 stdio 客户端配置和 `local-core-mvp` 调用顺序已记录。 | L-XL | P2 | 只封装已稳定 CLI/API，不把业务规则藏到 Agent prompt；当前本地停止线是 stdio + local-core profile + 人工审核点，不做网络 MCP 服务或真实平台工具。 |
 | 智能体 MVP | Agent 根据目标调用核心 MCP 工具，生成任务计划并停在审核点。 | L-XL | P2 | 能完成一条演示链路，不允许自动发布或自动销毁资源。 |
 | VM / Notebook 环境管理 | 实验环境镜像、Notebook 启停、资源配额、回收、审计。 | XL | P3 | 先对接测试环境，不碰生产云资源。 |
-| CI / 回归测试 | 已新增本地固定回归测试矩阵：`quality regression-profiles` 可列出 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp` profile；`quality regression-matrix` 可运行预定义 pytest 子集并输出 JSON evidence，默认排除 `integration` 和 `real_llm_online`，不接受任意命令、不使用 shell；`.github/workflows/core-regression-matrix.yml` 已在 PR / 手动触发时调用同一个 `core` profile，并上传 JSON artifact，CLI 返回 `success=false` 时会显式失败；`grading_core` 已纳入受控 Docker evidence、evidence merge、评分 job/record 和 SQLite staging；`quick` profile 已包含 Lab 生成、Exam/Grading 生成、Grading stable v1、Backend ASGI、MCP stdio 和 Frontend core manifest；2026-07-04 已完成本地 `core` profile 实跑，`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`；2026-07-09 本地 `quick` profile 实跑覆盖 `frontend_core_manifest`，`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`、`durationMs=21040`。 | `quality/regression_matrix.py`、`.github/workflows/core-regression-matrix.yml`、`python lab_cli.py quality regression-matrix --profile quick --stop-on-failure --output examples/output/regression-matrix-quick.json`、`examples/output/regression-matrix-quick.json`、`docs/26_CORE_REGRESSION_RUN_EVIDENCE.md`、`tests/test_quality_regression_matrix.py`、`tests/test_cli.py::test_quality_regression_matrix_cli_writes_json_report` | M | 本地 PR 前回归矩阵入口、GitHub Actions 配置和本地 core/quick 实跑 evidence 已完成；后续只记录 GitHub Actions / 外部 CI 实际运行 artifact，或在新增核心能力时向现有 profile 增补必要测试文件，不再新增同义测试矩阵壳、同义 CI 壳或任意命令执行器。 |
+| CI / 回归测试 | 已新增本地固定回归测试矩阵：`quality regression-profiles` 可列出 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp` profile；`quality regression-matrix` 可运行预定义 pytest 子集并输出 JSON evidence，默认排除 `integration` 和 `real_llm_online`，不接受任意命令、不使用 shell；`.github/workflows/core-regression-matrix.yml` 已在 PR / 手动触发时先运行 `demo offline`，再调用同一个 `core` profile，并上传离线 Demo 与矩阵 JSON artifact，CLI 返回 `success=false` 时会显式失败；`grading_core` 已纳入受控 Docker evidence、evidence merge、评分 job/record 和 SQLite staging；`quick` / `core` profile 已包含 Lab 生成、Exam/Grading 生成、`offline_demo`、Grading stable v1、Backend ASGI、MCP stdio 和 Frontend core manifest；2026-07-04 已完成历史本地 `core` profile 实跑，`commandTotal=9`、`executedTotal=9`、`passedTotal=9`、`failedTotal=0`；新增离线 Demo 后的当前实跑结果记录在 `docs/26_CORE_REGRESSION_RUN_EVIDENCE.md`。 | `quality/regression_matrix.py`、`.github/workflows/core-regression-matrix.yml`、`python lab_cli.py demo offline`、`python lab_cli.py quality regression-matrix --profile quick/core --stop-on-failure`、`examples/output/regression-matrix-quick.json`、`docs/26_CORE_REGRESSION_RUN_EVIDENCE.md`、`tests/test_offline_demo.py`、`tests/test_quality_regression_matrix.py` | M | 本地 PR 前回归矩阵入口、离线 Demo CLI/测试和 GitHub Actions 配置已完成；后续只记录实际远端 workflow artifact，或在新增核心能力时向现有 profile 增补必要测试文件，不再新增同义测试矩阵壳、同义 CI 壳或任意命令执行器。 |
 | 部署与运维 | Docker/服务部署、配置、日志、监控、密钥管理、告警。 | XL | P3 | 先部署开发/测试环境，不做生产 SLA 承诺。 |
 
 ### 4.1 可复现 DSL 质量基线
@@ -140,6 +141,18 @@ DSL 执行 Draft 2020-12、`WAITING_REVIEW`、跨产物引用/总分、候选人
 因此是内容质量基线而不是第二套 regression runner。做到默认 corpus 20/20 通过、
 破坏性 fixture 能稳定报错、CLI/CI 可复现后即停止；后续只加入经过脱敏的真实失败
 样本，不继续堆同义 runner 或虚构质量规则。
+
+### 4.2 可复现 Offline Demo
+
+2026-08-13 新增 `demo offline` 作为无 API Key 的最短本地闭环入口。它复用
+现有 Phase 2 Mock Workflow 和正式 Exam 候选人预览构建器，不复制生成、审核或
+脱敏业务逻辑。入口输出四类 DSL 校验摘要、候选人预览路径、质量阻塞/告警数量、
+`WAITING_REVIEW` 审核状态和本地安全标记；候选人预览与 summary 只有在校验通过后
+才写入指定路径。
+
+B1 停止线：默认 fixture 可稳定返回 `status=PASS`，四类 DSL Schema 通过，候选人
+预览无答案泄漏，`blockingIssueTotal=0`，并由固定 quick/core 回归与 GitHub Actions
+调用同一入口。达到该停止线后，不再新增第二个 offline runner、同义安全壳或展示页。
 
 ---
 

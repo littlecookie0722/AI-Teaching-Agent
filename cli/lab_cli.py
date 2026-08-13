@@ -5380,6 +5380,21 @@ def build_parser() -> argparse.ArgumentParser:
     workflow_registry_get = workflow_registry_sub.add_parser("get")
     workflow_registry_get.add_argument("--workflow-id", required=True)
 
+    demo = subparsers.add_parser("demo")
+    demo_sub = demo.add_subparsers(dest="command", required=True)
+    demo_offline = demo_sub.add_parser("offline")
+    demo_offline.add_argument("--input", default="examples/input/demo-source.md")
+    demo_offline.add_argument("--reviewer", default="offline-demo")
+    demo_offline.add_argument("--output", default="examples/output/offline-demo-summary.json")
+    demo_offline.add_argument(
+        "--workflow-output",
+        default="examples/output/offline-demo-workflow-report.json",
+    )
+    demo_offline.add_argument(
+        "--candidate-preview-output",
+        default="examples/output/offline-demo-candidate-preview.json",
+    )
+
     phase1 = subparsers.add_parser("phase1")
     phase1_sub = phase1.add_subparsers(dest="command", required=True)
     phase1_check = phase1_sub.add_parser("check")
@@ -6882,6 +6897,141 @@ def _summarize_phase2_report(report: dict[str, Any]) -> dict[str, Any]:
         "safety": report.get("safety", {}),
         "traceId": report.get("traceId"),
     }
+
+
+def _build_offline_demo_summary(
+    *,
+    report: dict[str, Any],
+    input_path: Path,
+    workflow_output_path: Path,
+    candidate_preview_output_path: Path,
+    candidate_preview: dict[str, Any],
+) -> dict[str, Any]:
+    generated = report.get("generatedDsl", {})
+    schema_checks = report.get("qualitySignals", {}).get("schemaChecks", {})
+    content_quality = report.get("contentQualitySummary", {})
+    quality_items = content_quality.get("items", {}) if isinstance(content_quality, dict) else {}
+    dsl_summary = {
+        kind: {
+            "dslId": item.get("dslId"),
+            "path": item.get("dslPath"),
+            "schemaValidated": schema_checks.get(kind, {}).get("schemaValidated") is True,
+            "status": item.get("status"),
+            "reviewRequired": item.get("reviewRequired") is True,
+            "qualityStatus": quality_items.get(kind, {}).get("status"),
+            "blockingIssueTotal": quality_items.get(kind, {}).get("blockingIssueTotal", 0),
+            "warningIssueTotal": quality_items.get(kind, {}).get("warningIssueTotal", 0),
+        }
+        for kind, item in generated.items()
+        if isinstance(item, dict)
+    }
+    expected_kinds = {"lab", "exam", "grading", "ppt"}
+    schema_validated = set(dsl_summary) == expected_kinds and all(
+        item["schemaValidated"] for item in dsl_summary.values()
+    )
+    review_gated = set(dsl_summary) == expected_kinds and all(
+        item["status"] == TaskStatus.WAITING_REVIEW.value and item["reviewRequired"]
+        for item in dsl_summary.values()
+    )
+    review_summary = report.get("reviewSummary", {})
+    review_required = review_summary.get("reviewRequired") is True
+    publish_blocked = review_summary.get("publishBlockedUntilApproved") is True
+    candidate_safe = (
+        candidate_preview.get("answersRemoved") is True
+        and candidate_preview.get("answerVisibleToCandidate") is False
+        and candidate_preview.get("redaction", {}).get("answerLeakDetected") is False
+    )
+    summary = {
+        "status": "PASS"
+        if schema_validated and review_gated and candidate_safe and review_required and publish_blocked
+        else "FAIL",
+        "mode": "offline",
+        "workflowId": report.get("workflowId"),
+        "input": str(input_path),
+        "workflowReportPath": str(workflow_output_path),
+        "candidatePreviewPath": str(candidate_preview_output_path),
+        "labValidated": dsl_summary.get("lab", {}).get("schemaValidated", False),
+        "examValidated": dsl_summary.get("exam", {}).get("schemaValidated", False),
+        "gradingValidated": dsl_summary.get("grading", {}).get("schemaValidated", False),
+        "pptValidated": dsl_summary.get("ppt", {}).get("schemaValidated", False),
+        "candidatePreviewSafe": candidate_safe,
+        "reviewStatus": TaskStatus.WAITING_REVIEW.value if review_gated else "INVALID",
+        "reviewRequired": review_required,
+        "publishBlockedUntilApproved": publish_blocked,
+        "blockingIssueTotal": content_quality.get("blockingIssueTotal", 0) if isinstance(content_quality, dict) else 0,
+        "warningIssueTotal": content_quality.get("warningTotal", 0) if isinstance(content_quality, dict) else 0,
+        "generatedDsl": dsl_summary,
+        "safety": {
+            "realLlmCalled": report.get("safety", {}).get("realLlmCalled", False),
+            "secretsRead": report.get("safety", {}).get("secretsRead", False),
+            "networkAccess": report.get("safety", {}).get("networkAccess", False),
+            "sandboxExecuted": report.get("safety", {}).get("sandboxExecuted", False),
+            "contestantCodeExecuted": report.get("safety", {}).get("contestantCodeExecuted", False),
+            "unknownShellExecuted": report.get("safety", {}).get("unknownShellExecuted", False),
+            "realCloudResourceCreated": report.get("safety", {}).get("realCloudResourceCreated", False),
+            "realCloudResourceChanged": report.get("safety", {}).get("realCloudResourceChanged", False),
+            "autoPublishAllowed": report.get("safety", {}).get("autoPublishAllowed", False),
+            "realPublish": report.get("safety", {}).get("realPublish", False),
+            "reviewBypassed": report.get("safety", {}).get("reviewBypassed", False),
+        },
+        "traceId": report.get("traceId"),
+    }
+    return summary
+
+
+def _validate_offline_demo_summary(summary: dict[str, Any]) -> None:
+    if summary.get("mode") != "offline":
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 报告格式错误",
+            [{"field": "mode", "reason": "必须是 offline"}],
+        )
+    if summary.get("status") != "PASS":
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 校验失败",
+            [{"field": "status", "reason": "离线主链路未通过"}],
+        )
+    if summary.get("blockingIssueTotal", 0) != 0:
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 存在质量阻塞项",
+            [{"field": "blockingIssueTotal", "reason": "must be zero"}],
+        )
+    if summary.get("reviewStatus") != TaskStatus.WAITING_REVIEW.value:
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 必须保留人工审核状态",
+            [{"field": "reviewStatus", "reason": "expected WAITING_REVIEW"}],
+        )
+    if summary.get("reviewRequired") is not True or summary.get("publishBlockedUntilApproved") is not True:
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 必须阻断未审核发布",
+            [{"field": "reviewSummary", "reason": "review is required and publish must remain blocked"}],
+        )
+    safety = summary.get("safety", {})
+    if any(
+        bool(safety.get(field))
+        for field in (
+            "realLlmCalled",
+            "secretsRead",
+            "networkAccess",
+            "sandboxExecuted",
+            "contestantCodeExecuted",
+            "unknownShellExecuted",
+            "realCloudResourceCreated",
+            "realCloudResourceChanged",
+            "autoPublishAllowed",
+            "realPublish",
+            "reviewBypassed",
+        )
+    ):
+        raise CliError(
+            "VALIDATION_ERROR",
+            "Offline Demo 包含不允许的真实执行标记",
+            [{"field": "safety", "reason": "offline mode must remain local and review-gated"}],
+        )
 
 
 def _validate_phase2_report(report: dict[str, Any]) -> None:
@@ -10462,6 +10612,93 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 "readyForPhase2MockHandoff": summary["readyForPhase2MockHandoff"],
                 "missingRequired": manifest_summary["missingRequired"],
                 "safetyAssertionsPassed": summary["safetyAssertionsPassed"],
+            },
+            trace_id,
+        )
+
+    if args.group == "demo" and args.command == "offline":
+        input_path = _path(args.input)
+        workflow_output_path = _path(args.workflow_output)
+        candidate_preview_output_path = _path(args.candidate_preview_output)
+        summary_output_path = _path(args.output)
+        phase2_args = argparse.Namespace(
+            group="phase2",
+            command="workflow",
+            workflow_command="run",
+            input=str(input_path),
+            reviewer=args.reviewer,
+            output=str(workflow_output_path),
+            provider_mode=PROVIDER_MODE_MOCK,
+            target_users="高职学生",
+            duration_minutes=60,
+            difficulty="beginner",
+            tech_tags="",
+            teaching_style="guided_practice",
+            real_lab_output=REAL_LLM_MINIMAL_LAB_OUTPUT_REF,
+            real_llm_lab_output=REAL_LLM_OUTPUT_REFS["lab"],
+            real_llm_exam_output=REAL_LLM_OUTPUT_REFS["exam"],
+            real_llm_grading_output=REAL_LLM_OUTPUT_REFS["grading"],
+            real_llm_ppt_output=REAL_LLM_OUTPUT_REFS["ppt"],
+            real_demo_lab_output=REAL_LLM_DEMO_OUTPUT_REFS["lab"],
+            real_demo_exam_output=REAL_LLM_DEMO_OUTPUT_REFS["exam"],
+            real_demo_grading_output=REAL_LLM_DEMO_OUTPUT_REFS["grading"],
+            real_demo_ppt_output=REAL_LLM_DEMO_OUTPUT_REFS["ppt"],
+            model=None,
+            base_url=None,
+            timeout_seconds=60,
+            max_output_tokens=1800,
+            api_surface="auto",
+            repair_on_schema_failure=False,
+            explicit_real_call_opt_in=False,
+            confirm_single_request=False,
+            confirm_lab_only=False,
+            confirm_real_dsl=False,
+            confirm_demo_real_dsl=False,
+            confirm_waiting_review=False,
+            confirm_no_auto_publish=False,
+        )
+        workflow_result = handle(phase2_args, trace_id)
+        if not workflow_result.get("success"):
+            raise CliError(
+                "OFFLINE_DEMO_FAILED",
+                "Offline Demo Workflow 执行失败",
+                [{"field": "workflow", "reason": workflow_result.get("message", "unknown error")}],
+            )
+        workflow_data = workflow_result["data"]
+        exam_path = _path(workflow_data["generatedDsl"]["exam"]["dslPath"])
+        try:
+            candidate_preview = build_exam_candidate_preview_from_file(
+                exam_path,
+                root=ROOT,
+                trace_id=trace_id,
+            )
+        except ExamCandidatePreviewError as exc:
+            _raise_exam_candidate_preview_error(exc)
+        summary = _build_offline_demo_summary(
+            report=workflow_data,
+            input_path=input_path,
+            workflow_output_path=workflow_output_path,
+            candidate_preview_output_path=candidate_preview_output_path,
+            candidate_preview=candidate_preview,
+        )
+        _validate_offline_demo_summary(summary)
+        _write_json(candidate_preview_output_path, candidate_preview)
+        _write_json(summary_output_path, summary)
+        created_tasks = workflow_data.get("createdTasks", [])
+        task_ids = {
+            task.get("taskType"): task.get("id")
+            for task in created_tasks
+            if isinstance(task, dict) and task.get("taskType") and task.get("id")
+        }
+        return ok(
+            "Offline Demo 执行完成，四类 DSL 均等待人工审核",
+            {
+                "summary": summary,
+                "summaryPath": str(summary_output_path),
+                "workflowReportPath": str(workflow_output_path),
+                "candidatePreviewPath": str(candidate_preview_output_path),
+                "taskIds": task_ids,
+                "workflowRunId": workflow_data.get("workflowRun", {}).get("id"),
             },
             trace_id,
         )

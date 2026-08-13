@@ -4,7 +4,7 @@
 
 ## 输入说明
 
-通过 `workflow demo` 的 `--output` 参数指定输出路径；不指定时默认写入本目录。
+通过命令的 `--output` 参数指定输出路径；不指定时默认写入本目录。
 
 ## 输出说明
 
@@ -15,9 +15,15 @@
 - `reviewRequired`: 是否需要人工审核
 - `publishBlockedUntilApproved`: 是否阻止未审核发布
 
+`demo offline` 还会写出两个关联文件：`offline-demo-workflow-report.json`
+和 `offline-demo-candidate-preview.json`。Demo summary 中的
+`blockingIssueTotal` 必须为 0；低级质量 warning 可以保留并交给人工审核，
+不会被误判为自动通过。
+
 ## 命令示例
 
 ```powershell
+python lab_cli.py demo offline
 python lab_cli.py grade run --grading templates/grading/examples/python-pytest.yaml --output examples/output/grading-report.json
 python lab_cli.py grade report --file examples/output/grading-report.json
 python lab_cli.py workflow demo --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/demo-report.json

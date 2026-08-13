@@ -92,6 +92,7 @@ From a Git checkout, the installed console command and the historical
 ```powershell
 ai-teaching-agent lab generate-from-source --input examples/input/demo-source.md
 ai-teaching-agent exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml
+ai-teaching-agent demo offline
 ai-teaching-agent quality dsl-eval --output examples/output/dsl-quality-eval.json
 python -m pytest -q
 ```
@@ -114,6 +115,20 @@ environment or a source checkout.
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,
 environment-provided credentials, and still creates a `WAITING_REVIEW` task.
+
+The no-key offline demo is the shortest end-to-end check:
+
+```powershell
+ai-teaching-agent demo offline
+```
+
+It validates the four local Lab/Exam/Grading/PPT DSL fixtures, creates a
+candidate-safe Exam preview, and confirms that generated work remains in
+`WAITING_REVIEW` with publishing blocked until approval. It does not call a
+model, read credentials, access the network, execute learner code, or publish.
+The default outputs are written under `examples/output/` and are ignored as
+local generated artifacts; pass `--output`, `--workflow-output`, and
+`--candidate-preview-output` to choose another writable directory.
 
 The offline quality command evaluates 20 sanitized, review-gated Lab/Exam/
 Grading/PPT bundles across five teaching domains, Chinese and English, and
