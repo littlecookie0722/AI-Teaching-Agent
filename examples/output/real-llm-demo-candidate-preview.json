@@ -38,5 +38,5 @@
     "contestantCodeExecuted": false
   },
   "sourcePath": "examples/output/real-llm-exam.json",
-  "traceId": "trace_demo_bundle"
+  "traceId": "trace_demo_candidate_preview"
 }

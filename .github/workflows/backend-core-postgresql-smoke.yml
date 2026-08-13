@@ -27,6 +27,7 @@ jobs:
         env:
           POSTGRES_DB: lab_core_smoke
           POSTGRES_USER: lab_core
+          # CI-only ephemeral fixture; never reused outside this job.
           POSTGRES_PASSWORD: ci_ephemeral_only
         ports:
           - "5432:5432"

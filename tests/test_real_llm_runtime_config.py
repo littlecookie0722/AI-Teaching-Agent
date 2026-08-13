@@ -18,7 +18,7 @@ def test_real_llm_runtime_config_summary_is_readonly_and_redacted():
     assert payload["env"]["OPENAI_API_KEY"]["valueReturned"] is False
     assert "value" not in payload["env"]["OPENAI_API_KEY"]
     assert payload["env"]["OPENAI_MODEL"]["value"] == "mimo-v2.5-pro"
-    assert payload["env"]["OPENAI_BASE_URL"]["value"] == "https://api.example.test/v1"
+    assert payload["env"]["OPENAI_BASE_URL"]["value"] == "https://<redacted-host>/v1"
     assert payload["readyForRealLlmCommand"] is True
     assert payload["missingRequiredEnv"] == []
     assert payload["commandReadiness"]["canRunWithCurrentEnvironment"] is True
@@ -58,7 +58,7 @@ def test_real_llm_runtime_config_summary_uses_argument_model_without_secret_valu
     assert payload["env"]["OPENAI_MODEL"]["source"] == "argument"
     assert payload["env"]["OPENAI_MODEL"]["envPresent"] is False
     assert payload["env"]["OPENAI_MODEL"]["argumentProvided"] is True
-    assert payload["env"]["OPENAI_BASE_URL"]["value"] == "https://api.deepseek.com"
+    assert payload["env"]["OPENAI_BASE_URL"]["value"] == "https://<redacted-host>"
     assert payload["env"]["OPENAI_BASE_URL"]["source"] == "argument"
     readiness = payload["commandReadiness"]
     assert readiness["canRunWithCurrentEnvironment"] is True
@@ -66,10 +66,12 @@ def test_real_llm_runtime_config_summary_uses_argument_model_without_secret_valu
     assert readiness["baseUrl"]["source"] == "argument"
     templates = payload["safeCommandTemplates"]
     assert templates["placeholders"]["model"] is None
-    assert templates["placeholders"]["baseUrl"] is None
+    assert templates["placeholders"]["baseUrl"] == "<openai-compatible-base-url>"
     assert "deepseek-v4-flash" in templates["runtimeConfigCheckArgs"]
-    assert "https://api.deepseek.com" in templates["runtimeConfigCheckArgs"]
+    assert "https://api.deepseek.com" not in templates["runtimeConfigCheckArgs"]
+    assert "<openai-compatible-base-url>" in templates["runtimeConfigCheckArgs"]
     assert "deepseek-v4-flash" in templates["workflowRunArgs"]
-    assert "https://api.deepseek.com" in templates["workflowRunArgs"]
+    assert "https://api.deepseek.com" not in templates["workflowRunArgs"]
+    assert "<openai-compatible-base-url>" in templates["workflowRunArgs"]
     assert "--confirm-real-dsl" in templates["workflowRunArgs"]
     assert "sk-test-never-return" not in json.dumps(payload)

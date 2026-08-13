@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from urllib.parse import urlsplit
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -40,6 +41,7 @@ def build_real_llm_runtime_config_summary(
     base_url_env_value = _clean(env.get(BASE_URL_ENV))
     model_value = model_arg or model_env_value
     base_url_value = base_url_arg or base_url_env_value
+    base_url_summary = _redacted_base_url(base_url_value)
     model_source = "argument" if model_arg else "environment" if model_env_value else None
     base_url_source = "argument" if base_url_arg else "environment" if base_url_env_value else None
     requirements_path = root / "requirements.txt"
@@ -83,7 +85,7 @@ def build_real_llm_runtime_config_summary(
             },
             BASE_URL_ENV: {
                 "present": bool(base_url_value),
-                "value": base_url_value,
+                "value": base_url_summary,
                 "source": base_url_source,
                 "envPresent": bool(base_url_env_value),
                 "argumentProvided": bool(base_url_arg),
@@ -161,7 +163,7 @@ def _build_command_readiness(
         },
         "baseUrl": {
             "required": False,
-            "value": base_url_value,
+            "value": _redacted_base_url(base_url_value),
             "source": base_url_source,
             "acceptedSources": ["--base-url", BASE_URL_ENV],
         },
@@ -174,7 +176,7 @@ def _build_safe_command_templates(
     base_url_value: str | None,
 ) -> dict[str, Any]:
     model_arg = model_value or "<model-name>"
-    base_url_arg = base_url_value or "<openai-compatible-base-url>"
+    base_url_arg = "<openai-compatible-base-url>"
     runtime_args = [
         "python",
         "lab_cli.py",
@@ -225,7 +227,7 @@ def _build_safe_command_templates(
         "placeholders": {
             "apiKey": "<your-api-key>",
             "model": None if model_value else "<model-name>",
-            "baseUrl": None if base_url_value else "<openai-compatible-base-url>",
+            "baseUrl": "<openai-compatible-base-url>",
         },
         "defaultOutputs": {
             "report": DEFAULT_DEMO_REPORT,
@@ -233,6 +235,7 @@ def _build_safe_command_templates(
         },
         "notes": [
             "Templates never include an API key value.",
+            "Templates never include the configured base URL host; provide it explicitly when running the command.",
             "The runtime config check is read-only and sends no request.",
             "The workflow command sends a real LLM request only after the operator sets the API key environment variable and keeps explicit confirmations.",
         ],
@@ -242,6 +245,21 @@ def _build_safe_command_templates(
 def _clean(value: str | None) -> str | None:
     text = str(value or "").strip()
     return text or None
+
+
+def _redacted_base_url(value: str | None) -> str | None:
+    """Keep scheme/path shape while hiding provider or internal hostnames."""
+    cleaned = _clean(value)
+    if not cleaned:
+        return None
+    try:
+        parsed = urlsplit(cleaned)
+    except ValueError:
+        return "<redacted-base-url>"
+    if not parsed.scheme or not parsed.netloc:
+        return "<redacted-base-url>"
+    path = parsed.path.rstrip("/") or ""
+    return f"{parsed.scheme}://<redacted-host>{path}"
 
 
 def _present(value: str | None) -> bool:

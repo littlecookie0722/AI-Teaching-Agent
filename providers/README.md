@@ -81,7 +81,7 @@ Phase 1 Provider Mock 抽象目录。当前只实现 `MockProvider`，用于预�
 - `providers/real-llm-sdk-boundary.contract.json`：真实 LLM SDK 边界检查机器契约，约束 `sdkImportAttempted=false`、`sdkImported=false`、`clientCreated=false`、`secretValueRead=false`、`networkAccess=false`、`realLlmCalled=false`。
 - `providers/real_llm_sdk_client_boundary.py`：真实 LLM SDK client 构造边界，显式确认后允许导入 `openai` SDK、读取 `OPENAI_API_KEY` 仅用于构造本地 client；不返回或记录密钥、不发起模型请求、不联网、不生成内容。
 - `providers/real-llm-sdk-client-boundary.contract.json`：真实 LLM SDK client 构造边界契约，约束 `clientCreated=true` 也不代表真实调用授权，`networkAccess=false`、`realLlmCalled=false`、`secretValueReturned=false`。
-- `providers/real_llm_runtime_config.py`：真实 LLM 运行时配置只读摘要，可汇总 `OPENAI_API_KEY` 是否存在以及模型名 / base URL 的环境变量或 CLI 参数来源，并返回 `commandReadiness` 与无密钥 `safeCommandTemplates` 供操作者复制检查命令和 workflow 参数；不接受 key 参数、不返回密钥值、不导入 SDK、不创建 client、不发送请求。
+- `providers/real_llm_runtime_config.py`：真实 LLM 运行时配置只读摘要，可汇总 `OPENAI_API_KEY` 是否存在以及模型名 / base URL 的来源和脱敏摘要，并返回不包含密钥或 endpoint 主机名的 `safeCommandTemplates` 供操作者补全检查命令和 workflow 参数；不接受 key 参数、不返回密钥值、不导入 SDK、不创建 client、不发送请求。
 - `providers/real_llm_minimal_poc.py`：真实 LLM 最小单请求 PoC，显式 opt-in 后读取 `OPENAI_API_KEY`、创建 OpenAI client、发送一次 Responses API 请求，返回 Lab DSL JSON；本地校验 schema 和 `WAITING_REVIEW` 状态，不 batch、不 streaming、不发布。
 - `providers/real_llm_request_review_package.py`：真实 LLM 首个请求审核包，只生成本地脱敏 request shape、schema/timeout/retry 配置和人工审核 checklist；不导入 SDK、不创建 client、不检查或读取密钥、不发送请求。
 - `providers/real-llm-request-review-package.contract.json`：真实 LLM 请求审核包机器契约，约束 `requestReviewPackageReady=true` 也不代表真实调用授权，`requestSent=false`、`networkAccess=false`、`realLlmCalled=false`。

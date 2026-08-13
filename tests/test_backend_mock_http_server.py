@@ -4,7 +4,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from backend.mock_api import handle_request
-from backend.mock_http_server import build_server
+from backend.mock_http_server import build_server, is_loopback_host, validate_bind_auth
 
 
 def read_json(url):
@@ -41,6 +41,33 @@ def stop_server(server, thread):
     server.shutdown()
     thread.join(timeout=5)
     server.server_close()
+
+
+def test_bind_auth_accepts_loopback_hosts_without_token(monkeypatch):
+    monkeypatch.delenv("LAB_BACKEND_API_TOKEN", raising=False)
+
+    assert is_loopback_host("127.0.0.1") is True
+    assert is_loopback_host("::1") is True
+    assert is_loopback_host("localhost") is True
+    validate_bind_auth("127.0.0.1")
+    validate_bind_auth("localhost")
+
+
+def test_bind_auth_rejects_non_loopback_without_token(monkeypatch):
+    monkeypatch.delenv("LAB_BACKEND_API_TOKEN", raising=False)
+
+    try:
+        validate_bind_auth("0.0.0.0")
+    except ValueError as exc:
+        assert "token" in str(exc).lower()
+        assert "127.0.0.1" in str(exc)
+    else:
+        raise AssertionError("expected non-loopback unauthenticated bind rejection")
+
+
+def test_bind_auth_accepts_non_loopback_with_token(monkeypatch):
+    monkeypatch.setenv("LAB_BACKEND_API_TOKEN", "test-bind-token")
+    validate_bind_auth("0.0.0.0")
 
 
 def test_mock_http_server_serves_api_and_review_center(tmp_path):

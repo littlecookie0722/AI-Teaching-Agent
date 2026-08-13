@@ -2940,13 +2940,14 @@ def test_provider_real_llm_runtime_config_accepts_cli_model_and_base_url_without
     assert env["OPENAI_MODEL"]["source"] == "argument"
     assert env["OPENAI_MODEL"]["envPresent"] is False
     assert env["OPENAI_MODEL"]["argumentProvided"] is True
-    assert env["OPENAI_BASE_URL"]["value"] == "https://api.deepseek.com"
+    assert env["OPENAI_BASE_URL"]["value"] == "https://<redacted-host>"
     assert env["OPENAI_BASE_URL"]["source"] == "argument"
     assert payload["data"]["readyForRealLlmCommand"] is True
     assert payload["data"]["commandReadiness"]["model"]["source"] == "argument"
     assert payload["data"]["commandReadiness"]["baseUrl"]["source"] == "argument"
     assert "deepseek-v4-flash" in payload["data"]["safeCommandTemplates"]["workflowRunArgs"]
-    assert "https://api.deepseek.com" in payload["data"]["safeCommandTemplates"]["workflowRunArgs"]
+    assert "https://api.deepseek.com" not in payload["data"]["safeCommandTemplates"]["workflowRunArgs"]
+    assert "<openai-compatible-base-url>" in payload["data"]["safeCommandTemplates"]["workflowRunArgs"]
     assert "--confirm-real-dsl" in payload["data"]["safeCommandTemplates"]["workflowRunArgs"]
     assert payload["data"]["recommendedCliDefaults"]["modelSource"] == "argument"
     assert payload["data"]["recommendedCliDefaults"]["baseUrlSource"] == "argument"

@@ -7,6 +7,7 @@ and forwards /api/* requests to backend.mock_api.handle_request.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -19,6 +20,26 @@ from backend.mock_api import BACKEND_DEFAULT_GRADING_DB_ENV
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8000
+
+
+def is_loopback_host(host: str) -> bool:
+    """Return whether a bind host is loopback-only or localhost."""
+    normalized = str(host or "").strip().lower()
+    if normalized in {"localhost", "ip6-localhost"}:
+        return True
+    try:
+        return ipaddress.ip_address(normalized).is_loopback
+    except ValueError:
+        return False
+
+
+def validate_bind_auth(host: str) -> None:
+    """Require an API token before exposing the mock API beyond loopback."""
+    if not is_loopback_host(host) and not str(os.environ.get("LAB_BACKEND_API_TOKEN") or "").strip():
+        raise ValueError(
+            "Refusing to start unauthenticated backend on a non-loopback address. "
+            "Set LAB_BACKEND_API_TOKEN or bind to 127.0.0.1."
+        )
 
 
 class MockApiRequestHandler(BaseHTTPRequestHandler):
@@ -83,6 +104,7 @@ def build_server(
     store_path: Path | None = None,
     quiet: bool = False,
 ) -> ThreadingHTTPServer:
+    validate_bind_auth(host)
     server = ThreadingHTTPServer((host, port), MockApiRequestHandler)
     server.store_path = store_path
     server.backend_app = BackendApiApp(store_path=store_path)
@@ -98,6 +120,11 @@ def main() -> None:
     parser.add_argument("--grading-db", type=Path, default=None)
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
+
+    try:
+        validate_bind_auth(args.host)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     if args.grading_db is not None:
         os.environ[BACKEND_DEFAULT_GRADING_DB_ENV] = str(args.grading_db)
