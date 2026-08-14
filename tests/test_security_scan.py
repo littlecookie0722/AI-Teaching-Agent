@@ -23,6 +23,16 @@ def test_security_scan_does_not_treat_placeholders_as_credentials(tmp_path: Path
     assert list(security_scan._text_findings(path)) == []
 
 
+def test_security_scan_flags_legacy_demo_token_literal(tmp_path: Path) -> None:
+    path = tmp_path / "fixture.md"
+    legacy_token = "local" + "-dev-token"
+    authorization_header = "Authori" + "zation: Bearer "
+    path.write_text(authorization_header + legacy_token + "\n", encoding="utf-8")
+
+    rules = {finding.rule for finding in security_scan._text_findings(path)}
+    assert "bearer-token-literal" in rules
+
+
 def test_security_scan_flags_literal_private_email_and_key(tmp_path: Path) -> None:
     path = tmp_path / "fixture.md"
     path.write_text(

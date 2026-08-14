@@ -67,7 +67,6 @@ EXAMPLE_SECRET_VALUES = {
     "<your-api-key>",
     "<real-api-key>",
     "<random-local-token>",
-    "<<random-local-token>>",
     "test-client-boundary-smoke-key",
     "test-client-boundary-secret",
     "hidden-value-that-must-not-leak",
