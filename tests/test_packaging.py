@@ -196,6 +196,74 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     assert import_payload["success"] is True
     assert import_preview.is_file()
 
+    exam_result = _run(
+        [
+            str(console),
+            "exam",
+            "generate-from-lab",
+            "--lab",
+            "templates/lab/examples/basic-lab.yaml",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    exam_payload = json.loads(exam_result.stdout)
+    assert exam_payload["success"] is True
+    exam_task_id = exam_payload["data"]["task"]["id"]
+    package_root = Path(workspace_info["data"]["workspace"]["packageRoot"])
+    for output_key in ("examDslPath", "gradingDslPath", "candidatePreviewPath"):
+        output_path = Path(exam_payload["data"][output_key])
+        assert output_path == Path("examples/output") / output_path.name
+        assert (workspace / output_path).is_file()
+        assert not (package_root / output_path).exists()
+
+    exam_approve_result = _run(
+        [
+            str(console),
+            "review",
+            "approve",
+            "--task-id",
+            exam_task_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(exam_approve_result.stdout)["data"]["task"]["status"] == "APPROVED"
+
+    exam_import_result = _run(
+        [
+            str(console),
+            "exam",
+            "import-preview",
+            "--task-id",
+            exam_task_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(exam_import_result.stdout)["success"] is True
+    assert (workspace / "examples/output/exam-question-import-preview.json").is_file()
+
+    grading_import_result = _run(
+        [
+            str(console),
+            "grade",
+            "import-preview",
+            "--task-id",
+            exam_task_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(grading_import_result.stdout)["success"] is True
+    assert (workspace / "examples/output/grading-rule-import-preview.json").is_file()
+
     asset_result = _run(
         [
             str(python),

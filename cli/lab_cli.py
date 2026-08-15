@@ -16107,6 +16107,7 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 task_id=task.id,
                 trace_id=trace_id,
                 root=ROOT,
+                output_root=workspace_root(root=ROOT),
             )
         except ExamGradingGenerationV1Error as exc:
             raise CliError(exc.code, exc.message, exc.errors) from exc

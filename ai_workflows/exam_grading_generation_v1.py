@@ -141,6 +141,7 @@ def finalize_exam_grading_generation_v1(
     task_id: str,
     trace_id: str,
     root: Path = ROOT,
+    output_root: Path | None = None,
 ) -> dict[str, Any]:
     finalized_exam = deepcopy(exam_generation)
     finalized_grading = deepcopy(grading_generation)
@@ -150,7 +151,8 @@ def finalize_exam_grading_generation_v1(
     _validate_or_raise(exam_dsl, "exam", root=root)
     _validate_or_raise(grading_dsl, "grading", root=root)
 
-    output_dir = root / "examples" / "output"
+    artifact_root = output_root or root
+    output_dir = artifact_root / "examples" / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
     exam_path = output_dir / f"{task_id}-exam.json"
     grading_path = output_dir / f"{task_id}-grading.json"
@@ -161,16 +163,16 @@ def finalize_exam_grading_generation_v1(
     try:
         candidate_preview = build_candidate_safe_exam_preview(
             exam_dsl,
-            source_path=_display_path(exam_path, root=root),
+            source_path=_display_path(exam_path, root=artifact_root),
             trace_id=trace_id,
         )
     except ExamCandidatePreviewError as exc:
         raise ExamGradingGenerationV1Error(exc.code, exc.message, exc.errors) from exc
     _write_json(candidate_preview_path, candidate_preview)
 
-    exam_ref = _display_path(exam_path, root=root)
-    grading_ref = _display_path(grading_path, root=root)
-    preview_ref = _display_path(candidate_preview_path, root=root)
+    exam_ref = _display_path(exam_path, root=artifact_root)
+    grading_ref = _display_path(grading_path, root=artifact_root)
+    preview_ref = _display_path(candidate_preview_path, root=artifact_root)
     finalized_exam.update(
         {
             "dsl": exam_dsl,
