@@ -220,7 +220,7 @@ def _metadata_findings(path: Path) -> Iterable[Finding]:
 def _identity_findings() -> Iterable[Finding]:
     ref = "HEAD"
     result = subprocess.run(
-        ["git", "log", ref, "--format=%an\t%ae\t%cn\t%ce"],
+        ["git", "log", "--use-mailmap", ref, "--format=%aN\t%aE\t%cN\t%cE"],
         cwd=ROOT,
         check=True,
         capture_output=True,
