@@ -134,6 +134,68 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     assert quality_report["summary"]["caseTotal"] == 20
     assert not Path(clean_env["LAB_CLI_STORE"]).exists()
 
+    workspace = tmp_path / "user-workspace"
+    source = outside_checkout / "source.md"
+    source.write_text("# Installed CLI source\n\nTeach a small Python validation lab.\n", encoding="utf-8")
+    external_env = dict(clean_env)
+    external_env.pop("LAB_CLI_STORE", None)
+    external_env["LAB_CLI_WORKSPACE"] = str(workspace)
+
+    workspace_info_result = _run([str(console), "workspace", "info"], cwd=outside_checkout, env=external_env)
+    workspace_info = json.loads(workspace_info_result.stdout)
+    assert workspace_info["success"] is True
+    assert workspace_info["data"]["workspace"]["workspaceRoot"] == str(workspace.resolve())
+    assert workspace_info["data"]["workspace"]["storageMode"] == "USER_WORKSPACE"
+
+    generation_result = _run(
+        [str(console), "lab", "generate-from-source", "--input", "source.md"],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    generation = json.loads(generation_result.stdout)
+    assert generation["success"] is True
+    task_id = generation["data"]["task"]["id"]
+    assert generation["data"]["status"] == "WAITING_REVIEW"
+    dsl_path = workspace / generation["data"]["dslPath"]
+    assert dsl_path.is_file()
+    assert (workspace / ".lab_cli_store.json").is_file()
+
+    detail_result = _run(
+        [str(console), "review", "detail", "--task-id", task_id],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    detail = json.loads(detail_result.stdout)
+    assert detail["success"] is True
+    assert detail["data"]["reviewDetail"]["reviewPage"]["dslPreview"]["contentLoaded"] is True
+
+    approve_result = _run(
+        [str(console), "review", "approve", "--task-id", task_id, "--reviewer", "packaging-test"],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(approve_result.stdout)["data"]["task"]["status"] == "APPROVED"
+
+    import_preview = workspace / "examples" / "output" / "installed-lab-import-preview.json"
+    import_result = _run(
+        [
+            str(console),
+            "lab",
+            "import-preview",
+            "--task-id",
+            task_id,
+            "--reviewer",
+            "packaging-test",
+            "--output",
+            str(import_preview),
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    import_payload = json.loads(import_result.stdout)
+    assert import_payload["success"] is True
+    assert import_preview.is_file()
+
     asset_result = _run(
         [
             str(python),

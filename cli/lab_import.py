@@ -12,6 +12,7 @@ from .audit import OperationAction, OperationResourceType, create_operation_audi
 from .dsl import DslValidationError, load_schema, load_yaml, validate_dsl
 from .agent_entity import AgentEntityType, create_agent_entity_record
 from .store import JsonTaskStore
+from .workspace import resolve_cli_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,8 +56,7 @@ class AgentEntityMockImportError(ValueError):
 def _resolve_local_path(path_value: str | None) -> Path | None:
     if not path_value or "://" in path_value:
         return None
-    path = Path(path_value)
-    return path if path.is_absolute() else ROOT / path
+    return resolve_cli_path(path_value, root=ROOT)
 
 
 def _primary_lab_artifact(store: JsonTaskStore, task_id: str) -> Any | None:

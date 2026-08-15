@@ -21,6 +21,7 @@ from .agent_entity_readiness import build_agent_entity_readiness_report
 from .agent_publish_activity import build_agent_entity_publish_activity_summary_for_task
 from .store import JsonTaskStore
 from .workflow import create_workflow_run, create_workflow_step
+from .workspace import resolve_cli_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1246,8 +1247,7 @@ def _resolve_local_path(path_value: Any) -> Path | None:
         return None
     if "://" in path_value:
         return None
-    path = Path(path_value)
-    return path if path.is_absolute() else ROOT / path
+    return resolve_cli_path(path_value, root=ROOT)
 
 
 def _load_dsl_preview_document(path_value: Any) -> tuple[dict[str, Any] | None, str | None]:

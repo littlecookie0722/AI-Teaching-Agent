@@ -108,9 +108,11 @@ python -m pytest tests/test_packaging.py -q
 The wheel includes the schemas, prompts, local runtime contracts, MCP manifest,
 frontend static assets, and controlled-grading image recipe used by installed
 commands. Repository-only historical outputs under `examples/output/` are
-deliberately excluded. Commands that create artifacts still use the project's
-local staging model; run generation workflows from a writable virtual
-environment or a source checkout.
+deliberately excluded. In a source checkout, the historical repository-local
+staging behavior is preserved. After installing a wheel, generated artifacts
+and task state go to a per-user workspace instead of `site-packages`; inspect
+the resolved location with `ai-teaching-agent workspace info` or set
+`LAB_CLI_WORKSPACE` to an explicit directory.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,
@@ -126,9 +128,10 @@ It validates the four local Lab/Exam/Grading/PPT DSL fixtures, creates a
 candidate-safe Exam preview, and confirms that generated work remains in
 `WAITING_REVIEW` with publishing blocked until approval. It does not call a
 model, read credentials, access the network, execute learner code, or publish.
-The default outputs are written under `examples/output/` and are ignored as
-local generated artifacts; pass `--output`, `--workflow-output`, and
-`--candidate-preview-output` to choose another writable directory.
+The default outputs are written under `examples/output/` in a checkout and are
+mapped into the user workspace for installed runs; pass `--output`,
+`--workflow-output`, and `--candidate-preview-output` to choose another
+writable directory.
 
 The offline quality command evaluates 20 sanitized, review-gated Lab/Exam/
 Grading/PPT bundles across five teaching domains, Chinese and English, and

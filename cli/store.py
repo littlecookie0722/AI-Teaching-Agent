@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,6 +17,7 @@ from .mcp_audit import McpToolCallRecord
 from .agent_entity import AgentEntityRecord
 from .provider_audit import ProviderCallAuditEvent
 from .workflow import WorkflowRun
+from .workspace import default_store_path as resolve_default_store_path
 
 
 def _empty_store_data() -> dict[str, dict]:
@@ -37,10 +37,7 @@ def _empty_store_data() -> dict[str, dict]:
 
 
 def default_store_path() -> Path:
-    configured = os.environ.get("LAB_CLI_STORE")
-    if configured:
-        return Path(configured)
-    return Path(__file__).resolve().parent / ".lab_cli_store.json"
+    return resolve_default_store_path()
 
 
 class JsonTaskStore:

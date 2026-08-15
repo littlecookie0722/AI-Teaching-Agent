@@ -121,6 +121,7 @@ from .review_detail import (
 from .review_pre_approve import build_pre_approve_review_check
 from .store import JsonTaskStore
 from .workflow import WorkflowStatus, create_workflow_run, create_workflow_step
+from .workspace import describe_workspace, resolve_cli_path, workspace_root
 from ai_workflows.exam_candidate_preview import (
     ExamCandidatePreviewError,
     build_exam_candidate_preview_from_file,
@@ -5607,14 +5608,15 @@ def build_parser() -> argparse.ArgumentParser:
     phase2_ppt_report = phase2_ppt_sub.add_parser("report")
     phase2_ppt_report.add_argument("--file", default="examples/output/phase2-ppt-generation-report.json")
 
+    workspace = subparsers.add_parser("workspace", help="inspect local state and artifact workspace")
+    workspace_sub = workspace.add_subparsers(dest="command", required=True)
+    workspace_sub.add_parser("info", help="show path resolution and storage policy")
+
     return parser
 
 
 def _path(value: str) -> Path:
-    path = Path(value)
-    if not path.is_absolute():
-        path = ROOT / path
-    return path
+    return resolve_cli_path(value, root=ROOT, workspace=workspace_root(root=ROOT))
 
 
 def _ensure_file(path: Path, field: str) -> None:
@@ -10579,6 +10581,11 @@ def _render_phase1_acceptance_report(package: dict[str, Any]) -> str:
 
 def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
     store = JsonTaskStore()
+
+    if args.group == "workspace" and args.command == "info":
+        workspace = describe_workspace()
+        workspace["storePath"] = str(store.path)
+        return ok("本地工作区信息读取成功", {"workspace": workspace}, trace_id)
 
     if args.group == "phase1" and args.command == "check":
         result = _run_phase1_check(args.input)
@@ -15877,6 +15884,7 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
             material_analysis=material_analysis,
             task_id=task.id,
             root=ROOT,
+            output_root=workspace_root(root=ROOT),
         )
         result_path = lab_generation["dslPath"]
         task.finalResultPath = result_path

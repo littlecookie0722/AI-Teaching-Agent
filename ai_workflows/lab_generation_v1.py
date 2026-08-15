@@ -25,6 +25,7 @@ def finalize_lab_generation_v1(
     material_analysis: dict[str, Any],
     task_id: str,
     root: Path = ROOT,
+    output_root: Path | None = None,
 ) -> dict[str, Any]:
     """Return a task-specific Lab generation result and persist its DSL JSON."""
 
@@ -43,10 +44,11 @@ def finalize_lab_generation_v1(
         _ensure_minimum_lab_teaching_content(spec)
 
     validate_dsl(dsl, load_schema("lab", root))
-    output_path = root / "examples" / "output" / f"{task_id}-lab.json"
+    artifact_root = output_root or root
+    output_path = artifact_root / "examples" / "output" / f"{task_id}-lab.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(dsl, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    output_ref = _display_path(output_path, root=root)
+    output_ref = _display_path(output_path, root=artifact_root)
 
     finalized["dsl"] = dsl
     finalized["dslPath"] = output_ref
