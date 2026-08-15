@@ -114,8 +114,9 @@ and task state go to a per-user workspace instead of `site-packages`; inspect
 the resolved location with `ai-teaching-agent workspace info` or set
 `LAB_CLI_WORKSPACE` to an explicit directory. The installed `exam
 generate-from-lab` path also keeps its task-specific Exam, Grading, and
-candidate-preview JSON artifacts in that workspace; approval and local
-import-preview can continue from the same directory.
+candidate-preview JSON artifacts in that workspace, and `ppt generate` writes
+its task-specific PPT DSL there as well; approval and local import-preview can
+continue from the same directory.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,

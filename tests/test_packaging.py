@@ -264,6 +264,56 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     assert json.loads(grading_import_result.stdout)["success"] is True
     assert (workspace / "examples/output/grading-rule-import-preview.json").is_file()
 
+    ppt_result = _run(
+        [
+            str(console),
+            "ppt",
+            "generate",
+            "--input",
+            "source.md",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    ppt_payload = json.loads(ppt_result.stdout)
+    assert ppt_payload["success"] is True
+    ppt_task_id = ppt_payload["data"]["task"]["id"]
+    ppt_output_path = Path(ppt_payload["data"]["pptDslPath"])
+    assert ppt_output_path == Path("examples/output") / f"{ppt_task_id}-ppt.json"
+    assert (workspace / ppt_output_path).is_file()
+    assert not (package_root / ppt_output_path).exists()
+
+    ppt_approve_result = _run(
+        [
+            str(console),
+            "review",
+            "approve",
+            "--task-id",
+            ppt_task_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(ppt_approve_result.stdout)["data"]["task"]["status"] == "APPROVED"
+
+    ppt_import_result = _run(
+        [
+            str(console),
+            "ppt",
+            "import-preview",
+            "--task-id",
+            ppt_task_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    assert json.loads(ppt_import_result.stdout)["success"] is True
+    assert (workspace / "examples/output/ppt-deck-import-preview.json").is_file()
+
     asset_result = _run(
         [
             str(python),

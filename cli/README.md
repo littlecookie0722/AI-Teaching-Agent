@@ -166,7 +166,7 @@ python lab_cli.py artifact list
 python lab_cli.py artifact list --kind LAB_DSL
 python lab_cli.py artifact get --id artifact_demo
 python lab_cli.py dsl validate --kind ppt --file templates/ppt/examples/course-ppt.yaml
-python lab_cli.py ppt generate --input examples/input/demo-source.md
+python lab_cli.py ppt generate --input examples/input/demo-source.md --output examples/output/ppt-dsl.json
 python lab_cli.py ai-task list
 python lab_cli.py ai-task list --status WAITING_REVIEW --task-type LAB_GENERATION
 python lab_cli.py ai-task get --id task_demo

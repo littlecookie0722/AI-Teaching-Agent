@@ -1045,6 +1045,7 @@ def build_parser() -> argparse.ArgumentParser:
     ppt_sub = ppt.add_subparsers(dest="command", required=True)
     ppt_generate = ppt_sub.add_parser("generate")
     ppt_generate.add_argument("--input", required=True)
+    ppt_generate.add_argument("--output")
     ppt_import_preview = ppt_sub.add_parser("import-preview")
     ppt_import_preview.add_argument("--task-id", required=True)
     ppt_import_preview.add_argument("--reviewer", required=True)
@@ -5617,6 +5618,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _path(value: str) -> Path:
     return resolve_cli_path(value, root=ROOT, workspace=workspace_root(root=ROOT))
+
+
+def _display_workspace_path(path: Path) -> str:
+    for base in (workspace_root(root=ROOT), ROOT):
+        try:
+            return path.resolve().relative_to(base.resolve()).as_posix()
+        except ValueError:
+            continue
+    return str(path)
 
 
 def _ensure_file(path: Path, field: str) -> None:
@@ -18091,9 +18101,13 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
             title="Mock PPT DSL generation",
             input_type="markdown",
             input_ref=str(input_path),
-            final_result_path=ppt_generation["dslPath"],
             trace_id=trace_id,
         )
+        output_path = _path(args.output or f"examples/output/{task.id}-ppt.json")
+        output_ref = _display_workspace_path(output_path)
+        _write_json(output_path, ppt_generation["dsl"])
+        ppt_generation = {**ppt_generation, "dslPath": output_ref}
+        task.finalResultPath = output_ref
         store.save(task)
         _save_provider_generation_audit(
             store,
