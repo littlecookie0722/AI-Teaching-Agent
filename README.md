@@ -115,8 +115,12 @@ the resolved location with `ai-teaching-agent workspace info` or set
 `LAB_CLI_WORKSPACE` to an explicit directory. The installed `exam
 generate-from-lab` path also keeps its task-specific Exam, Grading, and
 candidate-preview JSON artifacts in that workspace, and `ppt generate` writes
-its task-specific PPT DSL there as well; approval and local import-preview can
-continue from the same directory.
+its task-specific PPT DSL there as well. The `ppt artifact build` command also
+keeps its temporary presentation workspace outside `site-packages` and writes
+the PPTX artifact and previews to the user workspace. It requires Node.js and
+the optional presentations runtime; set `PRESENTATIONS_SKILL_DIR` when that
+runtime is not discoverable from the local Codex installation. Approval and
+local import-preview can continue from the same directory.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,

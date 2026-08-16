@@ -7,6 +7,12 @@ reports sanitized rule/path/line information. It checks tracked text files,
 the checked-out commit identity, Notebook text, PPTX core properties, PNG text
 chunks, and JPEG EXIF metadata.
 
+`build_pptx_from_ppt_dsl.mjs` is packaged with the installable CLI so
+`ppt artifact build` can run outside a source checkout. It accepts a validated
+`WAITING_REVIEW` PPT DSL and writes the PPTX, manifest, and optional previews
+to caller-selected paths. The command still requires Node.js and the optional
+presentations runtime, and it never publishes the generated artifact.
+
 ## 输入说明
 
 - `manifest.json`: 本地验证命令、演示 Runbook 引用和脚本安全限制。

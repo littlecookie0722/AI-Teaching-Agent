@@ -10,6 +10,8 @@ import venv
 import zipfile
 from pathlib import Path
 
+from tests.runtime_requirements import presentations_runtime_available
+
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_WHEEL_ASSETS = {
@@ -20,6 +22,7 @@ REQUIRED_WHEEL_ASSETS = {
     "mcp-server/tools.manifest.json",
     "prompts/manifest.json",
     "prompts/workflows/lab_generation.md",
+    "scripts/build_pptx_from_ppt_dsl.mjs",
     "sandbox/images/python-pytest/Dockerfile",
     "templates/lab/lab.schema.json",
 }
@@ -313,6 +316,31 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     )
     assert json.loads(ppt_import_result.stdout)["success"] is True
     assert (workspace / "examples/output/ppt-deck-import-preview.json").is_file()
+
+    if presentations_runtime_available():
+        installed_pptx = workspace / "examples" / "output" / "installed-ppt-artifact.pptx"
+        artifact_result = _run(
+            [
+                str(console),
+                "ppt",
+                "artifact",
+                "build",
+                "--dsl",
+                "templates/ppt/examples/course-ppt.yaml",
+                "--output",
+                str(installed_pptx),
+                "--reviewer",
+                "packaging-test",
+            ],
+            cwd=outside_checkout,
+            env=external_env,
+        )
+        artifact_payload = json.loads(artifact_result.stdout)
+        assert artifact_payload["success"] is True
+        assert artifact_payload["data"]["task"]["status"] == "WAITING_REVIEW"
+        assert artifact_payload["data"]["artifact"]["kind"] == "PPTX_FILE"
+        assert installed_pptx.is_file()
+        assert not (package_root / "outputs").exists()
 
     asset_result = _run(
         [

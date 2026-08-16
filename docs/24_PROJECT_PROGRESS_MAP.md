@@ -1,6 +1,6 @@
 # 项目进度地图与防跑偏清单
 
-> 最后更新：2026-08-13
+> 最后更新：2026-08-16
 > 当前定位：AI 教学智能体（独立版）。真实 LLM 演示闭环已跑通到本地审核、受控评分 evidence、本地实体持久化和状态管理阶段；项目目标不再是接入外部平台，而是作为独立智能体运行。
 > 使用方式：后续每次继续开发前，先看本文件的“下一步路线”和“停止线”，避免在同一个功能点反复加门禁、加展示页或加运营材料。
 
@@ -61,7 +61,7 @@
 | 项目底座 | 目录结构、Phase 文档、DSL / CLI / MCP / Sandbox 基础分层。 | `AGENTS.md`、`docs/00_START_HERE.md`、`docs/AI_PLATFORM_CODEX_FULL_GUIDE.md` | M | 已完成，可继续维护。 |
 | DSL Schema | Lab / Exam / Grading / PPT DSL Schema 和示例 YAML。 | `templates/*/schemas/`、`templates/*/examples/`、`docs/04_DSL_SPEC.md` | M | 已完成，后续只按真实输出问题迭代。 |
 | CLI JSON 契约 | `lab_cli.py` 统一 JSON 返回、错误码、traceId。 | `python lab_cli.py ...`、`docs/06_CLI_SPEC.md` | M | 已完成，后续保持兼容。 |
-| 安装式 CLI 用户工作区 | `workspace info` 只读展示路径策略；wheel 安装后默认将 JSON 状态和 `examples/output` 产物映射到用户工作区；Lab、Exam/Grading、PPT 任务生成、审核详情、人工批准和本地 import-preview 可在 checkout 外连续运行，支持 `LAB_CLI_WORKSPACE` 显式隔离。 | `cli/workspace.py`、`ai_workflows/exam_grading_generation_v1.py`、`cli/lab_cli.py`、`tests/test_packaging.py`、`tests/test_workspace.py` | M | 三类独立任务生成主链路的外部安装边界已完成；Phase 2 真实 LLM 默认输出、PPTX Artifact 和完整四类 Golden Path 仍按具体产物缺陷继续扩展，不把这一项误报为真实 LLM 或完整四类 Golden Path。 |
+| 安装式 CLI 用户工作区 | `workspace info` 只读展示路径策略；wheel 安装后默认将 JSON 状态和 `examples/output` 产物映射到用户工作区；Lab、Exam/Grading、PPT 任务生成、审核详情、人工批准、本地 import-preview 和 PPTX Artifact 可在 checkout 外连续运行，支持 `LAB_CLI_WORKSPACE` 显式隔离；PPTX 构建脚本随 wheel 发布，临时构建目录不写入 `site-packages`。 | `cli/workspace.py`、`ai_workflows/exam_grading_generation_v1.py`、`cli/lab_cli.py`、`scripts/build_pptx_from_ppt_dsl.mjs`、`tests/test_packaging.py`、`tests/test_workspace.py` | M | 安装式核心产物边界已完成；真实 LLM 默认输出、PPTX 版式质量和完整四类 Golden Path 仍按具体产物缺陷继续扩展，不把这一项误报为真实 LLM 或生产 PPT 服务。 |
 | AI Task 状态模型 | `WAITING_REVIEW`、审核通过 / 拒绝 / 发布阻断等本地状态流。 | `cli/ai_task_store.py`、`python lab_cli.py ai-task list` | M | 已完成，生产持久化未做。 |
 | 人工审核 Mock | 审核列表、审核详情、批量摘要、禁止自动发布。 | `python lab_cli.py review list/detail/batch-summary` | M | 已完成，前端真实交互未生产化。 |
 | Provider 抽象 | MockProvider、Provider Adapter、Provider 审计和错误上下文。 | `providers/`、`cli/provider_audit.py` | M | 已完成，真实 Provider 已开始接入。 |

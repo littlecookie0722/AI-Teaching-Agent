@@ -12,6 +12,7 @@ Phase 1 的 `lab-cli` Mock 实现。该模块只做本地 DSL、状态流转和�
 - DSL 输入：如 `templates/grading/examples/python-pytest.yaml`。
 - AI Task Mock 存储：源码 checkout 默认兼容写入 `cli/.lab_cli_store.json`；安装 wheel 后默认写入用户工作区的 `.lab_cli_store.json`。可通过 `LAB_CLI_WORKSPACE` 指定工作区，或通过 `LAB_CLI_STORE` 指定完整 JSON 文件路径；`workspace info` 可只读查看最终路径。
 - 安装式 Lab Golden Path：在空目录中运行 `ai-teaching-agent lab generate-from-source --input source.md`，产物写入用户工作区并保持 `WAITING_REVIEW`；人工 `review approve` 后可继续 `lab import-preview`，不会写入 `site-packages`、自动发布或调用真实平台。
+- 安装式 PPTX Artifact：安装 wheel 后，`ppt artifact build` 的临时构建目录、PPTX、manifest 和预览文件都写入用户工作区，不写入 `site-packages`；需要 Node.js 和可发现的 presentations runtime。
 - Artifact Mock 清单同样写入本地 Mock store，不连接对象存储或远程文件服务。
 - Backend Core PostgreSQL 测试库迁移输入为 `LAB_BACKEND_CORE_DATABASE_URL` 或自定义 `--database-url-env` 指向的 `postgresql://...` URL；命令只返回脱敏摘要，不回显 host、账号、密码或完整连接串。
 - Quality 回归测试矩阵输入为固定 `profile`：`quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`；不接受任意命令字符串。

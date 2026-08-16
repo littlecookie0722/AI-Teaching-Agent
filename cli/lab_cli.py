@@ -5769,7 +5769,7 @@ def _write_text(path: Path, content: str) -> None:
 
 def _create_presentation_workspace(slug: str) -> Path:
     thread_id = os.environ.get("CODEX_THREAD_ID") or f"manual-{uuid4().hex[:8]}"
-    workspace = ROOT / "outputs" / thread_id / "presentations" / slug / uuid4().hex[:12]
+    workspace = workspace_root(root=ROOT) / "outputs" / thread_id / "presentations" / slug / uuid4().hex[:12]
     workspace.mkdir(parents=True, exist_ok=True)
     return workspace
 

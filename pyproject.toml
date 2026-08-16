@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-teaching-agent"
-version = "0.1.1"
+version = "0.1.2"
 description = "Review-gated AI workflows for teaching labs, exams, grading, and presentation plans."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -82,6 +82,7 @@ include = [
   "prompts*",
   "providers*",
   "quality*",
+  "scripts*",
   "sandbox*",
   "templates*",
 ]
@@ -98,6 +99,7 @@ namespaces = true
   "*.js",
   "*.json",
   "*.md",
+  "*.mjs",
   "*.txt",
   "*.yaml",
   "*.yml",
