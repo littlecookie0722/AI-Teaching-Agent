@@ -178,6 +178,7 @@ from ai_workflows.provider_adapter_workflow import (
     generate_workflow_dsl_bundle,
     run_phase2_content_generation,
 )
+from quality.ppt_preflight import build_ppt_preflight_report
 from ai_workflows.real_dsl_review_preview import (
     RealDslReviewPreviewError,
     build_real_dsl_review_preview_from_files,
@@ -5856,6 +5857,20 @@ def _run_pptx_artifact_builder(
     _ensure_file(output_path, "output")
     if output_path.stat().st_size <= 0:
         raise CliError("PPTX_ARTIFACT_BUILD_ERROR", "PPTX Artifact 生成失败", [{"field": "output", "reason": "输出文件为空"}])
+    try:
+        source_dsl = json.loads(dsl_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CliError(
+            "PPTX_ARTIFACT_BUILD_ERROR",
+            "PPTX Artifact 质量预检失败",
+            [{"field": "dsl", "reason": str(exc)}],
+        ) from exc
+    quality_report = build_ppt_preflight_report(source_dsl)
+    payload["qualityReport"] = quality_report
+    if manifest_path is not None and manifest_path.is_file():
+        manifest_payload = _read_json(manifest_path)
+        manifest_payload["qualityReport"] = quality_report
+        _write_json(manifest_path, manifest_payload)
     return payload
 
 
@@ -7408,6 +7423,7 @@ def _build_real_llm_demo_bundle(
         "firstSlidePreview": pptx_build.get("preview", {}).get("firstSlide", {}),
         "slidePreviews": pptx_build.get("preview", {}).get("slidePreviews", []),
         "contactSheet": pptx_build.get("preview", {}).get("contactSheet"),
+        "qualityReport": pptx_build.get("qualityReport", {}),
         "reviewRequired": True,
         "autoPublishAllowed": False,
         "realPublish": False,
@@ -7474,6 +7490,7 @@ def _build_real_llm_demo_bundle(
     generated_dsl["ppt"]["pptxPreviewAvailable"] = pptx_build.get("preview", {}).get("previewAvailable", False)
     generated_dsl["ppt"]["firstSlidePreview"] = pptx_build.get("preview", {}).get("firstSlide", {})
     generated_dsl["ppt"]["slidePreviewCount"] = len(pptx_build.get("preview", {}).get("slidePreviews", []))
+    generated_dsl["ppt"]["pptxQualityReport"] = pptx_build.get("qualityReport", {})
     bundle = {
         "id": f"real_llm_demo_bundle_{uuid4().hex[:12]}",
         "workflowId": PHASE2_REAL_LLM_DEMO_BUNDLE_WORKFLOW_ID,
@@ -18201,6 +18218,12 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
         finally:
             shutil.rmtree(ppt_builder_workspace, ignore_errors=True)
         build_result["sourceDslPath"] = str(dsl_path)
+        quality_report = build_result.get("qualityReport", {})
+        quality_slides = {
+            slide.get("index"): slide
+            for slide in quality_report.get("slides", [])
+            if isinstance(slide, dict) and isinstance(slide.get("index"), int)
+        }
         slide_reviews = [
             {
                 **slide,
@@ -18213,8 +18236,14 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 },
                 "qaSignals": {
                     "layout": "NEEDS_REVIEW",
-                    "textOverflow": False,
-                    "visualDensity": "UNKNOWN",
+                    "textOverflow": quality_slides.get(slide.get("index"), {}).get("estimatedTextOverflow", False),
+                    "visualDensity": quality_slides.get(slide.get("index"), {}).get("visualDensity", "UNKNOWN"),
+                    "contentQuality": quality_slides.get(slide.get("index"), {}).get("status", "UNKNOWN"),
+                    "qualityIssueCodes": [
+                        issue.get("code")
+                        for issue in quality_slides.get(slide.get("index"), {}).get("issues", [])
+                        if isinstance(issue, dict) and issue.get("code")
+                    ],
                     "contrast": "NEEDS_REVIEW",
                     "reviewFocus": "manual_page_review_required",
                 },
@@ -18230,6 +18259,10 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
             "reviseRequired": 0,
             "manualCommentTotal": len(slide_reviews),
             "qaSignalStatus": "NEEDS_REVIEW",
+            "preflightStatus": quality_report.get("status", "UNKNOWN"),
+            "preflightIssueTotal": quality_report.get("issueTotal", 0),
+            "preflightBlockingIssueTotal": quality_report.get("blockingIssueTotal", 0),
+            "preflightWarningIssueTotal": quality_report.get("warningIssueTotal", 0),
             "autoApproveAllowed": False,
             "realPublishAllowed": False,
         }
@@ -18262,6 +18295,12 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 "slideCount": build_result.get("slideCount"),
                 "bytes": build_result.get("bytes"),
                 "preview": build_result.get("preview", {}),
+                "qualityReportSummary": {
+                    "status": quality_report.get("status", "UNKNOWN"),
+                    "issueTotal": quality_report.get("issueTotal", 0),
+                    "blockingIssueTotal": quality_report.get("blockingIssueTotal", 0),
+                    "warningIssueTotal": quality_report.get("warningIssueTotal", 0),
+                },
                 "reviewRequired": True,
                 "autoPublishAllowed": False,
                 "realPublish": False,
@@ -18293,6 +18332,7 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 "slidePreviews": slide_reviews,
                 "contactSheet": build_result.get("preview", {}).get("contactSheet"),
                 "pageReviewSummary": page_review_summary,
+                "qualityReport": quality_report,
                 "reviewRequired": True,
                 "generatedStatus": TaskStatus.WAITING_REVIEW.value,
                 "autoPublishAllowed": False,

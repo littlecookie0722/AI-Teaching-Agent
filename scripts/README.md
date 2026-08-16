@@ -10,8 +10,10 @@ chunks, and JPEG EXIF metadata.
 `build_pptx_from_ppt_dsl.mjs` is packaged with the installable CLI so
 `ppt artifact build` can run outside a source checkout. It accepts a validated
 `WAITING_REVIEW` PPT DSL and writes the PPTX, manifest, and optional previews
-to caller-selected paths. The command still requires Node.js and the optional
-presentations runtime, and it never publishes the generated artifact.
+to caller-selected paths. The CLI adds a deterministic advisory quality report
+to the manifest and Artifact metadata, including title, density, long-text,
+and renderer-truncation signals. The command still requires Node.js and the
+optional presentations runtime, and it never publishes the generated artifact.
 
 ## 输入说明
 

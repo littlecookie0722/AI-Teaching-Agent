@@ -4,6 +4,17 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-08-16
+
+- Added a deterministic, advisory PPT quality preflight to `ppt artifact
+  build` and the replayed Demo Bundle.
+- Reported empty titles, long text, dense slide bodies, and bullets truncated
+  by the renderer in the build JSON, manifest, Artifact metadata, and page QA
+  signals.
+- Added unit coverage and a fixed quick/core regression command for PPT
+  preflight results; PPTX generation remains `WAITING_REVIEW` and never auto
+  publishes.
+
 ## [0.1.2] - 2026-08-16
 
 - Packaged the PPTX DSL builder with the installable CLI so `ppt artifact

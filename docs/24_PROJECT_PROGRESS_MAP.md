@@ -155,6 +155,19 @@ B1 停止线：默认 fixture 可稳定返回 `status=PASS`，四类 DSL Schema 
 预览无答案泄漏，`blockingIssueTotal=0`，并由固定 quick/core 回归与 GitHub Actions
 调用同一入口。达到该停止线后，不再新增第二个 offline runner、同义安全壳或展示页。
 
+### 4.3 v0.1.3 PPT 质量预检切片
+
+2026-08-16，PPTX Artifact 构建增加了本地 `quality.ppt_preflight`：在已通过
+PPT Schema 校验、仍为 `WAITING_REVIEW` 的 DSL 上，逐页报告空标题、正文密度、
+长文本、估算溢出和 renderer 最多显示 6 个 bullet 的截断风险。结果写入构建
+JSON、manifest、`PPTX_FILE` Artifact metadata、Demo Bundle 和页级 `qaSignals`，
+并加入 quick/core 固定回归矩阵。
+
+该报告明确标记 `advisoryOnly=true`，不修改 DSL、不自动批准、不发布，也不把
+启发式检查误报为像素级渲染验证。PPT 质量切片达到“正常样例无 issue、异常样例
+可稳定报告 warning/blocking、PPTX 仍保持人工审核”停止线后，不继续扩展同义
+展示壳；下一步回到 P1 评分隔离/报告缺口或具体前端交互缺陷。
+
 ---
 
 ## 5. 后续推荐路线

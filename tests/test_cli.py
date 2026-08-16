@@ -2583,9 +2583,13 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
     assert len(payload["data"]["artifact"]["metadata"]["slidePreviews"]) == 2
     assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["status"] == "NEEDS_REVIEW"
     assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["needsReview"] == 2
+    assert payload["data"]["artifact"]["metadata"]["qualityReport"]["status"] == "PASS"
+    assert payload["data"]["artifact"]["metadata"]["qualityReport"]["issueTotal"] == 0
+    assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["preflightStatus"] == "PASS"
     assert payload["data"]["artifact"]["metadata"]["slidePreviews"][0]["reviewStatus"] == "NEEDS_REVIEW"
     assert payload["data"]["artifact"]["metadata"]["slidePreviews"][0]["manualComment"]["required"] is True
     assert payload["data"]["artifact"]["metadata"]["slidePreviews"][0]["qaSignals"]["layout"] == "NEEDS_REVIEW"
+    assert payload["data"]["artifact"]["metadata"]["slidePreviews"][1]["qaSignals"]["visualDensity"] == "BALANCED"
     assert payload["data"]["artifact"]["metadata"]["contactSheet"]["path"] == str(contact_sheet)
     assert manifest_payload["preview"]["previewAvailable"] is True
     assert manifest_payload["preview"]["renderAttempted"] is True
@@ -2594,6 +2598,8 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
     assert manifest_payload["preview"]["contactSheet"]["path"] == str(contact_sheet)
     assert manifest_payload["preview"]["firstSlide"]["title"] == "AI 工具应用课程"
     assert manifest_payload["preview"]["firstSlide"]["imagePath"] == str(preview)
+    assert manifest_payload["qualityReport"]["status"] == "PASS"
+    assert manifest_payload["qualityReport"]["issueTotal"] == 0
     assert payload["data"]["artifact"]["realLlmCalled"] is False
     assert payload["data"]["artifact"]["realPublish"] is False
     assert payload["data"]["safety"]["newLlmRequestSent"] is False
@@ -5744,6 +5750,8 @@ def test_phase2_demo_bundle_build_replays_real_outputs_and_runs_readonly_sandbox
     assert bundle["generatedDsl"]["ppt"]["firstSlidePreview"]["title"] == "AI 工具应用课程"
     assert bundle["pptArtifact"]["kind"] == "PPTX_FILE"
     assert bundle["pptArtifact"]["status"] == "WAITING_REVIEW"
+    assert bundle["pptArtifact"]["qualityReport"]["status"] == "PASS"
+    assert bundle["pptArtifact"]["qualityReport"]["issueTotal"] == 0
     assert bundle["pptArtifact"]["path"] == str(pptx)
     assert bundle["pptArtifact"]["manifestPath"] == str(pptx_manifest)
     assert bundle["pptArtifact"]["previewPath"] == str(pptx_preview)

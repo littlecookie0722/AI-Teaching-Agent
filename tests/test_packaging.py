@@ -339,6 +339,8 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
         assert artifact_payload["success"] is True
         assert artifact_payload["data"]["task"]["status"] == "WAITING_REVIEW"
         assert artifact_payload["data"]["artifact"]["kind"] == "PPTX_FILE"
+        assert artifact_payload["data"]["artifact"]["metadata"]["qualityReport"]["status"] == "PASS"
+        assert artifact_payload["data"]["artifact"]["metadata"]["qualityReport"]["issueTotal"] == 0
         assert installed_pptx.is_file()
         assert not (package_root / "outputs").exists()
 

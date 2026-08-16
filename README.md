@@ -13,6 +13,8 @@ questions, grading rules, and presentation plans.
 - Generates versioned Lab DSL artifacts from source material.
 - Converts a Lab DSL into linked Exam DSL and Grading DSL artifacts.
 - Produces PPT DSL slide plans from teaching material.
+- Adds a deterministic PPTX content preflight that surfaces text-density and
+  renderer-truncation risks before manual page review.
 - Validates all four DSL types before a task can continue.
 - Creates `WAITING_REVIEW` tasks and records human approve/reject decisions.
 - Produces a candidate-safe exam preview that excludes answers and internal
@@ -147,6 +149,10 @@ normal/boundary variants. It performs the same Draft 2020-12 validation used by
 runtime workflows, plus linked-score, grading-reference, candidate-safety, and
 minimum-content checks. It is deterministic and does not call a model or run
 learner code; see [the quality guide](quality/README.md).
+
+PPTX artifact builds also include a local advisory preflight report. It checks
+slide titles, body density, long text, and the six-bullet renderer limit; it
+does not modify the DSL, approve a task, or publish a deck.
 
 For a controlled local grading example, see
 [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md) and the fixtures
