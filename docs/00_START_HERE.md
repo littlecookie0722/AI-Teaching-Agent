@@ -21,6 +21,14 @@ docs/24_PROJECT_PROGRESS_MAP.md
 
 `AGENTS.md` 负责全局工作方式和安全边界；`docs/24_PROJECT_PROGRESS_MAP.md` 负责当前路线、优先级和功能停止线。`docs/12_PHASE_CUTOVER_AND_CORE_BUSINESS.md`、`docs/02_ROADMAP.md` 和完整指南保留为阶段背景或技术参考，不再作为独立的逐回合规则源。
 
+当前精简 MVP 的入口盘点、复用决策和实施顺序见：
+
+```text
+docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md
+```
+
+该文档是当前 P0 的实施说明，不新增上位约束；发生冲突时仍以 `AGENTS.md` 和进度地图为准。
+
 真实 SDK 安装执行记录见：
 
 ```text

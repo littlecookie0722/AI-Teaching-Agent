@@ -1,8 +1,15 @@
 ﻿# frontend
 
-Phase 1 前端 2.0 页面契约目录。当前只定义页面、组件、API 依赖和 Mock UI 数据，不启动真实 Web 应用。
+前端页面契约目录。当前只定义页面、组件、API 依赖和 Mock UI 数据，不启动真实 Web 应用。
 
-> 当前没有真实实训平台后端接口。前端页面默认只服务本地闭环：真实 LLM 产物审核、本地导入预览、mock-import、import-dry-run DTO、受控评分 evidence 和本地评分记录复核；平台请求发送、平台状态查询、平台侧签收和真实发布相关 UI/文案仅作为未来对接参考，不作为当前默认演示路径。
+> 当前产品主线只保留 `generation-workspace.html` 和 `review-center.html`：从一份 Markdown 生成 Lab + Exam/Grading，并完成逐项人工审核。其他页面保留为兼容、诊断或历史 PoC，不作为当前主导航。入口决策和待实现差距见 `docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md`。
+
+## 当前默认入口
+
+- `generation-workspace.html`：唯一默认生成入口。现有实现仍固定生成 Lab / Exam / Grading / PPT；下一实现切片将通过兼容的 `artifactProfile=teaching-core` 收敛为前三类。
+- `review-center.html`：唯一默认审核入口。现有实现已集中读取队列和详情；下一实现切片将按 `workflowRun.id` 聚合教学包并接入已有逐任务 approve/reject 动作。
+- `lab-generate.html`、`exam-generate.html` 和三个独立审核页：保留直接 URL，作为兼容、诊断和审核中心功能等价前的深层入口。
+- PPT、评分、平台实体、AI Task、MCP、Agent 和运营页面：退出当前主导航，只做必要的兼容性、安全或阻断性缺陷修复。
 
 ## 输入说明
 

@@ -233,8 +233,8 @@ Platform Entities 本地闭环、PPT 不再误回落到 Lab API、固定契约�
 
 ### P0：完成精简教学包闭环
 
-1. 选择并收敛一个默认生成入口：输入 Markdown，仅把 Lab + Exam/Grading 作为当前必需成果。
-2. 选择并收敛一个默认审核入口：集中展示教学包、校验结果、候选人安全预览和批准/退回动作。
+1. 默认生成入口已选定为 `frontend/generation-workspace.html`，默认审核入口已选定为 `frontend/review-center.html`；盘点与兼容决策见 `docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md`。
+2. 下一实现切片为既有 `POST /api/phase2/workflows/content-generation/run` 增加兼容的 `artifactProfile=teaching-core`，仅生成 Lab + Exam/Grading；未传字段时保持历史四类行为。
 3. 增加本地教学包导出：只导出已审核闭环需要的文件，不发送外部平台、不自动发布。
 4. 真实输出归一化只处理 Lab + Exam/Grading 的实际失败样本，不预先发明规则。
 5. 建立聚焦 E2E：Mock 正常路径和错误路径必测，真实 LLM 使用离线样本与可选在线测试分开。
@@ -269,10 +269,10 @@ Platform Entities 本地闭环、PPT 不再误回落到 Lab API、固定契约�
 
 | 顺序 | 任务 | 复杂度 |
 | --- | --- | --- |
-| 1 | 盘点现有 Lab 生成、Exam/Grading 生成和审核接口，选定一个默认生成入口与一个默认审核入口；其他入口保留但退出主导航。 | S-M |
-| 2 | 让默认生成入口从一份 Markdown 产出 Lab + Exam/Grading，并返回教学包级任务摘要、候选人安全预览和审核入口。 | M |
+| 1 | 已完成：默认生成入口选定 `generation-workspace.html`，默认审核入口选定 `review-center.html`；复用边界、兼容策略和差距记录在 `docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md`。 | S |
+| 2 | 为既有内容生成 API 增加 `artifactProfile=teaching-core`，让默认生成入口从一份 Markdown 只产出 Lab + Exam/Grading，并返回教学包级摘要、候选人安全预览和审核入口；未传字段保持历史四类行为。 | M |
 | 3 | 让默认审核入口在一条流程中展示三类关联产物、校验结果，并支持批准或退回。 | M-L |
 | 4 | 增加不依赖平台实体的本地教学包导出，保持 `WAITING_REVIEW` 和人工审核边界。 | S-M |
 | 5 | 为上述闭环补 Mock 正常路径、错误路径、状态和脱敏回归；真实 LLM 仅追加实际失败样本。 | M |
 
-当前最建议下一步：先完成任务 1，确定复用哪些现有接口和页面作为精简主入口，再修改行为。此前四类 DSL 一键 Demo、PPTX、评分 evidence、平台实体、MCP 和 Agent 仍可回归或演示，但不再决定当前产品范围。
+当前最建议下一步：执行任务 2，为现有内容生成 API 增加兼容的 `teaching-core` profile，并让默认生成页面显式使用该 profile。此前四类 DSL 一键 Demo、PPTX、评分 evidence、平台实体、MCP 和 Agent 仍可回归或演示，但不再决定当前产品范围。

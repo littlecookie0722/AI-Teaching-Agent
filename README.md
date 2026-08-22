@@ -56,6 +56,9 @@ hosted service, cloud resource manager, or automatic publishing system.
 
 The detailed delivery boundaries, implemented capabilities, and stop lines are
 maintained in [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md).
+The selected generation and review entry points, compatibility strategy, and
+next implementation slices are recorded in
+[the simplified MVP entrypoint decision](docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md).
 
 ## Installation
 
