@@ -15,6 +15,9 @@ questions, grading rules, and presentation plans.
 - Produces PPT DSL slide plans from teaching material.
 - Adds a deterministic PPTX content preflight that surfaces text-density and
   renderer-truncation risks before manual page review.
+- Hydrates the AI Task Center from a real workflow report in read-only mode,
+  so report-backed Lab/Exam/Grading/PPT artifacts remain connected to review
+  detail even when the local task store has no matching rows.
 - Validates all four DSL types before a task can continue.
 - Creates `WAITING_REVIEW` tasks and records human approve/reject decisions.
 - Produces a candidate-safe exam preview that excludes answers and internal
@@ -153,6 +156,14 @@ learner code; see [the quality guide](quality/README.md).
 PPTX artifact builds also include a local advisory preflight report. It checks
 slide titles, body density, long text, and the six-bullet renderer limit; it
 does not modify the DSL, approve a task, or publish a deck.
+
+When opening `frontend/ai-tasks.html?agentReport=<workflow-report-json>`, the
+AI Task Center forwards the report context to the read-only review summary. A
+valid custom report exposes its Lab, Exam, Grading, and PPT artifacts as
+synthetic `WAITING_REVIEW` task cards and loads their detail through
+`GET /api/review-tasks/{id}?agentReport=...`; this is a display bridge only and
+does not create tasks, approve content, publish artifacts, execute a sandbox,
+or reveal candidate answers.
 
 For a controlled local grading example, see
 [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md) and the fixtures

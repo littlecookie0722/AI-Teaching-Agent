@@ -4,6 +4,16 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-08-22
+
+- Made the AI Task Center aware of `agentReport` workflow batches.
+- Forwarded report, Core SQLite, and Grading SQLite context through the
+  read-only task summary and review-detail requests.
+- Rendered report-backed Lab, Exam, Grading, and PPT artifacts as synthetic
+  read-only task cards when the local task list is empty, while keeping review,
+  publishing, and candidate-answer boundaries unchanged.
+- Added frontend contract coverage for the report-aware task/detail path.
+
 ## [0.1.3] - 2026-08-16
 
 - Added a deterministic, advisory PPT quality preflight to `ppt artifact

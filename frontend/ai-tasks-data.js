@@ -74,6 +74,11 @@
     state.gradingDbPath = gradingDbPath;
     state.agentReport = agentReport;
     state.requestedTaskId = requestedTaskId;
+    state.summaryPath = withQuery("/api/review-task-summary", {
+      limit: 5,
+      detailMode: "light",
+      agentReport: agentReport
+    });
     if (requestedTaskId) {
       state.selectedTaskId = requestedTaskId;
     }
@@ -97,6 +102,31 @@
 
   function detailPath(taskId) {
     return state.detailPathTemplate.replace("{id}", encodeURIComponent(taskId));
+  }
+
+  function reviewDetailPath(taskId) {
+    return withQuery("/api/review-tasks/" + encodeURIComponent(taskId), {
+      coreDbPath: state.coreDbPath,
+      gradingDbPath: state.gradingDbPath,
+      agentReport: state.agentReport
+    });
+  }
+
+  function taskDetailPath(task) {
+    return state.agentReport ? reviewDetailPath(task.id) : detailPath(task.id);
+  }
+
+  function taskFromDetailPayload(payload) {
+    if (!payload || payload.success !== true || !payload.data) {
+      return null;
+    }
+    if (payload.data.task) {
+      return payload.data.task;
+    }
+    if (payload.data.reviewDetail && payload.data.reviewDetail.task) {
+      return payload.data.reviewDetail.task;
+    }
+    return null;
   }
 
   function setHref(id, href, text, disabled) {
@@ -135,6 +165,35 @@
       status: "WAITING_REVIEW",
       finalResultPath: "none"
     };
+  }
+
+  function realDemoTaskFromItem(item) {
+    if (!item || !item.taskId) {
+      return null;
+    }
+    return {
+      id: item.taskId,
+      taskType: item.taskType || "UNKNOWN_TASK",
+      title: item.title || ("真实批次 · " + String(item.artifactKind || "artifact")),
+      status: item.status || "WAITING_REVIEW",
+      inputRef: item.agentReportPath || state.agentReport || "agentReport",
+      finalResultPath: item.path || "none",
+      traceId: item.agentReportId || "agent_report",
+      realDemoQueueItem: item
+    };
+  }
+
+  function agentReportTasks(summary) {
+    if (!state.agentReport || !summary || !summary.realDemoReviewQueue) {
+      return [];
+    }
+    var queue = summary.realDemoReviewQueue;
+    if (queue.sourceMode !== "AGENT_REPORT_REAL_LLM_ARTIFACTS" || !Array.isArray(queue.items)) {
+      return [];
+    }
+    return queue.items.map(realDemoTaskFromItem).filter(function (task) {
+      return Boolean(task && task.id);
+    });
   }
 
   function entityKindFromTask(task) {
@@ -313,9 +372,9 @@
       return false;
     });
     renderSelectedTask(task);
-    safeFetchJson(detailPath(task.id))
+    safeFetchJson(taskDetailPath(task))
       .then(function (payload) {
-        var loadedTask = payload && payload.success === true && payload.data ? payload.data.task : null;
+        var loadedTask = taskFromDetailPayload(payload);
         if (loadedTask) {
           renderSelectedTask(loadedTask);
         }
@@ -479,15 +538,27 @@
       ? waitingPayload.data.items
       : [];
     var summary = summaryPayload && summaryPayload.data ? summaryPayload.data.reviewTaskSummary || {} : {};
+    var reportTasks = agentReportTasks(summary);
     var queueSummary = summary.queueSummary || {};
     var priorityQueue = summary.reviewPriorityQueue || {};
     var prioritySummary = priorityQueue.summary || {};
-    setText("ai-task-total", allPayload.data.total || allTasks.length);
-    setText("ai-task-waiting-total", waitingPayload.data.total || waitingTasks.length || queueSummary.waitingReviewTotal || 0);
+    var visibleTasks = reportTasks.length ? reportTasks : (waitingTasks.length ? waitingTasks : allTasks);
+    var reportQueueTotal = summary.realDemoReviewQueue && summary.realDemoReviewQueue.taskTotal;
+    var reportQueueWaitingTotal = summary.realDemoReviewQueue && summary.realDemoReviewQueue.waitingReviewTotal;
+    setText("ai-task-total", reportTasks.length ? (reportQueueTotal || reportTasks.length) : (allPayload.data.total || allTasks.length));
+    setText(
+      "ai-task-waiting-total",
+      reportTasks.length
+        ? (reportQueueWaitingTotal || reportTasks.length)
+        : (waitingPayload.data.total || waitingTasks.length || queueSummary.waitingReviewTotal || 0)
+    );
     setText("ai-task-urgent-total", prioritySummary.urgentTotal || 0);
     setText("ai-task-batch-state-change", boolText(false));
-    setText("ai-task-list-filter", "状态过滤：WAITING_REVIEW · source=" + state.waitingListPath);
-    renderTasks(waitingTasks.length ? waitingTasks : allTasks, summary);
+    setText(
+      "ai-task-list-filter",
+      "状态过滤：WAITING_REVIEW · source=" + (reportTasks.length ? state.summaryPath + ".realDemoReviewQueue" : state.waitingListPath)
+    );
+    renderTasks(visibleTasks, summary);
   }
 
   function load() {
@@ -508,12 +579,21 @@
         }
       });
       state.loadedFromApi = true;
+      var reportTasks = agentReportTasks(
+        payloads[2] && payloads[2].data ? payloads[2].data.reviewTaskSummary || {} : {}
+      );
       setApiState(
-        state.coreTaskMode ? "BACKEND_CORE_TASKS_READONLY_LOADED" : "API_READONLY_LOADED",
-        state.coreTaskMode
+        reportTasks.length
+          ? "AGENT_REPORT_READONLY_LOADED"
+          : (state.coreTaskMode ? "BACKEND_CORE_TASKS_READONLY_LOADED" : "API_READONLY_LOADED"),
+        reportTasks.length
+          ? "GET /api/review-task-summary?agentReport=..."
+          : (state.coreTaskMode
           ? "GET /api/backend/core-tasks + GET /api/review-task-summary"
-          : "GET /api/ai-tasks + GET /api/review-task-summary",
-        "readOnly=true · coreDbPath=" + (state.coreDbPath || "none") + " · autoPublishAllowed=false · batchStateChangeAllowed=false"
+          : "GET /api/ai-tasks + GET /api/review-task-summary"),
+        "readOnly=true · agentReport=" + (state.agentReport || "none")
+          + " · coreDbPath=" + (state.coreDbPath || "none")
+          + " · autoPublishAllowed=false · batchStateChangeAllowed=false"
       );
       applySummary(payloads[0], payloads[1], payloads[2]);
     }).catch(function (error) {

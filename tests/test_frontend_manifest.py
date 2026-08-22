@@ -8336,6 +8336,15 @@ def test_ai_tasks_static_page_has_readonly_api_loader():
     assert "coreDbPath" in script
     assert "gradingDbPath" in script
     assert "agentReport" in script
+    assert 'state.summaryPath = withQuery("/api/review-task-summary"' in script
+    assert "agentReportTasks(summary)" in script
+    assert "AGENT_REPORT_REAL_LLM_ARTIFACTS" in script
+    assert "AGENT_REPORT_READONLY_LOADED" in script
+    assert "function reviewDetailPath(taskId)" in script
+    assert "function taskFromDetailPayload(payload)" in script
+    assert "safeFetchJson(taskDetailPath(task))" in script
+    assert "payload.data.reviewDetail.task" in script
+    assert "realDemoQueueItem" in script
     assert "function withGradingDbPath(path)" in read_text("frontend/review-center-data.js")
     assert "return withAgentReport(withGradingDbPath(withCoreDbPath(" in read_text("frontend/review-center-data.js")
     assert "taskReviewHref(task)" in script
@@ -8378,6 +8387,15 @@ def test_ai_tasks_static_page_has_readonly_api_loader():
         "agent-entities.html?sourceTaskId={taskId}&entityKind={kind}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
         in pages["/ai-tasks"]["dataSources"]
     )
+    assert (
+        "GET /api/review-task-summary?limit=5&detailMode=light&agentReport={workflowReport}"
+        in pages["/ai-tasks"]["dataSources"]
+    )
+    assert (
+        "GET /api/review-tasks/{id}?coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+        in pages["/ai-tasks"]["dataSources"]
+    )
+    assert "realDemoReviewQueue.items[] -> synthetic read-only AI Task cards" in pages["/ai-tasks"]["dataSources"]
     assert "GET /api/ai-tasks/{id}.taskExecutionWorkspace" in pages["/ai-tasks"]["dataSources"]
     assert "GET /api/backend/core-tasks/{id}.taskExecutionWorkspace" in pages["/ai-tasks"]["dataSources"]
     assert "TaskExecutionWorkspace" in read_text("frontend/README.md")
