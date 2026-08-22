@@ -34,5 +34,5 @@ def test_entry_docs_point_to_real_sdk_install_execution_record():
     assert "python -c \"import openai" in readme
     assert "docs/13_REAL_SDK_INSTALL_EXECUTION.md" in start
     assert "尚未发起真实 LLM 请求" in start
-    assert "SDK 安装执行收口说明：已完成" in roadmap
-    assert "SDK import 验证：已验证 `import openai`" in roadmap
+    assert "历史阶段参考" in roadmap
+    assert "12_PHASE_CUTOVER_AND_CORE_BUSINESS.md" in roadmap

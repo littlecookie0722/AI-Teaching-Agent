@@ -171,5 +171,3 @@ python -m pytest tests/test_real_llm_demo_dsl.py tests/test_provider_adapter_wor
 - 人工检查四类 DSL 的课程可用性，并在审核详情中复核 usage、responseId、候选人预览摘要和 DSL 归一化摘要。
 - Grading DSL 到真实沙箱前预检已进入 `docs/19_REAL_SANDBOX_PRECHECK.md`；可执行 `grade sandbox-precheck` 生成演示评分预检报告。
 - 演示包收口已进入 `docs/21_REAL_LLM_DEMO_BUNDLE.md`；可执行 `phase2 demo-bundle build/report` 复放已有真实成果。
-
-建议智能模式：GPT-5.5 超高智能模式。

@@ -103,5 +103,3 @@ python -m pytest tests/test_provider_adapter_workflow.py tests/test_phase2_workf
 - 真实 Lab prompt 对 generation context 的严格匹配。
 - 更细的素材引用覆盖、步骤粒度和风险项复核。
 - 审核详情前端接入 providerSummary / qualitySignals。
-
-建议智能模式：GPT-5.5 超高智能模式。

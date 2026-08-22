@@ -101,5 +101,3 @@ python -m pytest tests/test_provider_adapter_workflow.py tests/test_phase2_workf
 - 将审核详情中的 providerSummary、candidatePreview 和 qualitySignals 接入前端审核页展示。
 - 扩展 Exam/Grading 生成质量信号：标准答案隐藏、评分点覆盖、自动评分计划可解释性。
 - 在有真实 `OPENAI_API_KEY` 和模型名时执行一次在线 Lab 生成，人工复核 v2 prompt 的字段匹配效果。
-
-建议智能模式：GPT-5.5 高智能模式；若下一步实际发送真实 LLM 请求，切换 GPT-5.5 超高智能模式。

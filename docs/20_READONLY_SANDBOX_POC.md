@@ -83,5 +83,3 @@ python -m pytest tests/test_readonly_sandbox_executor.py tests/test_cli.py tests
 - 将 `log_keyword` 静态 evidence 合并到审核页评分报告展示。
 - 保持真实 Notebook kernel 执行延后，直到容器、资源限制和审计日志稳定。
 - 在演示版中用受控 Docker 证据覆盖 `stdout_contains/pytest`，用静态 Notebook evidence 覆盖 `notebook_cell`。
-
-建议智能模式：GPT-5.5 高智能模式。

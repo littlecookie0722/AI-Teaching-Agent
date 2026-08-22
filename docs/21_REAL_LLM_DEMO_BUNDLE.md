@@ -297,5 +297,3 @@ python -m pytest
 ## 下一步
 
 - 将受控 Docker evidence 从演示摘要推进到真实 Grading DSL 的可选评分路径：保持人工审核前不发布，优先支持 `stdout_contains` / `pytest` 的最小业务闭环。
-
-建议智能模式：GPT-5.5 高智能模式。

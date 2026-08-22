@@ -37,6 +37,6 @@ def test_real_sdk_client_boundary_execution_is_linked_from_entry_docs():
     assert "docs/14_REAL_SDK_CLIENT_BOUNDARY_EXECUTION.md" in readme
     assert "真实 SDK 环境变量与 client 构造边界已完成" in readme
     assert "clientCreated=true" in readme
-    assert "环境变量存在性边界验证，不输出密钥值：已完成" in roadmap
-    assert "SDK client 构造边界验证：已完成 smoke test" in roadmap
+    assert "历史阶段参考" in roadmap
+    assert "12_PHASE_CUTOVER_AND_CORE_BUSINESS.md" in roadmap
     assert "docs/14_REAL_SDK_CLIENT_BOUNDARY_EXECUTION.md" in install_doc

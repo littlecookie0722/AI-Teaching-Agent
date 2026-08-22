@@ -179,5 +179,3 @@ python -m pytest
 - 可追溯的 task / artifact / provider audit。
 
 下一步进入核心业务开发，优先增强 Lab 生成输入参数、质量信号和审核详情。
-
-建议智能模式：GPT-5.5 超高智能模式。

@@ -88,4 +88,3 @@ def test_demo_usage_guide_documents_real_llm_commands_and_safety_limits():
     assert "不把真实 LLM 设置为默认 Provider" in content
     assert "不在日志、文档、前端或 Git 中写入 API Key" in content
     assert "不无沙箱执行选手代码" in content
-    assert "建议智能模式：GPT-5.5 超高智能模式" in content

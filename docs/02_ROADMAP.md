@@ -1,39 +1,33 @@
 # 02_ROADMAP
 
-详见 `AI_PLATFORM_CODEX_FULL_GUIDE.md` 第 15 章和第 22 章。
+> 文档角色：路线导航索引。当前执行路线以 [`24_PROJECT_PROGRESS_MAP.md`](24_PROJECT_PROGRESS_MAP.md) 为唯一状态源；本文件不重复维护阶段封口或运营暂停规则。
 
-## 当前路线结论
+## 当前入口
 
-项目已经完成 Mock 基线、Provider 抽象、SDK 边界和 request-send 安全建模。当前封口点是：
+继续开发时按以下顺序读取：
+
+1. [`../AGENTS.md`](../AGENTS.md)：全局执行约束、安全边界和交付要求。
+2. [`24_PROJECT_PROGRESS_MAP.md`](24_PROJECT_PROGRESS_MAP.md)：当前优先级、已完成项和停止线。
+3. 目标模块的 API、Schema、README 或专项技术文档。
+
+## 当前路线摘要
+
+项目已经越过 Phase 1 Mock 底座、真实 SDK 边界和最小真实 LLM PoC。默认路线是：
 
 ```text
-real-llm-request-send-attempt-gate-disabled
+真实 LLM 输出质量与归一化
+→ 审核详情 / 导入预览 / Grading Report 产品化
+→ 本地实体、状态和评分闭环
+→ 稳定 CLI / API / MCP 工具化
+→ Agent 只编排稳定工具
 ```
 
-后续默认不再新增同义安全壳，不再继续扩展 `*-disabled`、`*-gate`、`*-executor`、`*-review-only` 链条。
+真实平台 API、平台 token/字段映射、`import-send`、`import-status`、平台签收发布和运营交付扩展当前暂停；具体例外以用户明确任务为准。
 
-## 下一阶段路线
+## 历史阶段参考
 
-1. SDK 安装执行收口说明：已完成，见 `docs/13_REAL_SDK_INSTALL_EXECUTION.md`。
-2. 真实 SDK 依赖安装或依赖文件变更：已通过 `requirements.txt` 和 `python -m pip install -r requirements.txt` 确认。
-3. SDK import 验证：已验证 `import openai`。
-4. 环境变量存在性边界验证，不输出密钥值：已完成，见 `docs/14_REAL_SDK_CLIENT_BOUNDARY_EXECUTION.md`。
-5. SDK client 构造边界验证：已完成 smoke test，未发请求，见 `docs/14_REAL_SDK_CLIENT_BOUNDARY_EXECUTION.md`。
-6. 最小真实 LLM 单请求 PoC：已实现，见 `docs/15_REAL_LLM_MINIMAL_POC.md`；当前环境缺少真实 `OPENAI_API_KEY`，未执行在线请求。
-7. 将真实 LLM 能力接回 Lab DSL 生成 Workflow：已实现，见 `docs/16_REAL_LLM_WORKFLOW_RECONNECT.md`。
-8. Lab 生成核心业务参数与审核质量信号第一版：已实现，见 `docs/17_LAB_GENERATION_CORE_SIGNALS.md`。
-9. 核心业务开发：下一步，优先增强真实 Lab prompt 匹配、试题转换、评分脚本生成、评分沙箱、审核中心和运营复用。
+- SDK 与最小 PoC 边界：[`12_PHASE_CUTOVER_AND_CORE_BUSINESS.md`](12_PHASE_CUTOVER_AND_CORE_BUSINESS.md)
+- 完整架构、DSL、API、Phase 任务和历史提示词：[`AI_PLATFORM_CODEX_FULL_GUIDE.md`](AI_PLATFORM_CODEX_FULL_GUIDE.md)
+- 演示启动与本地使用：[`23_DEMO_USAGE_GUIDE.md`](23_DEMO_USAGE_GUIDE.md)
 
-## 核心业务优先级
-
-1. AI 生成教学实验。
-2. AI 将旧实验改造成考试 / 竞赛试题。
-3. AI 生成自动评分 DSL / 脚本计划。
-4. 沙箱内机器自动判分。
-5. VM / Notebook 环境管理。
-6. MCP Tool 与 Agent 编排。
-
-## 智能模式建议
-
-- 文档、Mock、普通业务代码、测试修复：GPT-5.5 高智能模式。
-- SDK 安装、依赖解析、环境变量读取边界、SDK import、client 构造、最小真实请求 PoC：GPT-5.5 超高智能模式。
+这些文档用于查背景和技术细节；如果其中的“当前下一步”与进度地图不一致，以进度地图为准。

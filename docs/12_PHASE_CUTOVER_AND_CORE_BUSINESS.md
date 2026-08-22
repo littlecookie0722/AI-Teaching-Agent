@@ -1,6 +1,8 @@
 # Phase Cutover And Core Business Guide
 
-本文件用于防止项目继续陷入无限新增安全门禁、禁用壳或评审壳。后续 Codex / AI Coding Agent 必须优先遵守这里的封口规则，再进入真实 SDK 安装和核心业务开发。
+> 文档角色：阶段切换技术记录。它解释为什么停止追加安全壳，并保留 SDK / PoC 边界细节；当前全局约束以根目录 `AGENTS.md` 为准，当前路线和停止线以 `docs/24_PROJECT_PROGRESS_MAP.md` 为准。本文件不再作为独立的逐回合规则源。
+
+本文件用于记录项目从 Mock / 安全建模切换到真实 SDK、最小 PoC 和核心业务的历史过程。若其中的“下一步”与进度地图不一致，以进度地图为准。
 
 ## 1. 当前封口结论
 
@@ -222,20 +224,11 @@ phase2 workflow run --provider-mode real-llm-minimal
 - 无沙箱执行选手代码。
 - 在前端、日志、测试输出中展示标准答案或密钥。
 
-## 7. Codex 下一步建议规则
+## 7. 下一步建议
 
-每次最终输出必须包含：
+下一步建议只需说明范围、验证方式和风险。
 
-```text
-建议智能模式：GPT-5.5 高智能模式 / GPT-5.5 超高智能模式
-```
-
-建议标准：
-
-- 文档、Mock、普通业务代码、测试修复：GPT-5.5 高智能模式。
-- SDK 安装、依赖解析、环境变量边界、SDK import、client 构造、最小真实 LLM 请求：GPT-5.5 超高智能模式。
-
-## 8. 下一步推荐
+## 8. 历史下一步推荐（不覆盖当前进度地图）
 
 当前推荐下一步：
 
@@ -246,5 +239,3 @@ phase2 workflow run --provider-mode real-llm-minimal
 3. 将 Prompt / Provider / traceId / responseId / usage 等信息纳入审核详情。
 4. 继续保持 Exam / Grading / PPT 默认 Mock，后续按业务优先级分层接入真实 LLM。
 ```
-
-建议智能模式：GPT-5.5 超高智能模式。

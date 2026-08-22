@@ -101,5 +101,3 @@ python -m pytest tests/test_sandbox_mock_executor.py tests/test_cli.py
 - 基于 `sandbox.execution_contract.build_sandbox_execution_request` 和 `sandbox.container_executor.ContainerSandboxExecutor.plan` 实现最小真实容器执行 PoC。
 - 先支持单个 `file_exists` 或 `json_field` 低风险 check，再扩展到 `pytest` 和 `notebook_cell`。
 - 将真实执行结果回填到现有 `gradingReport.checks[]` 的 evidence 字段，保持 CLI JSON 契约不变。
-
-建议智能模式：GPT-5.5 超高智能模式。

@@ -10,15 +10,16 @@ docs/23_DEMO_USAGE_GUIDE.md
 
 该文档包含本地依赖安装、静态页面入口、CLI / Backend Mock / MCP Mock 启动方式、当前能力清单，以及 `OPENAI_API_KEY`、`OPENAI_MODEL`、`OPENAI_BASE_URL` 的大模型配置说明。
 
-## 当前必须先看的封口规则
+## 继续开发时先看什么
 
-继续开发前必须阅读：
+当前执行约束只有两处：
 
 ```text
-docs/12_PHASE_CUTOVER_AND_CORE_BUSINESS.md
+AGENTS.md
+docs/24_PROJECT_PROGRESS_MAP.md
 ```
 
-该文档明确：`real-llm-request-send-attempt-gate-disabled` 是安装前与真实请求发送前的封口点。后续默认不再新增同义安全壳，下一阶段进入真实 SDK 安装、环境变量边界、SDK import/client 边界、最小真实 LLM 单请求 PoC 和核心业务开发。
+`AGENTS.md` 负责全局工作方式和安全边界；`docs/24_PROJECT_PROGRESS_MAP.md` 负责当前路线、优先级和功能停止线。`docs/12_PHASE_CUTOVER_AND_CORE_BUSINESS.md`、`docs/02_ROADMAP.md` 和完整指南保留为阶段背景或技术参考，不再作为独立的逐回合规则源。
 
 真实 SDK 安装执行记录见：
 
@@ -46,41 +47,38 @@ docs/15_REAL_LLM_MINIMAL_POC.md
 docs/16_REAL_LLM_WORKFLOW_RECONNECT.md
 ```
 
-当前已实现一次真实请求代码路径和 Phase 2 Lab Workflow 显式回接；由于当前 shell 未检测到真实 `OPENAI_API_KEY`，尚未执行在线请求。下一步默认进入核心业务开发，不要回到新增同义门禁或禁用壳。
+真实 SDK、真实 LLM 请求和相关环境变量仍然必须显式 opt-in，密钥不得写入代码或日志；当前具体开发路线以进度地图为准，不要回到新增同义门禁或禁用壳。
 
 ## 当前项目要做什么
 
 这是一个 AI 实训平台智能化升级项目，目标不是单点功能，而是一套 AI 原生实训基础设施。
 
-## 第一个里程碑
+## 当前开发重点
 
-先完成 Phase 1：
+Phase 1 底座已经完成，当前默认推进真实演示稳定性和核心业务产品化：
 
 ```text
-目录结构
-DSL Schema
-CLI Mock
-AI Task 状态模型
-人工审核流
-基础测试
+真实 LLM 输出与 DSL 归一化
+审核详情与导入预览
+Grading DSL / 受控评分
+本地实体、状态和版本管理
+核心前端、CLI、API、MCP
 ```
 
 ## 不要现在做什么
 
-不要现在做：
+除非用户明确恢复，不要默认做：
 
 ```text
-真实大模型
-真实云资源
-真实 Agent
-真实发布
-真实判卷
-复杂 UI
+外部平台 API 对接
+平台 import-send / import-status / 签收发布
+新增同义安全壳
+运营交付页和新运营材料
 ```
 
 ## 给 Codex 的第一条命令
 
 ```text
-请阅读 AGENTS.md 和 docs/AI_PLATFORM_CODEX_FULL_GUIDE.md。
-只完成 Phase 1 的项目底座搭建。
+请阅读 AGENTS.md 和 docs/24_PROJECT_PROGRESS_MAP.md，
+根据当前路线实现一个最小、可验证的核心业务增量。
 ```

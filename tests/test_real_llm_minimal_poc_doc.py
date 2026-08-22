@@ -28,7 +28,6 @@ def test_real_llm_minimal_poc_doc_records_implemented_boundary_and_command():
     assert "将真实 LLM 能力接回 Lab DSL 生成 Workflow" in content
     assert "docs/16_REAL_LLM_WORKFLOW_RECONNECT.md" in content
     assert "下一步进入核心业务开发" in content
-    assert "建议智能模式：GPT-5.5 超高智能模式" in content
 
 
 def test_real_llm_minimal_poc_is_linked_from_entry_docs():
@@ -48,8 +47,9 @@ def test_real_llm_minimal_poc_is_linked_from_entry_docs():
     assert "docs/15_REAL_LLM_MINIMAL_POC.md" in start_here
     assert "docs/16_REAL_LLM_WORKFLOW_RECONNECT.md" in start_here
     assert "不要回到新增同义门禁或禁用壳" in start_here
-    assert "最小真实 LLM 单请求 PoC：已实现" in roadmap
-    assert "将真实 LLM 能力接回 Lab DSL 生成 Workflow：已实现" in roadmap
+    assert "当前路线摘要" in roadmap
+    assert "真实 LLM 输出质量与归一化" in roadmap
+    assert "24_PROJECT_PROGRESS_MAP.md" in roadmap
     assert "最小真实 LLM 单请求 PoC：已实现" in full_guide
     assert "当前默认下一步是第 8 步核心业务开发" in full_guide
     assert "real-llm-minimal-poc run" in cli_readme
@@ -68,4 +68,3 @@ def test_real_llm_workflow_reconnect_doc_records_cli_and_limits():
     assert "REAL_LLM_MINIMAL_LAB_WORKFLOW" in content
     assert "REAL_LLM_MINIMAL_CALL_SECRET_REQUIRED" in content
     assert "python -m pytest tests/test_provider_adapter_workflow.py tests/test_phase2_workflow_orchestrator.py tests/test_real_llm_minimal_poc.py" in content
-    assert "建议智能模式：GPT-5.5 超高智能模式" in content

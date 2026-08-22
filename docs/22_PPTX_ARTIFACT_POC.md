@@ -124,5 +124,3 @@ python -m pytest
 
 - PPT 审核页和审核中心已展示 PPTX Artifact 摘要、路径、manifest、slideCount、bytes、审核状态、首页 PNG、contact sheet、逐页审核状态、人工批注、版式 QA 信号和 `PptPageReviewUpdateAction`。
 - v0.1.3 已把 PPT DSL 质量预检接入本地 PPTX Artifact 和 Demo Bundle；下一步回到 P1 核心业务缺口，优先处理具体的评分隔离/报告问题或真实前端交互缺陷。
-
-建议智能模式：高智能模式。

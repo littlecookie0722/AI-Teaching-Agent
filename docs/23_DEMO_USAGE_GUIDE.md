@@ -557,5 +557,3 @@ $env:OPENAI_MODEL="<model-name>"
 真实大模型可以接入，但默认不自动发布；所有实验、试题、评分规则和 PPT 都先进入 WAITING_REVIEW。
 当前演示版已经能展示真实 LLM 产出的 Lab / Exam / Grading / PPT、PPTX Artifact、评分 evidence 和人工审核闭环。
 ```
-
-建议智能模式：GPT-5.5 超高智能模式。

@@ -1,8 +1,8 @@
 # 项目进度地图与防跑偏清单
 
-> 最后更新：2026-08-16
+> 最后更新：2026-08-22
 > 当前定位：AI 教学智能体（独立版）。真实 LLM 演示闭环已跑通到本地审核、受控评分 evidence、本地实体持久化和状态管理阶段；项目目标不再是接入外部平台，而是作为独立智能体运行。
-> 使用方式：后续每次继续开发前，先看本文件的“下一步路线”和“停止线”，避免在同一个功能点反复加门禁、加展示页或加运营材料。
+> 使用方式：本文件只维护当前路线、优先级和功能停止线；全局执行约束以项目根目录 `AGENTS.md` 为准。继续开发前先看本文件的“下一步路线”和相关停止线，避免在同一个功能点反复加门禁、加展示页或加运营材料。
 
 ---
 
@@ -217,29 +217,26 @@ loader 通过带 `agentReport`、`coreDbPath` 和 `gradingDbPath` 的
 
 ---
 
-## 6. 防跑偏规则
+## 6. 地图专属停止线（全局约束见 `AGENTS.md`）
 
-1. 不再新增 `*-disabled`、`*-gate`、`*-review-only`、`pre-install`、`request-send` 同义安全壳，除非用户明确说明新的具体风险。
-2. 运营交付暂停扩展；`delivery/` 和 `frontend/operations-*` 只做勘误、链接修复或归档说明。
-3. 每个功能只做到本文件的“做到什么就停”，达到停止线后转入下一项。
-4. Mock、真实 LLM、真实平台、真实云资源必须分层说明，不能把演示成功误写成生产完成。
-5. 真实 LLM 失败优先改 Schema 提示、归一化和错误报告；不要回到新增门禁。
-6. 前端优先连接核心生成/审核/导入/评分数据；不要继续做纯展示页。
-7. Agent 只能编排稳定工具，不能替代 DSL、审核和沙箱；真实平台 API 工具当前暂停，不得被 Agent 默认调用。
-8. 自动发布、真实云资源删除、无沙箱执行选手代码、密钥入库或日志输出仍然禁止。
-9. `review core-readiness` 或历史文档出现 `PLATFORM_IMPORT_REQUEST_PENDING` / `agent_internal_publish_request` 时，当前阶段只记录为未来平台对接项，不作为默认下一步。
+1. 本文件中的每个功能只做到对应“做到什么就停”，达到停止线后转入下一项，不在同一功能上追加同义壳、展示页或验收页。
+2. Mock、真实 LLM、真实平台和真实云资源必须分层说明；演示通过不等于生产完成。
+3. 真实 LLM 失败优先修复真实失败样本对应的 Prompt、归一化、Schema 或错误报告，不预先发明大量门禁规则。
+4. 前端优先连接核心生成、审核、导入和评分数据；达到当前页面停止线后转向其他 P0/P1 缺口。
+5. 当前真实平台 `import-send`、`import-status`、平台签收/发布和相关 readiness 提示只作为未来对接项，不作为默认下一步。
+6. Agent / MCP 只接入已稳定的本地核心工具；`local-core-mvp` 停止线之外的工具不恢复为默认路线。
 
 ---
 
 ## 7. 近期建议任务清单
 
-| 顺序 | 任务 | 复杂度 | 建议智能模式 |
-| --- | --- | --- | --- |
-| 1 | 建立真实演示闭环 README / 命令脚本，明确输入、输出和验收文件。已收敛到 `phase2 real-dsl-demo one-click` 作为 P0 默认总控入口。 | S-M | 高智能模式 |
-| 2 | 收集最近真实 LLM Schema 失败样本，补归一化、失败诊断和离线回归测试。已建立 `docs/25_REAL_LLM_SCHEMA_DRIFT_MATRIX.md`、矩阵测试入口和 `schemaFailureDiagnostic`，后续只按新增真实失败样本追加。 | M | 超高智能模式 |
-| 3 | Review Center 已支持 `agentReport` 只读加载真实 workflow report，并已补齐自定义真实输出批次在 Review Queue / DSL preview / artifact links / 候选安全预览中的映射；独立 Lab / Exam / Grading / PPT 审核页已继承 `agentReport` 查询参数，且 Review Center 到独立审核页入口会保留该参数；`MVP Review Workspace` 已把真实 DSL 批次、当前任务、评分证据、本地导入预览、当前审核入口、评分报告入口和下一步人工动作提前到首屏；v0.1.4 进一步把同一 `realDemoReviewQueue` 回接到 AI Task Center。后续不要继续围绕 Review Center 首屏或 AI Task synthetic card 追加同义总览壳，转向 Grading Report、生成页或导入预览页具体产品化缺陷。 | M-L | 高智能模式 |
-| 4 | 本地导入预览数据模型：Lab / Exam / Grading / PPT 到本地平台实体、mock-import 和 import-dry-run DTO。已完成本地 mock/staging mapping 与 PPT Deck dry-run DTO；2026-07-11 修复了 repository-backed readiness 将无关 Lab/PPT 计入 Exam 任务缺失项的问题，并使带 `coreDbPath` 的审核就绪报告读取同一本地 dry-run evidence。完成 dry-run 后固定停在 `LOCAL_CORE_MVP_STOP_LINE_REACHED`，后续不执行真实平台发送。 | L | 高智能模式 |
-| 5 | 本地评分记录闭环：从 `grading-evidence-auto.json` 派生 `GradingRecord`，记录人工 `approve-ready` / `needs-evidence` / `needs-revision` 复核，并在审核详情、Review Center、Grading Report、AI Task 和平台实体 readiness 中展示；审核详情会转发 `gradingDbPath` 并与评分报告 / AI Task 一致读取 SQLite 或 JSON staging；后续转向镜像/隔离质量。 | M | 高智能模式 |
-| 6 | MCP 本地 stdio 服务、客户端 smoke 和真实本地客户端两阶段挂接已完成：`mcp stdio-local-core-demo` 先通过 stdio 调用素材分析、Lab 生成和审核读取，固定停在 `WAITING_REVIEW`；显式人工批准后才继续 import-preview、mock-import、import-dry-run、GradingJob / GradingRecord 读取和审计查询，默认 profile 同时验证暂停工具返回 `MCP_TOOL_NOT_IN_PROFILE`。`docs/27_MCP_LOCAL_CORE_CLIENT_USAGE.md` 已补配置、命令和停止线。后续只封装新增稳定 CLI/API，或转向 Agent MVP 体验。 | L-XL | 高智能模式 |
+| 顺序 | 任务 | 复杂度 |
+| --- | --- | --- |
+| 1 | 建立真实演示闭环 README / 命令脚本，明确输入、输出和验收文件。已收敛到 `phase2 real-dsl-demo one-click` 作为 P0 默认总控入口。 | S-M |
+| 2 | 收集最近真实 LLM Schema 失败样本，补归一化、失败诊断和离线回归测试。已建立 `docs/25_REAL_LLM_SCHEMA_DRIFT_MATRIX.md`、矩阵测试入口和 `schemaFailureDiagnostic`，后续只按新增真实失败样本追加。 | M |
+| 3 | Review Center 已支持 `agentReport` 只读加载真实 workflow report，并已补齐自定义真实输出批次在 Review Queue / DSL preview / artifact links / 候选安全预览中的映射；独立 Lab / Exam / Grading / PPT 审核页已继承 `agentReport` 查询参数，且 Review Center 到独立审核页入口会保留该参数；`MVP Review Workspace` 已把真实 DSL 批次、当前任务、评分证据、本地导入预览、当前审核入口、评分报告入口和下一步人工动作提前到首屏；v0.1.4 进一步把同一 `realDemoReviewQueue` 回接到 AI Task Center。后续不要继续围绕 Review Center 首屏或 AI Task synthetic card 追加同义总览壳，转向 Grading Report、生成页或导入预览页具体产品化缺陷。 | M-L |
+| 4 | 本地导入预览数据模型：Lab / Exam / Grading / PPT 到本地平台实体、mock-import 和 import-dry-run DTO。已完成本地 mock/staging mapping 与 PPT Deck dry-run DTO；2026-07-11 修复了 repository-backed readiness 将无关 Lab/PPT 计入 Exam 任务缺失项的问题，并使带 `coreDbPath` 的审核就绪报告读取同一本地 dry-run evidence。完成 dry-run 后固定停在 `LOCAL_CORE_MVP_STOP_LINE_REACHED`，后续不执行真实平台发送。 | L |
+| 5 | 本地评分记录闭环：从 `grading-evidence-auto.json` 派生 `GradingRecord`，记录人工 `approve-ready` / `needs-evidence` / `needs-revision` 复核，并在审核详情、Review Center、Grading Report、AI Task 和平台实体 readiness 中展示；审核详情会转发 `gradingDbPath` 并与评分报告 / AI Task 一致读取 SQLite 或 JSON staging；后续转向镜像/隔离质量。 | M |
+| 6 | MCP 本地 stdio 服务、客户端 smoke 和真实本地客户端两阶段挂接已完成：`mcp stdio-local-core-demo` 先通过 stdio 调用素材分析、Lab 生成和审核读取，固定停在 `WAITING_REVIEW`；显式人工批准后才继续 import-preview、mock-import、import-dry-run、GradingJob / GradingRecord 读取和审计查询，默认 profile 同时验证暂停工具返回 `MCP_TOOL_NOT_IN_PROFILE`。`docs/27_MCP_LOCAL_CORE_CLIENT_USAGE.md` 已补配置、命令和停止线。后续只封装新增稳定 CLI/API，或转向 Agent MVP 体验。 | L-XL |
 
-当前最建议下一步：P0 真实 LLM 输出稳定性和 Review Center / AI Task 自定义真实输出批次映射都已有当前证据；除非出现新的真实失败样本或具体前端交互缺陷，否则转向 Grading Report、生成页或导入预览页的真实 API 兼容与视觉/交互产品化，或 P1 本地平台实体闭环剩余缺口。真实平台后端对接、平台 API base URL、`AGENT_API_TOKEN`、`import-send` 和 `import-status` 暂停；本地演示链路以真实 LLM 产物、受控评分 evidence、decision note、mock-import、import-dry-run DTO、GradingRecord 和前端审核/评分页为核心。建议智能模式：高智能模式。
+当前最建议下一步：P0 真实 LLM 输出稳定性和 Review Center / AI Task 自定义真实输出批次映射都已有当前证据；除非出现新的真实失败样本或具体前端交互缺陷，否则转向 Grading Report、生成页或导入预览页的真实 API 兼容与视觉/交互产品化，或 P1 本地平台实体闭环剩余缺口。真实平台后端对接、平台 API base URL、`AGENT_API_TOKEN`、`import-send` 和 `import-status` 暂停；本地演示链路以真实 LLM 产物、受控评分 evidence、decision note、mock-import、import-dry-run DTO、GradingRecord 和前端审核/评分页为核心。
