@@ -20,9 +20,9 @@
 
 ## 1. 项目定位与当前阶段
 
-项目是独立运行的 AI 教学智能体，核心能力包括 Lab / Exam / Grading / PPT 生成、人工审核、受控评分、内部实体管理、CLI、MCP 和前端交互；不以外部实训平台对接为默认目标。
+项目是独立运行的 AI 教学智能体。当前产品目标收敛为：教师提交一份 Markdown 教学材料，系统生成可人工审核、可本地导出的 Lab + Exam 教学包；Grading 作为 Exam 的内部配套评分规则，不作为独立产品线扩张。
 
-当前已越过 Phase 1 Mock 底座和真实 SDK / 最小真实 LLM PoC。继续开发默认进入真实演示稳定性和 P0/P1 核心业务产品化，具体顺序以进度地图为准。Phase 1 限制只在用户明确要求维护 Phase 1 产物时适用，不再作为全项目默认阶段。
+当前已越过 Phase 1 Mock 底座和真实 SDK / 最小真实 LLM PoC。此前完成的 PPT、受控评分、内部实体、CLI、API、MCP、Agent 和多页前端能力继续保留，但不再同时作为当前 MVP 的交付目标。继续开发默认只收敛上述单一教学包闭环，具体顺序以进度地图为准。
 
 ## 2. 基本架构顺序
 
@@ -44,9 +44,23 @@ Agent 只编排已经稳定的 CLI/API/MCP 工具，业务规则应留在 DSL、
 
 ### 3.2 默认开发范围
 
-默认优先：真实 LLM 输出质量与归一化、DSL/Schema、审核详情、导入预览、本地实体和状态、Grading DSL/受控沙箱、核心 CLI/API/MCP、前端生成/审核/评分闭环。
+默认优先：Markdown 输入、Lab + Exam/Grading 生成、Schema 校验与归一化、Exam 候选人脱敏、`WAITING_REVIEW`、人工批准/退回、本地导出，以及支撑这条链路所需的最小本地状态、单一生成入口和单一审核入口。
 
-默认暂停：外部平台 API、平台 token/字段映射、`import-send` / `import-status` / 平台签收发布、运营交付页、`operations-*` 页面、`delivery/` 新运营材料。只有用户明确恢复对应任务时才进入。
+默认只维护、不扩张：已有 PPT/PPTX、受控评分沙箱、本地实体与 import-preview/mock-import/import-dry-run、MCP、Agent、数据库 adapter 和其他前端页面。除非出现影响现有兼容性或安全边界的具体缺陷，否则不把这些能力列为下一步。
+
+默认暂停：自动评分生产化、PPT 产品化、外部平台 API、平台 token/字段映射、`import-send` / `import-status` / 平台签收发布、MCP/Agent 新能力、VM/Notebook、生产部署、运营交付页、`operations-*` 页面、`delivery/` 新运营材料。只有用户明确恢复对应任务时才进入。
+
+### 3.3 当前 MVP 停止线
+
+当前 MVP 达到以下条件即停止扩张：
+
+1. 一份 Markdown 可稳定生成相互引用正确的 Lab + Exam/Grading。
+2. 产物通过 Schema/契约校验，并默认进入 `WAITING_REVIEW`。
+3. 候选人预览不包含答案或内部 `gradingRef`。
+4. 教师可在一条清晰流程中查看、批准或退回，并本地导出教学包。
+5. Mock 正常路径和至少一个错误/回归路径可复现验证；真实 LLM 只对实际失败样本补修复。
+
+达到该停止线后，只能在 PPT 产品化与自动评分产品化中选择一个作为下一阶段，且需要用户明确确认；不得并行恢复全部历史路线。
 
 ## 4. 不可退让的安全与数据规则
 
@@ -60,7 +74,7 @@ Agent 只编排已经稳定的 CLI/API/MCP 工具，业务规则应留在 DSL、
 
 ## 5. 工程契约
 
-- 支持并优先维护 Lab / Exam / Grading / PPT DSL；生成、归一化和跨产物引用都要有 Schema 或契约校验。
+- 优先维护 Lab / Exam / Grading DSL；PPT DSL 保持现有兼容性。生成、归一化和跨产物引用都要有 Schema 或契约校验。
 - CLI 命令返回统一 JSON envelope；新增或修改命令要保持已有公共字段兼容。
 - 真实 SDK、环境变量、client 构造或真实 LLM 请求必须显式 opt-in；默认 Mock 路径不因新增功能而改变。
 - 真实生成仍必须保留 `WAITING_REVIEW`、失败诊断、审计上下文和不自动发布边界。

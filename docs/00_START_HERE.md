@@ -51,18 +51,27 @@ docs/16_REAL_LLM_WORKFLOW_RECONNECT.md
 
 ## 当前项目要做什么
 
-这是一个 AI 实训平台智能化升级项目，目标不是单点功能，而是一套 AI 原生实训基础设施。
+这是一个独立运行的 AI 教学智能体。当前目标不是建设完整实训平台，而是让教师从一份 Markdown 教学材料得到一套可人工审核、可本地导出的 Lab + Exam 教学包；Grading 作为 Exam 的内部配套规则。
+
+```text
+Markdown 教学材料
+→ Lab + Exam/Grading
+→ Schema 校验
+→ WAITING_REVIEW
+→ 人工批准或退回
+→ 本地导出
+```
 
 ## 当前开发重点
 
-Phase 1 底座已经完成，当前默认推进真实演示稳定性和核心业务产品化：
+Phase 1 底座和更大范围的本地 PoC 已经完成。当前只推进上述单一 MVP 闭环：
 
 ```text
-真实 LLM 输出与 DSL 归一化
-审核详情与导入预览
-Grading DSL / 受控评分
-本地实体、状态和版本管理
-核心前端、CLI、API、MCP
+Markdown 输入与真实 LLM 生成质量
+Lab / Exam / Grading DSL 及跨产物校验
+候选人安全预览
+单一生成入口与单一审核入口
+人工审核状态与本地教学包导出
 ```
 
 ## 不要现在做什么
@@ -70,11 +79,18 @@ Grading DSL / 受控评分
 除非用户明确恢复，不要默认做：
 
 ```text
+PPT / PPTX 产品化
+自动评分与受控沙箱生产化
+本地实体和 import-preview / mock-import / import-dry-run 扩张
+MCP / Agent 新能力和多页面工作台扩张
 外部平台 API 对接
 平台 import-send / import-status / 签收发布
+VM / Notebook 和生产部署
 新增同义安全壳
 运营交付页和新运营材料
 ```
+
+上述已有实现保留并进行必要的兼容性或安全修复，但不再同时作为当前 MVP 的交付目标。当前 MVP 验收后，PPT 产品化和自动评分产品化只能选择一项进入下一阶段。
 
 ## 给 Codex 的第一条命令
 

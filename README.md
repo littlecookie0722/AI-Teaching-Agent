@@ -1,34 +1,30 @@
 # AI Teaching Agent
 
-AI Teaching Agent is a standalone, Python-based project for turning teaching
-materials into reviewable learning artifacts. It keeps LLM-generated content
-inside a structured and auditable workflow instead of publishing it directly.
+AI Teaching Agent is a standalone, Python-based project for turning one
+Markdown teaching source into a reviewable, locally exportable Lab and Exam
+package. It keeps LLM-generated content inside a structured and auditable
+workflow instead of publishing it directly.
 
-The project is an MVP for maintainers, educators, and developers who need a
-repeatable path from source material to teaching experiments, assessment
-questions, grading rules, and presentation plans.
+The current MVP is deliberately narrow: generate linked Lab, Exam, and internal
+Grading artifacts, validate them, protect candidate-facing content, and stop
+for a human decision before local export.
 
-## What It Does
+## Current MVP
 
 - Generates versioned Lab DSL artifacts from source material.
 - Converts a Lab DSL into linked Exam DSL and Grading DSL artifacts.
-- Produces PPT DSL slide plans from teaching material.
-- Adds a deterministic PPTX content preflight that surfaces text-density and
-  renderer-truncation risks before manual page review.
-- Hydrates the AI Task Center from a real workflow report in read-only mode,
-  so report-backed Lab/Exam/Grading/PPT artifacts remain connected to review
-  detail even when the local task store has no matching rows.
-- Continues an approved PPT task through local PPT Deck import preview, mock
-  import, and import dry-run without sending a platform request or publishing.
-- Validates all four DSL types before a task can continue.
+- Validates the linked Lab, Exam, and Grading artifacts before they continue.
 - Creates `WAITING_REVIEW` tasks and records human approve/reject decisions.
 - Produces a candidate-safe exam preview that excludes answers and internal
   grading references.
-- Runs grading evidence through a controlled local Docker path when explicitly
-  requested; the normal workflow never runs unreviewed learner code on the
-  host.
-- Exposes the stable local capabilities through JSON CLI commands, a minimal
-  HTTP/ASGI adapter, and an MCP stdio server.
+- Exports the reviewed teaching package locally without automatic publishing.
+
+Existing PPT/PPTX, controlled grading, local entity, MCP, Agent, database
+adapter, and additional frontend capabilities remain in the repository for
+compatibility and targeted fixes. They are not concurrent goals of the current
+MVP. After this MVP is accepted, PPT productization and automatic grading
+productization are mutually exclusive next-stage candidates until one is
+explicitly selected.
 
 ## Architecture
 
@@ -36,10 +32,10 @@ questions, grading rules, and presentation plans.
 Teaching material
        |
        v
-CLI / HTTP API / MCP stdio
+single generation entry
        |
        v
-Prompt + provider -> Lab / Exam / Grading / PPT DSL
+Prompt + provider -> Lab / Exam / Grading DSL
        |
        v
 Schema validation -> WAITING_REVIEW -> human decision
@@ -47,19 +43,16 @@ Schema validation -> WAITING_REVIEW -> human decision
        |                                  v
        |                         candidate-safe preview
        v
-local artifacts, audit events, and SQLite-backed entities
-       |
-       v
-controlled grading evidence (explicit local Docker execution only)
+local teaching-package export
 ```
 
 ## Current Status
 
-The project has reached a local-core MVP: real LLM output can be normalized
-into Lab, Exam, Grading, and PPT DSL artifacts; generated content remains
-review-gated; local entity persistence and controlled grading evidence are
-available. It is not a production hosted service, cloud resource manager, or
-automatic publishing system.
+The project has already demonstrated a broader local-core PoC, including PPT,
+controlled grading evidence, local entity persistence, MCP, and Agent paths.
+Current development is now refocused on making the smaller Lab + Exam/Grading
+review-and-export workflow coherent and dependable. It is not a production
+hosted service, cloud resource manager, or automatic publishing system.
 
 The detailed delivery boundaries, implemented capabilities, and stop lines are
 maintained in [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md).
