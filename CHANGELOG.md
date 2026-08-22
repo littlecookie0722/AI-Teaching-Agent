@@ -4,6 +4,16 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-08-22
+
+- Connected PPT generation and review pages to the existing local PPT Deck
+  import-preview and mock-import APIs.
+- Added PPT Deck preparation to the Platform Entities workflow, including
+  repository-aware import preview, mock import, and import dry-run output.
+- Preserved Core SQLite, Grading SQLite, and workflow-report context through
+  PPT import navigation while keeping approval and publishing boundaries.
+- Added frontend contract coverage for the four-kind local import workflow.
+
 ## [0.1.4] - 2026-08-22
 
 - Made the AI Task Center aware of `agentReport` workflow batches.

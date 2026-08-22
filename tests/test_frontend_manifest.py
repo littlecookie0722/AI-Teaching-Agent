@@ -901,6 +901,8 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
         "/api/exams/mock-import",
         "/api/grading/import-preview",
         "/api/grading/mock-import",
+        "/api/ppt/import-preview",
+        "/api/ppt/mock-import",
         "/api/platform-entities/{id}/import-dry-run",
     }
     assert pages["/platform-entities"]["prototypePath"] == "frontend/agent-entities.html"
@@ -951,6 +953,10 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
     assert "POST /api/grading/import-preview body.coreDbPath" in prototypes["/platform-entities"]["dataSources"]
     assert "POST /api/grading/mock-import" in prototypes["/platform-entities"]["dataSources"]
     assert "POST /api/grading/mock-import body.coreDbPath" in prototypes["/platform-entities"]["dataSources"]
+    assert "POST /api/ppt/import-preview" in prototypes["/platform-entities"]["dataSources"]
+    assert "POST /api/ppt/import-preview body.coreDbPath" in prototypes["/platform-entities"]["dataSources"]
+    assert "POST /api/ppt/mock-import" in prototypes["/platform-entities"]["dataSources"]
+    assert "POST /api/ppt/mock-import body.coreDbPath" in prototypes["/platform-entities"]["dataSources"]
     assert "POST /api/platform-entities/{id}/import-dry-run" in prototypes["/platform-entities"]["dataSources"]
     assert "POST /api/platform-entities/{id}/import-dry-run body.contractConfig" in prototypes["/platform-entities"]["dataSources"]
     assert "POST /api/platform-entities/{id}/import-send" not in prototypes["/platform-entities"]["dataSources"]
@@ -1544,12 +1550,17 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
     assert pages["/ppt/:id/review"]["prototypePath"] == "frontend/ppt-review.html"
     assert "ReviewDetailDataLoader" in pages["/ppt/:id/review"]["components"]
     assert "ReviewActionDataLoader" in pages["/ppt/:id/review"]["components"]
+    assert "AgentImportPreviewActionPanel" in pages["/ppt/:id/review"]["components"]
+    assert "AgentEntityMockImportActionPanel" in pages["/ppt/:id/review"]["components"]
     assert "frontend/review-detail-data.js" in pages["/ppt/:id/review"]["dataSources"]
     assert "frontend/review-action-data.js" in pages["/ppt/:id/review"]["dataSources"]
+    assert "frontend/review-import-preview-data.js" in pages["/ppt/:id/review"]["dataSources"]
     assert "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview" in pages["/ppt/:id/review"]["dataSources"]
     assert "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline" in pages["/ppt/:id/review"]["dataSources"]
     assert "POST /api/ai-tasks/{id}/approve" in pages["/ppt/:id/review"]["dataSources"]
     assert "POST /api/ai-tasks/{id}/reject" in pages["/ppt/:id/review"]["dataSources"]
+    assert "POST /api/ppt/import-preview" in pages["/ppt/:id/review"]["dataSources"]
+    assert "POST /api/ppt/mock-import" in pages["/ppt/:id/review"]["dataSources"]
     assert pages["/ppt/:id/review"]["safety"]["rejectRequiresReason"] is True
     assert pages["/ppt/:id/review"]["safety"]["auditTrailRequired"] is True
     assert pages["/ppt/:id/review"]["safety"]["realLlmCalled"] is False
@@ -1567,6 +1578,8 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
         "/api/ai-tasks/{id}/approve",
         "/api/ai-tasks/{id}/reject",
         "/api/review-tasks/{id}/ppt-page-review-status",
+        "/api/ppt/import-preview",
+        "/api/ppt/mock-import",
         "/api/audit-events",
     }
     assert pages["/environments"]["prototypePath"] == "frontend/environments.html"
@@ -5065,6 +5078,7 @@ def test_agent_entities_static_prototype_is_readonly_mock_store():
     assert "lab_template" in html
     assert "exam_question" in html
     assert "grading_rule" in html
+    assert "ppt_deck" in html
     assert "mockStoreWritten=true" in html
     assert "databaseWritten=false" in html
     assert "realAgentImport=false" in html
@@ -5103,6 +5117,9 @@ def test_agent_entities_static_prototype_is_readonly_mock_store():
     assert "POST /api/exams/mock-import" in html
     assert "POST /api/grading/import-preview" in html
     assert "POST /api/grading/mock-import" in html
+    assert "POST /api/ppt/import-preview" in html
+    assert "POST /api/ppt/mock-import" in html
+    assert 'ppt: "PPT_GENERATION"' in html
     assert "safePostJson(config.previewApi, withCoreDbBody({" in html
     assert "safePostJson(config.mockImportApi, withCoreDbBody({" in html
     assert '"/import-dry-run", withCoreDbBody({' in html
@@ -5207,8 +5224,8 @@ def test_agent_entities_static_prototype_is_readonly_mock_store():
     assert requested_placeholder["safety"]["realAgentImport"] is False
     assert requested_placeholder["safety"]["realPublish"] is False
     assert prototype["corePrepareDemoDataSource"] == (
-        "POST /api/{lab|exam|grading}/import-preview body.coreDbPath -> "
-        "POST /api/{lab|exam|grading}/mock-import body.coreDbPath -> "
+        "POST /api/{lab|exam|grading|ppt}/import-preview body.coreDbPath -> "
+        "POST /api/{lab|exam|grading|ppt}/mock-import body.coreDbPath -> "
         "POST /api/platform-entities/{id}/import-dry-run body.coreDbPath"
     )
     assert prototype["prepareDemoDataCoreBodyForwarding"] == [
@@ -5229,7 +5246,7 @@ def test_agent_entities_static_prototype_is_readonly_mock_store():
         "platform-signoff",
         "final-publish",
     ]
-    assert prototype["prepareDemoDataSource"].startswith("POST /api/{lab|exam|grading}/import-preview")
+    assert prototype["prepareDemoDataSource"].startswith("POST /api/{lab|exam|grading|ppt}/import-preview")
     assert prototype["activitySource"] == "GET /api/platform-entities/{id}.agentEntityImportActivity"
     assert prototype["coreActivitySource"] == "GET /api/platform-entities/{id}?coreDbPath={path}.agentEntityImportActivity"
     assert prototype["stepperComponent"] == "AgentEntityImportStepper"
@@ -5515,6 +5532,7 @@ def test_ppt_generate_local_core_workspace_has_api_loader_and_review_stop():
     assert 'id="ppt-generate-api-state"' in html
     assert 'id="ppt-generate-review-center-link"' in html
     assert 'id="ppt-generate-review-page-link"' in html
+    assert 'id="ppt-generate-import-preview-link"' in html
     assert '<script src="ppt-generate-data.js"></script>' in html
     assert 'id="ppt-generate-provider-mode"' in html
     assert 'id="ppt-generate-explicit-real-call"' in html
@@ -5529,6 +5547,8 @@ def test_ppt_generate_local_core_workspace_has_api_loader_and_review_stop():
     assert "WAITING_REVIEW" in script
     assert "review-center.html" in script
     assert "ppt-review.html" in script
+    assert "agent-entities.html" in script
+    assert 'entityKind: "ppt"' in script
     assert "frontendDirectRealLlmCall" not in script
     assert "OPENAI_API_KEY" not in html
     assert "AGENT_API_TOKEN" not in html
@@ -5668,9 +5688,15 @@ def test_review_pages_have_platform_import_preview_action_loader():
     assert "/api/labs/import-preview" in import_js
     assert "/api/exams/import-preview" in import_js
     assert "/api/grading/import-preview" in import_js
+    assert "/api/ppt/import-preview" in import_js
     assert "/api/labs/mock-import" in import_js
     assert "/api/exams/mock-import" in import_js
     assert "/api/grading/mock-import" in import_js
+    assert "/api/ppt/mock-import" in import_js
+    assert 'if (entityType === "ppt_deck")' in import_js
+    assert '["coreDbPath", "gradingDbPath", "agentReport"]' in import_js
+    assert 'next.coreDbPath = coreDbPath' in import_js
+    assert "JSON.stringify(requestBody({" in import_js
     assert "agent-entities.html?" in import_js
     assert "sourceTaskId" in import_js
     assert "entityKind" in import_js
@@ -5691,6 +5717,7 @@ def test_review_pages_have_platform_import_preview_action_loader():
         ("frontend/lab-review.html", "lab", "/api/labs/import-preview", "/api/labs/mock-import"),
         ("frontend/exam-review.html", "exam", "/api/exams/import-preview", "/api/exams/mock-import"),
         ("frontend/grading-review.html", "grading", "/api/grading/import-preview", "/api/grading/mock-import"),
+        ("frontend/ppt-review.html", "ppt", "/api/ppt/import-preview", "/api/ppt/mock-import"),
     ]
     for page_path, import_kind, endpoint, mock_endpoint in page_specs:
         html = read_text(page_path)
@@ -5714,12 +5741,6 @@ def test_review_pages_have_platform_import_preview_action_loader():
         assert "realPublishAllowed=false" in html
         assert "realPublish=false" in html
         assert f'<script src="review-import-preview-data.js" data-import-kind="{import_kind}"></script>' in html
-
-    ppt_html = read_text("frontend/ppt-review.html")
-    assert "review-import-preview-data.js" not in ppt_html
-    assert "AgentImportPreviewAction" not in ppt_html
-    assert "AgentEntityMockImportAction" not in ppt_html
-
 
 def test_grading_report_static_prototype_has_phase1_safety_text():
     html = (ROOT / "frontend/grading-report.html").read_text(encoding="utf-8")

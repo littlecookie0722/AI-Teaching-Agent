@@ -414,6 +414,7 @@
               <option value="lab">Lab Template</option>
               <option value="exam">Exam Question</option>
               <option value="grading">Grading Rule</option>
+              <option value="ppt">PPT Deck</option>
             </select>
             <span>approvedTaskCandidate</span>
             <select id="platform-demo-prepare-task-select" aria-label="approved task candidate">
@@ -431,6 +432,8 @@
               <span class="pill">POST /api/exams/mock-import</span>
               <span class="pill">POST /api/grading/import-preview</span>
               <span class="pill">POST /api/grading/mock-import</span>
+              <span class="pill">POST /api/ppt/import-preview</span>
+              <span class="pill">POST /api/ppt/mock-import</span>
               <span class="pill blocked">autoApproveAllowed=false</span>
               <span class="pill blocked">realPublish=false</span>
             </div>
@@ -735,6 +738,13 @@
             previewOutput: "examples/output/grading-rule-import-preview.json",
             mockImportOutput: "examples/output/grading-rule-mock-import.json",
             dryRunOutput: "examples/output/platform-entity-grading-import-dry-run.json"
+          },
+          ppt: {
+            previewApi: "/api/ppt/import-preview",
+            mockImportApi: "/api/ppt/mock-import",
+            previewOutput: "examples/output/ppt-deck-import-preview.json",
+            mockImportOutput: "examples/output/ppt-deck-mock-import.json",
+            dryRunOutput: "examples/output/platform-entity-ppt-import-dry-run.json"
           }
         };
         return configs[kind] || configs.lab;
@@ -744,7 +754,8 @@
         var types = {
           lab: "LAB_GENERATION",
           exam: "EXAM_GENERATION",
-          grading: "GRADING_GENERATION"
+          grading: "GRADING_GENERATION",
+          ppt: "PPT_GENERATION"
         };
         return types[kind] || types.lab;
       }

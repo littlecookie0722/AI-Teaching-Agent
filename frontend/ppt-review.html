@@ -592,6 +592,21 @@ realPptFileGenerated: false</pre>
             </div>
             <p class="danger-text">autoPublishAllowed=false · realPublishAllowed=false · realPptFileGenerated=false</p>
           </div>
+          <div class="card" aria-label="Platform import preview action panel">
+            <h3>AgentImportPreviewAction</h3>
+            <p class="ok" id="agent-import-preview-status">IMPORT_PREVIEW_STATIC_FALLBACK</p>
+            <p id="agent-import-preview-detail">POST /api/ppt/import-preview · requiresApprovedTask=true · databaseWritten=false</p>
+            <button id="agent-import-preview-button" type="button">生成 PPT Deck 平台导入预览</button>
+            <p class="danger-text">realAgentImport=false · realPublishAllowed=false · mockStoreWritten=false</p>
+          </div>
+          <div class="card" aria-label="Platform entity mock import action panel">
+            <h3>AgentEntityMockImportAction</h3>
+            <p class="ok" id="agent-mock-import-status">MOCK_IMPORT_STATIC_FALLBACK</p>
+            <p id="agent-mock-import-detail">POST /api/ppt/mock-import · requiresImportPreview=true · mockStoreWritten=true</p>
+            <button id="agent-mock-import-button" type="button" disabled>Mock 入库 PPT Deck 草稿</button>
+            <a class="pill strong" id="agent-mock-import-link" href="agent-entities.html?entityKind=ppt">查看平台实体页</a>
+            <p class="danger-text">databaseWritten=false · realAgentImport=false · realPublish=false</p>
+          </div>
         </aside>
       </div>
       <div class="action-bar">
@@ -611,5 +626,6 @@ realPptFileGenerated: false</pre>
   </main>
   <script src="review-detail-data.js" data-review-kind="ppt" data-default-task-id="task_ppt_demo"></script>
   <script src="review-action-data.js"></script>
+  <script src="review-import-preview-data.js" data-import-kind="ppt"></script>
 </body>
 </html>

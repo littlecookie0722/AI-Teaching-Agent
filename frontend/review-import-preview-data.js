@@ -6,22 +6,26 @@
   var endpoints = {
     lab: "/api/labs/import-preview",
     exam: "/api/exams/import-preview",
-    grading: "/api/grading/import-preview"
+    grading: "/api/grading/import-preview",
+    ppt: "/api/ppt/import-preview"
   };
   var mockImportEndpoints = {
     lab: "/api/labs/mock-import",
     exam: "/api/exams/mock-import",
-    grading: "/api/grading/mock-import"
+    grading: "/api/grading/mock-import",
+    ppt: "/api/ppt/mock-import"
   };
   var outputs = {
     lab: "examples/output/lab-template-import-preview.json",
     exam: "examples/output/exam-question-import-preview.json",
-    grading: "examples/output/grading-rule-import-preview.json"
+    grading: "examples/output/grading-rule-import-preview.json",
+    ppt: "examples/output/ppt-deck-import-preview.json"
   };
   var mockImportOutputs = {
     lab: "examples/output/lab-template-mock-import.json",
     exam: "examples/output/exam-question-mock-import.json",
-    grading: "examples/output/grading-rule-mock-import.json"
+    grading: "examples/output/grading-rule-mock-import.json",
+    ppt: "examples/output/ppt-deck-mock-import.json"
   };
 
   function byId(id) {
@@ -48,6 +52,15 @@
     return params.get("taskId") || params.get("id") || "";
   }
 
+  function requestBody(body) {
+    var next = Object.assign({}, body || {});
+    var coreDbPath = new URLSearchParams(window.location.search).get("coreDbPath");
+    if (coreDbPath) {
+      next.coreDbPath = coreDbPath;
+    }
+    return next;
+  }
+
   function setImportStatus(status, detail) {
     setText("agent-import-preview-status", status);
     setText("agent-import-preview-detail", detail);
@@ -60,7 +73,11 @@
 
   function previewSummary(payload) {
     var data = payload.data || {};
-    var preview = data.labTemplateImportPreview || data.examQuestionImportPreview || data.gradingRuleImportPreview || {};
+    var preview = data.labTemplateImportPreview
+      || data.examQuestionImportPreview
+      || data.gradingRuleImportPreview
+      || data.pptDeckImportPreview
+      || {};
     var entity = preview.agentEntity || "agent_entity";
     var artifact = data.artifact || {};
     return "agentEntity=" + entity
@@ -95,7 +112,20 @@
     if (entityType === "grading_rule") {
       return "grading";
     }
+    if (entityType === "ppt_deck") {
+      return "ppt";
+    }
     return importKind || "lab";
+  }
+
+  function forwardLocalContext(params) {
+    var query = new URLSearchParams(window.location.search);
+    ["coreDbPath", "gradingDbPath", "agentReport"].forEach(function (name) {
+      var value = query.get(name);
+      if (value) {
+        params.set(name, value);
+      }
+    });
   }
 
   function updateAgentEntityLink(record) {
@@ -110,6 +140,7 @@
       params.set("sourceTaskId", taskId);
     }
     params.set("entityKind", entityKindForRoute(record));
+    forwardLocalContext(params);
     link.href = "agent-entities.html?" + params.toString();
     link.textContent = "打开平台实体页：" + record.id;
   }
@@ -120,7 +151,7 @@
     var reviewer = readValue("review-action-reviewer") || "teacher_1";
 
     if (!endpoint) {
-      setImportStatus("IMPORT_PREVIEW_UNSUPPORTED", "PPT does not create platform entity import preview");
+      setImportStatus("IMPORT_PREVIEW_UNSUPPORTED", "This artifact kind does not create a platform entity import preview");
       return Promise.resolve(null);
     }
     if (!taskId) {
@@ -145,11 +176,11 @@
         "Content-Type": "application/json"
       },
       credentials: "same-origin",
-      body: JSON.stringify({
+      body: JSON.stringify(requestBody({
         taskId: taskId,
         reviewer: reviewer,
         output: outputs[importKind]
-      })
+      }))
     }).then(function (response) {
       return response.json().then(function (payload) {
         if (!response.ok || !payload || payload.success !== true) {
@@ -184,7 +215,7 @@
     var reviewer = readValue("review-action-reviewer") || "teacher_1";
 
     if (!endpoint) {
-      setMockImportStatus("MOCK_IMPORT_UNSUPPORTED", "PPT does not create platform entity mock import");
+      setMockImportStatus("MOCK_IMPORT_UNSUPPORTED", "This artifact kind does not create a platform entity mock import");
       return Promise.resolve(null);
     }
     if (!taskId) {
@@ -209,11 +240,11 @@
         "Content-Type": "application/json"
       },
       credentials: "same-origin",
-      body: JSON.stringify({
+      body: JSON.stringify(requestBody({
         taskId: taskId,
         reviewer: reviewer,
         output: mockImportOutputs[importKind]
-      })
+      }))
     }).then(function (response) {
       return response.json().then(function (payload) {
         if (!response.ok || !payload || payload.success !== true) {
@@ -252,13 +283,13 @@
       endpoint ? "IMPORT_PREVIEW_READY" : "IMPORT_PREVIEW_UNSUPPORTED",
       endpoint
         ? "POST " + endpoint + " · requiresApprovedTask=true · databaseWritten=false"
-        : "PPT review keeps platform import preview unavailable"
+        : "This artifact kind does not support platform import preview"
     );
     setMockImportStatus(
       mockImportEndpoints[importKind] ? "MOCK_IMPORT_WAITING_PREVIEW" : "MOCK_IMPORT_UNSUPPORTED",
       mockImportEndpoints[importKind]
         ? "POST " + mockImportEndpoints[importKind] + " · requiresImportPreview=true · mockStoreWritten=true"
-        : "PPT review keeps platform entity mock import unavailable"
+        : "This artifact kind does not support platform entity mock import"
     );
     setMockImportButtonDisabled(true);
     var button = byId("agent-import-preview-button");

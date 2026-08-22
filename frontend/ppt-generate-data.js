@@ -126,6 +126,11 @@
       withQuery("ppt-review.html", withLocalContext({ taskId })),
       "打开 PPT 审核页"
     );
+    setHref(
+      "ppt-generate-import-preview-link",
+      withQuery("agent-entities.html", withLocalContext({ sourceTaskId: taskId, entityKind: "ppt" })),
+      "打开 PPT 导入预览"
+    );
     setHref("ppt-generate-list-link", withQuery("ppt.html", withLocalContext({})), "返回 PPT 清单");
   }
 

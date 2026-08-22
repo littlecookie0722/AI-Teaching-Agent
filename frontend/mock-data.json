@@ -1827,8 +1827,8 @@
       "defaultActionEnabled": false,
       "handoffOwner": "future_platform_integration_team"
     },
-    "prepareDemoDataSource": "POST /api/{lab|exam|grading}/import-preview -> POST /api/{lab|exam|grading}/mock-import -> POST /api/platform-entities/{id}/import-dry-run",
-    "corePrepareDemoDataSource": "POST /api/{lab|exam|grading}/import-preview body.coreDbPath -> POST /api/{lab|exam|grading}/mock-import body.coreDbPath -> POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
+    "prepareDemoDataSource": "POST /api/{lab|exam|grading|ppt}/import-preview -> POST /api/{lab|exam|grading|ppt}/mock-import -> POST /api/platform-entities/{id}/import-dry-run",
+    "corePrepareDemoDataSource": "POST /api/{lab|exam|grading|ppt}/import-preview body.coreDbPath -> POST /api/{lab|exam|grading|ppt}/mock-import body.coreDbPath -> POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
     "prepareDemoDataCoreBodyForwarding": [
       "import-preview body.coreDbPath",
       "mock-import body.coreDbPath",

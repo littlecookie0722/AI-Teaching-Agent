@@ -203,7 +203,9 @@
         "query: coreDbPath, gradingDbPath, agentReport",
         "POST /api/ppt/generate.task",
         "POST /api/ppt/generate.pptDsl",
-        "review-center.html?taskId={taskId}"
+        "review-center.html?taskId={taskId}",
+        "ppt-review.html?taskId={taskId}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=ppt&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
       ],
       "blockedActions": [
         "frontendDirectRealLlmGenerate",
@@ -268,10 +270,14 @@
         "frontend/mock-data.json.pptReviewPrototype.pageReviewUpdateAction",
         "frontend/review-detail-data.js",
         "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
         "query: agentReport",
         "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
         "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
         "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
+        "POST /api/ppt/import-preview",
+        "POST /api/ppt/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=ppt&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "examples/output/real-llm-demo-ppt-artifact.pptx",
         "examples/output/real-llm-demo-ppt-artifact-manifest.json",
         "frontend/mock-data.json.operationAuditEvents"
@@ -823,6 +829,10 @@
         "POST /api/grading/import-preview body.coreDbPath",
         "POST /api/grading/mock-import",
         "POST /api/grading/mock-import body.coreDbPath",
+        "POST /api/ppt/import-preview",
+        "POST /api/ppt/import-preview body.coreDbPath",
+        "POST /api/ppt/mock-import",
+        "POST /api/ppt/mock-import body.coreDbPath",
         "POST /api/platform-entities/{id}/import-dry-run",
         "POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
         "POST /api/platform-entities/{id}/import-dry-run body.contractConfig",
@@ -2034,7 +2044,8 @@
         "POST /api/ppt/generate.providerGeneration",
         "POST /api/ppt/generate body.coreDbPath",
         "review-center.html?taskId={taskId}",
-        "ppt-review.html?taskId={taskId}"
+        "ppt-review.html?taskId={taskId}",
+        "agent-entities.html?sourceTaskId={taskId}&entityKind=ppt&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
       ],
       "mockDataPath": "frontend/mock-data.json",
       "prototypePath": "frontend/ppt-generate.html",
@@ -3110,7 +3121,7 @@
       "route": "/platform-entities",
       "title": "Platform Entity Mock Store",
       "priority": 1,
-      "purpose": "Read local mock platform entity drafts created by lab/exam/grading mock-import without real database writes, real platform import, or publishing.",
+      "purpose": "Read local mock platform entity drafts created by lab/exam/grading/ppt mock-import without real database writes, real platform import, or publishing.",
       "apiDependencies": [
         {
           "method": "GET",
@@ -3151,6 +3162,14 @@
         {
           "method": "POST",
           "path": "/api/grading/mock-import"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ppt/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ppt/mock-import"
         },
         {
           "method": "POST",
@@ -3218,6 +3237,10 @@
         "POST /api/grading/import-preview body.coreDbPath",
         "POST /api/grading/mock-import",
         "POST /api/grading/mock-import body.coreDbPath",
+        "POST /api/ppt/import-preview",
+        "POST /api/ppt/import-preview body.coreDbPath",
+        "POST /api/ppt/mock-import",
+        "POST /api/ppt/mock-import body.coreDbPath",
         "POST /api/platform-entities/{id}/import-dry-run",
         "POST /api/platform-entities/{id}/import-dry-run body.coreDbPath",
         "POST /api/platform-entities/{id}/import-dry-run body.contractConfig",
@@ -3877,6 +3900,14 @@
           "path": "/api/review-tasks/{id}/ppt-page-review-status"
         },
         {
+          "method": "POST",
+          "path": "/api/ppt/import-preview"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ppt/mock-import"
+        },
+        {
           "method": "GET",
           "path": "/api/audit-events"
         }
@@ -3887,17 +3918,23 @@
         "PptPageReviewUpdateAction",
         "ReviewDetailDataLoader",
         "ReviewActionDataLoader",
+        "AgentImportPreviewActionPanel",
+        "AgentEntityMockImportActionPanel",
         "AiTaskTimeline"
       ],
       "dataSources": [
         "frontend/review-detail-data.js",
         "frontend/review-action-data.js",
+        "frontend/review-import-preview-data.js",
         "query: agentReport",
         "GET /api/review-tasks/{id}?agentReport={workflowReport}.reviewDetail",
         "GET /api/review-tasks/{id}.reviewDetail.reviewPage.dslPreview",
         "GET /api/review-tasks/{id}.reviewDetail.reviewPage.timeline",
         "POST /api/ai-tasks/{id}/approve",
         "POST /api/ai-tasks/{id}/reject",
+        "POST /api/ppt/import-preview",
+        "POST /api/ppt/mock-import",
+        "agent-entities.html?entityId={id}&sourceTaskId={taskId}&entityKind=ppt&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "GET /api/review-tasks/{id}.reviewDetail.reviewPage.pptPageReview"
       ],
       "mockDataPath": "frontend/mock-data.json",

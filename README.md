@@ -18,6 +18,8 @@ questions, grading rules, and presentation plans.
 - Hydrates the AI Task Center from a real workflow report in read-only mode,
   so report-backed Lab/Exam/Grading/PPT artifacts remain connected to review
   detail even when the local task store has no matching rows.
+- Continues an approved PPT task through local PPT Deck import preview, mock
+  import, and import dry-run without sending a platform request or publishing.
 - Validates all four DSL types before a task can continue.
 - Creates `WAITING_REVIEW` tasks and records human approve/reject decisions.
 - Produces a candidate-safe exam preview that excludes answers and internal
@@ -164,6 +166,12 @@ synthetic `WAITING_REVIEW` task cards and loads their detail through
 `GET /api/review-tasks/{id}?agentReport=...`; this is a display bridge only and
 does not create tasks, approve content, publish artifacts, execute a sandbox,
 or reveal candidate answers.
+
+The PPT generation and review pages link approved tasks into
+`frontend/agent-entities.html?entityKind=ppt`. That local workflow reuses the
+existing `POST /api/ppt/import-preview`, `POST /api/ppt/mock-import`, and
+platform-entity import-dry-run APIs, preserves optional SQLite/report context,
+and stops before any real platform request.
 
 For a controlled local grading example, see
 [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md) and the fixtures
