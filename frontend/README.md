@@ -7,9 +7,11 @@
 ## 当前默认入口
 
 - `generation-workspace.html`：唯一默认生成入口。现已固定传入兼容的 `artifactProfile=teaching-core`，只生成 Lab / Exam / Grading 三类核心产物；旧四类行为保留在未传 profile 的 API 兼容路径中。
-- `review-center.html`：唯一默认审核入口。现有实现已集中读取队列和详情；下一实现切片将按 `workflowRun.id` 聚合教学包并接入已有逐任务 approve/reject 动作。
+- `review-center.html`：唯一默认审核入口。通过 `workflowRunId` 聚合 Lab / Exam / Grading 的任务状态、Schema/质量信号、候选人安全和导出就绪状态，并在同一流程中复用已有逐任务 approve/reject 动作；不提供批量决定或发布。
 - `lab-generate.html`、`exam-generate.html` 和三个独立审核页：保留直接 URL，作为兼容、诊断和审核中心功能等价前的深层入口。
 - PPT、评分、平台实体、AI Task、MCP、Agent 和运营页面：退出当前主导航，只做必要的兼容性、安全或阻断性缺陷修复。
+
+默认审核深链为 `review-center.html?taskId=<taskId>&workflowRunId=<workflowRunId>`。页面调用 `GET /api/review-task-summary?detailMode=light&workflowRunId=...`，在顶部固定呈现 Lab、Exam、Grading 三行及审核进度、Schema 通过数、候选人安全和 `exportReady`；教学包激活时不混入历史 PPT/real-demo 队列卡片。每行“通过 / 退回”仍调用既有 `POST /api/ai-tasks/{id}/approve|reject`，要求 reviewer，退回额外要求 reason，并在动作后回读同一批次状态。Exam 行只展示候选人安全摘要，不渲染答案或内部 `gradingRef`；页面不批量审核、不自动发布、不调用真实 LLM。
 
 ## 输入说明
 

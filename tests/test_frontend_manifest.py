@@ -83,6 +83,72 @@ def test_one_click_generation_workspace_has_single_workflow_request_and_review_r
     assert "generation-workspace.html" in read_text("frontend/review-center.html")
     assert "generation-workspace.html" in read_text("frontend/README.md")
     assert "generation-workspace.html" in read_text("docs/24_PROJECT_PROGRESS_MAP.md")
+    assert ".section-head > .pill" in html.split("@media (max-width: 620px)", 1)[1]
+
+
+def test_review_center_aggregates_teaching_package_and_uses_per_task_review_actions():
+    generation_script = read_text("frontend/generation-workspace-data.js")
+    html = read_text("frontend/review-center.html")
+    loader_js = read_text("frontend/review-center-data.js")
+    action_js = read_text("frontend/review-action-data.js")
+    manifest = load_json("frontend/ui.manifest.json")
+    pages = {page["route"]: page for page in manifest["pages"]}
+    prototypes = {prototype["route"]: prototype for prototype in manifest["staticPrototypes"]}
+
+    assert "workflowRunId: workflow.id" in generation_script
+    assert 'id="teaching-package-review"' in html
+    assert 'id="teaching-package-progress"' in html
+    assert 'id="teaching-package-schema"' in html
+    assert 'id="teaching-package-candidate-safety"' in html
+    assert 'id="teaching-package-export-ready"' in html
+    assert 'id="teaching-package-reviewer"' in html
+    assert 'id="teaching-package-artifacts"' in html
+    assert '<script src="review-action-data.js"></script>' in html
+
+    assert "getQueryWorkflowRunId" in loader_js
+    assert "withWorkflowRunId" in loader_js
+    assert "teachingPackageReview" in loader_js
+    assert "renderTeachingPackageReview" in loader_js
+    assert "renderTeachingPackageArtifact" in loader_js
+    assert 'data-package-review-action' in loader_js
+    assert 'data-package-reject-reason' in loader_js
+    assert "loadTaskDetail(taskId)" in loader_js
+    assert "POST /api/ai-tasks/{id}/approve" not in loader_js
+    assert "POST /api/ai-tasks/{id}/reject" not in loader_js
+
+    assert "postPackageReviewAction" in action_js
+    assert "data-package-review-action" in action_js
+    assert "data-package-reject-reason" in action_js
+    assert "teaching-package-reviewer" in action_js
+    assert "rejectRequiresReason=true" in action_js
+    assert "window.reviewCenterDataLoader.load()" in action_js
+    assert "/api/ai-tasks/{id}/{action}" in action_js
+    assert "/publish" not in action_js
+
+    page = pages["/review-center"]
+    prototype = prototypes["/review-center"]
+    assert "TeachingPackageReviewWorkspace" in page["components"]
+    assert "TeachingPackageArtifactReviewRow" in page["components"]
+    assert "query: workflowRunId" in page["dataSources"]
+    assert (
+        "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview"
+        in page["dataSources"]
+    )
+    assert "frontend/review-action-data.js" in page["dataSources"]
+    assert "POST /api/ai-tasks/{id}/approve" in page["dataSources"]
+    assert "POST /api/ai-tasks/{id}/reject" in page["dataSources"]
+    assert {dependency["path"] for dependency in page["apiDependencies"]} >= {
+        "/api/review-task-summary",
+        "/api/ai-tasks/{id}/approve",
+        "/api/ai-tasks/{id}/reject",
+    }
+    assert page["safety"]["reviewActionsArePerTask"] is True
+    assert page["safety"]["rejectRequiresReason"] is True
+    assert page["safety"]["batchStateChangeAllowed"] is False
+    assert "query: workflowRunId" in prototype["dataSources"]
+    assert "POST /api/ai-tasks/{id}/approve" in prototype["dataSources"]
+    assert "POST /api/ai-tasks/{id}/reject" in prototype["dataSources"]
+    assert ".runtime-strip," in html.split("@media (max-width: 920px)", 1)[1]
 
 
 def test_frontend_manifest_is_phase1_mock_contract():
@@ -863,10 +929,12 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
 
     review_center_deps = {dependency["path"] for dependency in pages["/review-center"]["apiDependencies"]}
     assert review_center_deps == {
-            "/api/review-task-summary",
-            "/api/review-tasks/{id}",
-            "/api/grading/records",
-            "/api/backend/core-tasks/{id}",
+        "/api/review-task-summary",
+        "/api/review-tasks/{id}",
+        "/api/grading/records",
+        "/api/backend/core-tasks/{id}",
+        "/api/ai-tasks/{id}/approve",
+        "/api/ai-tasks/{id}/reject",
         "/api/platform-entities/readiness-report",
         "/api/review-tasks/{id}/ppt-page-review-status",
         "/api/grading/evidence-auto",

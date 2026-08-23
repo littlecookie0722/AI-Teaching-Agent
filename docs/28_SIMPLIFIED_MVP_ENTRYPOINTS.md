@@ -1,6 +1,6 @@
 # 精简 MVP 入口与实施边界
 
-> 状态：生成入口与 `teaching-core` profile 已完成，审核聚合与本地导出待实现。
+> 状态：生成入口、`teaching-core` profile 与审核聚合已完成，本地导出待实现。
 > 日期：2026-08-23
 > 上位约束：`AGENTS.md`、`docs/24_PROJECT_PROGRESS_MAP.md`
 
@@ -22,8 +22,8 @@
 
 | 入口 | 当前能力 | 决策 | 主要差距 |
 | --- | --- | --- | --- |
-| `frontend/generation-workspace.html` | 一份素材、一次请求生成 Lab / Exam / Grading / PPT，创建 4 个 `WAITING_REVIEW` 任务。 | 选为唯一默认生成入口。 | 默认视图需收敛为 Lab + Exam/Grading，并停止创建 PPT 任务。 |
-| `frontend/review-center.html` | 集中读取审核队列、DSL 摘要、质量信号和候选人安全信息。 | 选为唯一默认审核入口。 | 需按同一 `workflowRun.id` 聚合三类任务，并接入已有逐任务 approve/reject 动作。 |
+| `frontend/generation-workspace.html` | 一份素材、一次请求以 `teaching-core` 生成 Lab / Exam / Grading，创建 3 个 `WAITING_REVIEW` 任务。 | 唯一默认生成入口，已完成。 | 下一步不再扩张生成页。 |
+| `frontend/review-center.html` | 按同一 `workflowRun.id` 聚合三类任务、Schema/质量信号、候选人安全与逐任务人工决定。 | 唯一默认审核入口，已完成。 | 下一步只接本地教学包导出，不新增批量审核。 |
 | `frontend/lab-generate.html`、`frontend/exam-generate.html` | 分别覆盖 Lab 和 Exam/Grading 生成。 | 保留为兼容与诊断入口，退出当前主导航。 | 不再单独产品化。 |
 | `frontend/lab-review.html`、`frontend/exam-review.html`、`frontend/grading-review.html` | 单任务详情和人工审核动作。 | 在审核中心达到功能等价前保留为深层详情入口。 | 不再作为教师必须依次访问的主流程。 |
 | PPT、评分报告、评分工作台、平台实体、AI Task、MCP、Agent 页面 | 支撑此前更大范围本地 PoC。 | 冻结并退出当前主导航。 | 只修复兼容性、安全或阻断当前闭环的问题。 |
@@ -76,6 +76,8 @@ reviewEntry
 
 不得新增批量 approve/reject 接口。审核中心可集中展示三个任务，但每次决定仍调用已有 `POST /api/ai-tasks/{id}/approve` 或 `POST /api/ai-tasks/{id}/reject`，并保留 reviewer、reject reason 和审计事件。
 
+当前实现通过 `GET /api/review-task-summary?detailMode=light&workflowRunId=<id>` 返回 `TeachingPackageReviewSummary`。摘要从 WorkflowRun、Artifact 和当前 AI Task 派生，不新增 `TeachingPackage` 持久化实体；未知运行返回 `NOT_FOUND`，历史 `legacy-all` 运行继续按批次返回原四类任务，但教学包摘要标记为不可用。默认生成入口把 `taskId` 和 `workflowRunId` 一并传给审核中心，动作完成后回读同一批次。页面不显示 Exam 答案或内部 `gradingRef`，也不提供批量状态变更。
+
 ## 5. 本地导出边界
 
 本地教学包导出只在三个任务全部 `APPROVED` 后启用，目标内容为：
@@ -95,7 +97,7 @@ review-summary.json
 
 1. 已完成：为既有内容生成 API 增加 `artifactProfile=teaching-core`，补正常、非法 profile、失败不落任务和兼容路径测试。
 2. 已完成：将 `generation-workspace.html` 默认切到 `teaching-core`，只展示三类产物和一个审核中心入口。
-3. 让 `review-center.html` 按 `workflowRun.id` 展示教学包进度，并接入已有逐任务人工决定。
+3. 已完成：`review-center.html` 按 `workflowRun.id` 展示教学包进度，并接入已有逐任务人工决定。
 4. 增加仅对全部已批准任务开放的本地教学包导出。
 5. 收敛主导航和 E2E，保留旧入口的直接 URL 与契约回归。
 

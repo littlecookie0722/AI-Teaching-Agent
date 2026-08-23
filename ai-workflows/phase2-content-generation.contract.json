@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "phase": "Phase 2",
   "mode": "MOCK_ONLY",
   "workflowId": "phase2_content_generation",
@@ -29,6 +29,27 @@
       "realLlmRequestCountWithoutRepair": 3
     }
   ],
+  "reviewAggregation": {
+    "query": "GET /api/review-task-summary?detailMode=light&workflowRunId={workflowRunId}",
+    "component": "TeachingPackageReviewSummary",
+    "derivedFrom": ["WorkflowRun", "Artifact", "AI Task"],
+    "packageStatuses": ["WAITING_REVIEW", "NEEDS_REVISION", "APPROVED"],
+    "artifactKinds": ["lab", "exam", "grading"],
+    "actions": {
+      "approve": "POST /api/ai-tasks/{id}/approve",
+      "reject": "POST /api/ai-tasks/{id}/reject",
+      "rejectRequiresReason": true,
+      "batchStateChangeAllowed": false
+    },
+    "candidateSafety": {
+      "answerVisibleToCandidate": false,
+      "gradingRefVisibleToCandidate": false
+    },
+    "exportReadyRequiresAllApproved": true,
+    "localPackageExportImplemented": false,
+    "autoPublishAllowed": false,
+    "realPublish": false
+  },
   "providerModes": [
     {
       "id": "mock",

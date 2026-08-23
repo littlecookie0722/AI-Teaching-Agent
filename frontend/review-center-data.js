@@ -576,11 +576,15 @@
     params.set("taskId", taskId);
     var agentReport = getQueryAgentReport();
     var coreDbPath = state.coreDbPath || getQueryCoreDbPath();
+    var workflowRunId = getQueryWorkflowRunId();
     if (agentReport) {
       params.set("agentReport", agentReport);
     }
     if (coreDbPath) {
       params.set("coreDbPath", coreDbPath);
+    }
+    if (workflowRunId) {
+      params.set("workflowRunId", workflowRunId);
     }
     if (state.gradingDbPath || getQueryGradingDbPath()) {
       params.set("gradingDbPath", state.gradingDbPath || getQueryGradingDbPath());
@@ -603,11 +607,15 @@
     params.set("taskId", taskId);
     var agentReport = getQueryAgentReport();
     var coreDbPath = state.coreDbPath || getQueryCoreDbPath();
+    var workflowRunId = getQueryWorkflowRunId();
     if (agentReport) {
       params.set("agentReport", agentReport);
     }
     if (coreDbPath) {
       params.set("coreDbPath", coreDbPath);
+    }
+    if (workflowRunId) {
+      params.set("workflowRunId", workflowRunId);
     }
     if (state.gradingDbPath || getQueryGradingDbPath()) {
       params.set("gradingDbPath", state.gradingDbPath || getQueryGradingDbPath());
@@ -1295,6 +1303,10 @@
     return getQueryParam("taskId");
   }
 
+  function getQueryWorkflowRunId() {
+    return getQueryParam("workflowRunId");
+  }
+
   function getQueryAgentReport() {
     return getQueryParam("agentReport");
   }
@@ -1316,6 +1328,7 @@
     var agentReport = getQueryAgentReport();
     var coreDbPath = state.coreDbPath || getQueryCoreDbPath();
     var gradingDbPath = state.gradingDbPath || getQueryGradingDbPath();
+    var workflowRunId = getQueryWorkflowRunId();
     if (agentReport) {
       params.set("agentReport", agentReport);
     }
@@ -1324,6 +1337,9 @@
     }
     if (gradingDbPath) {
       params.set("gradingDbPath", gradingDbPath);
+    }
+    if (workflowRunId) {
+      params.set("workflowRunId", workflowRunId);
     }
     return params;
   }
@@ -1373,8 +1389,19 @@
       + encodeURIComponent(reportPath);
   }
 
+  function withWorkflowRunId(path) {
+    var workflowRunId = getQueryWorkflowRunId();
+    if (!workflowRunId) {
+      return path;
+    }
+    return path
+      + (path.indexOf("?") === -1 ? "?" : "&")
+      + "workflowRunId="
+      + encodeURIComponent(workflowRunId);
+  }
+
   function summaryPath() {
-    return withAgentReport(state.summaryPath);
+    return withAgentReport(withWorkflowRunId(state.summaryPath));
   }
 
   function detailPath(taskId) {
@@ -2051,8 +2078,11 @@
     }
     var priorityQueue = summary && summary.reviewPriorityQueue ? summary.reviewPriorityQueue : {};
     var realDemoQueue = summary && summary.realDemoReviewQueue ? summary.realDemoReviewQueue : {};
+    var teachingPackageReview = summary && summary.teachingPackageReview ? summary.teachingPackageReview : {};
     var priorityItems = Array.isArray(priorityQueue.items) ? priorityQueue.items : [];
-    var realDemoItems = Array.isArray(realDemoQueue.items) ? realDemoQueue.items : [];
+    var realDemoItems = teachingPackageReview.available === true
+      ? []
+      : (Array.isArray(realDemoQueue.items) ? realDemoQueue.items : []);
     var items = priorityItems.slice();
     realDemoItems.forEach(function (item) {
       items.push({
@@ -3407,6 +3437,156 @@
     }
   }
 
+  function packagePill(value, strong) {
+    var pill = document.createElement("span");
+    pill.className = strong ? "pill strong" : "pill";
+    pill.textContent = String(value || "-");
+    return pill;
+  }
+
+  function renderTeachingPackageArtifact(kind, item) {
+    var row = document.createElement("div");
+    var taskId = item.taskId || "";
+    var waitingReview = item.status === "WAITING_REVIEW";
+    row.className = "teaching-package-row";
+    row.setAttribute("data-package-kind", kind);
+    row.setAttribute("data-package-task-id", taskId);
+
+    var identity = document.createElement("div");
+    var title = document.createElement("h3");
+    var path = document.createElement("p");
+    title.textContent = (item.label || kind) + " · " + (item.taskType || "UNKNOWN_TASK");
+    path.textContent = "taskId=" + (taskId || "none") + " · " + (item.dslPath || "path unavailable");
+    identity.appendChild(title);
+    identity.appendChild(path);
+
+    var validation = document.createElement("div");
+    var contentQuality = item.contentQuality || {};
+    validation.className = "package-validation";
+    validation.appendChild(packagePill(item.status || "UNKNOWN_STATUS", item.status !== "REJECTED"));
+    validation.appendChild(packagePill(
+      "Schema=" + (item.schemaValidated === true ? "PASS" : "FAIL"),
+      item.schemaValidated === true
+    ));
+    validation.appendChild(packagePill(
+      "Quality=" + (contentQuality.status || "UNKNOWN"),
+      contentQuality.blockingIssueTotal === 0
+    ));
+
+    var reasonField = document.createElement("label");
+    var reasonInput = document.createElement("input");
+    reasonField.className = "package-reason-field";
+    reasonField.textContent = "退回原因";
+    reasonInput.type = "text";
+    reasonInput.placeholder = "退回时必填";
+    reasonInput.setAttribute("data-package-reject-reason", kind);
+    reasonInput.setAttribute("aria-label", (item.label || kind) + " 退回原因");
+    reasonInput.disabled = !waitingReview;
+    reasonField.appendChild(reasonInput);
+
+    var actions = document.createElement("div");
+    var detailButton = document.createElement("button");
+    var approveButton = document.createElement("button");
+    var rejectButton = document.createElement("button");
+    actions.className = "package-artifact-actions";
+    detailButton.type = "button";
+    detailButton.textContent = "查看";
+    detailButton.disabled = !taskId;
+    detailButton.addEventListener("click", function () {
+      loadTaskDetail(taskId);
+    });
+    approveButton.type = "button";
+    approveButton.className = "primary";
+    approveButton.textContent = "通过";
+    approveButton.setAttribute("data-package-review-action", "approve");
+    approveButton.setAttribute("data-task-id", taskId);
+    approveButton.setAttribute("data-package-kind", kind);
+    approveButton.setAttribute("data-package-action-enabled", waitingReview ? "true" : "false");
+    approveButton.disabled = !waitingReview;
+    rejectButton.type = "button";
+    rejectButton.className = "danger";
+    rejectButton.textContent = "退回";
+    rejectButton.setAttribute("data-package-review-action", "reject");
+    rejectButton.setAttribute("data-task-id", taskId);
+    rejectButton.setAttribute("data-package-kind", kind);
+    rejectButton.setAttribute("data-package-action-enabled", waitingReview ? "true" : "false");
+    rejectButton.disabled = !waitingReview;
+    actions.appendChild(detailButton);
+    actions.appendChild(approveButton);
+    actions.appendChild(rejectButton);
+
+    var actionStatus = document.createElement("p");
+    actionStatus.setAttribute("data-package-row-status", kind);
+    actionStatus.textContent = waitingReview ? "等待人工决定" : "审核结论=" + item.status;
+    identity.appendChild(actionStatus);
+
+    row.appendChild(identity);
+    row.appendChild(validation);
+    row.appendChild(reasonField);
+    row.appendChild(actions);
+    return row;
+  }
+
+  function renderTeachingPackageReview(packageReview) {
+    var panel = byId("teaching-package-review");
+    var list = clearNode("teaching-package-artifacts");
+    if (!panel) {
+      return;
+    }
+    if (!packageReview || packageReview.available !== true) {
+      panel.hidden = true;
+      return;
+    }
+
+    panel.hidden = false;
+    var progress = packageReview.reviewProgress || {};
+    var validation = packageReview.validation || {};
+    var candidateSafety = packageReview.candidateSafeExamPreview || {};
+    var reviewedTotal = (progress.approved || 0) + (progress.rejected || 0);
+    setText("teaching-package-status", packageReview.status || "WAITING_REVIEW");
+    setText(
+      "teaching-package-summary",
+      "workflowRunId=" + (packageReview.workflowRunId || "none")
+        + " · sourceRef=" + (packageReview.sourceRef || "none")
+        + " · nextAction=" + (packageReview.nextAction || "review_remaining_artifacts")
+    );
+    setText("teaching-package-progress", reviewedTotal + " / " + (progress.total || 3));
+    setText(
+      "teaching-package-schema",
+      (validation.schemaValidatedTotal || 0) + " / " + (validation.total || 3)
+    );
+    setText(
+      "teaching-package-candidate-safety",
+      candidateSafety.candidateSafe === true ? "SAFE" : "BLOCKED"
+    );
+    setText(
+      "teaching-package-export-ready",
+      packageReview.exportReady === true ? "READY" : "NOT_READY"
+    );
+    setText(
+      "teaching-package-action-status",
+      packageReview.status === "APPROVED"
+        ? "ACTION_COMPLETE · 三项均已人工批准"
+        : (packageReview.status === "NEEDS_REVISION"
+          ? "ACTION_REJECTED_RECORDED · 教学包需要修订"
+          : "ACTION_READY · 逐项人工审核")
+    );
+    var statusNode = byId("teaching-package-status");
+    if (statusNode) {
+      statusNode.className = packageReview.status === "NEEDS_REVISION"
+        ? "pill blocked"
+        : "pill strong";
+    }
+    if (list) {
+      ["lab", "exam", "grading"].forEach(function (kind) {
+        var item = packageReview.artifacts && packageReview.artifacts[kind];
+        if (item) {
+          list.appendChild(renderTeachingPackageArtifact(kind, item));
+        }
+      });
+    }
+  }
+
   function applySummary(summary) {
     if (!summary || typeof summary !== "object") {
       return;
@@ -3416,6 +3596,7 @@
     var controlledSignal = summary.controlledDockerEvidenceReviewSignal || {};
     var mergedSignal = summary.mergedGradingEvidenceReviewSignal || {};
     var readinessSignal = summary.gradingEvidenceReadinessSignal || {};
+    renderTeachingPackageReview(summary.teachingPackageReview || null);
     setText("review-center-queue-total", queue.waitingReviewTotal || summary.total || 0);
     setText("review-center-priority-total", priorityQueue.summary ? priorityQueue.summary.queueTotal : 0);
     applyMvpReviewWorkspaceFromSummary(summary);

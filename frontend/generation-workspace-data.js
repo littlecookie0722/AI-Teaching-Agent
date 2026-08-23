@@ -286,7 +286,10 @@
     );
     setLink(
       "generation-review-center",
-      withQuery("review-center.html", withLocalContext({ taskId: firstTaskId })),
+      withQuery(
+        "review-center.html",
+        withLocalContext({ taskId: firstTaskId, workflowRunId: workflow.id || "" })
+      ),
       Boolean(firstTaskId)
     );
     setText("generation-result-json", JSON.stringify(safeResult(payload), null, 2));

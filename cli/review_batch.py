@@ -28,6 +28,24 @@ PRIORITY_ORDER = {
     "LOW": 3,
 }
 
+TEACHING_PACKAGE_ARTIFACT_SPECS = {
+    "lab": {
+        "artifactKind": "LAB_DSL",
+        "taskType": "LAB_GENERATION",
+        "label": "Lab",
+    },
+    "exam": {
+        "artifactKind": "EXAM_DSL",
+        "taskType": "EXAM_GENERATION",
+        "label": "Exam",
+    },
+    "grading": {
+        "artifactKind": "GRADING_DSL",
+        "taskType": "GRADING_GENERATION",
+        "label": "Grading",
+    },
+}
+
 
 def _path_exists(path: str) -> bool:
     candidate = Path(path)
@@ -1253,11 +1271,227 @@ def _task_card(detail: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _status_counts(store: JsonTaskStore, task_type: str | None) -> dict[str, int]:
+def _status_counts(
+    store: JsonTaskStore,
+    task_type: str | None,
+    *,
+    task_ids: set[str] | None = None,
+) -> dict[str, int]:
     tasks = store.list(task_type=task_type)
+    if task_ids is not None:
+        tasks = [task for task in tasks if task.id in task_ids]
     return {
         status.value: sum(1 for task in tasks if task.status == status)
         for status in TaskStatus
+    }
+
+
+def build_teaching_package_review_summary(
+    store: JsonTaskStore,
+    workflow_run_id: str,
+) -> dict[str, Any] | None:
+    workflow_run = store.get_workflow_run(workflow_run_id)
+    if workflow_run is None:
+        return None
+
+    artifact_payloads = [
+        artifact.to_dict()
+        for artifact in store.list_artifacts(workflow_run_id=workflow_run_id)
+    ]
+    core_artifact_kinds = {
+        spec["artifactKind"] for spec in TEACHING_PACKAGE_ARTIFACT_SPECS.values()
+    }
+    artifacts_by_kind = {
+        artifact["kind"]: artifact
+        for artifact in artifact_payloads
+        if artifact.get("kind") in core_artifact_kinds
+    }
+    ppt_present = any(artifact.get("kind") == "PPT_DSL" for artifact in artifact_payloads)
+    metadata_profile = next(
+        (
+            str(artifact.get("metadata", {}).get("artifactProfile"))
+            for artifact in artifact_payloads
+            if artifact.get("metadata", {}).get("artifactProfile")
+        ),
+        None,
+    )
+    artifact_profile = metadata_profile or ("legacy-all" if ppt_present else "teaching-core")
+    missing_artifact_kinds = [
+        spec["artifactKind"]
+        for spec in TEACHING_PACKAGE_ARTIFACT_SPECS.values()
+        if spec["artifactKind"] not in artifacts_by_kind
+    ]
+    is_teaching_core = (
+        workflow_run.workflowId == "phase2_content_generation"
+        and artifact_profile == "teaching-core"
+        and not ppt_present
+        and not missing_artifact_kinds
+    )
+    if not is_teaching_core:
+        return {
+            "component": "TeachingPackageReviewSummary",
+            "available": False,
+            "unavailableReason": "NOT_TEACHING_CORE_WORKFLOW_RUN",
+            "workflowRunId": workflow_run_id,
+            "workflowId": workflow_run.workflowId,
+            "artifactProfile": artifact_profile,
+            "missingArtifactKinds": missing_artifact_kinds,
+            "pptArtifactPresent": ppt_present,
+            "exportReady": False,
+            "safety": {
+                "readOnlySummary": True,
+                "batchStateChangeAllowed": False,
+                "autoApproveAllowed": False,
+                "autoPublishAllowed": False,
+                "realPublishAllowed": False,
+            },
+        }
+
+    artifact_summaries: dict[str, dict[str, Any]] = {}
+    statuses: list[str] = []
+    schema_validated_total = 0
+    schema_failed_total = 0
+    content_quality_blocking_total = 0
+    candidate_safety: dict[str, Any] = {
+        "answersRemovedFromSafePreview": False,
+        "answerVisibleToCandidate": False,
+        "gradingRefVisibleToCandidate": False,
+        "candidateSafe": False,
+    }
+
+    for kind, spec in TEACHING_PACKAGE_ARTIFACT_SPECS.items():
+        artifact = artifacts_by_kind[spec["artifactKind"]]
+        task_id = str(artifact.get("taskId") or "")
+        task = store.get(task_id) if task_id else None
+        detail = build_review_detail(store, task_id) if task is not None else None
+        preview = (
+            detail.get("reviewPage", {}).get("dslPreview", {})
+            if isinstance(detail, dict)
+            else {}
+        )
+        content_quality = (
+            detail.get("contentQualitySummary", {})
+            if isinstance(detail, dict)
+            else {}
+        )
+        schema_validated = (
+            preview.get("schemaValidated") is True
+            or artifact.get("metadata", {}).get("schemaValidated") is True
+        )
+        schema_error_total = len(preview.get("schemaValidationErrors", []))
+        blocking_issue_total = int(content_quality.get("blockingIssueTotal") or 0)
+        status = task.status.value if task is not None else "MISSING"
+        statuses.append(status)
+        schema_validated_total += 1 if schema_validated else 0
+        schema_failed_total += 0 if schema_validated else 1
+        content_quality_blocking_total += blocking_issue_total
+        artifact_summaries[kind] = {
+            "kind": kind,
+            "label": spec["label"],
+            "artifactKind": spec["artifactKind"],
+            "artifactId": artifact.get("id"),
+            "taskId": task_id or None,
+            "taskType": task.taskType if task is not None else spec["taskType"],
+            "status": status,
+            "dslPath": artifact.get("path"),
+            "schemaValidated": schema_validated,
+            "schemaValidationErrorTotal": schema_error_total,
+            "contentQuality": {
+                "available": content_quality.get("available") is True,
+                "status": content_quality.get("decisionStatus") or content_quality.get("status"),
+                "readyForManualReview": content_quality.get("readyForManualReview") is True,
+                "blockingIssueTotal": blocking_issue_total,
+                "warningIssueTotal": int(content_quality.get("warningIssueTotal") or 0),
+                "recommendedAction": content_quality.get("recommendedAction"),
+            },
+            "reviewEntry": {
+                "path": "/review-center.html",
+                "taskId": task_id or None,
+                "workflowRunId": workflow_run_id,
+            },
+            "reviewActions": {
+                "approve": {
+                    "method": "POST",
+                    "path": f"/api/ai-tasks/{task_id}/approve" if task_id else None,
+                    "enabled": status == TaskStatus.WAITING_REVIEW.value,
+                },
+                "reject": {
+                    "method": "POST",
+                    "path": f"/api/ai-tasks/{task_id}/reject" if task_id else None,
+                    "enabled": status == TaskStatus.WAITING_REVIEW.value,
+                    "reasonRequired": True,
+                },
+            },
+        }
+        if kind == "exam":
+            preview_safety = preview.get("candidateSafety", {})
+            candidate_safety = {
+                "answersRemovedFromSafePreview": preview_safety.get("answersRemovedFromSafePreview") is True,
+                "answerVisibleToCandidate": preview_safety.get("answerVisibleToCandidate") is True,
+                "gradingRefVisibleToCandidate": preview_safety.get("gradingRefVisibleToCandidate") is True,
+                "candidateSafe": (
+                    preview_safety.get("answersRemovedFromSafePreview") is True
+                    and preview_safety.get("answerVisibleToCandidate") is False
+                    and preview_safety.get("gradingRefVisibleToCandidate") is False
+                ),
+            }
+
+    progress = {
+        "total": len(TEACHING_PACKAGE_ARTIFACT_SPECS),
+        "waitingReview": statuses.count(TaskStatus.WAITING_REVIEW.value),
+        "approved": statuses.count(TaskStatus.APPROVED.value),
+        "rejected": statuses.count(TaskStatus.REJECTED.value),
+        "missing": statuses.count("MISSING"),
+    }
+    if progress["rejected"]:
+        package_status = "NEEDS_REVISION"
+        next_action = "revise_rejected_artifacts"
+    elif progress["approved"] == progress["total"]:
+        package_status = "APPROVED"
+        next_action = "export_teaching_package"
+    else:
+        package_status = "WAITING_REVIEW"
+        next_action = "review_remaining_artifacts"
+
+    return {
+        "component": "TeachingPackageReviewSummary",
+        "available": True,
+        "workflowRunId": workflow_run_id,
+        "workflowId": workflow_run.workflowId,
+        "artifactProfile": "teaching-core",
+        "sourceRef": workflow_run.inputRef,
+        "status": package_status,
+        "artifacts": artifact_summaries,
+        "candidateSafeExamPreview": candidate_safety,
+        "validation": {
+            "total": len(TEACHING_PACKAGE_ARTIFACT_SPECS),
+            "schemaValidatedTotal": schema_validated_total,
+            "schemaFailedTotal": schema_failed_total,
+            "allSchemaValidated": schema_validated_total == len(TEACHING_PACKAGE_ARTIFACT_SPECS),
+            "contentQualityBlockingIssueTotal": content_quality_blocking_total,
+        },
+        "reviewProgress": progress,
+        "nextAction": next_action,
+        "exportReady": (
+            package_status == "APPROVED"
+            and schema_failed_total == 0
+            and candidate_safety["candidateSafe"] is True
+        ),
+        "reviewEntry": {
+            "path": "/review-center.html",
+            "workflowRunId": workflow_run_id,
+        },
+        "safety": {
+            "readOnlySummary": True,
+            "reviewActionsArePerTask": True,
+            "rejectRequiresReason": True,
+            "batchStateChangeAllowed": False,
+            "autoApproveAllowed": False,
+            "autoPublishAllowed": False,
+            "answerVisibleToCandidate": False,
+            "gradingRefVisibleToCandidate": False,
+            "realPublishAllowed": False,
+        },
     }
 
 
@@ -1916,18 +2150,45 @@ def build_review_batch_summary(
     limit: int | None = None,
     detail_mode: str = "full",
     agent_report: str | None = None,
+    workflow_run_id: str | None = None,
 ) -> dict[str, Any]:
     tasks = store.list(status=status, task_type=task_type)
+    teaching_package_review = (
+        build_teaching_package_review_summary(store, workflow_run_id)
+        if workflow_run_id
+        else None
+    )
+    workflow_task_ids = (
+        {
+            artifact.taskId
+            for artifact in store.list_artifacts(workflow_run_id=workflow_run_id)
+            if artifact.taskId
+        }
+        if workflow_run_id
+        else set()
+    )
+    if workflow_run_id:
+        tasks = [task for task in tasks if task.id in workflow_task_ids]
     if limit is not None:
         tasks = tasks[:limit]
 
-    status_counts = _status_counts(store, task_type)
+    status_counts = _status_counts(
+        store,
+        task_type,
+        task_ids=workflow_task_ids if workflow_run_id else None,
+    )
     if detail_mode == "light":
         priority_queue = _light_review_priority_queue(tasks)
-        return {
+        result = {
             "mode": "MOCK_ONLY",
             "detailMode": "LIGHT",
-            "filters": {"status": status, "taskType": task_type, "limit": limit, "detailMode": detail_mode},
+            "filters": {
+                "status": status,
+                "taskType": task_type,
+                "limit": limit,
+                "detailMode": detail_mode,
+                "workflowRunId": workflow_run_id,
+            },
             "items": [_light_task_card(task) for task in tasks],
             "total": len(tasks),
             "providerQualityTaskSignal": _light_provider_quality_task_signal(tasks),
@@ -1952,6 +2213,9 @@ def build_review_batch_summary(
             },
             "safety": build_review_safety(),
         }
+        if workflow_run_id:
+            result["teachingPackageReview"] = teaching_package_review
+        return result
 
     details = []
     for task in tasks:
@@ -1961,10 +2225,16 @@ def build_review_batch_summary(
 
     items = [_task_card(detail) for detail in details]
     priority_queue = _review_priority_queue(details)
-    return {
+    result = {
         "mode": "MOCK_ONLY",
         "detailMode": "FULL",
-        "filters": {"status": status, "taskType": task_type, "limit": limit, "detailMode": detail_mode},
+        "filters": {
+            "status": status,
+            "taskType": task_type,
+            "limit": limit,
+            "detailMode": detail_mode,
+            "workflowRunId": workflow_run_id,
+        },
         "items": items,
         "total": len(items),
         "providerQualityTaskSignal": _provider_quality_task_signal(details),
@@ -1989,3 +2259,6 @@ def build_review_batch_summary(
         },
         "safety": build_review_safety(),
     }
+    if workflow_run_id:
+        result["teachingPackageReview"] = teaching_package_review
+    return result

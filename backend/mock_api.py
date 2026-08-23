@@ -2687,6 +2687,7 @@ def save_phase2_artifacts(
                 "riskCount": material_analysis.get("riskCount", 0),
                 "unknownShellExecuted": material_analysis.get("unknownShellExecuted", False),
                 "workflowId": PHASE2_WORKFLOW_ID,
+                "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
             },
         ),
         save_artifact(
@@ -2703,6 +2704,8 @@ def save_phase2_artifacts(
                 "reviewRequired": True,
                 "providerAdapter": generated["lab"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
                 "workflowId": PHASE2_WORKFLOW_ID,
+                "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
+                "schemaValidated": generated["lab"].get("schemaValidated") is True,
                 "contentQualitySummary": content_quality_items.get("lab", {}),
                 "workflowContentQualitySummary": content_quality_summary,
             },
@@ -2721,6 +2724,8 @@ def save_phase2_artifacts(
                 "answerVisibleToCandidate": False,
                 "providerAdapter": generated["exam"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
                 "workflowId": PHASE2_WORKFLOW_ID,
+                "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
+                "schemaValidated": generated["exam"].get("schemaValidated") is True,
                 "contentQualitySummary": content_quality_items.get("exam", {}),
                 "workflowContentQualitySummary": content_quality_summary,
             },
@@ -2739,6 +2744,8 @@ def save_phase2_artifacts(
                 "reviewRequired": True,
                 "providerAdapter": generated["grading"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
                 "workflowId": PHASE2_WORKFLOW_ID,
+                "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
+                "schemaValidated": generated["grading"].get("schemaValidated") is True,
                 "contentQualitySummary": content_quality_items.get("grading", {}),
                 "workflowContentQualitySummary": content_quality_summary,
             },
@@ -2759,6 +2766,8 @@ def save_phase2_artifacts(
                         "artifactGenerated": False,
                         "providerAdapter": generated["ppt"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
                         "workflowId": PHASE2_WORKFLOW_ID,
+                        "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
+                        "schemaValidated": generated["ppt"].get("schemaValidated") is True,
                         "contentQualitySummary": content_quality_items.get("ppt", {}),
                         "workflowContentQualitySummary": content_quality_summary,
                     },
@@ -2778,6 +2787,7 @@ def save_phase2_artifacts(
             metadata={
                 "workflowId": PHASE2_WORKFLOW_ID,
                 "reviewRequired": True,
+                "artifactProfile": report.get("artifactProfile", ARTIFACT_PROFILE_LEGACY_ALL),
                 "contentQualitySummary": content_quality_summary,
             },
         ),
@@ -4465,6 +4475,7 @@ def run_phase2_workflow(payload: dict[str, Any], store: JsonTaskStore, trace_id:
             "reviewEntry": {
                 "path": "/review-center.html",
                 "workflowRunId": workflow_run.id,
+                "href": f"/review-center.html?workflowRunId={workflow_run.id}",
             },
         }
     return ok(
@@ -5919,6 +5930,7 @@ def handle_request(
     if path == "/api/review-task-summary":
         status = query.get("status", TaskStatus.WAITING_REVIEW.value)
         task_type = query.get("taskType")
+        workflow_run_id = query.get("workflowRunId")
         limit_value = query.get("limit")
         detail_mode = query.get("detailMode", "full")
         allowed_statuses = {item.value for item in TaskStatus}
@@ -5932,6 +5944,13 @@ def handle_request(
             return fail("VALIDATION_ERROR", "参数错误", [{"field": "limit", "reason": "必须是整数"}], trace_id)
         if limit is not None and limit < 1:
             return fail("VALIDATION_ERROR", "参数错误", [{"field": "limit", "reason": "必须大于等于 1"}], trace_id)
+        if workflow_run_id and store.get_workflow_run(workflow_run_id) is None:
+            return fail(
+                "NOT_FOUND",
+                "Workflow Run 不存在",
+                [{"field": "workflowRunId", "reason": "未找到运行记录"}],
+                trace_id,
+            )
         summary = build_review_batch_summary(
             store,
             status=status,
@@ -5939,6 +5958,7 @@ def handle_request(
             limit=limit,
             detail_mode=detail_mode,
             agent_report=query.get("agentReport"),
+            workflow_run_id=workflow_run_id,
         )
         return ok("查询成功", {"reviewTaskSummary": summary}, trace_id)
 

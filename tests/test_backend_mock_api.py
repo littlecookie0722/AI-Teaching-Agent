@@ -5639,6 +5639,18 @@ def test_phase2_content_generation_workflow_creates_review_bundle(tmp_path):
     assert {item["detail"]["workflowId"] for item in audit["data"]["items"]} == {"phase2_content_generation"}
     assert runs["data"]["total"] == 1
 
+    workflow_run_id = payload["data"]["workflowRun"]["id"]
+    run_summary = handle_request(
+        "GET",
+        f"/api/review-task-summary?detailMode=light&workflowRunId={workflow_run_id}",
+        store_path=store_path,
+    )["data"]["reviewTaskSummary"]
+    assert run_summary["total"] == 4
+    assert run_summary["queueSummary"]["waitingReviewTotal"] == 4
+    assert run_summary["teachingPackageReview"]["available"] is False
+    assert run_summary["teachingPackageReview"]["artifactProfile"] == "legacy-all"
+    assert run_summary["teachingPackageReview"]["pptArtifactPresent"] is True
+
 
 def test_phase2_teaching_core_profile_creates_candidate_safe_three_task_package(tmp_path):
     store_path = tmp_path / "store.json"
@@ -5685,6 +5697,163 @@ def test_phase2_teaching_core_profile_creates_candidate_safe_three_task_package(
 
     persisted = JsonTaskStore(store_path)
     assert len(persisted.list()) == 3
+
+
+def test_teaching_package_review_summary_tracks_per_task_approval_and_rejection(tmp_path):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+    generated = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+    workflow_run_id = generated["data"]["workflowRun"]["id"]
+    task_by_type = {
+        task["taskType"]: task
+        for task in generated["data"]["createdTasks"]
+    }
+
+    initial = handle_request(
+        "GET",
+        f"/api/review-task-summary?detailMode=light&workflowRunId={workflow_run_id}",
+        store_path=store_path,
+    )
+
+    assert_api_envelope(initial)
+    assert initial["success"] is True
+    summary = initial["data"]["reviewTaskSummary"]
+    package = summary["teachingPackageReview"]
+    assert summary["filters"]["workflowRunId"] == workflow_run_id
+    assert summary["total"] == 3
+    assert package["component"] == "TeachingPackageReviewSummary"
+    assert package["available"] is True
+    assert package["artifactProfile"] == "teaching-core"
+    assert package["status"] == "WAITING_REVIEW"
+    assert list(package["artifacts"]) == ["lab", "exam", "grading"]
+    assert package["validation"] == {
+        "total": 3,
+        "schemaValidatedTotal": 3,
+        "schemaFailedTotal": 0,
+        "allSchemaValidated": True,
+        "contentQualityBlockingIssueTotal": 0,
+    }
+    assert package["candidateSafeExamPreview"] == {
+        "answersRemovedFromSafePreview": True,
+        "answerVisibleToCandidate": False,
+        "gradingRefVisibleToCandidate": False,
+        "candidateSafe": True,
+    }
+    assert package["reviewProgress"] == {
+        "total": 3,
+        "waitingReview": 3,
+        "approved": 0,
+        "rejected": 0,
+        "missing": 0,
+    }
+    assert package["exportReady"] is False
+    assert package["safety"]["reviewActionsArePerTask"] is True
+    assert package["safety"]["batchStateChangeAllowed"] is False
+
+    lab_task_id = task_by_type["LAB_GENERATION"]["id"]
+    approved = handle_request(
+        "POST",
+        f"/api/ai-tasks/{lab_task_id}/approve",
+        store_path=store_path,
+        body={"reviewer": "teacher_2"},
+    )
+    assert_api_envelope(approved)
+    assert approved["success"] is True
+
+    after_approve = handle_request(
+        "GET",
+        f"/api/review-task-summary?detailMode=light&workflowRunId={workflow_run_id}",
+        store_path=store_path,
+    )["data"]["reviewTaskSummary"]
+    assert after_approve["total"] == 2
+    assert after_approve["queueSummary"]["waitingReviewTotal"] == 2
+    assert after_approve["teachingPackageReview"]["status"] == "WAITING_REVIEW"
+    assert after_approve["teachingPackageReview"]["artifacts"]["lab"]["status"] == "APPROVED"
+    assert after_approve["teachingPackageReview"]["reviewProgress"]["approved"] == 1
+
+    exam_task_id = task_by_type["EXAM_GENERATION"]["id"]
+    rejected = handle_request(
+        "POST",
+        f"/api/ai-tasks/{exam_task_id}/reject",
+        store_path=store_path,
+        body={"reviewer": "teacher_2", "reason": "题目范围需要收敛"},
+    )
+    assert_api_envelope(rejected)
+    assert rejected["success"] is True
+
+    after_reject = handle_request(
+        "GET",
+        f"/api/review-task-summary?detailMode=light&workflowRunId={workflow_run_id}",
+        store_path=store_path,
+    )["data"]["reviewTaskSummary"]["teachingPackageReview"]
+    assert after_reject["status"] == "NEEDS_REVISION"
+    assert after_reject["reviewProgress"]["rejected"] == 1
+    assert after_reject["artifacts"]["exam"]["status"] == "REJECTED"
+    assert after_reject["artifacts"]["exam"]["reviewActions"]["approve"]["enabled"] is False
+    assert after_reject["nextAction"] == "revise_rejected_artifacts"
+    assert after_reject["exportReady"] is False
+
+
+def test_teaching_package_review_summary_becomes_export_ready_after_three_manual_approvals(tmp_path):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+    generated = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+    workflow_run_id = generated["data"]["workflowRun"]["id"]
+
+    for task in generated["data"]["createdTasks"]:
+        approved = handle_request(
+            "POST",
+            f"/api/ai-tasks/{task['id']}/approve",
+            store_path=store_path,
+            body={"reviewer": "teacher_2"},
+        )
+        assert_api_envelope(approved)
+        assert approved["success"] is True
+
+    summary = handle_request(
+        "GET",
+        f"/api/review-task-summary?detailMode=light&workflowRunId={workflow_run_id}",
+        store_path=store_path,
+    )["data"]["reviewTaskSummary"]
+    package = summary["teachingPackageReview"]
+    assert summary["total"] == 0
+    assert package["status"] == "APPROVED"
+    assert package["reviewProgress"] == {
+        "total": 3,
+        "waitingReview": 0,
+        "approved": 3,
+        "rejected": 0,
+        "missing": 0,
+    }
+    assert package["nextAction"] == "export_teaching_package"
+    assert package["exportReady"] is True
+
+
+def test_teaching_package_review_summary_rejects_unknown_workflow_run(tmp_path):
+    payload = handle_request(
+        "GET",
+        "/api/review-task-summary?detailMode=light&workflowRunId=workflow_run_missing",
+        store_path=tmp_path / "store.json",
+    )
+
+    assert_api_envelope(payload)
+    assert payload["success"] is False
+    assert payload["code"] == "NOT_FOUND"
+    assert payload["errors"] == [
+        {"field": "workflowRunId", "reason": "未找到运行记录"}
+    ]
 
 
 def test_phase2_content_generation_rejects_invalid_artifact_profile_without_tasks(tmp_path):

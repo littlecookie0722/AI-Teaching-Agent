@@ -4,6 +4,18 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-08-23
+
+- Added workflow-run-scoped Lab, Exam, and Grading review aggregation with
+  derived package status, validation signals, candidate safety, and export
+  readiness.
+- Added a single teaching-package review strip to the default Review Center,
+  with per-artifact approve/reject actions, reviewer capture, and required
+  rejection reasons.
+- Preserved the existing single-task review APIs and historical `legacy-all`
+  workflow behavior; no batch review, publishing, PPT generation, or package
+  export was added in this slice.
+
 ## [0.1.6] - 2026-08-23
 
 - Added the compatible `teaching-core` artifact profile to the existing

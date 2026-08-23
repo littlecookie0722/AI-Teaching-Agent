@@ -27,7 +27,7 @@
         "POST /api/phase2/workflows/content-generation/run.candidateSafeExamPreview",
         "request.artifactProfile=teaching-core",
         "query: coreDbPath, gradingDbPath, agentReport",
-        "review-center.html?taskId={taskId}",
+        "review-center.html?taskId={taskId}&workflowRunId={workflowRunId}",
         "lab-review.html?taskId={taskId}",
         "exam-review.html?taskId={taskId}",
         "grading-review.html?taskId={taskId}"
@@ -614,6 +614,11 @@
         "MvpReviewWorkspace.staticFallbackContextLinks",
         "MvpReviewWorkspace.noHorizontalOverflow",
         "GET /api/review-task-summary.mvpReviewWorkspace",
+        "query: workflowRunId",
+        "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview",
+        "frontend/review-action-data.js",
+        "POST /api/ai-tasks/{id}/approve",
+        "POST /api/ai-tasks/{id}/reject",
         "GET /api/review-tasks/{id}.mvpReviewWorkspace",
         "GET /api/review-tasks/{id}/core-readiness.mvpReviewWorkspace",
         "frontend/mock-data.json.reviewDetail.reviewPage.providerSummary",
@@ -1944,6 +1949,8 @@
     "RealDslRevisionDiffPreview",
     "RealDslRevisionDecision",
     "MvpReviewWorkspace",
+    "TeachingPackageReviewWorkspace",
+    "TeachingPackageArtifactReviewRow",
     "RealDemoReviewQueue",
     "ControlledDockerEvidenceReviewSignal",
     "GradingEvidenceReadiness",
@@ -2001,7 +2008,7 @@
         "request.artifactProfile=teaching-core",
         "frontendDirectRealLlmCall=false",
         "query: coreDbPath, gradingDbPath, agentReport",
-        "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
+        "review-center.html?taskId={taskId}&workflowRunId={workflowRunId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "lab-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "exam-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
@@ -2991,6 +2998,14 @@
           "path": "/api/review-task-summary"
         },
         {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/approve"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai-tasks/{id}/reject"
+        },
+        {
           "method": "GET",
           "path": "/api/review-tasks/{id}"
         },
@@ -3023,6 +3038,8 @@
         "AiTaskStatusBadge",
         "AiTaskTimeline",
         "MvpReviewWorkspace",
+        "TeachingPackageReviewWorkspace",
+        "TeachingPackageArtifactReviewRow",
         "ReviewCenterDataLoader",
         "RealDslContentQualityDecision",
         "RealDemoReviewQueue",
@@ -3054,6 +3071,8 @@
     "safety": {
       "autoPublishAllowed": false,
       "batchStateChangeAllowed": false,
+      "reviewActionsArePerTask": true,
+      "rejectRequiresReason": true,
       "realPublishAllowed": false,
       "realPublish": false,
       "realLlmArtifactsReadOnly": true,
@@ -3067,9 +3086,14 @@
       },
       "dataSources": [
         "frontend/review-center-data.js",
+        "frontend/review-action-data.js",
         "MvpReviewWorkspace.staticFallbackContextLinks",
         "MvpReviewWorkspace.noHorizontalOverflow",
         "GET /api/review-task-summary.mvpReviewWorkspace",
+        "query: workflowRunId",
+        "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview",
+        "POST /api/ai-tasks/{id}/approve",
+        "POST /api/ai-tasks/{id}/reject",
         "GET /api/review-tasks/{id}.mvpReviewWorkspace",
         "GET /api/review-tasks/{id}/core-readiness.mvpReviewWorkspace",
         "GET /api/review-task-summary",

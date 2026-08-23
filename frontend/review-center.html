@@ -393,13 +393,124 @@
       pointer-events: none;
     }
 
+    .teaching-package-strip {
+      margin-top: 12px;
+      border-width: 1px 0;
+      border-radius: 0;
+      background: #ffffff;
+    }
+
+    .teaching-package-strip .section-head {
+      padding: 16px 18px 10px;
+      border-bottom: 0;
+    }
+
+    .teaching-package-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 18px 14px;
+    }
+
+    .teaching-package-controls {
+      display: grid;
+      grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: end;
+      padding: 12px 18px;
+      border-top: 1px solid var(--line);
+      background: #f9fafb;
+    }
+
+    .teaching-package-controls label,
+    .package-reason-field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .teaching-package-controls input,
+    .package-reason-field input {
+      width: 100%;
+      min-width: 0;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .teaching-package-controls p {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .teaching-package-artifacts {
+      border-top: 1px solid var(--line);
+    }
+
+    .teaching-package-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.25fr) minmax(180px, 0.9fr) minmax(200px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .teaching-package-row:last-child {
+      border-bottom: 0;
+    }
+
+    .teaching-package-row h3,
+    .teaching-package-row p {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .teaching-package-row p {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .package-validation {
+      display: grid;
+      gap: 6px;
+    }
+
+    .package-artifact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      min-width: 190px;
+    }
+
+    .package-artifact-actions button {
+      min-width: 54px;
+    }
+
     @media (max-width: 920px) {
       header,
       main,
+      .runtime-strip,
       .content-grid,
       .detail-grid,
-      .workspace-grid {
+      .workspace-grid,
+      .teaching-package-metrics,
+      .teaching-package-controls,
+      .teaching-package-row {
         grid-template-columns: 1fr;
+      }
+
+      .package-artifact-actions {
+        justify-content: flex-start;
+        min-width: 0;
       }
 
       header,
@@ -440,6 +551,42 @@
     <span class="pill" id="review-center-api-detail">api loader keeps actions read-only</span>
     <span class="pill" id="review-center-selected-task">task_grading_demo</span>
   </div>
+
+  <section class="teaching-package-strip" id="teaching-package-review" aria-labelledby="teaching-package-title" hidden>
+    <div class="section-head">
+      <div>
+        <h2 id="teaching-package-title">教学包审核</h2>
+        <p id="teaching-package-summary">等待按 workflowRunId 加载 Lab、Exam 与 Grading</p>
+      </div>
+      <span class="pill strong" id="teaching-package-status">WAITING_REVIEW</span>
+    </div>
+    <div class="teaching-package-metrics" aria-label="Teaching package review progress">
+      <div class="metric">
+        <span>审核进度</span>
+        <strong id="teaching-package-progress">0 / 3</strong>
+      </div>
+      <div class="metric">
+        <span>Schema 校验</span>
+        <strong id="teaching-package-schema">0 / 3</strong>
+      </div>
+      <div class="metric">
+        <span>候选人预览</span>
+        <strong id="teaching-package-candidate-safety">等待校验</strong>
+      </div>
+      <div class="metric">
+        <span>本地导出</span>
+        <strong id="teaching-package-export-ready">未就绪</strong>
+      </div>
+    </div>
+    <div class="teaching-package-controls">
+      <label for="teaching-package-reviewer">
+        审核人
+        <input id="teaching-package-reviewer" type="text" value="teacher_1" autocomplete="off">
+      </label>
+      <p class="ok" id="teaching-package-action-status" aria-live="polite">ACTION_READY · 逐项人工审核</p>
+    </div>
+    <div class="teaching-package-artifacts" id="teaching-package-artifacts"></div>
+  </section>
 
   <section class="workspace-strip" aria-labelledby="mvp-workspace-title">
     <div class="section-head">
@@ -1633,5 +1780,6 @@ spec:
     </section>
   </main>
   <script src="review-center-data.js"></script>
+  <script src="review-action-data.js"></script>
 </body>
 </html>
