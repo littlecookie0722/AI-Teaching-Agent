@@ -4,6 +4,24 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-08-23
+
+- Added a productized teaching-presentation path that turns an approved
+  `teaching-core` workflow into a deterministic 5-8 slide deck, defaulting to
+  six teaching-focused layouts.
+- Added local `python-pptx` and Pillow rendering for the PPTX file, 1280x720
+  page previews, contact sheet, manifest, integrity metadata, and quality
+  preflight signals.
+- Added a child presentation workflow, candidate-answer and `gradingRef`
+  leakage checks, and a single `WAITING_REVIEW` task without changing the
+  approved source teaching package.
+- Added Review Center generation, page-by-page review, whole-deck approval,
+  and approved-only local PPTX download; no online editor, platform import,
+  automatic approval, or publishing is included.
+- Bound product-deck preview and download routes to optional Backend API auth
+  and registered SHA-256 values, blocked short or truncated answer leakage,
+  and retained legacy PPT teaching-content and layout-alias compatibility.
+
 ## [0.1.8] - 2026-08-23
 
 - Added review-gated local teaching-package export for `teaching-core`

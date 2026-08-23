@@ -96,6 +96,16 @@
                   "summary"
                 ]
               },
+              "layout": {
+                "enum": [
+                  "hero",
+                  "objectives",
+                  "concept",
+                  "process",
+                  "exercise",
+                  "summary"
+                ]
+              },
               "title": {
                 "type": "string"
               },

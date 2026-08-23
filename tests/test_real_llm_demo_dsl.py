@@ -1595,6 +1595,7 @@ REAL_LLM_SCHEMA_DRIFT_MATRIX = [
             "set.spec.slides[0].id.from.slideId",
             "set.spec.slides[0].type.from.layout",
             "set.spec.slides[0].type",
+            "remove.spec.slides[0].layout",
             "set.spec.slides[0].title.from.heading",
             "set.spec.slides[0].bullets.from.points",
             "set.spec.slides[0].bullets",

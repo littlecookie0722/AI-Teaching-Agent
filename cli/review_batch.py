@@ -1477,6 +1477,19 @@ def build_teaching_package_review_summary(
             and schema_failed_total == 0
             and candidate_safety["candidateSafe"] is True
         ),
+        "presentationDeckGeneration": {
+            "enabled": (
+                package_status == "APPROVED"
+                and schema_failed_total == 0
+                and candidate_safety["candidateSafe"] is True
+            ),
+            "method": "POST",
+            "path": "/api/teaching-presentations/generate",
+            "defaultSlideCount": 6,
+            "minimumSlideCount": 5,
+            "maximumSlideCount": 8,
+            "createsChildWorkflowRun": True,
+        },
         "reviewEntry": {
             "path": "/review-center.html",
             "workflowRunId": workflow_run_id,
@@ -1490,6 +1503,112 @@ def build_teaching_package_review_summary(
             "autoPublishAllowed": False,
             "answerVisibleToCandidate": False,
             "gradingRefVisibleToCandidate": False,
+            "realPublishAllowed": False,
+        },
+    }
+
+
+def build_presentation_deck_review_summary(
+    store: JsonTaskStore,
+    workflow_run_id: str,
+) -> dict[str, Any] | None:
+    workflow_run = store.get_workflow_run(workflow_run_id)
+    if workflow_run is None or workflow_run.workflowId != "teaching_presentation_generation":
+        return None
+
+    artifacts = store.list_artifacts(workflow_run_id=workflow_run_id)
+    ppt_dsl = next((artifact for artifact in artifacts if artifact.kind.value == "PPT_DSL"), None)
+    pptx = next((artifact for artifact in artifacts if artifact.kind.value == "PPTX_FILE"), None)
+    task_id = str((pptx or ppt_dsl).taskId or "") if (pptx or ppt_dsl) else ""
+    task = store.get(task_id) if task_id else None
+    if ppt_dsl is None or pptx is None or task is None:
+        return {
+            "component": "PresentationDeckReviewSummary",
+            "available": False,
+            "workflowRunId": workflow_run_id,
+            "sourceWorkflowRunId": workflow_run.inputRef,
+            "unavailableReason": "PRESENTATION_ARTIFACTS_INCOMPLETE",
+            "approveReady": False,
+            "downloadReady": False,
+            "downloadBlockedReason": "PRESENTATION_ARTIFACTS_INCOMPLETE",
+        }
+
+    metadata = pptx.metadata if isinstance(pptx.metadata, dict) else {}
+    dsl_metadata = ppt_dsl.metadata if isinstance(ppt_dsl.metadata, dict) else {}
+    slide_previews = metadata.get("slidePreviews")
+    if not isinstance(slide_previews, list):
+        preview = metadata.get("preview", {})
+        slide_previews = preview.get("slidePreviews", []) if isinstance(preview, dict) else []
+    detail = build_review_detail(store, task.id)
+    page_review = detail.get("pptPageReview", {}) if isinstance(detail, dict) else {}
+    page_summary = page_review.get("pageReviewSummary", {}) if isinstance(page_review, dict) else {}
+    artifact_id = pptx.id
+    safe_previews = []
+    for position, item in enumerate(slide_previews, start=1):
+        if not isinstance(item, dict):
+            continue
+        index = int(item.get("index") or position)
+        safe_previews.append(
+            {
+                "index": index,
+                "id": item.get("id") or f"slide_{index}",
+                "title": item.get("title") or f"Slide {index}",
+                "imageUrl": f"/api/ppt-artifacts/{artifact_id}/previews/{index}",
+                "reviewStatus": item.get("reviewStatus") or "NEEDS_REVIEW",
+                "manualComment": item.get("manualComment") or {},
+                "qaSignals": item.get("qaSignals") or {},
+            }
+        )
+
+    contact_sheet = metadata.get("contactSheet")
+    contact_sheet_available = isinstance(contact_sheet, dict) and bool(contact_sheet.get("path"))
+    if not contact_sheet_available:
+        contact_sheet_available = bool(metadata.get("contactSheetPath"))
+    page_review_approved = (
+        bool(safe_previews)
+        and page_summary.get("status") == "APPROVED"
+        and int(page_summary.get("approved") or 0) == len(safe_previews)
+    )
+    download_ready = task.status == TaskStatus.APPROVED
+    quality_report = metadata.get("qualityReport") if isinstance(metadata.get("qualityReport"), dict) else {}
+    return {
+        "component": "PresentationDeckReviewSummary",
+        "available": True,
+        "workflowRunId": workflow_run_id,
+        "sourceWorkflowRunId": metadata.get("sourceWorkflowRunId") or workflow_run.inputRef,
+        "taskId": task.id,
+        "status": task.status.value,
+        "slideTotal": len(safe_previews),
+        "schemaValidated": dsl_metadata.get("schemaValidated") is True,
+        "qualityReport": quality_report,
+        "pageReviewSummary": page_summary,
+        "slidePreviews": safe_previews,
+        "contactSheetUrl": (
+            f"/api/ppt-artifacts/{artifact_id}/contact-sheet" if contact_sheet_available else None
+        ),
+        "pptxArtifact": {
+            "artifactId": artifact_id,
+            "fileName": Path(pptx.path).name,
+            "sizeBytes": int(metadata.get("sizeBytes") or metadata.get("bytes") or 0),
+            "sha256": metadata.get("sha256"),
+            "downloadUrl": f"/api/ppt-artifacts/{artifact_id}/download",
+        },
+        "approveReady": task.status == TaskStatus.WAITING_REVIEW and page_review_approved,
+        "downloadReady": download_ready,
+        "downloadBlockedReason": None if download_ready else "TASK_NOT_APPROVED",
+        "reviewActions": {
+            "pageUpdatePath": f"/api/review-tasks/{task.id}/ppt-page-review-status",
+            "approvePath": f"/api/ai-tasks/{task.id}/approve",
+            "rejectPath": f"/api/ai-tasks/{task.id}/reject",
+            "rejectRequiresReason": True,
+        },
+        "safety": {
+            "localOnly": True,
+            "candidateSafe": True,
+            "answerVisibleToCandidate": False,
+            "gradingRefVisibleToCandidate": False,
+            "autoApproveAllowed": False,
+            "autoPublishAllowed": False,
             "realPublishAllowed": False,
         },
     }
@@ -2158,6 +2277,11 @@ def build_review_batch_summary(
         if workflow_run_id
         else None
     )
+    presentation_deck_review = (
+        build_presentation_deck_review_summary(store, workflow_run_id)
+        if workflow_run_id
+        else None
+    )
     workflow_task_ids = (
         {
             artifact.taskId
@@ -2215,6 +2339,8 @@ def build_review_batch_summary(
         }
         if workflow_run_id:
             result["teachingPackageReview"] = teaching_package_review
+            if presentation_deck_review is not None:
+                result["presentationDeckReview"] = presentation_deck_review
         return result
 
     details = []
@@ -2261,4 +2387,6 @@ def build_review_batch_summary(
     }
     if workflow_run_id:
         result["teachingPackageReview"] = teaching_package_review
+        if presentation_deck_review is not None:
+            result["presentationDeckReview"] = presentation_deck_review
     return result

@@ -2,12 +2,14 @@
 
 AI Teaching Agent is a standalone, Python-based project for turning one
 Markdown teaching source into a reviewable, locally exportable Lab and Exam
-package. It keeps LLM-generated content inside a structured and auditable
-workflow instead of publishing it directly.
+package and an optional 5-8 slide teaching presentation. It keeps generated
+content inside a structured and auditable workflow instead of publishing it
+directly.
 
-The current MVP is deliberately narrow: generate linked Lab, Exam, and internal
-Grading artifacts, validate them, protect candidate-facing content, and stop
-for a human decision before local export.
+The core MVP generates linked Lab, Exam, and internal Grading artifacts,
+validates them, protects candidate-facing content, and stops for a human
+decision before local export. The selected next stage productizes a local PPTX
+deck from that approved package and adds page-by-page human review.
 
 ## Current MVP
 
@@ -18,13 +20,15 @@ for a human decision before local export.
 - Produces a candidate-safe exam preview that excludes answers and internal
   grading references.
 - Exports the reviewed teaching package locally without automatic publishing.
+- Generates a 5-8 slide local teaching deck from an approved package, with six
+  slides by default.
+- Renders a 16:9 PPTX, per-slide PNG previews, and a contact sheet for manual
+  page review before whole-deck approval and download.
 
-Existing PPT/PPTX, controlled grading, local entity, MCP, Agent, database
-adapter, and additional frontend capabilities remain in the repository for
-compatibility and targeted fixes. They are not concurrent goals of the current
-MVP. After this MVP is accepted, PPT productization and automatic grading
-productization are mutually exclusive next-stage candidates until one is
-explicitly selected.
+Automatic grading productization, local entity expansion, MCP/Agent expansion,
+external platforms, and additional workbench pages remain frozen. PPT
+productization is intentionally limited to local generation, review, and
+download; it does not add an online editor or publishing path.
 
 ## Architecture
 
@@ -44,16 +48,21 @@ Schema validation -> WAITING_REVIEW -> human decision
        |                         candidate-safe preview
        v
 local teaching-package export
+       |
+       v
+5-8 slide PPTX -> page review -> whole-deck approval -> local download
 ```
 
 ## Current Status
 
 The project has already demonstrated a broader local-core PoC, including PPT,
 controlled grading evidence, local entity persistence, MCP, and Agent paths.
-Current development is now refocused on making the smaller Lab + Exam/Grading
-review-and-export workflow coherent and dependable. The current local export
-is a six-file ZIP gated on three explicit human approvals. It is not a production
-hosted service, cloud resource manager, or automatic publishing system.
+The Lab + Exam/Grading review-and-export workflow is complete. The current PPT
+stage derives a local 5-8 slide deck only after those three source tasks are
+approved, creates a separate child workflow and `WAITING_REVIEW` task, and
+requires every rendered page to be reviewed before whole-deck approval. It is
+not a hosted service, online editor, cloud resource manager, or automatic
+publishing system.
 
 The detailed delivery boundaries, implemented capabilities, and stop lines are
 maintained in [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md).
@@ -63,9 +72,10 @@ next implementation slices are recorded in
 
 ## Installation
 
-Requirements: Python 3.11 or later. The default installation contains the
-offline DSL/CLI runtime only; Docker is needed only for explicit controlled
-grading, and no model SDK or database driver is installed unless selected.
+Requirements: Python 3.11 or later. The default installation includes the
+offline DSL/CLI runtime plus `python-pptx` and Pillow for local presentation
+rendering. Docker is needed only for explicit controlled grading, and no model
+SDK or database driver is installed unless selected.
 
 ```powershell
 python -m venv .venv
@@ -97,6 +107,7 @@ From a Git checkout, the installed console command and the historical
 ai-teaching-agent lab generate-from-source --input examples/input/demo-source.md
 ai-teaching-agent exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml
 ai-teaching-agent teaching-package export --workflow-run-id <workflowRunId> --reviewer teacher_1
+ai-teaching-agent ppt generate-from-teaching-package --workflow-run-id <approvedWorkflowRunId> --reviewer teacher_1 --slide-count 6
 ai-teaching-agent demo offline
 ai-teaching-agent quality dsl-eval --output examples/output/dsl-quality-eval.json
 python -m pytest -q
@@ -122,10 +133,10 @@ generate-from-lab` path also keeps its task-specific Exam, Grading, and
 candidate-preview JSON artifacts in that workspace, and `ppt generate` writes
 its task-specific PPT DSL there as well. The `ppt artifact build` command also
 keeps its temporary presentation workspace outside `site-packages` and writes
-the PPTX artifact and previews to the user workspace. It requires Node.js and
-the optional presentations runtime; set `PRESENTATIONS_SKILL_DIR` when that
-runtime is not discoverable from the local Codex installation. Approval and
-local import-preview can continue from the same directory.
+the PPTX artifact and previews to the user workspace. Presentation rendering
+uses the installed Python dependencies and does not require Node.js or an
+external presentation runtime. Approval and local import-preview can continue
+from the same directory.
 
 After a `teaching-core` run has three manually approved tasks, `teaching-package
 export` writes `examples/output/teaching-packages/<workflowRunId>.zip` in the
@@ -134,6 +145,17 @@ manifest, Lab/Exam/Grading JSON, candidate-safe Exam preview, and review summary
 the manifest excludes reviewer and export-time metadata so identical inputs stay
 deterministic, while those values are recorded only in the operation audit. The
 export does not call platform import, grading execution, or publishing paths.
+
+After that source workflow is approved, `ppt generate-from-teaching-package`
+creates a separate child workflow under
+`examples/output/teaching-presentations/<childWorkflowRunId>/`. The directory
+contains `presentation.json`, `presentation.pptx`, six page previews by
+default, a contact sheet, and `manifest.json`. Generation revalidates the source
+contracts and blocks answer text or internal `gradingRef` values from visible
+slides. The Review Center exposes only authenticated, registered local preview
+URLs, verifies their recorded SHA-256 values when serving bytes, requires all
+pages to pass manual review, and allows PPTX download only after the deck task
+is approved.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,
@@ -173,11 +195,10 @@ synthetic `WAITING_REVIEW` task cards and loads their detail through
 does not create tasks, approve content, publish artifacts, execute a sandbox,
 or reveal candidate answers.
 
-The PPT generation and review pages link approved tasks into
-`frontend/agent-entities.html?entityKind=ppt`. That local workflow reuses the
-existing `POST /api/ppt/import-preview`, `POST /api/ppt/mock-import`, and
-platform-entity import-dry-run APIs, preserves optional SQLite/report context,
-and stops before any real platform request.
+The older PPT generation and review pages still retain their direct local
+import-preview compatibility, but that path is outside the current product
+flow. The default Review Center stops at approved local PPTX download and does
+not offer platform import or publishing.
 
 For a controlled local grading example, see
 [the project progress map](docs/24_PROJECT_PROGRESS_MAP.md) and the fixtures

@@ -41,6 +41,9 @@ POST /api/agent-entities/{id}/import-dry-run
 # POST /api/agent-entities/{id}/final-publish-review-decision
 GET /api/artifacts
 GET /api/artifacts/{id}
+GET /api/ppt-artifacts/{artifactId}/previews/{slideIndex}
+GET /api/ppt-artifacts/{artifactId}/contact-sheet
+GET /api/ppt-artifacts/{artifactId}/download
 GET /api/workflow-runs
 GET /api/workflow-runs/{id}
 GET /api/environments
@@ -55,6 +58,7 @@ POST /api/backend/core-db/init
 POST /api/backend/core-db/sync-local
 POST /api/workflow/demo
 POST /api/teaching-packages/export
+POST /api/teaching-presentations/generate
 POST /api/labs/generate
 POST /api/labs/import-preview
 POST /api/labs/mock-import
@@ -128,6 +132,9 @@ POST /api/environments/{id}/reset
 - `POST /api/exams/mock-import` 与 `POST /api/grading/mock-import` 分别要求已有 `ExamQuestionImportPreview` / `GradingRuleImportPreview`，把 `examQuestionDraft` / `gradingRuleDraft` 写入本地 `platformEntities`；标准答案仍保持教师侧语义，评分规则仍不执行沙箱，固定 `databaseWritten=false`、`realAgentImport=false`、`realPublish=false`。
 - `POST /api/phase2/workflows/content-generation/run` 请求体需要 `input` 和 `reviewer`。未传 `artifactProfile` 时按 `legacy-all` 兼容生成 Lab / Exam / Grading / PPT 四类审核包；传 `artifactProfile=teaching-core` 时只生成 Lab / Exam / Grading，创建 3 个 `WAITING_REVIEW` 任务，并返回 `candidateSafeExamPreview` 和 `teachingPackageSummary`（含 `workflowRunId`、三类任务/路径/Schema 摘要、审核进度、`exportReady=false` 和审核入口）。非法 profile 返回 `VALIDATION_ERROR` 且不创建任务。可选 `providerMode=real-llm`、`model`、`baseUrl`、`maxOutputTokens`、对应 `realLlm*Output` 路径以及 `explicitRealCallOptIn=true`、`confirmRealDsl=true`、`confirmWaitingReview=true`、`confirmNoAutoPublish=true` 发起真实 OpenAI-compatible LLM 生成；`teaching-core` 真实模式只发送三类请求，不请求 PPT。`repairOnSchemaFailure=true` 只在某一类 DSL Schema 校验失败时最多追加一次修复请求。任一生成、Schema 或候选预览脱敏失败时不创建可审核任务；所有成功结果仍为 `WAITING_REVIEW`，不自动发布、不执行沙箱、不生成真实 PPTX。
 - `POST /api/teaching-packages/export` 请求体只接受 `workflowRunId` 和 `reviewer`，固定写入 `examples/output/teaching-packages/<workflowRunId>.zip`；API 收到 `output` 会返回 `VALIDATION_ERROR`，只有 CLI 的 `--output` 可以覆盖本地 ZIP 路径。仅 `teaching-core` 批次的 Lab、Exam、Grading 三个任务均为 `APPROVED` 时返回 `data.teachingPackageExport`（`component=TeachingPackageExportResult`），ZIP 固定且仅包含 `manifest.json`、`lab.json`、`exam.json`、`grading.json`、`exam-candidate-preview.json`、`review-summary.json`。`manifest.json` 不包含 `reviewer`、`exportedAt` 或其他易变导出元数据；导出人和导出时间只记录在 operation audit 中，以保持相同输入生成确定性 ZIP。导出前重新执行三类 DSL Schema 校验并重新生成候选人安全预览；失败时不保留部分 ZIP。错误使用统一 envelope，可能返回 `VALIDATION_ERROR`、`NOT_FOUND`、`TEACHING_PACKAGE_NOT_EXPORTABLE`、`TEACHING_PACKAGE_EXPORT_NOT_READY`、`TEACHING_PACKAGE_ARTIFACT_NOT_FOUND`、`SCHEMA_VALIDATION_ERROR`、`TEACHING_PACKAGE_CONTRACT_VALIDATION_ERROR`、`CANDIDATE_PREVIEW_ANSWER_LEAK_DETECTED`、`TEACHING_PACKAGE_EXPORT_CONFLICT` 或 `TEACHING_PACKAGE_EXPORT_ERROR`。该接口固定 `localOnly=true`、`networkAccess=false`、`sandboxExecuted=false`、`contestantCodeExecuted=false`、`taskStatusChanged=false`、`autoPublishAllowed=false`、`realPublish=false`，不依赖平台实体、导入预览或发布接口。
+- `POST /api/teaching-presentations/generate` 请求体只接受 `workflowRunId`、`reviewer` 和可选 `slideCount`（5-8，默认 6），拒绝客户端输出路径。它只接受 `exportReady=true` 的 `teaching-core` 父批次，重新校验三类 DSL、跨产物引用和候选人预览，并从 Lab 与候选人安全 Exam 内容生成独立 `teaching_presentation_generation` child WorkflowRun。成功响应返回 `data.teachingPresentation`，包含 `PPT_DSL`、`PPTX_FILE`、逐页 PNG、contact sheet、manifest、质量预检和单个 `PPT_GENERATION` / `WAITING_REVIEW` 任务；父批次 Artifact、任务状态及六成员 ZIP 契约不变。答案文本、`gradingRef` 或不完整构建会在创建 child 状态前被阻断。
+- `GET /api/ppt-artifacts/{artifactId}/previews/{slideIndex}` 与 `/contact-sheet` 返回注册的本地 PNG；未知 Artifact、越界页码、工作区外路径或错误扩展名返回 `NOT_FOUND`。`GET /api/ppt-artifacts/{artifactId}/download` 仅在关联 AI Task 已人工 `APPROVED` 后返回 PPTX 二进制，审批前返回 `PPT_ARTIFACT_DOWNLOAD_BLOCKED`。这些路由复用 `LAB_BACKEND_API_TOKEN` Bearer 校验并按 Artifact ID 查找服务端路径，不接受前端文件路径；产品 Deck 还会在每次读取时核对登记的 SHA-256，缺失或不匹配返回 `PPT_ARTIFACT_INTEGRITY_ERROR`，避免审核后文件被替换。
+- 产品 Deck 的 `POST /api/review-tasks/{id}/ppt-page-review-status` 只允许 `WAITING_REVIEW` 任务逐页更新；`REVISE_REQUIRED` 必须有批注。`POST /api/ai-tasks/{id}/approve` 会对 `artifactProfile=presentation-deck` 强制页级 gate，全部页面为 `APPROVED` 后才允许整套通过；历史 PPT 任务保持原兼容行为。
 - `POST /api/phase2/workflows/grading-generation/run` 请求体需要 `exam` 和 `reviewer`，读取本地 Exam DSL，通过 MockProvider 生成 Grading DSL 审核包，同时创建 `WAITING_REVIEW` AI Task、Artifact、WorkflowRun 和 Provider 审计；不执行真实沙箱或选手代码。
 - `POST /api/ppt/generate` 请求体需要 `input`，只返回本地 PPT DSL 示例，同时创建 `WAITING_REVIEW` AI Task，`artifactGenerated=false`。
 - `POST /api/grading/run` 请求体需要 `grading`，只读取本地 Grading DSL 并生成 Mock 报告，`sandboxExecuted=false`，不执行选手代码。

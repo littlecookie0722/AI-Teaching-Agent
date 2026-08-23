@@ -9,6 +9,9 @@
     decisionNotePathTemplate: "/api/review-tasks/{id}/decision-note",
     workflowReportPathTemplate: "/api/workflow/report?file={file}",
     teachingPackageExportPath: "/api/teaching-packages/export",
+    teachingPresentationGeneratePath: "/api/teaching-presentations/generate",
+    presentationPageReviewPathTemplate: "/api/review-tasks/{id}/ppt-page-review-status",
+    presentationTaskActionPathTemplate: "/api/ai-tasks/{id}/{action}",
     evidenceAutoPath: "/api/grading/evidence-auto",
     evidenceAutoDefaults: {
       grading: "examples/output/real-llm-grading.json",
@@ -28,7 +31,16 @@
     gradingDbPath: "",
     teachingPackageWorkflowRunId: "",
     teachingPackageExportReady: false,
-    teachingPackageExportPending: false
+    teachingPackageExportPending: false,
+    teachingPresentationSourceWorkflowRunId: "",
+    teachingPresentationGenerateReady: false,
+    teachingPresentationGeneratePending: false,
+    presentationDeckReview: null,
+    presentationSlides: [],
+    presentationSelectedSlideIndex: 0,
+    presentationApproveReady: false,
+    presentationDownloadReady: false,
+    presentationActionPending: false
   };
   var AGENT_CORE_NEXT_TOOL_OUTPUT_PREFIX = "examples/output/demo-agent-core-next-tool-execution-";
   var AGENT_CORE_NEXT_TOOL_OUTPUT_ARG_PREFIX = " --output examples/output/demo-agent-core-next-tool-execution-";
@@ -3441,6 +3453,635 @@
     }
   }
 
+  function postPresentationJson(path, body) {
+    if (!window.fetch) {
+      return Promise.reject(new Error("FETCH_UNAVAILABLE"));
+    }
+    return fetch(path, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(body)
+    }).then(function (response) {
+      return response.json().then(function (payload) {
+        if (!response.ok || !payload || payload.success !== true) {
+          throw new Error(payload && payload.code ? payload.code : "HTTP_" + response.status);
+        }
+        return payload;
+      }, function () {
+        throw new Error("INVALID_JSON_RESPONSE");
+      });
+    });
+  }
+
+  function safePresentationArtifactUrl(value) {
+    if (typeof value !== "string" || !value.trim()) {
+      return "";
+    }
+    try {
+      var url = new URL(value, window.location.href);
+      if (url.origin !== window.location.origin
+          || url.username
+          || url.password
+          || url.search
+          || url.hash
+          || url.pathname.indexOf("/api/ppt-artifacts/") !== 0) {
+        return "";
+      }
+      var artifactRoute = /^\/api\/ppt-artifacts\/[A-Za-z0-9_-]+\/(?:previews\/[1-9][0-9]*|contact-sheet|download)$/;
+      if (!artifactRoute.test(url.pathname)) {
+        return "";
+      }
+      return url.pathname;
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function setTeachingPresentationGenerationStatus(status, detail, tone) {
+    var node = byId("teaching-presentation-generation-status");
+    if (!node) {
+      return;
+    }
+    node.textContent = status + (detail ? " · " + detail : "");
+    node.className = tone === "ok" ? "ok" : (tone === "blocked" ? "blocked" : "warning");
+  }
+
+  function updateTeachingPresentationGenerateButton() {
+    var button = byId("teaching-presentation-generate-button");
+    if (!button) {
+      return;
+    }
+    var enabled = state.teachingPresentationGenerateReady === true
+      && state.teachingPresentationGeneratePending !== true;
+    button.disabled = !enabled;
+    button.setAttribute("aria-disabled", boolText(!enabled));
+  }
+
+  function applyTeachingPresentationGenerationState(packageReview) {
+    var action = byId("teaching-presentation-generation-action");
+    var available = Boolean(
+      packageReview
+        && packageReview.available === true
+        && packageReview.status === "APPROVED"
+        && packageReview.exportReady === true
+        && packageReview.workflowRunId
+    );
+    state.teachingPresentationSourceWorkflowRunId = available
+      ? String(packageReview.workflowRunId)
+      : "";
+    state.teachingPresentationGenerateReady = available;
+    if (action) {
+      action.hidden = !available;
+    }
+    updateTeachingPresentationGenerateButton();
+    if (available) {
+      setTeachingPresentationGenerationStatus(
+        "PRESENTATION_READY",
+        "slideCount=6 · manualReviewRequired=true",
+        "ok"
+      );
+    } else {
+      setTeachingPresentationGenerationStatus(
+        "PRESENTATION_BLOCKED",
+        "approved teaching package required",
+        "blocked"
+      );
+    }
+  }
+
+  function generateTeachingPresentation() {
+    var workflowRunId = state.teachingPresentationSourceWorkflowRunId;
+    var reviewerInput = byId("teaching-package-reviewer");
+    var reviewer = reviewerInput ? String(reviewerInput.value || "").trim() : "";
+    if (state.teachingPresentationGenerateReady !== true || !workflowRunId) {
+      setTeachingPresentationGenerationStatus("PRESENTATION_BLOCKED", "exportReady=false", "blocked");
+      return Promise.resolve(null);
+    }
+    if (!reviewer) {
+      setTeachingPresentationGenerationStatus("PRESENTATION_VALIDATION_ERROR", "reviewer is required", "blocked");
+      if (reviewerInput) {
+        reviewerInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (state.teachingPresentationGeneratePending === true) {
+      return Promise.resolve(null);
+    }
+
+    state.teachingPresentationGeneratePending = true;
+    updateTeachingPresentationGenerateButton();
+    setTeachingPresentationGenerationStatus(
+      "PRESENTATION_GENERATING",
+      "workflowRunId=" + workflowRunId + " · slideCount=6",
+      "warning"
+    );
+    return postPresentationJson(state.teachingPresentationGeneratePath, {
+      workflowRunId: workflowRunId,
+      reviewer: reviewer,
+      slideCount: 6
+    }).then(function (payload) {
+      var result = payload.data && payload.data.teachingPresentation
+        ? payload.data.teachingPresentation
+        : {};
+      var childWorkflowRunId = result.childWorkflowRun && result.childWorkflowRun.id
+        ? String(result.childWorkflowRun.id)
+        : "";
+      var taskId = result.task && result.task.id ? String(result.task.id) : "";
+      if (!childWorkflowRunId || !taskId) {
+        throw new Error("INVALID_PRESENTATION_GENERATION_PAYLOAD");
+      }
+      setTeachingPresentationGenerationStatus(
+        "PRESENTATION_CREATED",
+        "workflowRunId=" + childWorkflowRunId + " · taskId=" + taskId,
+        "ok"
+      );
+      var target = new URL("review-center.html", window.location.href);
+      target.searchParams.set("workflowRunId", childWorkflowRunId);
+      target.searchParams.set("taskId", taskId);
+      window.location.assign(target.toString());
+      return payload;
+    }).catch(function (error) {
+      setTeachingPresentationGenerationStatus(
+        "PRESENTATION_GENERATION_FAILED",
+        "code=" + (error && error.message ? error.message : "REQUEST_FAILED"),
+        "blocked"
+      );
+      return null;
+    }).finally(function () {
+      state.teachingPresentationGeneratePending = false;
+      updateTeachingPresentationGenerateButton();
+    });
+  }
+
+  function setupTeachingPresentationGenerationAction() {
+    var button = byId("teaching-presentation-generate-button");
+    if (button) {
+      button.addEventListener("click", generateTeachingPresentation);
+    }
+    updateTeachingPresentationGenerateButton();
+  }
+
+  function setPresentationStatus(id, status, detail, tone) {
+    var node = byId(id);
+    if (!node) {
+      return;
+    }
+    node.textContent = status + (detail ? " · " + detail : "");
+    node.className = "presentation-deck-status-line "
+      + (tone === "ok" ? "ok" : (tone === "blocked" ? "blocked" : "warning"));
+  }
+
+  function presentationSlideCountIsValid(deck, slides) {
+    var declaredTotal = Number(deck && deck.slideTotal);
+    return slides.length >= 5
+      && slides.length <= 8
+      && declaredTotal === slides.length;
+  }
+
+  function presentationPreviewUrlsAreSafe(deck, slides) {
+    var slidesSafe = slides.length > 0 && slides.every(function (slide) {
+      return Boolean(safePresentationArtifactUrl(slide && slide.imageUrl));
+    });
+    var contactSheetUrl = deck && deck.contactSheetUrl;
+    return slidesSafe && (!contactSheetUrl || Boolean(safePresentationArtifactUrl(contactSheetUrl)));
+  }
+
+  function presentationAllSlidesApproved(slides) {
+    return slides.length > 0 && slides.every(function (slide) {
+      return slide && slide.reviewStatus === "APPROVED";
+    });
+  }
+
+  function presentationTaskApproveAllowed() {
+    var deck = state.presentationDeckReview || {};
+    return state.presentationApproveReady === true
+      && deck.approveReady === true
+      && deck.status === "WAITING_REVIEW"
+      && deck.schemaValidated === true
+      && presentationSlideCountIsValid(deck, state.presentationSlides)
+      && presentationAllSlidesApproved(state.presentationSlides)
+      && presentationPreviewUrlsAreSafe(deck, state.presentationSlides);
+  }
+
+  function updatePresentationReviewControls() {
+    var deck = state.presentationDeckReview || {};
+    var taskWaiting = Boolean(deck.taskId && deck.status === "WAITING_REVIEW");
+    var selected = state.presentationSlides[state.presentationSelectedSlideIndex] || null;
+    var pageEnabled = taskWaiting
+      && Boolean(selected && safePresentationArtifactUrl(selected.imageUrl))
+      && state.presentationActionPending !== true;
+    var approveButton = byId("presentation-deck-approve-button");
+    var rejectButton = byId("presentation-deck-reject-button");
+    var download = byId("presentation-deck-download");
+    var approveEnabled = presentationTaskApproveAllowed()
+      && state.presentationActionPending !== true;
+    var rejectEnabled = taskWaiting && state.presentationActionPending !== true;
+
+    document.querySelectorAll("[data-presentation-slide-status]").forEach(function (button) {
+      button.disabled = !pageEnabled;
+      button.setAttribute("aria-disabled", boolText(!pageEnabled));
+    });
+    if (approveButton) {
+      approveButton.disabled = !approveEnabled;
+      approveButton.setAttribute("aria-disabled", boolText(!approveEnabled));
+    }
+    if (rejectButton) {
+      rejectButton.disabled = !rejectEnabled;
+      rejectButton.setAttribute("aria-disabled", boolText(!rejectEnabled));
+    }
+    if (download) {
+      var downloadUrl = safePresentationArtifactUrl(
+        deck.pptxArtifact && deck.pptxArtifact.downloadUrl
+      );
+      var downloadEnabled = state.presentationDownloadReady === true
+        && deck.downloadReady === true
+        && deck.status === "APPROVED"
+        && Boolean(downloadUrl);
+      if (downloadEnabled) {
+        download.setAttribute("href", downloadUrl);
+        download.setAttribute("download", String(deck.pptxArtifact.fileName || "presentation.pptx"));
+        download.setAttribute("aria-disabled", "false");
+        download.title = "下载已批准的 PPTX";
+      } else {
+        download.removeAttribute("href");
+        download.removeAttribute("download");
+        download.setAttribute("aria-disabled", "true");
+        download.title = "完成逐页审核并批准后下载";
+      }
+    }
+  }
+
+  function resetPresentationDeckReview() {
+    state.presentationDeckReview = null;
+    state.presentationSlides = [];
+    state.presentationSelectedSlideIndex = 0;
+    state.presentationApproveReady = false;
+    state.presentationDownloadReady = false;
+    state.presentationActionPending = false;
+    var panel = byId("presentation-deck-review");
+    var activePreview = byId("presentation-active-preview");
+    var contactSheet = byId("presentation-contact-sheet");
+    var contactSheetImage = byId("presentation-contact-sheet-image");
+    if (panel) {
+      panel.hidden = true;
+    }
+    clearNode("presentation-thumbnail-list");
+    if (activePreview) {
+      activePreview.hidden = true;
+      activePreview.removeAttribute("src");
+    }
+    if (contactSheet) {
+      contactSheet.hidden = true;
+    }
+    if (contactSheetImage) {
+      contactSheetImage.removeAttribute("src");
+    }
+    setText("presentation-preview-empty", "等待安全预览 URL");
+    updatePresentationReviewControls();
+  }
+
+  function renderPresentationSelectedSlide() {
+    var selected = state.presentationSlides[state.presentationSelectedSlideIndex] || null;
+    var activePreview = byId("presentation-active-preview");
+    var previewEmpty = byId("presentation-preview-empty");
+    var comment = byId("presentation-slide-comment");
+    var safeUrl = selected ? safePresentationArtifactUrl(selected.imageUrl) : "";
+    if (activePreview) {
+      activePreview.hidden = !safeUrl;
+      activePreview.removeAttribute("src");
+      activePreview.onerror = null;
+      if (safeUrl) {
+        activePreview.onerror = function () {
+          activePreview.hidden = true;
+          activePreview.removeAttribute("src");
+          if (previewEmpty) {
+            previewEmpty.hidden = false;
+            previewEmpty.textContent = "预览加载失败，请刷新后重试";
+          }
+          setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_BLOCKED", "preview load failed", "blocked");
+        };
+        activePreview.setAttribute("src", safeUrl);
+      }
+    }
+    if (previewEmpty) {
+      previewEmpty.hidden = Boolean(safeUrl);
+      previewEmpty.textContent = selected
+        ? (safeUrl ? "" : "预览 URL 未通过同源校验")
+        : "等待安全预览 URL";
+    }
+    setText(
+      "presentation-selected-slide-title",
+      selected ? "第 " + selected.index + " 页 · " + (selected.title || selected.id || "未命名页面") : "请选择页面"
+    );
+    setText(
+      "presentation-selected-slide-status",
+      "reviewStatus=" + (selected && selected.reviewStatus ? selected.reviewStatus : "NEEDS_REVIEW")
+        + " · previewSafe=" + boolText(Boolean(safeUrl))
+    );
+    if (comment) {
+      var manualComment = selected && selected.manualComment;
+      var commentWasRecorded = selected
+        && (selected.reviewStatus !== "NEEDS_REVIEW"
+          || (selected.qaSignals && selected.qaSignals.reviewFocus === "manual_page_review_updated"));
+      comment.value = commentWasRecorded && manualComment && typeof manualComment.text === "string"
+        ? manualComment.text
+        : "";
+    }
+    document.querySelectorAll(".presentation-thumbnail").forEach(function (button) {
+      button.setAttribute(
+        "aria-current",
+        Number(button.getAttribute("data-presentation-slide-position")) === state.presentationSelectedSlideIndex
+          ? "true"
+          : "false"
+      );
+    });
+    if (!selected) {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_BLOCKED", "waiting for preview", "blocked");
+    } else if (!safeUrl) {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_BLOCKED", "unsafe preview URL", "blocked");
+    } else if (selected.reviewStatus === "APPROVED") {
+      setPresentationStatus("presentation-page-action-status", "PAGE_APPROVED", "人工审核已记录", "ok");
+    } else if (selected.reviewStatus === "REVISE_REQUIRED") {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVISION_REQUIRED", "请修订后重新审核", "blocked");
+    } else {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_READY", "等待人工决定", "warning");
+    }
+    updatePresentationReviewControls();
+  }
+
+  function selectPresentationSlide(position) {
+    if (position < 0 || position >= state.presentationSlides.length) {
+      return;
+    }
+    state.presentationSelectedSlideIndex = position;
+    renderPresentationSelectedSlide();
+  }
+
+  function renderPresentationThumbnails(slides) {
+    var list = clearNode("presentation-thumbnail-list");
+    if (!list) {
+      return;
+    }
+    slides.forEach(function (slide, position) {
+      var button = document.createElement("button");
+      var image = document.createElement("img");
+      var title = document.createElement("strong");
+      var status = document.createElement("span");
+      var safeUrl = safePresentationArtifactUrl(slide.imageUrl);
+      button.type = "button";
+      button.className = "presentation-thumbnail";
+      button.setAttribute("data-presentation-slide-position", String(position));
+      button.setAttribute("aria-current", position === state.presentationSelectedSlideIndex ? "true" : "false");
+      button.setAttribute("aria-label", "查看第 " + slide.index + " 页 " + (slide.title || ""));
+      if (safeUrl) {
+        image.alt = "第 " + slide.index + " 页缩略图";
+        image.setAttribute("src", safeUrl);
+        image.onerror = function () {
+          image.hidden = true;
+          button.setAttribute("data-preview-load-error", "true");
+        };
+        button.appendChild(image);
+      }
+      title.textContent = "第 " + slide.index + " 页 · " + (slide.title || slide.id || "未命名页面");
+      status.textContent = "reviewStatus=" + (slide.reviewStatus || "NEEDS_REVIEW")
+        + " · previewSafe=" + boolText(Boolean(safeUrl));
+      button.appendChild(title);
+      button.appendChild(status);
+      button.addEventListener("click", function () {
+        selectPresentationSlide(position);
+      });
+      list.appendChild(button);
+    });
+  }
+
+  function renderPresentationContactSheet(deck) {
+    var wrapper = byId("presentation-contact-sheet");
+    var image = byId("presentation-contact-sheet-image");
+    var safeUrl = safePresentationArtifactUrl(deck && deck.contactSheetUrl);
+    if (!wrapper || !image) {
+      return;
+    }
+    wrapper.hidden = !safeUrl;
+    image.removeAttribute("src");
+    image.onerror = null;
+    if (safeUrl) {
+      image.onerror = function () {
+        wrapper.hidden = true;
+        image.removeAttribute("src");
+      };
+      image.setAttribute("src", safeUrl);
+    }
+  }
+
+  function applyPresentationDeckReview(deck) {
+    resetPresentationDeckReview();
+    if (!deck || deck.available !== true) {
+      return;
+    }
+    var panel = byId("presentation-deck-review");
+    var slides = Array.isArray(deck.slidePreviews)
+      ? deck.slidePreviews.filter(function (slide) {
+        return slide && typeof slide === "object";
+      })
+      : [];
+    state.presentationDeckReview = deck;
+    state.presentationSlides = slides;
+    state.presentationSelectedSlideIndex = 0;
+    state.presentationApproveReady = deck.approveReady === true;
+    state.presentationDownloadReady = deck.downloadReady === true;
+    if (panel) {
+      panel.hidden = false;
+    }
+
+    var pageReview = deck.pageReviewSummary || {};
+    var quality = deck.qualityReport || {};
+    var approvedTotal = slides.filter(function (slide) {
+      return slide.reviewStatus === "APPROVED";
+    }).length;
+    var slideCountValid = presentationSlideCountIsValid(deck, slides);
+    setText("presentation-deck-status", deck.status || "WAITING_REVIEW");
+    setText(
+      "presentation-deck-summary",
+      "workflowRunId=" + (deck.workflowRunId || "none")
+        + " · sourceWorkflowRunId=" + (deck.sourceWorkflowRunId || "none")
+        + " · taskId=" + (deck.taskId || "none")
+    );
+    setText("presentation-deck-slide-total", slides.length + " / 5–8");
+    setText("presentation-deck-schema", deck.schemaValidated === true ? "PASS" : "FAIL");
+    setText(
+      "presentation-deck-quality",
+      (quality.status || "UNKNOWN") + " · blocking=" + (quality.blockingIssueTotal || 0)
+    );
+    setText(
+      "presentation-deck-page-progress",
+      (pageReview.approved || approvedTotal) + " / " + (pageReview.total || slides.length)
+    );
+    var statusNode = byId("presentation-deck-status");
+    if (statusNode) {
+      statusNode.className = deck.status === "REJECTED" ? "pill blocked" : "pill strong";
+    }
+    renderPresentationThumbnails(slides);
+    renderPresentationContactSheet(deck);
+    renderPresentationSelectedSlide();
+
+    if (!slideCountValid) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_BLOCKED", "slide count must be 5–8", "blocked");
+    } else if (!presentationPreviewUrlsAreSafe(deck, slides)) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_BLOCKED", "unsafe preview URL", "blocked");
+    } else if (deck.status === "APPROVED" && state.presentationDownloadReady === true
+        && safePresentationArtifactUrl(deck.pptxArtifact && deck.pptxArtifact.downloadUrl)) {
+      setPresentationStatus("presentation-deck-action-status", "DOWNLOAD_READY", "taskStatus=APPROVED", "ok");
+    } else if (deck.status === "REJECTED") {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REJECTED", "整套课件已退回", "blocked");
+    } else if (presentationTaskApproveAllowed()) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_APPROVE_READY", "all pages approved", "ok");
+    } else {
+      setPresentationStatus("presentation-deck-action-status", "DOWNLOAD_BLOCKED", "PPT_REVIEW_REQUIRED", "warning");
+    }
+    updatePresentationReviewControls();
+  }
+
+  function updatePresentationSlideReviewStatus(reviewStatus) {
+    var allowedStatuses = ["APPROVED", "NEEDS_REVIEW", "REVISE_REQUIRED"];
+    var deck = state.presentationDeckReview || {};
+    var slide = state.presentationSlides[state.presentationSelectedSlideIndex] || null;
+    var reviewerInput = byId("presentation-deck-reviewer");
+    var commentInput = byId("presentation-slide-comment");
+    var reviewer = reviewerInput ? String(reviewerInput.value || "").trim() : "";
+    var comment = commentInput ? String(commentInput.value || "").trim() : "";
+    if (allowedStatuses.indexOf(reviewStatus) === -1 || !deck.taskId || !slide) {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_BLOCKED", "invalid page review request", "blocked");
+      return Promise.resolve(null);
+    }
+    if (!reviewer) {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_VALIDATION_ERROR", "reviewer is required", "blocked");
+      if (reviewerInput) {
+        reviewerInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (reviewStatus === "REVISE_REQUIRED" && !comment) {
+      setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_VALIDATION_ERROR", "comment is required for REVISE_REQUIRED", "blocked");
+      if (commentInput) {
+        commentInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (state.presentationActionPending === true) {
+      return Promise.resolve(null);
+    }
+
+    state.presentationActionPending = true;
+    updatePresentationReviewControls();
+    setPresentationStatus("presentation-page-action-status", "PAGE_REVIEW_PENDING", "reviewStatus=" + reviewStatus, "warning");
+    var path = state.presentationPageReviewPathTemplate.replace(
+      "{id}",
+      encodeURIComponent(String(deck.taskId))
+    );
+    return postPresentationJson(path, {
+      slideIndex: Number(slide.index),
+      reviewStatus: reviewStatus,
+      reviewer: reviewer,
+      comment: comment || null
+    }).then(function () {
+      return loadReviewCenterData();
+    }).catch(function (error) {
+      setPresentationStatus(
+        "presentation-page-action-status",
+        "PAGE_REVIEW_FAILED",
+        "code=" + (error && error.message ? error.message : "REQUEST_FAILED"),
+        "blocked"
+      );
+      return null;
+    }).finally(function () {
+      state.presentationActionPending = false;
+      updatePresentationReviewControls();
+    });
+  }
+
+  function reviewPresentationDeck(action) {
+    var deck = state.presentationDeckReview || {};
+    var reviewerInput = byId("presentation-deck-reviewer");
+    var rejectReasonInput = byId("presentation-deck-reject-reason");
+    var reviewer = reviewerInput ? String(reviewerInput.value || "").trim() : "";
+    var reason = rejectReasonInput ? String(rejectReasonInput.value || "").trim() : "";
+    if (["approve", "reject"].indexOf(action) === -1 || !deck.taskId) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_BLOCKED", "invalid task action", "blocked");
+      return Promise.resolve(null);
+    }
+    if (action === "approve" && !presentationTaskApproveAllowed()) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_APPROVE_BLOCKED", "all 5–8 pages must be approved", "blocked");
+      return Promise.resolve(null);
+    }
+    if (!reviewer) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_VALIDATION_ERROR", "reviewer is required", "blocked");
+      if (reviewerInput) {
+        reviewerInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (action === "reject" && !reason) {
+      setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_VALIDATION_ERROR", "reason is required for reject", "blocked");
+      if (rejectReasonInput) {
+        rejectReasonInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (state.presentationActionPending === true) {
+      return Promise.resolve(null);
+    }
+
+    state.presentationActionPending = true;
+    updatePresentationReviewControls();
+    setPresentationStatus("presentation-deck-action-status", "PPT_REVIEW_PENDING", "action=" + action, "warning");
+    var path = state.presentationTaskActionPathTemplate
+      .replace("{id}", encodeURIComponent(String(deck.taskId)))
+      .replace("{action}", action);
+    var body = { reviewer: reviewer };
+    if (action === "reject") {
+      body.reason = reason;
+    }
+    return postPresentationJson(path, body).then(function () {
+      return loadReviewCenterData();
+    }).catch(function (error) {
+      setPresentationStatus(
+        "presentation-deck-action-status",
+        "PPT_REVIEW_FAILED",
+        "code=" + (error && error.message ? error.message : "REQUEST_FAILED"),
+        "blocked"
+      );
+      return null;
+    }).finally(function () {
+      state.presentationActionPending = false;
+      updatePresentationReviewControls();
+    });
+  }
+
+  function setupPresentationReviewActions() {
+    document.querySelectorAll("[data-presentation-slide-status]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        updatePresentationSlideReviewStatus(button.getAttribute("data-presentation-slide-status"));
+      });
+    });
+    var approveButton = byId("presentation-deck-approve-button");
+    var rejectButton = byId("presentation-deck-reject-button");
+    if (approveButton) {
+      approveButton.addEventListener("click", function () {
+        reviewPresentationDeck("approve");
+      });
+    }
+    if (rejectButton) {
+      rejectButton.addEventListener("click", function () {
+        reviewPresentationDeck("reject");
+      });
+    }
+    updatePresentationReviewControls();
+  }
+
   function packagePill(value, strong) {
     var pill = document.createElement("span");
     pill.className = strong ? "pill strong" : "pill";
@@ -3697,6 +4338,7 @@
   function renderTeachingPackageReview(packageReview) {
     var panel = byId("teaching-package-review");
     var list = clearNode("teaching-package-artifacts");
+    applyTeachingPresentationGenerationState(packageReview || null);
     if (!panel) {
       return;
     }
@@ -3766,6 +4408,7 @@
     var mergedSignal = summary.mergedGradingEvidenceReviewSignal || {};
     var readinessSignal = summary.gradingEvidenceReadinessSignal || {};
     renderTeachingPackageReview(summary.teachingPackageReview || null);
+    applyPresentationDeckReview(summary.presentationDeckReview || null);
     setText("review-center-queue-total", queue.waitingReviewTotal || summary.total || 0);
     setText("review-center-priority-total", priorityQueue.summary ? priorityQueue.summary.queueTotal : 0);
     applyMvpReviewWorkspaceFromSummary(summary);
@@ -3848,6 +4491,7 @@
     state.gradingDbPath = getQueryGradingDbPath();
     state.agentEntityRefreshRequested = getQueryAgentEntityRefreshRequested();
     applyTeachingPackageExportState(null);
+    applyPresentationDeckReview(null);
     refreshMvpWorkspaceContextLinks(getQueryTaskId());
     refreshStaticRealDemoReviewLinks();
 
@@ -3880,6 +4524,7 @@
       })
       .catch(function (error) {
         applyTeachingPackageExportState(null);
+        applyPresentationDeckReview(null);
         setState("STATIC_HTML_FALLBACK", "frontend/mock-data.json + static HTML", "apiLoadError=" + error.message);
       });
   }
@@ -3905,6 +4550,14 @@
     applyAgentCoreExecutionReport: applyAgentCoreExecutionReport,
     applyTeachingPackageExportState: applyTeachingPackageExportState,
     exportTeachingPackage: exportTeachingPackage,
+    applyTeachingPresentationGenerationState: applyTeachingPresentationGenerationState,
+    generateTeachingPresentation: generateTeachingPresentation,
+    safePresentationArtifactUrl: safePresentationArtifactUrl,
+    applyPresentationDeckReview: applyPresentationDeckReview,
+    selectPresentationSlide: selectPresentationSlide,
+    updatePresentationSlideReviewStatus: updatePresentationSlideReviewStatus,
+    presentationTaskApproveAllowed: presentationTaskApproveAllowed,
+    reviewPresentationDeck: reviewPresentationDeck,
     copySuggestedCoreNextCommand: copySuggestedCoreNextCommand,
     copySuggestedCoreReviewUrl: copySuggestedCoreReviewUrl,
     copyAgentReportSuggestedCoreNextCommand: copyAgentReportSuggestedCoreNextCommand,
@@ -3919,6 +4572,8 @@
       setupCoreNextStepCopyAction();
       setupAgentReportNextStepCopyAction();
       setupTeachingPackageExportAction();
+      setupTeachingPresentationGenerationAction();
+      setupPresentationReviewActions();
       loadAgentCoreExecutionReport();
       loadReviewCenterData();
     });
@@ -3928,6 +4583,8 @@
     setupCoreNextStepCopyAction();
     setupAgentReportNextStepCopyAction();
     setupTeachingPackageExportAction();
+    setupTeachingPresentationGenerationAction();
+    setupPresentationReviewActions();
     loadAgentCoreExecutionReport();
     loadReviewCenterData();
   }

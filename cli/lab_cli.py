@@ -99,6 +99,7 @@ from .agent_entity_publish_review import (
 )
 from .agent_entity_readiness import build_agent_entity_readiness_report
 from .provider_audit import ProviderCallStatus, create_provider_call_audit_event
+from .pptx_artifact import PptxArtifactBuildError, build_pptx_artifact
 from .review_batch import build_review_batch_summary
 from .review_decision_note import (
     ALLOWED_REVIEW_DECISION_NOTES,
@@ -111,6 +112,7 @@ from .review_detail import (
     ReviewMockRegenerationError,
     ReviewRevisionRequestError,
     build_review_detail,
+    build_ppt_approval_gate,
     build_second_confirmation_status,
     enqueue_promoted_revision_for_review,
     create_review_mock_regeneration,
@@ -121,6 +123,7 @@ from .review_detail import (
 from .review_pre_approve import build_pre_approve_review_check
 from .store import JsonTaskStore
 from .teaching_package_export import TeachingPackageExportError, export_teaching_package
+from .teaching_presentation import TeachingPresentationError, generate_teaching_presentation
 from .workflow import WorkflowStatus, create_workflow_run, create_workflow_step
 from .workspace import describe_workspace, resolve_cli_path, workspace_root
 from ai_workflows.exam_candidate_preview import (
@@ -1048,6 +1051,10 @@ def build_parser() -> argparse.ArgumentParser:
     ppt_generate = ppt_sub.add_parser("generate")
     ppt_generate.add_argument("--input", required=True)
     ppt_generate.add_argument("--output")
+    ppt_generate_package = ppt_sub.add_parser("generate-from-teaching-package")
+    ppt_generate_package.add_argument("--workflow-run-id", required=True)
+    ppt_generate_package.add_argument("--reviewer", required=True)
+    ppt_generate_package.add_argument("--slide-count", type=int, default=6)
     ppt_import_preview = ppt_sub.add_parser("import-preview")
     ppt_import_preview.add_argument("--task-id", required=True)
     ppt_import_preview.add_argument("--reviewer", required=True)
@@ -5791,94 +5798,81 @@ def _run_pptx_artifact_builder(
     preview_dir: Path | None,
     contact_sheet_path: Path | None,
 ) -> dict[str, Any]:
-    node_override = os.environ.get("CODEX_NODE_EXE")
-    node_exe = shutil.which(node_override or "node")
-    if node_exe is None and node_override:
-        override_path = Path(node_override).expanduser()
-        if override_path.is_file():
-            node_exe = str(override_path)
-    script_path = ROOT / "scripts" / "build_pptx_from_ppt_dsl.mjs"
-    if node_exe is None:
-        raise CliError(
-            "DEPENDENCY_ERROR",
-            "PPTX 构建依赖缺失",
-            [{"field": "node", "reason": "未找到 Node.js，请安装 Node.js 或设置 CODEX_NODE_EXE"}],
-        )
-    _ensure_file(script_path, "script")
-    workspace_dir = _create_presentation_workspace("pptx-artifact-build")
-    try:
-        args = [
-            node_exe,
-            str(script_path),
-            "--dsl",
-            str(dsl_path),
-            "--out",
-            str(output_path),
-            "--workspace",
-            str(workspace_dir),
-        ]
-        if manifest_path is not None:
-            args.extend(["--manifest", str(manifest_path)])
-        if preview_path is not None:
-            args.extend(["--preview", str(preview_path)])
-        if preview_dir is not None:
-            args.extend(["--preview-dir", str(preview_dir)])
-        if contact_sheet_path is not None:
-            args.extend(["--contact-sheet", str(contact_sheet_path)])
-        result = subprocess.run(
-            args,
-            cwd=str(ROOT),
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            timeout=60,
-            env={
-                **os.environ,
-                "HOME": os.environ.get("HOME") or str(Path.home()),
-                "PYTHONIOENCODING": "utf-8",
-                "LC_ALL": os.environ.get("LC_ALL", "C.UTF-8"),
-                "LANG": os.environ.get("LANG", "C.UTF-8"),
-            },
-            check=False,
-        )
-    finally:
-        shutil.rmtree(workspace_dir, ignore_errors=True)
-    if result.returncode != 0:
-        raise CliError(
-            "PPTX_ARTIFACT_BUILD_ERROR",
-            "PPTX Artifact 生成失败",
-            [
-                {
-                    "field": "builder",
-                    "reason": (result.stderr or result.stdout or "artifact-tool export failed").strip()[:1000],
-                }
-            ],
-        )
-    try:
-        payload = _parse_builder_json_stdout(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise CliError(
-            "PPTX_ARTIFACT_BUILD_ERROR",
-            "PPTX Artifact 生成失败",
-            [{"field": "builder", "reason": f"构建脚本未返回 JSON: {exc}"}],
-        ) from exc
-    _ensure_file(output_path, "output")
-    if output_path.stat().st_size <= 0:
-        raise CliError("PPTX_ARTIFACT_BUILD_ERROR", "PPTX Artifact 生成失败", [{"field": "output", "reason": "输出文件为空"}])
     try:
         source_dsl = json.loads(dsl_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise CliError(
             "PPTX_ARTIFACT_BUILD_ERROR",
-            "PPTX Artifact 质量预检失败",
+            "PPTX Artifact 生成失败",
             [{"field": "dsl", "reason": str(exc)}],
         ) from exc
+    effective_preview_dir = preview_dir or output_path.with_name(f"{output_path.stem}-slides")
+    effective_contact_sheet = contact_sheet_path or output_path.with_name(f"{output_path.stem}-contact-sheet.png")
+    try:
+        build = build_pptx_artifact(
+            source_dsl,
+            pptx_path=output_path,
+            preview_dir=effective_preview_dir,
+            contact_sheet_path=effective_contact_sheet,
+            manifest_path=manifest_path,
+        )
+    except PptxArtifactBuildError as exc:
+        raise CliError(exc.code, exc.message, exc.errors) from exc
+    _ensure_file(output_path, "output")
+    if output_path.stat().st_size <= 0:
+        raise CliError("PPTX_ARTIFACT_BUILD_ERROR", "PPTX Artifact 生成失败", [{"field": "output", "reason": "输出文件为空"}])
+
+    dsl_slides = source_dsl.get("spec", {}).get("slides", [])
+    slide_previews = []
+    for item in build.get("slidePreviews", []):
+        if not isinstance(item, dict):
+            continue
+        position = int(item.get("index") or len(slide_previews) + 1)
+        dsl_slide = dsl_slides[position - 1] if position <= len(dsl_slides) else {}
+        slide_previews.append(
+            {
+                **item,
+                "id": dsl_slide.get("id") if isinstance(dsl_slide, dict) else None,
+                "type": dsl_slide.get("type") if isinstance(dsl_slide, dict) else "content",
+            }
+        )
+    first_slide = dict(slide_previews[0]) if slide_previews else {}
+    if preview_path is not None and first_slide.get("imagePath"):
+        preview_path.parent.mkdir(parents=True, exist_ok=True)
+        if Path(first_slide["imagePath"]).resolve() != preview_path.resolve():
+            shutil.copyfile(first_slide["imagePath"], preview_path)
+        first_slide["imagePath"] = str(preview_path)
+        first_slide["thumbnailPath"] = str(preview_path)
+
+    preview = {
+        "previewAvailable": bool(slide_previews),
+        "renderAttempted": True,
+        "reason": "PREVIEW_RENDERED" if slide_previews else "PREVIEW_NOT_RENDERED",
+        "slidePreviews": slide_previews,
+        "contactSheet": build.get("contactSheet"),
+        "firstSlide": first_slide,
+    }
+    payload = {
+        "mode": "LOCAL_PPTX_ARTIFACT",
+        "dslPath": str(dsl_path),
+        "pptxPath": str(output_path),
+        "slideCount": build.get("slideCount"),
+        "bytes": build.get("sizeBytes"),
+        "sizeBytes": build.get("sizeBytes"),
+        "sha256": build.get("sha256"),
+        "generator": "python-pptx+pillow",
+        "preview": preview,
+        "safety": {
+            "networkAccess": False,
+            "sandboxExecuted": False,
+            "autoPublishAllowed": False,
+            "realPublish": False,
+        },
+    }
     quality_report = build_ppt_preflight_report(source_dsl)
     payload["qualityReport"] = quality_report
-    if manifest_path is not None and manifest_path.is_file():
-        manifest_payload = _read_json(manifest_path)
-        manifest_payload["qualityReport"] = quality_report
-        _write_json(manifest_path, manifest_payload)
+    if manifest_path is not None:
+        _write_json(manifest_path, payload)
     return payload
 
 
@@ -18414,6 +18408,13 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
         pre_approve_review_check = (
             build_pre_approve_review_check(store, task.id) if args.command == "approve" else None
         )
+        ppt_approval_gate = build_ppt_approval_gate(store, task.id) if args.command == "approve" else None
+        if ppt_approval_gate and ppt_approval_gate.get("applicable") is True and not ppt_approval_gate.get("approveReady"):
+            raise CliError(
+                "PPT_PAGE_REVIEW_INCOMPLETE",
+                "PPT 每一页均通过人工审核后才能批准课件",
+                [{"field": "pptPageReview", "reason": str(ppt_approval_gate.get("reasonCode"))}],
+            )
         try:
             from_status = task.status
             if args.command == "approve":
@@ -18465,11 +18466,14 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
                 "reviewAuditEventId": audit_event.id,
                 "reason": reason,
                 "preApproveReviewCheck": pre_approve_review_check,
+                "pptApprovalGate": ppt_approval_gate,
             },
         )
         data = {"task": task.to_dict(), "auditEvent": audit_event.to_dict(), "operationAuditEvent": operation_event}
         if pre_approve_review_check is not None:
             data["preApproveReviewCheck"] = pre_approve_review_check
+        if ppt_approval_gate is not None:
+            data["pptApprovalGate"] = ppt_approval_gate
         if args.command == "publish":
             data["publishResult"] = {
                 "published": False,
@@ -18697,6 +18701,19 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
         except TeachingPackageExportError as exc:
             raise CliError(exc.code, exc.message, exc.errors) from exc
         return ok("教学包已导出到本地工作区", {"teachingPackageExport": result}, trace_id)
+
+    if args.group == "ppt" and args.command == "generate-from-teaching-package":
+        try:
+            result = generate_teaching_presentation(
+                store,
+                workflow_run_id=args.workflow_run_id,
+                reviewer=args.reviewer,
+                slide_count=args.slide_count,
+                trace_id=trace_id,
+            )
+        except TeachingPresentationError as exc:
+            raise CliError(exc.code, exc.message, exc.errors) from exc
+        return ok("演示 PPT 已生成并进入人工审核", {"teachingPresentation": result}, trace_id)
 
     if args.group == "review" and args.command == "detail":
         detail = build_review_detail(store, args.task_id)

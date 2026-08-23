@@ -1,6 +1,6 @@
 ---
 id: ppt_generation_v0
-version: 0.1.0
+version: 0.1.9
 phase: Phase 2
 mode: MOCK_ONLY
 realMode: REAL_LLM_DEMO_DSL_GENERATION
@@ -30,13 +30,18 @@ Return JSON only. Do not use Markdown fences, comments, prose, or multiple objec
 - Set `status` to `"WAITING_REVIEW"`.
 - Set `metadata.title`, `metadata.audience`, and `metadata.durationMinutes`.
 - Include `spec.theme.style` and `spec.theme.language`.
-- Include at least one title slide and at least one content or summary slide.
+- Include 5-8 slides. Prefer exactly 6 for the default teaching presentation.
+- Use this teaching flow: cover, learning objectives, core concept, lab process,
+  candidate-safe exercise, and summary.
+- Use `layout` values from `hero`, `objectives`, `concept`, `process`,
+  `exercise`, and `summary` to create at least three distinct layouts.
 - Keep slide titles concise.
 - Use bullets derived from the source or Lab DSL.
 
 ## Slide Planning Rules
 
-- Build a clear teaching flow: title, learning goals, main content, practice or review.
+- Build a clear teaching flow: title, learning goals, main content, process,
+  practice, and summary.
 - Keep each content slide to 3-5 bullets.
 - Do not generate binary PPTX content.
 
@@ -46,3 +51,5 @@ Return JSON only. Do not use Markdown fences, comments, prose, or multiple objec
 - Do not publish courseware.
 - Do not bypass human review.
 - Do not include secrets.
+- Do not include answers, answer text, `gradingRef`, internal IDs, review status,
+  PoC labels, or publish policy in visible slide content.

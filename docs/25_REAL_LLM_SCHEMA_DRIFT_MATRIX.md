@@ -38,7 +38,7 @@
 | `grading_assessment_plan_mock_evidence` | `assessmentPlan[].mockEvidence` 是字符串、错误状态或带真实证据字段 | 固定为 `{status: MOCK_EVIDENCE_NOT_COLLECTED}`，避免模型伪造执行证据 |
 | `grading_checks_and_assessment_plan_object_map` | `spec.checks` / `spec.assessmentPlan` 是以 check id 为 key 的 object map | 转为 checks / assessmentPlan 数组，保留 key 作为 check id 并继续对齐评分计划 |
 | `ppt_metadata_and_slide_named_fields` | `metadata.title/audience`、`slides[].title/subtitle` 是带同名字段的 object | 优先提取同名字段为 schema 要求的字符串 |
-| `ppt_slide_alias_fields` | `slides[]` 使用 `slideId/layout/heading/points/items` 等常见别名 | 提升到 `id/type/title/bullets`，避免课件正文要点被裁剪 |
+| `ppt_slide_alias_fields` | `slides[]` 使用 `slideId/layout/heading/points/items` 等常见别名，且旧 `layout` 值可能不在新版枚举中 | 提升到 `id/type/title/bullets`；合法 `layout` 保留，非枚举 alias 在推导 `type` 后移除，避免课件正文要点被裁剪或 Schema 回归 |
 | `ppt_slides_object_map` | `spec.slides` 是以页面 id 为 key 的 object map | 转为 slides 数组，保留 key 作为 slide id |
 
 ## Schema 失败诊断

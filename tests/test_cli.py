@@ -2574,16 +2574,16 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
     assert payload["data"]["task"]["taskType"] == "PPT_ARTIFACT_GENERATION"
     assert payload["data"]["artifact"]["kind"] == "PPTX_FILE"
     assert payload["data"]["artifact"]["status"] == "WAITING_REVIEW"
-    assert payload["data"]["artifact"]["metadata"]["slideCount"] == 2
-    assert payload["data"]["artifact"]["metadata"]["generator"] == "@oai/artifact-tool/presentation-jsx"
+    assert payload["data"]["artifact"]["metadata"]["slideCount"] == 6
+    assert payload["data"]["artifact"]["metadata"]["generator"] == "python-pptx+pillow"
     assert payload["data"]["artifact"]["metadata"]["previewAvailable"] is True
     assert payload["data"]["artifact"]["metadata"]["firstSlidePreview"]["title"] == "AI 工具应用课程"
     assert payload["data"]["artifact"]["metadata"]["firstSlidePreview"]["imagePath"] == str(preview)
     assert payload["data"]["artifact"]["metadata"]["preview"]["renderAttempted"] is True
     assert payload["data"]["artifact"]["metadata"]["preview"]["reason"] == "PREVIEW_RENDERED"
-    assert len(payload["data"]["artifact"]["metadata"]["slidePreviews"]) == 2
+    assert len(payload["data"]["artifact"]["metadata"]["slidePreviews"]) == 6
     assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["status"] == "NEEDS_REVIEW"
-    assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["needsReview"] == 2
+    assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["needsReview"] == 6
     assert payload["data"]["artifact"]["metadata"]["qualityReport"]["status"] == "PASS"
     assert payload["data"]["artifact"]["metadata"]["qualityReport"]["issueTotal"] == 0
     assert payload["data"]["artifact"]["metadata"]["pageReviewSummary"]["preflightStatus"] == "PASS"
@@ -2595,7 +2595,7 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
     assert manifest_payload["preview"]["previewAvailable"] is True
     assert manifest_payload["preview"]["renderAttempted"] is True
     assert manifest_payload["preview"]["reason"] == "PREVIEW_RENDERED"
-    assert len(manifest_payload["preview"]["slidePreviews"]) == 2
+    assert len(manifest_payload["preview"]["slidePreviews"]) == 6
     assert manifest_payload["preview"]["contactSheet"]["path"] == str(contact_sheet)
     assert manifest_payload["preview"]["firstSlide"]["title"] == "AI 工具应用课程"
     assert manifest_payload["preview"]["firstSlide"]["imagePath"] == str(preview)
@@ -2613,7 +2613,7 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
     _, page_status = run_cli(["review", "ppt-page-status", "--task-id", payload["data"]["task"]["id"]], capsys)
     assert page_status["data"]["pptPageReview"]["available"] is True
     assert page_status["data"]["pptPageReview"]["pageReviewSummary"]["status"] == "NEEDS_REVIEW"
-    assert page_status["data"]["pptPageReview"]["pageReviewSummary"]["total"] == 2
+    assert page_status["data"]["pptPageReview"]["pageReviewSummary"]["total"] == 6
     assert page_status["data"]["pptPageReview"]["slideReviews"][0]["reviewStatus"] == "NEEDS_REVIEW"
     assert page_status["data"]["pptPageReview"]["operatorDecision"]["autoApproveAllowed"] is False
     _, page_update = run_cli(
@@ -2634,7 +2634,7 @@ def test_ppt_artifact_build_creates_waiting_review_pptx_artifact(tmp_path, monke
         capsys,
     )
     assert page_update["data"]["pptPageReviewUpdate"]["pptPageReview"]["pageReviewSummary"]["approved"] == 1
-    assert page_update["data"]["pptPageReviewUpdate"]["pptPageReview"]["pageReviewSummary"]["needsReview"] == 1
+    assert page_update["data"]["pptPageReviewUpdate"]["pptPageReview"]["pageReviewSummary"]["needsReview"] == 5
     assert page_update["data"]["pptPageReviewUpdate"]["pptPageReview"]["slideReviews"][0]["reviewStatus"] == "APPROVED"
     assert page_update["data"]["pptPageReviewUpdate"]["operationAuditEvent"]["action"] == "PPT_PAGE_REVIEW_UPDATE"
     assert page_update["data"]["pptPageReviewUpdate"]["safety"]["taskStatusChanged"] is False
@@ -5747,7 +5747,7 @@ def test_phase2_demo_bundle_build_replays_real_outputs_and_runs_readonly_sandbox
     assert bundle["generatedDsl"]["ppt"]["pptxPreviewDir"] == str(pptx_preview_dir)
     assert bundle["generatedDsl"]["ppt"]["pptxContactSheetPath"] == str(pptx_contact_sheet)
     assert bundle["generatedDsl"]["ppt"]["pptxPreviewAvailable"] is True
-    assert bundle["generatedDsl"]["ppt"]["slidePreviewCount"] == 2
+    assert bundle["generatedDsl"]["ppt"]["slidePreviewCount"] == 6
     assert bundle["generatedDsl"]["ppt"]["firstSlidePreview"]["title"] == "AI 工具应用课程"
     assert bundle["pptArtifact"]["kind"] == "PPTX_FILE"
     assert bundle["pptArtifact"]["status"] == "WAITING_REVIEW"
@@ -5758,11 +5758,11 @@ def test_phase2_demo_bundle_build_replays_real_outputs_and_runs_readonly_sandbox
     assert bundle["pptArtifact"]["previewPath"] == str(pptx_preview)
     assert bundle["pptArtifact"]["previewDir"] == str(pptx_preview_dir)
     assert bundle["pptArtifact"]["contactSheetPath"] == str(pptx_contact_sheet)
-    assert bundle["pptArtifact"]["slideCount"] == 2
+    assert bundle["pptArtifact"]["slideCount"] == 6
     assert bundle["pptArtifact"]["previewAvailable"] is True
     assert bundle["pptArtifact"]["preview"]["renderAttempted"] is True
     assert bundle["pptArtifact"]["preview"]["reason"] == "PREVIEW_RENDERED"
-    assert len(bundle["pptArtifact"]["slidePreviews"]) == 2
+    assert len(bundle["pptArtifact"]["slidePreviews"]) == 6
     assert bundle["pptArtifact"]["contactSheet"]["path"] == str(pptx_contact_sheet)
     assert bundle["pptArtifact"]["firstSlidePreview"]["imagePath"] == str(pptx_preview)
     assert bundle["pptArtifact"]["firstSlidePreview"]["title"] == "AI 工具应用课程"

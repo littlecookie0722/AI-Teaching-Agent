@@ -2573,7 +2573,7 @@
       "pptTotal": 2,
       "waitingReviewTotal": 1,
       "approvedTotal": 1,
-      "slideTotal": 4,
+      "slideTotal": 12,
       "artifactGenerated": false,
       "realPptFileGenerated": false,
       "reviewRequired": true,
@@ -2630,7 +2630,7 @@
       "taskStatus": "WAITING_REVIEW",
       "artifactTotal": 1,
       "workflowStepTotal": 3,
-      "slideTotal": 2,
+      "slideTotal": 6,
       "artifactGenerated": false,
       "realPptFileGenerated": false,
       "pptxArtifactGenerated": true,
@@ -2639,7 +2639,7 @@
     },
     "dslPreview": {
       "pptDslPath": "templates/ppt/examples/course-ppt.yaml",
-      "slideCount": 2,
+      "slideCount": 6,
       "themeStyle": "modern",
       "language": "zh-CN",
       "artifactGenerated": false,
@@ -2652,7 +2652,7 @@
       "path": "examples/output/real-llm-demo-ppt-artifact.pptx",
       "manifestPath": "examples/output/real-llm-demo-ppt-artifact-manifest.json",
       "sourceDslPath": "examples/output/real-llm-ppt.json",
-      "slideCount": 5,
+      "slideCount": 6,
       "bytes": 26988,
       "reviewRequired": true,
       "previewDir": "examples/output/real-llm-demo-ppt-artifact-slides",
@@ -2689,13 +2689,19 @@
           {
             "index": 5,
             "id": "slide_5",
-            "title": "审核要点",
+            "title": "课堂练习",
             "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-05.png"
+          },
+          {
+            "index": 6,
+            "id": "slide_6",
+            "title": "总结与下一步",
+            "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-06.png"
           }
         ],
         "contactSheet": {
           "path": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
-          "slideCount": 5
+          "slideCount": 6
         },
         "firstSlide": {
           "id": "slide_1",
@@ -2717,11 +2723,11 @@
       "renderAttempted": true,
       "pageReviewSummary": {
         "status": "NEEDS_REVIEW",
-        "total": 5,
+        "total": 6,
         "approved": 2,
-        "needsReview": 2,
+        "needsReview": 3,
         "reviseRequired": 1,
-        "manualCommentTotal": 3,
+        "manualCommentTotal": 4,
         "qaSignalStatus": "NEEDS_REVIEW",
         "autoApproveAllowed": false,
         "realPublishAllowed": false
@@ -2810,12 +2816,12 @@
         {
           "index": 5,
           "id": "slide_5",
-          "title": "审核要点",
+          "title": "课堂练习",
           "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-05.png",
           "reviewStatus": "APPROVED",
           "manualComment": {
             "required": false,
-            "text": "审核要点覆盖 WAITING_REVIEW 和禁止自动发布要求。",
+            "text": "练习内容与本节课目标一致。",
             "reviewer": "teacher_1",
             "updatedAt": "2026-06-08T09:38:00+08:00"
           },
@@ -2824,13 +2830,33 @@
             "textOverflow": false,
             "visualDensity": "OK",
             "contrast": "PASS",
-            "reviewFocus": "确认发布前人工审核边界"
+            "reviewFocus": "确认练习不包含标准答案"
+          }
+        },
+        {
+          "index": 6,
+          "id": "slide_6",
+          "title": "总结与下一步",
+          "imagePath": "examples/output/real-llm-demo-ppt-artifact-slides/slide-06.png",
+          "reviewStatus": "NEEDS_REVIEW",
+          "manualComment": {
+            "required": true,
+            "text": "请确认总结覆盖核心概念与实践步骤。",
+            "reviewer": "teacher_1",
+            "updatedAt": "2026-06-08T09:40:00+08:00"
+          },
+          "qaSignals": {
+            "layout": "PASS",
+            "textOverflow": false,
+            "visualDensity": "OK",
+            "contrast": "PASS",
+            "reviewFocus": "核对总结和下一步建议"
           }
         }
       ],
       "contactSheet": {
         "path": "examples/output/real-llm-demo-ppt-artifact-contact-sheet.png",
-        "slideCount": 5
+        "slideCount": 6
       },
       "autoPublishAllowed": false,
       "realPublish": false
@@ -2878,6 +2904,26 @@
           "order": 2,
           "title": "学习目标",
           "type": "content"
+        },
+        {
+          "order": 3,
+          "title": "核心概念",
+          "type": "content"
+        },
+        {
+          "order": 4,
+          "title": "实验步骤",
+          "type": "content"
+        },
+        {
+          "order": 5,
+          "title": "课堂练习",
+          "type": "content"
+        },
+        {
+          "order": 6,
+          "title": "总结与下一步",
+          "type": "summary"
         }
       ],
       "artifactGenerated": false,
@@ -7412,7 +7458,7 @@
       "status": "WAITING_REVIEW",
       "taskId": "task_ppt_demo",
       "dslPath": "templates/ppt/examples/course-ppt.yaml",
-      "slideCount": 2,
+      "slideCount": 6,
       "artifactGenerated": false,
       "realPptFileGenerated": false,
       "reviewRequired": true,
@@ -7428,7 +7474,7 @@
       "status": "APPROVED",
       "taskId": "task_ppt_reviewed_demo",
       "dslPath": "templates/ppt/examples/course-ppt.yaml",
-      "slideCount": 2,
+      "slideCount": 6,
       "artifactGenerated": false,
       "realPptFileGenerated": false,
       "reviewRequired": true,

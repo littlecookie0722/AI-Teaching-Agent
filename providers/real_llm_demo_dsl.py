@@ -283,6 +283,7 @@ PPT_SLIDE_FIELD_ALIASES = {
         "body",
     ),
 }
+PPT_SLIDE_LAYOUTS = frozenset({"hero", "objectives", "concept", "process", "exercise", "summary"})
 
 
 @dataclass(frozen=True)
@@ -2817,6 +2818,9 @@ def _normalize_ppt_dsl(
         if slide.get("type") not in {"title", "content", "summary"}:
             slide["type"] = _normalize_ppt_slide_type(slide.get("type"))
             patches.append(f"set.spec.slides[{index - 1}].type")
+        if "layout" in slide and slide.get("layout") not in PPT_SLIDE_LAYOUTS:
+            del slide["layout"]
+            patches.append(f"remove.spec.slides[{index - 1}].layout")
         _fill_defaults(
             slide,
             {"id": f"slide_{index}", "title": f"页面 {index}"},

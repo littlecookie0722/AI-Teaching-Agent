@@ -63,6 +63,7 @@ from cli.review_detail import (
     ReviewMockRegenerationError,
     ReviewRevisionRequestError,
     build_review_detail,
+    build_ppt_approval_gate,
     build_second_confirmation_status,
     enqueue_promoted_revision_for_review,
     create_review_mock_regeneration,
@@ -73,6 +74,7 @@ from cli.review_detail import (
 from cli.review_pre_approve import build_pre_approve_review_check
 from cli.store import JsonTaskStore
 from cli.teaching_package_export import TeachingPackageExportError, export_teaching_package
+from cli.teaching_presentation import TeachingPresentationError, generate_teaching_presentation
 from cli.workflow import WorkflowStatus, create_workflow_run, create_workflow_step
 from backend.core_contract import BackendCoreRepositoryContract
 from backend.core_repository import CoreRepositoryError, sync_core_repository_from_store
@@ -5190,6 +5192,27 @@ def handle_request(
             return fail(exc.code, exc.message, exc.errors, trace_id)
         return ok("教学包已导出到本地工作区", {"teachingPackageExport": result}, trace_id)
 
+    if method == "POST" and path == "/api/teaching-presentations/generate":
+        payload = body or {}
+        if "output" in payload or "outputRoot" in payload:
+            return fail(
+                "VALIDATION_ERROR",
+                "参数错误",
+                [{"field": "output", "reason": "API 不接受输出路径"}],
+                trace_id,
+            )
+        try:
+            result = generate_teaching_presentation(
+                store,
+                workflow_run_id=str(payload.get("workflowRunId") or ""),
+                reviewer=str(payload.get("reviewer") or ""),
+                slide_count=payload.get("slideCount", 6),
+                trace_id=trace_id,
+            )
+        except TeachingPresentationError as exc:
+            return fail(exc.code, exc.message, exc.errors, trace_id)
+        return ok("演示 PPT 已生成并进入人工审核", {"teachingPresentation": result}, trace_id)
+
     if method == "POST" and path == "/api/backend/core-db/init":
         return initialize_backend_core_repository_request(body or {}, store, trace_id)
 
@@ -5439,6 +5462,14 @@ def handle_request(
         pre_approve_review_check = (
             build_pre_approve_review_check(store, task.id) if action == "approve" else None
         )
+        ppt_approval_gate = build_ppt_approval_gate(store, task.id) if action == "approve" else None
+        if ppt_approval_gate and ppt_approval_gate.get("applicable") is True and not ppt_approval_gate.get("approveReady"):
+            return fail(
+                "PPT_PAGE_REVIEW_INCOMPLETE",
+                "PPT 每一页均通过人工审核后才能批准课件",
+                [{"field": "pptPageReview", "reason": str(ppt_approval_gate.get("reasonCode"))}],
+                trace_id,
+            )
         try:
             from_status = task.status
             if action == "approve":
@@ -5478,6 +5509,7 @@ def handle_request(
                 "reviewAuditEventId": audit_event.id,
                 "reason": str(reason) if reason else None,
                 "preApproveReviewCheck": pre_approve_review_check,
+                "pptApprovalGate": ppt_approval_gate,
             },
         )
         store.save_operation_audit_event(operation_event)
@@ -5501,6 +5533,8 @@ def handle_request(
             data["backendCoreWriteThrough"] = core_write
         if pre_approve_review_check is not None:
             data["preApproveReviewCheck"] = pre_approve_review_check
+        if ppt_approval_gate is not None:
+            data["pptApprovalGate"] = ppt_approval_gate
         return ok(message, data, trace_id)
 
     if method == "POST" and environment_action:

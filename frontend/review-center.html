@@ -473,6 +473,226 @@
       min-width: 148px;
     }
 
+    .teaching-presentation-generation-action {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 18px;
+      border-top: 1px solid var(--line);
+      background: #f0fdfa;
+    }
+
+    .teaching-presentation-generation-action p {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .teaching-presentation-generation-action button {
+      min-width: 148px;
+    }
+
+    .presentation-deck-strip {
+      margin-top: 12px;
+      border-width: 1px 0;
+      border-radius: 0;
+      background: #ffffff;
+    }
+
+    .presentation-deck-strip .section-head {
+      padding: 16px 18px 10px;
+      border-bottom: 0;
+    }
+
+    .presentation-deck-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 18px 14px;
+    }
+
+    .presentation-deck-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.75fr);
+      gap: 16px;
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .presentation-preview-column,
+    .presentation-review-controls {
+      min-width: 0;
+    }
+
+    .presentation-preview-column {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .presentation-preview-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef2f6;
+    }
+
+    .presentation-preview-stage img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
+    .presentation-preview-empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .presentation-thumbnail-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .presentation-thumbnail {
+      display: grid;
+      gap: 7px;
+      width: 100%;
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .presentation-thumbnail[aria-current="true"] {
+      border-color: #14b8a6;
+      box-shadow: 0 0 0 2px #ccfbf1;
+    }
+
+    .presentation-thumbnail img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #eef2f6;
+    }
+
+    .presentation-thumbnail strong,
+    .presentation-thumbnail span {
+      overflow-wrap: anywhere;
+    }
+
+    .presentation-thumbnail span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .presentation-contact-sheet {
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .presentation-contact-sheet img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: 8px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .presentation-review-controls {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .presentation-review-controls label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .presentation-review-controls input,
+    .presentation-review-controls textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .presentation-review-controls input {
+      min-height: 38px;
+    }
+
+    .presentation-review-controls textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .presentation-page-status-actions,
+    .presentation-task-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .presentation-page-status-actions button {
+      flex: 1 1 118px;
+    }
+
+    .presentation-task-actions button,
+    .presentation-task-actions .button {
+      flex: 1 1 132px;
+      text-align: center;
+    }
+
+    .presentation-task-actions .button[aria-disabled="true"] {
+      border-color: #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .presentation-deck-status-line {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
     .teaching-package-row {
       display: grid;
       grid-template-columns: minmax(220px, 1.25fr) minmax(180px, 0.9fr) minmax(200px, 1fr) auto;
@@ -525,11 +745,15 @@
       .teaching-package-metrics,
       .teaching-package-controls,
       .teaching-package-export-action,
-      .teaching-package-row {
+      .teaching-presentation-generation-action,
+      .teaching-package-row,
+      .presentation-deck-metrics,
+      .presentation-deck-layout {
         grid-template-columns: 1fr;
       }
 
-      .teaching-package-export-action button {
+      .teaching-package-export-action button,
+      .teaching-presentation-generation-action button {
         width: 100%;
       }
 
@@ -550,6 +774,18 @@
 
       .status-strip {
         justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .presentation-thumbnail-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .presentation-page-status-actions,
+      .presentation-task-actions {
+        display: grid;
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -614,6 +850,81 @@
     <div class="teaching-package-export-action">
       <p class="warning" id="teaching-package-export-status" aria-live="polite">EXPORT_BLOCKED · exportReady=false</p>
       <button class="primary" id="teaching-package-export-button" type="button" data-export-enabled="false" aria-disabled="true" disabled>导出教学包</button>
+    </div>
+    <div class="teaching-presentation-generation-action" id="teaching-presentation-generation-action" hidden>
+      <p class="ok" id="teaching-presentation-generation-status" aria-live="polite">PRESENTATION_READY · 生成 6 页本地演示 PPT</p>
+      <button class="primary" id="teaching-presentation-generate-button" type="button" aria-disabled="true" disabled>生成演示 PPT</button>
+    </div>
+  </section>
+
+  <section class="presentation-deck-strip" id="presentation-deck-review" aria-labelledby="presentation-deck-title" hidden>
+    <div class="section-head">
+      <div>
+        <h2 id="presentation-deck-title">演示 PPT 审核</h2>
+        <p id="presentation-deck-summary">等待按 child workflowRunId 加载 5–8 页演示课件</p>
+      </div>
+      <span class="pill strong" id="presentation-deck-status">WAITING_REVIEW</span>
+    </div>
+    <div class="presentation-deck-metrics" aria-label="Presentation deck review metrics">
+      <div class="metric">
+        <span>课件页数</span>
+        <strong id="presentation-deck-slide-total">0 / 5–8</strong>
+      </div>
+      <div class="metric">
+        <span>Schema 校验</span>
+        <strong id="presentation-deck-schema">等待校验</strong>
+      </div>
+      <div class="metric">
+        <span>质量预检</span>
+        <strong id="presentation-deck-quality">等待预检</strong>
+      </div>
+      <div class="metric">
+        <span>逐页审核</span>
+        <strong id="presentation-deck-page-progress">0 / 0</strong>
+      </div>
+    </div>
+    <div class="presentation-deck-layout">
+      <div class="presentation-preview-column">
+        <div class="presentation-preview-stage" id="presentation-preview-stage">
+          <img id="presentation-active-preview" alt="当前 PPT 页面预览" hidden>
+          <p class="presentation-preview-empty" id="presentation-preview-empty">等待安全预览 URL</p>
+        </div>
+        <div class="presentation-thumbnail-list" id="presentation-thumbnail-list" aria-label="PPT 页面缩略图"></div>
+        <div class="presentation-contact-sheet" id="presentation-contact-sheet" hidden>
+          <strong>课件总览</strong>
+          <img id="presentation-contact-sheet-image" alt="PPT 课件总览图">
+        </div>
+      </div>
+      <div class="presentation-review-controls">
+        <div>
+          <h3 id="presentation-selected-slide-title">请选择页面</h3>
+          <p class="presentation-deck-status-line" id="presentation-selected-slide-status">reviewStatus=NEEDS_REVIEW</p>
+        </div>
+        <label for="presentation-deck-reviewer">
+          审核人
+          <input id="presentation-deck-reviewer" type="text" value="teacher_1" autocomplete="off">
+        </label>
+        <label for="presentation-slide-comment">
+          页面批注
+          <textarea id="presentation-slide-comment" rows="3" placeholder="标记需要修订时必填"></textarea>
+        </label>
+        <div class="presentation-page-status-actions" aria-label="页面审核结论">
+          <button type="button" data-presentation-slide-status="APPROVED" disabled>通过本页</button>
+          <button type="button" data-presentation-slide-status="NEEDS_REVIEW" disabled>保留待审</button>
+          <button class="danger" type="button" data-presentation-slide-status="REVISE_REQUIRED" disabled>需要修订</button>
+        </div>
+        <p class="presentation-deck-status-line warning" id="presentation-page-action-status" aria-live="polite">PAGE_REVIEW_BLOCKED · waiting for preview</p>
+        <label for="presentation-deck-reject-reason">
+          整套退回原因
+          <input id="presentation-deck-reject-reason" type="text" placeholder="退回整套课件时必填">
+        </label>
+        <div class="presentation-task-actions">
+          <button class="primary" id="presentation-deck-approve-button" type="button" disabled>通过整套课件</button>
+          <button class="danger" id="presentation-deck-reject-button" type="button" disabled>退回整套课件</button>
+          <a class="button" id="presentation-deck-download" aria-disabled="true" title="完成逐页审核并批准后下载">下载 PPTX</a>
+        </div>
+        <p class="presentation-deck-status-line warning" id="presentation-deck-action-status" aria-live="polite">DOWNLOAD_BLOCKED · PPT_REVIEW_REQUIRED</p>
+      </div>
     </div>
   </section>
 

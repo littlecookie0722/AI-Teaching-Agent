@@ -42,6 +42,7 @@ lab-cli material analyze --input examples/input/demo-source.md
 lab-cli demo offline --output examples/output/offline-demo-summary.json
 lab-cli teaching-package export --workflow-run-id <workflowRunId> --reviewer teacher_1
 lab-cli teaching-package export --workflow-run-id <workflowRunId> --reviewer teacher_1 --output examples/output/teaching-packages/<workflowRunId>.zip
+lab-cli ppt generate-from-teaching-package --workflow-run-id <approvedWorkflowRunId> --reviewer teacher_1 --slide-count 6
 lab-cli lab generate-from-source --input examples/input/demo-source.md
 lab-cli lab generate-from-source --input examples/input/demo-source.md --provider-mode real-llm --model deepseek-v4-flash --base-url https://api.deepseek.com --api-surface chat.completions --repair-on-schema-failure --explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish
 lab-cli exam generate-from-lab --lab-id lab_demo
@@ -177,6 +178,7 @@ lab-cli workflow report --file examples/output/demo-report.json
 - `review audit` 只读取本地审核审计事件，可按 `taskId`、`action`、`actor` 过滤。
 - `review publish` 仅允许 `APPROVED` 任务进入 `COMPLETED`，并且只返回 Mock 发布结果，不发布真实平台实体。
 - `teaching-package export` 读取 `--workflow-run-id` 关联的 `teaching-core` WorkflowRun、Artifact 和 AI Task，要求 Lab、Exam、Grading 三项均已人工 `APPROVED`，并要求 `--reviewer` 记录本次导出操作者。默认输出 `examples/output/teaching-packages/<workflowRunId>.zip`，可用 `--output` 指定其他本地 ZIP；ZIP 固定只含 `manifest.json`、`lab.json`、`exam.json`、`grading.json`、`exam-candidate-preview.json`、`review-summary.json`。`manifest.json` 不写 `reviewer`、`exportedAt` 或其他易变导出元数据，导出人和导出时间只进入 operation audit，以保持相同输入生成确定性 ZIP。命令会重新校验三类 DSL Schema、重新生成候选人安全预览，并在任一校验、脱敏或写盘步骤失败时保持无部分 ZIP。它不改变任务状态、不依赖平台实体、不发送网络请求、不执行评分沙箱、不自动批准或发布。
+- `ppt generate-from-teaching-package` 读取已批准且 `exportReady=true` 的 `teaching-core` WorkflowRun，要求 `--reviewer`，并用可选 `--slide-count 5..8` 选择页数（默认 6）。它重新校验源教学包，从 Lab 与候选人安全 Exam 预览确定性生成独立 child WorkflowRun、`PPT_DSL`、16:9 `PPTX_FILE`、逐页 1280x720 PNG、contact sheet 和 manifest；只创建一个 `PPT_GENERATION` / `WAITING_REVIEW` 任务，不改变父批次状态，不调用 LLM、网络、平台或评分沙箱。答案文本、内部 `gradingRef`、Schema/契约/预检失败和部分构建会被阻断。
 - `ai-task list` 从本地 Mock store 读取任务列表，可按 `status` 和 `taskType` 过滤。
 - `artifact list/get` 只读取本地 Mock 产物清单，可按 `kind`、`taskId`、`workflowRunId`、`traceId` 过滤，不读取真实远程存储。
 - `lab/exam/grade import-preview` 只接受已 `APPROVED` 的 DSL 任务，生成本地平台实体草稿导入预览，不写真实数据库、不发布。
@@ -194,7 +196,7 @@ lab-cli workflow report --file examples/output/demo-report.json
 - `material analyze` 仅对本地 Markdown / 文本 / Shell 素材做静态摘要和风险标记，不执行 Shell、不抓取远程内容、不调用真实 LLM。
 - `lab generate-from-source` 会先复用素材分析结果，再生成任务专属 `examples/output/<task_id>-lab.json` Lab DSL、创建 `WAITING_REVIEW` 任务，并返回 `labFeatureReadiness`。默认 `--provider-mode mock` 不读取密钥、不联网；显式 `--provider-mode real-llm` 时会复用 OpenAI-compatible SDK 边界，用 `OPENAI_API_KEY`、`--model` / `OPENAI_MODEL` 和 `--base-url` / `OPENAI_BASE_URL` 发送一次真实 Lab DSL 请求。真实模式仍必须传 `--explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish`，生成后继续走同一条人工审核、`lab import-preview` 和 `lab mock-import` 路径，不执行真实平台发布。稳定 v1 判定要求：Schema 已校验、DSL 绑定本次输入素材、至少 2 个学习目标和 3 个实验步骤、审核前不可发布。
 - `exam generate-from-lab` 保留旧 `--lab-id` Mock 兼容路径，同时新增稳定 v1 路径：传入 `--lab <Lab DSL>` 后会先校验 Lab DSL，再生成任务专属 `examples/output/<task_id>-exam.json`、`examples/output/<task_id>-grading.json` 和 `examples/output/<task_id>-exam-candidate-preview.json`，创建一个 `WAITING_REVIEW` 任务并返回 `examGradingFeatureReadiness`。显式 `--provider-mode real-llm` 时会用 OpenAI-compatible 模型分别生成 Exam DSL 与 Grading DSL，然后做跨产物归一化：题目 `gradingRef` 必须被 Grading `checks` 与 `assessmentPlan` 覆盖，总分对齐，候选人预览移除 `answer` 与 `gradingRef`。真实模式必须传 `--lab` 和三项确认参数；审核通过前不能导入预览，审核通过后继续走本地 `exam import-preview` 与 `grade import-preview`，不调用真实平台、不发布。
-- `ppt artifact build` 只读取本地 `WAITING_REVIEW` PPT DSL，使用 bundled artifact-tool 导出本地 PPTX Artifact，写入 `PPTX_FILE` 产物清单；不新增 LLM 请求、不读取密钥、不上传、不自动发布。
+- `ppt artifact build` 只读取本地 `WAITING_REVIEW` PPT DSL，使用随 wheel 安装的 `python-pptx` + Pillow 构建器导出本地 16:9 PPTX、逐页 PNG 和 contact sheet，并写入 `PPTX_FILE` 产物清单；不要求 Node.js 或外部 presentations runtime，不新增 LLM 请求、不读取密钥、不上传、不自动发布。
 - `exam candidate-preview` 读取本地 Exam DSL，先做 Schema 校验，再输出 `ExamCandidatePreview` JSON；选手端字段不包含 `answer`，并且会检测答案文本是否泄漏到候选人可见内容。
 - `workflow demo` 只串联本地 Mock 主链路，仍然要求人工审核，不自动发布，并将报告保存为 JSON。
 - `workflow demo` 会写入本地 Workflow Run 记录，记录步骤顺序、traceId、报告路径和 Phase 1 安全标记。

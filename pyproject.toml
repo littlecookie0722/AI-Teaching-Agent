@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-teaching-agent"
-version = "0.1.8"
-description = "Review-gated AI workflows for teaching labs, exams, grading, and presentation plans."
+version = "0.1.9"
+description = "Review-gated AI workflows for teaching labs, exams, grading, and presentation decks."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -34,6 +34,8 @@ classifiers = [
 dependencies = [
   "PyYAML>=6.0,<7",
   "jsonschema>=4.23,<5",
+  "python-pptx>=1.0,<2",
+  "Pillow>=11,<13",
 ]
 
 [project.optional-dependencies]

@@ -18,8 +18,8 @@ def test_course_ppt_preflight_is_clean_but_still_requires_manual_review():
     assert report["status"] == "PASS"
     assert report["advisoryOnly"] is True
     assert report["manualReviewRequired"] is True
-    assert report["slideTotal"] == 2
-    assert report["contentSlideTotal"] == 1
+    assert report["slideTotal"] == 6
+    assert report["contentSlideTotal"] == 5
     assert report["issueTotal"] == 0
     assert report["slides"][1]["visualDensity"] == "BALANCED"
     assert report["slides"][1]["renderedBulletTotal"] == 3

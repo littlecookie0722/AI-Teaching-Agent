@@ -25,6 +25,14 @@ python lab_cli.py dsl validate --kind ppt --file templates/ppt/examples/course-p
 
 所有 AI 生成类 DSL 示例默认状态为 `WAITING_REVIEW`，审核通过前不得发布。
 
+## PPT 产品契约
+
+- `templates/ppt/ppt.schema.json` 保持历史兼容，`spec.slides` 的全局最小数量不提升到 5。
+- `layout` 是可选字段，可取 `hero`、`objectives`、`concept`、`process`、`exercise` 或 `summary`；旧 DSL 不提供时，本地构建器按页面类型和标题确定版式。
+- `presentation-deck` 产品服务另行强制 5-8 页，默认 6 页，并要求封面、学习目标、核心概念、实验流程、候选人安全练习和总结语义完整。
+- 产品 Deck 的可见标题、副标题和 bullet 不得包含答案、答案文本、`gradingRef` 字面量或实际内部评分引用值。
+- PPT DSL、PPTX、逐页 PNG、contact sheet 和 manifest 都属于同一 child WorkflowRun 的本地审核产物；生成成功后仍为 `WAITING_REVIEW`。
+
 ## Schema 校验约定
 
 - 四类 DSL 使用 JSON Schema Draft 2020-12，由 `jsonschema.Draft202012Validator` 执行完整标准关键字校验。

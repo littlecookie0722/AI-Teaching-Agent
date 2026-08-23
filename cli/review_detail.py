@@ -1881,6 +1881,7 @@ def _ppt_slide_reviews(slide_previews: list[Any]) -> list[dict[str, Any]]:
             }
         reviews.append(
             {
+                **slide,
                 "index": int(slide.get("index") or position),
                 "id": slide.get("id") or f"slide_{position}",
                 "title": slide.get("title") or f"Slide {position}",
@@ -1922,6 +1923,79 @@ def _ppt_page_review_summary(slide_reviews: list[dict[str, Any]]) -> dict[str, A
         "reviseRequired": revise_required,
         "manualCommentTotal": manual_comment_total,
         "qaSignalStatus": "NEEDS_REVIEW" if manual_comment_total or revise_required or needs_review else "PASS",
+        "autoApproveAllowed": False,
+        "realPublishAllowed": False,
+    }
+
+
+def build_ppt_approval_gate(store: JsonTaskStore, task_id: str) -> dict[str, Any]:
+    """Require every rendered slide to pass page review before task approval."""
+    task = store.get(task_id)
+    if task is None:
+        return {
+            "applicable": False,
+            "approveReady": False,
+            "reasonCode": "TASK_NOT_FOUND",
+            "taskId": task_id,
+        }
+    product_deck_task = task.inputType == "teaching_package_workflow"
+    if task.taskType not in PPT_REVIEW_TASK_TYPES:
+        return {
+            "applicable": False,
+            "approveReady": True,
+            "reasonCode": "NOT_PPT_TASK",
+            "taskId": task_id,
+        }
+
+    artifact = _pptx_artifact_record(store, task_id)
+    if artifact is None:
+        if product_deck_task:
+            return {
+                "applicable": True,
+                "approveReady": False,
+                "reasonCode": "PRESENTATION_DECK_ARTIFACT_MISSING",
+                "taskId": task_id,
+            }
+        return {
+            "applicable": False,
+            "approveReady": True,
+            "reasonCode": "LEGACY_PPT_TASK_WITHOUT_PRODUCT_DECK",
+            "taskId": task_id,
+        }
+    metadata = artifact.metadata if isinstance(artifact.metadata, dict) else {}
+    if metadata.get("artifactProfile") != "presentation-deck":
+        if product_deck_task:
+            return {
+                "applicable": True,
+                "approveReady": False,
+                "reasonCode": "PRESENTATION_DECK_PROFILE_MISSING",
+                "taskId": task_id,
+                "artifactId": artifact.id,
+            }
+        return {
+            "applicable": False,
+            "approveReady": True,
+            "reasonCode": "LEGACY_PPT_ARTIFACT",
+            "taskId": task_id,
+            "artifactId": artifact.id,
+        }
+    slide_previews = metadata.get("slidePreviews")
+    if not isinstance(slide_previews, list):
+        preview = metadata.get("preview", {})
+        slide_previews = preview.get("slidePreviews", []) if isinstance(preview, dict) else []
+    summary = _ppt_page_review_summary(_ppt_slide_reviews(slide_previews))
+    approve_ready = (
+        summary["total"] > 0
+        and summary["approved"] == summary["total"]
+        and summary["status"] == "APPROVED"
+    )
+    return {
+        "applicable": True,
+        "approveReady": approve_ready,
+        "reasonCode": "PPT_PAGES_APPROVED" if approve_ready else "PPT_PAGE_REVIEW_INCOMPLETE",
+        "taskId": task_id,
+        "artifactId": artifact.id,
+        "pageReviewSummary": summary,
         "autoApproveAllowed": False,
         "realPublishAllowed": False,
     }
@@ -2098,6 +2172,13 @@ def update_ppt_page_review_status(
     target["qaSignals"] = qa_signals
 
     summary = _ppt_page_review_summary(slide_reviews)
+    preview_metadata = metadata.get("preview")
+    if isinstance(preview_metadata, dict):
+        preview_metadata = {
+            **preview_metadata,
+            "slidePreviews": slide_reviews,
+            "firstSlide": slide_reviews[0] if slide_reviews else None,
+        }
     artifact.metadata = {
         **metadata,
         "slidePreviews": slide_reviews,
@@ -2107,6 +2188,8 @@ def update_ppt_page_review_status(
         "autoPublishAllowed": False,
         "realPublish": False,
     }
+    if isinstance(preview_metadata, dict):
+        artifact.metadata["preview"] = preview_metadata
     store.save_artifact(artifact)
     operation_event = create_operation_audit_event(
         action=OperationAction.PPT_PAGE_REVIEW_UPDATE,

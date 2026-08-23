@@ -1,126 +1,98 @@
 # 22_PPTX_ARTIFACT_POC
 
-状态：已实现第一版，并在 v0.1.3 增加构建前质量预检。
+状态：v0.1.9 已从本地 Artifact PoC 收敛为教学 PPT 产品闭环。
 
-本文件记录 PPT DSL 到本地 PPTX Artifact 的最小可用 PoC。该能力只读取本地 PPT DSL，使用 bundled `@oai/artifact-tool/presentation-jsx` 导出可打开的 `.pptx` 文件，不新增 LLM 请求，不读取密钥，不访问网络，不自动发布。
+当前实现包含两条兼容路径：
 
-## 范围
+- `ppt artifact build`：读取已有 `WAITING_REVIEW` PPT DSL，生成本地 PPTX 与预览。
+- `ppt generate-from-teaching-package`：从已批准的 `teaching-core` 教学包确定性生成 5-8 页教学 PPT，默认 6 页。
 
-已实现：
+两条路径都使用项目内的 `python-pptx` + Pillow 构建器，不需要 Node.js、Codex presentations runtime、网络或密钥。历史 `scripts/build_pptx_from_ppt_dsl.mjs` 继续保留为直接调用兼容工具，但不再是 CLI 默认实现。
 
-- `ppt artifact build`
-- `phase2 demo-bundle build` 已复用该能力，为真实 LLM Demo PPT DSL 生成本地 PPTX Artifact 附件。
-- 输入本地 PPT DSL YAML。
-- 先执行 `templates/ppt/ppt.schema.json` 校验。
-- 仅接受 `WAITING_REVIEW` 状态的 PPT DSL。
-- 生成本地 PPTX 文件。
-- 写入 `PPT_ARTIFACT_GENERATION` AI Task，状态仍为 `WAITING_REVIEW`。
-- 写入 `PPTX_FILE` Artifact 记录。
-- Manifest、CLI 返回和审核页均包含 `preview` / `firstSlidePreview` / `slidePreviews` / `contactSheet` 字段；提供 preview 输出路径时会用 artifact-tool 渲染首页 PNG，提供 preview dir/contact sheet 路径时会渲染每页 PNG 和总览图。
-- PPT 审核页已补充 `pageReviewSummary`、逐页 `reviewStatus`、人工批注和 `qaSignals` 静态契约，覆盖 `APPROVED` / `NEEDS_REVIEW` / `REVISE_REQUIRED` 三类状态。
-- `ppt artifact build` 会生成 `qualityReport`：按页检查标题、正文密度、长文本、估算溢出和 renderer 的 6-bullet 截断风险；报告同时写入构建 JSON、manifest、`PPTX_FILE` Artifact metadata 和页级 `qaSignals`。
-- `qualityReport` 只读且 `advisoryOnly=true`，质量 warning/blocking 不会绕过人工审核，也不会改变 `WAITING_REVIEW` 或触发发布。
-- PPT 页级审核更新已接入 Backend Mock、CLI 和前端静态演示：`POST /api/review-tasks/{id}/ppt-page-review-status`、`python lab_cli.py review ppt-page-update`、`PptPageReviewUpdateAction`。
-- 页级审核更新只修改 PPTX Artifact 的页级审核元数据，写入 `PPT_PAGE_REVIEW_UPDATE` 操作审计，返回更新后的 `pageReviewSummary`，不改变 AI Task 状态，不自动通过，不自动发布。
-- 返回统一 JSON。
+## 产品范围
 
-未实现：
+教学 PPT 路径只接受 `exportReady=true` 的 `teaching-core` 父 WorkflowRun，并重新校验 Lab / Exam / Grading Schema、跨产物引用和候选人安全预览。可见内容只来自 Lab 与候选人安全 Exam 预览，不读取答案作为课件内容，也不显示内部 `gradingRef`。
 
-- 不调用真实 LLM。
-- 不重新生成 PPT DSL 内容。
-- 不读取或输出 API Key。
-- 不上传对象存储。
-- 不发布到真实平台。
-- 不替代人工审核。
+默认 6 页依次为：
 
-## 输入说明
+1. 封面
+2. 学习目标
+3. 核心概念
+4. 实验流程
+5. 候选人安全练习
+6. 总结
 
-- 运行环境需要可执行的 Node.js，以及 Codex presentations runtime。默认从 `PATH` 查找 `node`，也可通过 `CODEX_NODE_EXE` 指定可执行文件；可通过 `PRESENTATIONS_SKILL_DIR` 指定 presentations Skill 目录。
-- `--dsl`: 本地 PPT DSL 文件，必须通过 Schema 校验，且状态必须是 `WAITING_REVIEW`。
-- `--output`: 本地 PPTX 输出路径，默认 `examples/output/ppt-artifact.pptx`。
-- `--manifest-output`: 可选，本地构建摘要 JSON 输出路径。
-- `--preview-output`: 可选，首页 PNG 预览输出路径；未提供时默认写到 PPTX 同目录同名 `-slide-01.png`。
-- `--preview-dir`: 可选，每页 PNG 缩略图输出目录；未提供时默认写到 PPTX 同目录同名 `-slides/`。
-- `--contact-sheet-output`: 可选，缩略图总览图输出路径；未提供时默认写到 PPTX 同目录同名 `-contact-sheet.png`。
-- `--reviewer`: 记录本地操作审计 actor，默认 `teacher_1`。
+`--slide-count` 支持 5-8。生成服务强制页数范围、首尾语义、必要教学段落、唯一页 ID、Schema、泄漏检查和质量预检；全局 PPT Schema 继续允许历史短 Deck，以保持旧接口兼容。
+
+成功生成后会创建独立 `teaching_presentation_generation` child WorkflowRun，不向父教学包追加 PPT Artifact。父教学包的三项审核摘要与六成员 ZIP 因而保持不变。
+
+## 本地产物
+
+默认目录：
+
+```text
+examples/output/teaching-presentations/<childWorkflowRunId>/
+  presentation.json
+  presentation.pptx
+  manifest.json
+  contact-sheet.png
+  slides/slide-01.png ...
+```
+
+PPTX 为 16:9；逐页预览为 1280x720 PNG。Manifest 和 `PPTX_FILE` Artifact metadata 包含 SHA-256、文件大小、逐页审核状态、contact sheet 和 advisory `qualityReport`。
+
+构建先在同一输出根目录的临时目录完成，PPTX、全部页面预览和 contact sheet 完整后才原子提升为最终目录。构建失败不会创建 child WorkflowRun、AI Task 或 Artifact，也不会留下最终半成品目录。
+
+## 审核与下载
+
+新课件只创建一个 `PPT_GENERATION` / `WAITING_REVIEW` 任务。每页支持：
+
+- `APPROVED`
+- `NEEDS_REVIEW`
+- `REVISE_REQUIRED`
+
+`REVISE_REQUIRED` 必须填写人工批注。只有全部页面为 `APPROVED` 时，整套课件才允许人工批准；整套任务为 `APPROVED` 后才允许下载 PPTX。预览和下载只使用 Artifact ID 路由：
+
+```text
+GET /api/ppt-artifacts/{artifactId}/previews/{slideIndex}
+GET /api/ppt-artifacts/{artifactId}/contact-sheet
+GET /api/ppt-artifacts/{artifactId}/download
+```
+
+这些路由复用可选的 `LAB_BACKEND_API_TOKEN` Bearer 校验，只读取 Artifact 已注册且位于本地工作区内的文件。产品 Deck 每次读取预览、contact sheet 或 PPTX 时还会核对 Artifact metadata 中登记的 SHA-256，缺失或不匹配均 fail closed；前端不接收或拼接本地文件路径。
 
 ## 命令示例
+
+从已批准教学包生成默认 6 页课件：
+
+```powershell
+python lab_cli.py ppt generate-from-teaching-package --workflow-run-id <approvedWorkflowRunId> --reviewer teacher_1 --slide-count 6
+```
+
+兼容的已有 DSL 构建：
 
 ```powershell
 python lab_cli.py ppt artifact build --dsl templates/ppt/examples/course-ppt.yaml --output examples/output/ppt-artifact-demo.pptx --manifest-output examples/output/ppt-artifact-demo-manifest.json --preview-output examples/output/ppt-artifact-demo-slide-01.png --preview-dir examples/output/ppt-artifact-demo-slides --contact-sheet-output examples/output/ppt-artifact-demo-contact-sheet.png
 ```
 
-页级审核更新 Mock：
+逐页审核：
 
 ```powershell
-python lab_cli.py review ppt-page-update --task-id task_ppt_demo --slide-index 4 --review-status REVISE_REQUIRED --reviewer teacher_1 --comment "需要补充操作截图"
+python lab_cli.py review ppt-page-update --task-id <presentationTaskId> --slide-index 4 --review-status APPROVED --reviewer teacher_1
+python lab_cli.py review approve --task-id <presentationTaskId> --reviewer teacher_1
 ```
 
-## 输出说明
-
-关键字段：
-
-```json
-{
-  "mode": "LOCAL_PPTX_ARTIFACT_POC",
-  "task": {
-    "taskType": "PPT_ARTIFACT_GENERATION",
-    "status": "WAITING_REVIEW"
-  },
-  "artifact": {
-    "kind": "PPTX_FILE",
-    "status": "WAITING_REVIEW",
-    "metadata": {
-      "qualityReport": {
-        "status": "PASS",
-        "advisoryOnly": true,
-        "issueTotal": 0
-      },
-      "previewAvailable": true,
-      "firstSlidePreview": {
-        "title": "AI 工具应用课程",
-        "imagePath": "examples/output/ppt-artifact-demo-slide-01.png"
-      },
-      "slidePreviews": [
-        {"index": 1, "imagePath": "examples/output/ppt-artifact-demo-slides/slide-01.png"}
-      ],
-      "contactSheet": {
-        "path": "examples/output/ppt-artifact-demo-contact-sheet.png"
-      }
-    },
-    "realLlmCalled": false,
-    "realPublish": false
-  },
-  "safety": {
-    "newLlmRequestSent": false,
-    "secretsRead": false,
-    "networkAccess": false,
-    "autoPublishAllowed": false,
-    "realPublish": false
-  }
-}
-```
-
-## 测试方式
+## 验证
 
 ```powershell
-python -m pytest tests/test_ppt_preflight.py -q
-python -m pytest tests/test_cli.py -q
-python -m pytest
+.\.venv\Scripts\python.exe -m pytest -q tests/test_pptx_artifact.py tests/test_teaching_presentation.py tests/test_backend_ppt_artifact_routes.py tests/test_teaching_presentation_frontend.py
+.\.venv\Scripts\python.exe -m pytest -q tests/test_ppt_preflight.py tests/test_cli.py tests/test_backend_mock_api.py
 ```
 
-缺少 Node.js 或 Codex presentations runtime 时，仅跳过 7 个实际生成 PPTX 的端到端测试；其余核心回归测试继续执行。跳过不代表 PPTX 能力已验证，发布前仍需在具备该运行时的环境执行上述完整测试。
+## 限制与停止线
 
-## 限制说明
-
-- 当前是 Artifact PoC，版式只保证可打开、可编辑和可审核，不承诺高端商业演示稿质量。
-- 质量预检是基于 PPT DSL 的启发式 advisory report，不等同于像素级渲染验证；warning/blocking 仍需人工判断和修改源 DSL。
-- 当前已渲染每页 PNG 和 contact sheet；逐页审核状态、人工批注、QA 信号和页级状态更新仍是本地审核辅助，不代表自动通过。
-- 输入必须是 PPT DSL；该命令不直接从 Markdown 或 Prompt 生成内容。
-- 生成的 PPTX 仍需人工审核，审核通过前不得发布。
-- 后续若要生产级课件，应在此命令之上增加渲染预览、版式 QA、模板体系和前端审核预览。
-
-## 下一步
-
-- PPT 审核页和审核中心已展示 PPTX Artifact 摘要、路径、manifest、slideCount、bytes、审核状态、首页 PNG、contact sheet、逐页审核状态、人工批注、版式 QA 信号和 `PptPageReviewUpdateAction`。
-- v0.1.3 已把 PPT DSL 质量预检接入本地 PPTX Artifact 和 Demo Bundle；下一步回到 P1 核心业务缺口，优先处理具体的评分隔离/报告问题或真实前端交互缺陷。
+- 当前生成是本地确定性转换，不新增真实 LLM 请求。
+- 质量预检是启发式报告，不能替代逐页人工视觉检查。
+- 不提供在线编辑器、模板市场、云上传、平台导入、自动批准或发布。
+- 自动评分、MCP/Agent 扩张和外部平台路线继续冻结。
+- 5-8 页本地生成、预览、逐页审核、整套人工决定和批准后下载已达到本阶段停止线；后续只修复具体版式、兼容性或安全缺陷。

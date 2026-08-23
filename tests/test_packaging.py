@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_WHEEL_ASSETS = {
     "ai-workflows/phase2-content-generation.contract.json",
     "cli/teaching_package_export.py",
+    "cli/teaching_presentation.py",
+    "cli/pptx_artifact.py",
     "config/runtime.contract.json",
     "evals/dsl_quality/v1/manifest.json",
     "evals/dsl_quality/v1/baseline-bundle.json",
@@ -24,9 +26,12 @@ REQUIRED_WHEEL_ASSETS = {
     "mcp-server/tools.manifest.json",
     "prompts/manifest.json",
     "prompts/workflows/lab_generation.md",
+    "prompts/workflows/ppt_generation.md",
     "scripts/build_pptx_from_ppt_dsl.mjs",
     "sandbox/images/python-pytest/Dockerfile",
     "templates/lab/lab.schema.json",
+    "templates/ppt/ppt.schema.json",
+    "templates/ppt/examples/course-ppt.yaml",
 }
 TEACHING_PACKAGE_MEMBERS = {
     "manifest.json",
@@ -84,7 +89,7 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
         assert len(metadata_members) == 1
         metadata_lines = archive.read(metadata_members[0]).decode("utf-8").splitlines()
     assert REQUIRED_WHEEL_ASSETS <= wheel_members
-    assert "Version: 0.1.8" in metadata_lines
+    assert "Version: 0.1.9" in metadata_lines
     assert not any(member.startswith("tests/") for member in wheel_members)
     assert not any(member.startswith("examples/output/") for member in wheel_members)
 
@@ -220,6 +225,33 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     assert not (package_root / "examples" / "output" / "teaching-packages" / package_path.name).exists()
     with zipfile.ZipFile(package_path) as archive:
         assert set(archive.namelist()) == TEACHING_PACKAGE_MEMBERS
+
+    teaching_presentation_result = _run(
+        [
+            str(console),
+            "ppt",
+            "generate-from-teaching-package",
+            "--workflow-run-id",
+            workflow_run_id,
+            "--reviewer",
+            "packaging-test",
+            "--slide-count",
+            "6",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    teaching_presentation_payload = json.loads(teaching_presentation_result.stdout)
+    assert teaching_presentation_payload["success"] is True
+    teaching_presentation = teaching_presentation_payload["data"]["teachingPresentation"]
+    assert teaching_presentation["slideCount"] == 6
+    assert teaching_presentation["task"]["status"] == "WAITING_REVIEW"
+    presentation_output = Path(teaching_presentation["outputDirectory"])
+    assert workspace.resolve() in presentation_output.resolve().parents
+    assert presentation_output.is_dir()
+    assert Path(teaching_presentation["pptxArtifact"]["path"]).is_file()
+    assert len(teaching_presentation["pptxArtifact"]["metadata"]["slidePreviews"]) == 6
+    assert not (package_root / "examples" / "output" / "teaching-presentations").exists()
 
     generation_result = _run(
         [str(console), "lab", "generate-from-source", "--input", "source.md"],

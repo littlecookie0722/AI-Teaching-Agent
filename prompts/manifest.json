@@ -56,11 +56,11 @@
     },
     {
       "id": "ppt_generation_v0",
-      "version": "0.1.0",
+      "version": "0.1.9",
       "title": "PPT DSL generation prompt",
       "path": "prompts/workflows/ppt_generation.md",
       "owner": "teaching-operations",
-      "inputTypes": ["markdown"],
+      "inputTypes": ["markdown", "lab_dsl", "candidate_safe_exam_preview"],
       "outputKind": "PPT",
       "outputSchema": "templates/ppt/ppt.schema.json",
       "defaultStatus": "WAITING_REVIEW",

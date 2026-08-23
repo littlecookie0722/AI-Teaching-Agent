@@ -1958,14 +1958,14 @@ def test_frontend_mock_data_avoids_real_execution_and_publish():
     assert mock_data["pptReviewPrototype"]["summary"]["taskStatus"] == "WAITING_REVIEW"
     assert mock_data["pptReviewPrototype"]["summary"]["artifactTotal"] == 1
     assert mock_data["pptReviewPrototype"]["summary"]["workflowStepTotal"] == 3
-    assert mock_data["pptReviewPrototype"]["summary"]["slideTotal"] == 2
+    assert mock_data["pptReviewPrototype"]["summary"]["slideTotal"] == 6
     assert mock_data["pptReviewPrototype"]["summary"]["artifactGenerated"] is False
     assert mock_data["pptReviewPrototype"]["summary"]["realPptFileGenerated"] is False
     assert mock_data["pptReviewPrototype"]["summary"]["pptxArtifactGenerated"] is True
     assert mock_data["pptReviewPrototype"]["summary"]["reviewRequired"] is True
     assert mock_data["pptReviewPrototype"]["summary"]["publishBlockedUntilApproved"] is True
     assert mock_data["pptReviewPrototype"]["dslPreview"]["pptDslPath"] == mock_data["dslPreviews"]["ppt"]["path"]
-    assert mock_data["pptReviewPrototype"]["dslPreview"]["slideCount"] == 2
+    assert mock_data["pptReviewPrototype"]["dslPreview"]["slideCount"] == 6
     assert mock_data["pptReviewPrototype"]["dslPreview"]["artifactGenerated"] is False
     assert mock_data["pptReviewPrototype"]["dslPreview"]["realPptFileGenerated"] is False
     assert mock_data["pptReviewPrototype"]["dslPreview"]["pptxArtifactGenerated"] is True
@@ -1973,31 +1973,31 @@ def test_frontend_mock_data_avoids_real_execution_and_publish():
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["status"] == "WAITING_REVIEW"
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["path"].endswith("real-llm-demo-ppt-artifact.pptx")
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["manifestPath"].endswith("real-llm-demo-ppt-artifact-manifest.json")
-    assert mock_data["pptReviewPrototype"]["pptxArtifact"]["slideCount"] == 5
+    assert mock_data["pptReviewPrototype"]["pptxArtifact"]["slideCount"] == 6
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["bytes"] > 0
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["previewAvailable"] is True
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["renderAttempted"] is True
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["preview"]["reason"] == "PREVIEW_RENDERED"
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["firstSlidePreview"]["title"] == "AI 工具应用课程"
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["firstSlidePreview"]["imagePath"].endswith("real-llm-demo-ppt-artifact-slide-01.png")
-    assert len(mock_data["pptReviewPrototype"]["pptxArtifact"]["slidePreviews"]) == 5
+    assert len(mock_data["pptReviewPrototype"]["pptxArtifact"]["slidePreviews"]) == 6
     page_review = mock_data["pptReviewPrototype"]["pptxArtifact"]["pageReviewSummary"]
     slide_reviews = mock_data["pptReviewPrototype"]["pptxArtifact"]["slidePreviews"]
     assert page_review["status"] == "NEEDS_REVIEW"
-    assert page_review["total"] == 5
+    assert page_review["total"] == 6
     assert page_review["approved"] == 2
-    assert page_review["needsReview"] == 2
+    assert page_review["needsReview"] == 3
     assert page_review["reviseRequired"] == 1
-    assert page_review["manualCommentTotal"] == 3
+    assert page_review["manualCommentTotal"] == 4
     assert page_review["qaSignalStatus"] == "NEEDS_REVIEW"
     assert page_review["autoApproveAllowed"] is False
     assert page_review["realPublishAllowed"] is False
     assert {slide["reviewStatus"] for slide in slide_reviews} == {"APPROVED", "NEEDS_REVIEW", "REVISE_REQUIRED"}
-    assert sum(1 for slide in slide_reviews if slide["manualComment"]["required"]) == 3
+    assert sum(1 for slide in slide_reviews if slide["manualComment"]["required"]) == 4
     assert all("reviewFocus" in slide["qaSignals"] for slide in slide_reviews)
     assert any(slide["qaSignals"]["layout"] == "NEEDS_REVIEW" for slide in slide_reviews)
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["contactSheet"]["path"].endswith("real-llm-demo-ppt-artifact-contact-sheet.png")
-    assert mock_data["pptReviewPrototype"]["pptxArtifact"]["contactSheet"]["slideCount"] == 5
+    assert mock_data["pptReviewPrototype"]["pptxArtifact"]["contactSheet"]["slideCount"] == 6
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["autoPublishAllowed"] is False
     assert mock_data["pptReviewPrototype"]["pptxArtifact"]["realPublish"] is False
     page_update = mock_data["pptReviewPrototype"]["pageReviewUpdateAction"]
@@ -2019,7 +2019,7 @@ def test_frontend_mock_data_avoids_real_execution_and_publish():
     assert page_update["autoApproveAllowed"] is False
     assert page_update["autoPublishAllowed"] is False
     assert page_update["realPublishAllowed"] is False
-    assert len(mock_data["pptReviewPrototype"]["slidePlan"]["slides"]) == 2
+    assert len(mock_data["pptReviewPrototype"]["slidePlan"]["slides"]) == 6
     assert mock_data["pptReviewPrototype"]["slidePlan"]["artifactGenerated"] is False
     assert mock_data["pptReviewPrototype"]["slidePlan"]["realPptFileGenerated"] is False
     assert mock_data["pptReviewPrototype"]["actionPolicy"]["singleApproveEnabled"] is True
