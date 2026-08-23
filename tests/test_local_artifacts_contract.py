@@ -21,6 +21,7 @@ def gitignore_lines():
 def test_local_artifacts_contract_is_phase1_mock_only():
     contract = load_contract()
 
+    assert contract["version"] == "0.1.1"
     assert contract["phase"] == "Phase 1"
     assert contract["mode"] == "MOCK_ONLY"
     assert contract["gitignorePath"] == ".gitignore"
@@ -72,6 +73,18 @@ def test_generated_output_json_is_ignored_but_readme_is_allowed():
     assert lines.index("!examples/output/README.md") > lines.index("examples/output/*.md")
 
 
+def test_teaching_package_zip_exports_are_ignored():
+    contract = load_contract()
+    lines = gitignore_lines()
+
+    assert "examples/output/teaching-packages/" in lines
+    assert any(
+        artifact["pattern"] == "examples/output/teaching-packages/"
+        and artifact["category"] == "generated_output"
+        for artifact in contract["ignoredArtifacts"]
+    )
+
+
 def test_contract_rules_cover_phase1_safety_boundary():
     rules = load_contract()["rules"]
 
@@ -79,5 +92,6 @@ def test_contract_rules_cover_phase1_safety_boundary():
     assert rules["envExampleMustRemainTracked"] is True
     assert rules["mockStoresMustBeIgnored"] is True
     assert rules["generatedReportsMustBeIgnored"] is True
+    assert rules["teachingPackageExportsMustBeIgnored"] is True
     assert rules["cacheArtifactsMustBeIgnored"] is True
     assert rules["ignoreContractMustBeTested"] is True

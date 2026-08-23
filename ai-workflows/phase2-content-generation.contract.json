@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "phase": "Phase 2",
   "mode": "MOCK_ONLY",
   "workflowId": "phase2_content_generation",
@@ -10,6 +10,8 @@
     "cliRunRealLlmMinimalLab": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-workflow-report.json --provider-mode real-llm-minimal --real-lab-output examples/output/phase2-real-llm-lab.json --model <model-name> --explicit-real-call-opt-in --confirm-single-request --confirm-lab-only --confirm-waiting-review --confirm-no-auto-publish",
     "cliRunRealLlmDemo": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-demo-report.json --provider-mode real-llm-demo --real-demo-lab-output examples/output/demo-real-lab.json --real-demo-exam-output examples/output/demo-real-exam.json --real-demo-grading-output examples/output/demo-real-grading.json --real-demo-ppt-output examples/output/demo-real-ppt.json --model <model-name> --explicit-real-call-opt-in --confirm-demo-real-dsl --confirm-waiting-review --confirm-no-auto-publish",
     "cliReport": "python lab_cli.py phase2 workflow report --file examples/output/phase2-content-generation-report.json",
+    "cliTeachingPackageExport": "lab-cli teaching-package export --workflow-run-id <workflowRunId> --reviewer <reviewer>",
+    "apiTeachingPackageExport": "POST /api/teaching-packages/export",
     "pythonHelper": "ai_workflows.provider_adapter_workflow.run_phase2_content_generation"
   },
   "artifactProfiles": [
@@ -46,9 +48,70 @@
       "gradingRefVisibleToCandidate": false
     },
     "exportReadyRequiresAllApproved": true,
-    "localPackageExportImplemented": false,
+    "localPackageExportImplemented": true,
     "autoPublishAllowed": false,
     "realPublish": false
+  },
+  "localPackageExport": {
+    "component": "TeachingPackageExportResult",
+    "artifactProfile": "teaching-core",
+    "cli": "lab-cli teaching-package export --workflow-run-id <workflowRunId> --reviewer <reviewer> [--output <zip>]",
+    "api": {
+      "method": "POST",
+      "path": "/api/teaching-packages/export",
+      "requiredBodyFields": ["workflowRunId", "reviewer"],
+      "acceptedBodyFields": ["workflowRunId", "reviewer"],
+      "customOutputPathAllowed": false
+    },
+    "cliCustomOutputPathAllowed": true,
+    "defaultOutputPathTemplate": "examples/output/teaching-packages/{workflowRunId}.zip",
+    "requiresArtifactKinds": ["LAB_DSL", "EXAM_DSL", "GRADING_DSL"],
+    "requiresTaskStatusByKind": {
+      "lab": "APPROVED",
+      "exam": "APPROVED",
+      "grading": "APPROVED"
+    },
+    "zipMembers": [
+      "manifest.json",
+      "lab.json",
+      "exam.json",
+      "grading.json",
+      "exam-candidate-preview.json",
+      "review-summary.json"
+    ],
+    "validation": {
+      "dslSchemaRevalidatedAtExport": true,
+      "candidatePreviewRegeneratedAtExport": true,
+      "answerVisibleToCandidate": false,
+      "gradingRefVisibleToCandidate": false,
+      "allApprovedRequired": true
+    },
+    "determinism": {
+      "fixedZipMetadata": true,
+      "manifestIncludesReviewer": false,
+      "manifestIncludesExportedAt": false,
+      "volatileExportMetadataStoredInOperationAuditOnly": true
+    },
+    "failurePolicy": {
+      "unknownWorkflowRunCreatesPackage": false,
+      "legacyAllCreatesPackage": false,
+      "notAllApprovedCreatesPackage": false,
+      "schemaFailureCreatesPackage": false,
+      "candidatePreviewFailureCreatesPackage": false,
+      "partialPackageAllowed": false
+    },
+    "safety": {
+      "localOnly": true,
+      "networkAccess": false,
+      "platformEntityRequired": false,
+      "importPreviewRequired": false,
+      "sandboxExecuted": false,
+      "contestantCodeExecuted": false,
+      "taskStatusChanged": false,
+      "autoApproveAllowed": false,
+      "autoPublishAllowed": false,
+      "realPublish": false
+    }
   },
   "providerModes": [
     {

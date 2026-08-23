@@ -2,9 +2,11 @@ import json
 import subprocess
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import urlencode
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from zipfile import ZipFile
 
 import backend.mock_api as mock_api
 import backend.mock_http_server as mock_http_server
@@ -5839,6 +5841,94 @@ def test_teaching_package_review_summary_becomes_export_ready_after_three_manual
     }
     assert package["nextAction"] == "export_teaching_package"
     assert package["exportReady"] is True
+
+
+def test_teaching_package_export_api_enforces_server_path_and_returns_safe_metadata(tmp_path, monkeypatch):
+    store_path = tmp_path / "store.json"
+    workspace = tmp_path / "workspace"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+    monkeypatch.setenv("LAB_CLI_WORKSPACE", str(workspace))
+
+    missing = handle_request(
+        "POST",
+        "/api/teaching-packages/export",
+        store_path=store_path,
+        body={},
+    )
+    client_path = handle_request(
+        "POST",
+        "/api/teaching-packages/export",
+        store_path=store_path,
+        body={"workflowRunId": "workflow_run_demo", "reviewer": "teacher", "output": "other.zip"},
+    )
+    assert_api_envelope(missing)
+    assert missing["success"] is False
+    assert missing["code"] == "VALIDATION_ERROR"
+    assert {item["field"] for item in missing["errors"]} == {"workflowRunId", "reviewer"}
+    assert_api_envelope(client_path)
+    assert client_path["success"] is False
+    assert client_path["code"] == "VALIDATION_ERROR"
+    assert client_path["errors"] == [{"field": "output", "reason": "API 不接受输出路径"}]
+
+    generated = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+    workflow_run_id = generated["data"]["workflowRun"]["id"]
+    not_ready = handle_request(
+        "POST",
+        "/api/teaching-packages/export",
+        store_path=store_path,
+        body={"workflowRunId": workflow_run_id, "reviewer": "teacher_export"},
+    )
+    assert_api_envelope(not_ready)
+    assert not_ready["success"] is False
+    assert not_ready["code"] == "TEACHING_PACKAGE_EXPORT_NOT_READY"
+
+    for task in generated["data"]["createdTasks"]:
+        approved = handle_request(
+            "POST",
+            f"/api/ai-tasks/{task['id']}/approve",
+            store_path=store_path,
+            body={"reviewer": "teacher_review"},
+        )
+        assert approved["success"] is True
+
+    exported = handle_request(
+        "POST",
+        "/api/teaching-packages/export",
+        store_path=store_path,
+        body={"workflowRunId": workflow_run_id, "reviewer": "teacher_export"},
+    )
+    assert_api_envelope(exported)
+    assert exported["success"] is True
+    result = exported["data"]["teachingPackageExport"]
+    output_path = Path(result["outputPath"])
+    assert output_path == workspace / "examples" / "output" / "teaching-packages" / f"{workflow_run_id}.zip"
+    assert output_path.is_file()
+    assert result["fileName"] == output_path.name
+    assert result["fileTotal"] == 6
+    assert result["candidateSafety"] == {
+        "candidateSafe": True,
+        "answerVisibleToCandidate": False,
+        "gradingRefVisibleToCandidate": False,
+    }
+    assert result["safety"]["networkAccess"] is False
+    assert result["safety"]["sandboxExecuted"] is False
+    assert result["safety"]["realPublish"] is False
+    assert "lab" not in result and "exam" not in result and "grading" not in result
+    with ZipFile(output_path) as archive:
+        assert archive.namelist() == [
+            "manifest.json",
+            "lab.json",
+            "exam.json",
+            "grading.json",
+            "exam-candidate-preview.json",
+            "review-summary.json",
+        ]
 
 
 def test_teaching_package_review_summary_rejects_unknown_workflow_run(tmp_path):

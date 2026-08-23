@@ -453,6 +453,26 @@
       border-top: 1px solid var(--line);
     }
 
+    .teaching-package-export-action {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 18px;
+      border-top: 1px solid var(--line);
+      background: #f9fafb;
+    }
+
+    .teaching-package-export-action p {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .teaching-package-export-action button {
+      min-width: 148px;
+    }
+
     .teaching-package-row {
       display: grid;
       grid-template-columns: minmax(220px, 1.25fr) minmax(180px, 0.9fr) minmax(200px, 1fr) auto;
@@ -504,8 +524,13 @@
       .workspace-grid,
       .teaching-package-metrics,
       .teaching-package-controls,
+      .teaching-package-export-action,
       .teaching-package-row {
         grid-template-columns: 1fr;
+      }
+
+      .teaching-package-export-action button {
+        width: 100%;
       }
 
       .package-artifact-actions {
@@ -586,6 +611,10 @@
       <p class="ok" id="teaching-package-action-status" aria-live="polite">ACTION_READY · 逐项人工审核</p>
     </div>
     <div class="teaching-package-artifacts" id="teaching-package-artifacts"></div>
+    <div class="teaching-package-export-action">
+      <p class="warning" id="teaching-package-export-status" aria-live="polite">EXPORT_BLOCKED · exportReady=false</p>
+      <button class="primary" id="teaching-package-export-button" type="button" data-export-enabled="false" aria-disabled="true" disabled>导出教学包</button>
+    </div>
   </section>
 
   <section class="workspace-strip" aria-labelledby="mvp-workspace-title">

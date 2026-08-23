@@ -4,6 +4,17 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-08-23
+
+- Added review-gated local teaching-package export for `teaching-core`
+  workflow runs after Lab, Exam, and Grading are all manually approved.
+- Added a deterministic ZIP containing `manifest.json`, the three validated
+  DSL files, a candidate-safe Exam preview, and the review summary.
+- Kept reviewer and export-time metadata in operation audit only so they do not
+  make `manifest.json` or otherwise identical package content nondeterministic.
+- Kept export local and atomic: blocked or invalid runs create no package and
+  never call platform import, grading sandbox, network, or publish paths.
+
 ## [0.1.7] - 2026-08-23
 
 - Added workflow-run-scoped Lab, Exam, and Grading review aggregation with

@@ -1,8 +1,8 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "phase": "Phase 1",
   "mode": "MOCK_ONLY",
-  "description": "Local artifact ignore contract for Phase 1. Generated reports, local stores, caches, and real secret files must stay out of version control.",
+  "description": "Local artifact ignore contract. Generated reports, local teaching-package exports, local stores, caches, and real secret files must stay out of version control.",
   "gitignorePath": ".gitignore",
   "trackedAllowList": [
     ".env.example",
@@ -40,6 +40,11 @@
       "category": "generated_output",
       "reason": "Phase 1 acceptance reports are reproducible local Markdown outputs.",
       "exception": "examples/output/README.md"
+    },
+    {
+      "pattern": "examples/output/teaching-packages/",
+      "category": "generated_output",
+      "reason": "Review-approved teaching-package ZIP exports are reproducible local outputs and may contain teacher-only Exam answers and Grading rules."
     },
     {
       "pattern": "codex_ai_platform_full_package.zip",
@@ -87,6 +92,7 @@
     "envExampleMustRemainTracked": true,
     "mockStoresMustBeIgnored": true,
     "generatedReportsMustBeIgnored": true,
+    "teachingPackageExportsMustBeIgnored": true,
     "cacheArtifactsMustBeIgnored": true,
     "ignoreContractMustBeTested": true
   }

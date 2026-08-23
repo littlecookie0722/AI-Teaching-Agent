@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import cli.lab_cli as lab_cli
+from backend.mock_api import handle_request
 from cli.ai_task import create_waiting_review_task
 from cli.artifact import ArtifactKind, ArtifactStatus, create_artifact_record
 from cli.lab_cli import main
@@ -9492,3 +9493,68 @@ def test_workflow_report_missing_file_returns_json(capsys):
     assert_json_envelope(payload)
     assert payload["code"] == "VALIDATION_ERROR"
     assert payload["errors"][0]["field"] == "file"
+
+
+def test_teaching_package_export_cli_uses_json_envelope_and_explicit_zip_path(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    store_path = tmp_path / "store.json"
+    workspace = tmp_path / "workspace"
+    source = tmp_path / "source.md"
+    output = tmp_path / "exports" / "approved-package.zip"
+    source.write_text("# Demo Source", encoding="utf-8")
+    monkeypatch.setenv("LAB_CLI_STORE", str(store_path))
+    monkeypatch.setenv("LAB_CLI_WORKSPACE", str(workspace))
+
+    generated = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+    workflow_run_id = generated["data"]["workflowRun"]["id"]
+    for task in generated["data"]["createdTasks"]:
+        approved = handle_request(
+            "POST",
+            f"/api/ai-tasks/{task['id']}/approve",
+            store_path=store_path,
+            body={"reviewer": "teacher_review"},
+        )
+        assert approved["success"] is True
+
+    exit_code, payload = run_cli(
+        [
+            "teaching-package",
+            "export",
+            "--workflow-run-id",
+            workflow_run_id,
+            "--reviewer",
+            "teacher_export",
+            "--output",
+            str(output),
+        ],
+        capsys,
+    )
+
+    assert exit_code == 0
+    assert_json_envelope(payload)
+    result = payload["data"]["teachingPackageExport"]
+    assert result["component"] == "TeachingPackageExportResult"
+    assert result["workflowRunId"] == workflow_run_id
+    assert result["outputPath"] == str(output.resolve())
+    assert result["fileName"] == output.name
+    assert result["entryNames"] == [
+        "manifest.json",
+        "lab.json",
+        "exam.json",
+        "grading.json",
+        "exam-candidate-preview.json",
+        "review-summary.json",
+    ]
+    assert result["candidateSafety"]["candidateSafe"] is True
+    assert result["safety"]["autoPublishAllowed"] is False
+    assert output.is_file()
+    with zipfile.ZipFile(output) as archive:
+        assert archive.namelist() == result["entryNames"]

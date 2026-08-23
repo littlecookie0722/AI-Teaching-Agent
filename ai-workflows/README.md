@@ -5,7 +5,7 @@ AI Workflow 契约目录。当前 Phase 2 默认仍为 MockProvider-first 工作
 ## 输入说明
 
 - `workflow.manifest.json`: Phase 1 Mock Workflow 契约。
-- `phase2-content-generation.contract.json`: Phase 2 内容生成工作流契约；`legacy-all` 保持 Lab / Exam / Grading / PPT 四类兼容行为，`teaching-core` 只编排 Lab / Exam / Grading。真实模式仍需显式 opt-in，并只请求 profile 包含的产物。
+- `phase2-content-generation.contract.json`: Phase 2 内容生成与教学包闭环契约；`legacy-all` 保持 Lab / Exam / Grading / PPT 四类兼容行为，`teaching-core` 只编排 Lab / Exam / Grading，并在三项人工批准后允许本地六文件 ZIP 导出。真实模式仍需显式 opt-in，并只请求 profile 包含的产物。
 - `phase2-exam-conversion.contract.json`: Phase 2 Mock 试题改造工作流契约，读取 Lab DSL 和 Notebook JSON，生成 Exam / Grading DSL 审核包。
 - `phase2-grading-generation.contract.json`: Phase 2 Mock 评分脚本生成工作流契约，读取 Exam DSL，生成 Grading DSL 审核包和 `assessmentPlan` 质量信号。
 - `phase2-ppt-generation.contract.json`: Phase 2 Mock PPT / 文档生成工作流契约，读取 Markdown，先生成 slide plan JSON，再生成 PPT DSL 审核包。
@@ -39,6 +39,8 @@ Mock Report  -> COMPLETED
 
 Phase 2 `phase2_content_generation` 同时写入本地 AI Task、Provider 审计、Workflow Run、Artifact 清单和 Workflow Report JSON，生成类 DSL 继续保持 `WAITING_REVIEW`。未指定 profile 时使用 `legacy-all` 保持四类兼容行为；`teaching-core` 只生成 Lab / Exam / Grading，并在任务落库前构建候选人安全预览。真实模式只请求 profile 中的种类，因此 `teaching-core` 正常为 3 次请求，`legacy-all` 为 4 次请求。
 
+`lab-cli teaching-package export --workflow-run-id <id> --reviewer <name>` 只对 `teaching-core` 批次工作：三个关联 AI Task 必须全部为 `APPROVED`。导出会重新校验 Lab / Exam / Grading DSL、重新生成候选人安全 Exam 预览，并将 `manifest.json`、三类 DSL JSON、`exam-candidate-preview.json` 与 `review-summary.json` 原子写入本地 ZIP；默认路径是 `examples/output/teaching-packages/<workflowRunId>.zip`，CLI 可用 `--output` 覆盖。API 固定使用默认路径，传入 `output` 返回 `VALIDATION_ERROR`。为保持确定性，`manifest.json` 不写导出人或导出时间，这些易变信息只进入 operation audit。该步骤不新增 WorkflowRun 或 TeachingPackage 实体，不联网、不执行评分、不调用平台导入或发布。
+
 Phase 2 `phase2_exam_conversion` 额外读取 `examples/notebooks/demo-lab.ipynb`，只解析 Notebook JSON，不执行 cell；候选人预览会复用 `ai_workflows/exam_candidate_preview.py` 移除标准答案，并检测答案文本是否意外进入候选人字段。报告会输出 `qualitySignals`，覆盖标准答案隐藏、题目 gradingRef 与评分 check 对齐、Exam / Grading 分值一致性、评分计划可解释性，并同步写入 Exam / Grading Artifact metadata。`qualitySignals.grading.assessmentPlan` 会从 Grading DSL checks 派生评分前计划，包含 `inputSummary`、`executionPlan.requiredLimits`、`mockEvidence.status`、`riskLevel` 和 `sandboxRequiredBeforeRealExecution`，用于和 Phase 3 `reportDetail.checkPlans` 保持字段语义一致。
 
 Phase 2 `phase2_grading_generation` 可独立从 Exam DSL 生成 Grading DSL 审核包。报告会输出 `qualitySignals.coverage.gradingRefCoverage`、`scoreCoverage` 和 `explainability`，并把 `qualitySignals.grading.assessmentPlan` 写入 Grading Artifact metadata，供审核详情页展示；当前不执行真实沙箱、不运行选手代码。
@@ -61,6 +63,7 @@ python lab_cli.py workflow get --id workflow_run_demo
 python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json
 python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json --target-users "高职学生,教师" --duration-minutes 90 --difficulty intermediate --tech-tags "Python,Notebook" --teaching-style project_based
 python lab_cli.py phase2 workflow report --file examples/output/phase2-content-generation-report.json
+lab-cli teaching-package export --workflow-run-id <workflowRunId> --reviewer teacher_1
 python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-workflow-report.json --provider-mode real-llm-minimal --real-lab-output examples/output/phase2-real-llm-lab.json --model <model> --explicit-real-call-opt-in --confirm-single-request --confirm-lab-only --confirm-waiting-review --confirm-no-auto-publish
 python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-demo-report.json --provider-mode real-llm-demo --real-demo-lab-output examples/output/demo-real-lab.json --real-demo-exam-output examples/output/demo-real-exam.json --real-demo-grading-output examples/output/demo-real-grading.json --real-demo-ppt-output examples/output/demo-real-ppt.json --model <model> --explicit-real-call-opt-in --confirm-demo-real-dsl --confirm-waiting-review --confirm-no-auto-publish
 python lab_cli.py phase2 exam-convert run --lab templates/lab/examples/basic-lab.yaml --notebook examples/notebooks/demo-lab.ipynb --reviewer teacher_1 --output examples/output/phase2-exam-conversion-report.json

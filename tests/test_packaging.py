@@ -16,6 +16,7 @@ from tests.runtime_requirements import presentations_runtime_available
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_WHEEL_ASSETS = {
     "ai-workflows/phase2-content-generation.contract.json",
+    "cli/teaching_package_export.py",
     "config/runtime.contract.json",
     "evals/dsl_quality/v1/manifest.json",
     "evals/dsl_quality/v1/baseline-bundle.json",
@@ -26,6 +27,14 @@ REQUIRED_WHEEL_ASSETS = {
     "scripts/build_pptx_from_ppt_dsl.mjs",
     "sandbox/images/python-pytest/Dockerfile",
     "templates/lab/lab.schema.json",
+}
+TEACHING_PACKAGE_MEMBERS = {
+    "manifest.json",
+    "lab.json",
+    "exam.json",
+    "grading.json",
+    "exam-candidate-preview.json",
+    "review-summary.json",
 }
 
 
@@ -71,7 +80,11 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
 
     with zipfile.ZipFile(wheel) as archive:
         wheel_members = set(archive.namelist())
+        metadata_members = [member for member in wheel_members if member.endswith(".dist-info/METADATA")]
+        assert len(metadata_members) == 1
+        metadata_lines = archive.read(metadata_members[0]).decode("utf-8").splitlines()
     assert REQUIRED_WHEEL_ASSETS <= wheel_members
+    assert "Version: 0.1.8" in metadata_lines
     assert not any(member.startswith("tests/") for member in wheel_members)
     assert not any(member.startswith("examples/output/") for member in wheel_members)
 
@@ -150,6 +163,63 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     assert workspace_info["success"] is True
     assert workspace_info["data"]["workspace"]["workspaceRoot"] == str(workspace.resolve())
     assert workspace_info["data"]["workspace"]["storageMode"] == "USER_WORKSPACE"
+    package_root = Path(workspace_info["data"]["workspace"]["packageRoot"])
+
+    teaching_core_result = _run(
+        [
+            str(python),
+            "-c",
+            (
+                "import json, sys; from pathlib import Path; import backend; "
+                "from backend.mock_api import handle_request; "
+                "assert Path(sys.prefix).resolve() in Path(backend.__file__).resolve().parents; "
+                "generated = handle_request("
+                "'POST', '/api/phase2/workflows/content-generation/run', "
+                "body={'input': sys.argv[1], 'reviewer': 'packaging-test', "
+                "'artifactProfile': 'teaching-core'}"
+                "); "
+                "assert generated['success'], generated; "
+                "approvals = [handle_request("
+                "'POST', f\"/api/ai-tasks/{task['id']}/approve\", "
+                "body={'reviewer': 'packaging-test'}"
+                ") for task in generated['data']['createdTasks']]; "
+                "assert len(approvals) == 3 and all(item['success'] for item in approvals), approvals; "
+                "print(json.dumps({"
+                "'workflowRunId': generated['data']['workflowRun']['id'], "
+                "'taskIds': [task['id'] for task in generated['data']['createdTasks']]"
+                "}))"
+            ),
+            str(source),
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    teaching_core = json.loads(teaching_core_result.stdout)
+    assert len(teaching_core["taskIds"]) == 3
+    workflow_run_id = teaching_core["workflowRunId"]
+
+    teaching_package_result = _run(
+        [
+            str(console),
+            "teaching-package",
+            "export",
+            "--workflow-run-id",
+            workflow_run_id,
+            "--reviewer",
+            "packaging-test",
+        ],
+        cwd=outside_checkout,
+        env=external_env,
+    )
+    teaching_package_payload = json.loads(teaching_package_result.stdout)
+    assert teaching_package_payload["success"] is True
+    teaching_package = teaching_package_payload["data"]["teachingPackageExport"]
+    package_path = workspace / "examples" / "output" / "teaching-packages" / f"{workflow_run_id}.zip"
+    assert Path(teaching_package["outputPath"]).resolve() == package_path.resolve()
+    assert package_path.is_file()
+    assert not (package_root / "examples" / "output" / "teaching-packages" / package_path.name).exists()
+    with zipfile.ZipFile(package_path) as archive:
+        assert set(archive.namelist()) == TEACHING_PACKAGE_MEMBERS
 
     generation_result = _run(
         [str(console), "lab", "generate-from-source", "--input", "source.md"],
@@ -214,7 +284,6 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
     exam_payload = json.loads(exam_result.stdout)
     assert exam_payload["success"] is True
     exam_task_id = exam_payload["data"]["task"]["id"]
-    package_root = Path(workspace_info["data"]["workspace"]["packageRoot"])
     for output_key in ("examDslPath", "gradingDslPath", "candidatePreviewPath"):
         output_path = Path(exam_payload["data"][output_key])
         assert output_path == Path("examples/output") / output_path.name

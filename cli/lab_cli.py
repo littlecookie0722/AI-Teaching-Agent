@@ -120,6 +120,7 @@ from .review_detail import (
 )
 from .review_pre_approve import build_pre_approve_review_check
 from .store import JsonTaskStore
+from .teaching_package_export import TeachingPackageExportError, export_teaching_package
 from .workflow import WorkflowStatus, create_workflow_run, create_workflow_step
 from .workspace import describe_workspace, resolve_cli_path, workspace_root
 from ai_workflows.exam_candidate_preview import (
@@ -1073,6 +1074,13 @@ def build_parser() -> argparse.ArgumentParser:
     ai_task_list.add_argument("--task-type")
     ai_task_get = ai_task_sub.add_parser("get")
     ai_task_get.add_argument("--id", required=True)
+
+    teaching_package = subparsers.add_parser("teaching-package")
+    teaching_package_sub = teaching_package.add_subparsers(dest="command", required=True)
+    teaching_package_export = teaching_package_sub.add_parser("export")
+    teaching_package_export.add_argument("--workflow-run-id", required=True)
+    teaching_package_export.add_argument("--reviewer", required=True)
+    teaching_package_export.add_argument("--output")
 
     review = subparsers.add_parser("review")
     review_sub = review.add_subparsers(dest="command", required=True)
@@ -18676,6 +18684,19 @@ def handle(args: argparse.Namespace, trace_id: str) -> dict[str, Any]:
         except PromotionReviewEnqueueError as exc:
             raise CliError(exc.code, exc.message, exc.errors) from exc
         return ok("真实 DSL 修订候选版已进入审核队列", result, trace_id)
+
+    if args.group == "teaching-package" and args.command == "export":
+        try:
+            result = export_teaching_package(
+                store,
+                workflow_run_id=args.workflow_run_id,
+                reviewer=args.reviewer,
+                output_path=_path(args.output) if args.output else None,
+                trace_id=trace_id,
+            )
+        except TeachingPackageExportError as exc:
+            raise CliError(exc.code, exc.message, exc.errors) from exc
+        return ok("教学包已导出到本地工作区", {"teachingPackageExport": result}, trace_id)
 
     if args.group == "review" and args.command == "detail":
         detail = build_review_detail(store, args.task_id)

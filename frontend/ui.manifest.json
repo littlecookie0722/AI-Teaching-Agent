@@ -616,6 +616,7 @@
         "GET /api/review-task-summary.mvpReviewWorkspace",
         "query: workflowRunId",
         "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview",
+        "POST /api/teaching-packages/export.teachingPackageExport",
         "frontend/review-action-data.js",
         "POST /api/ai-tasks/{id}/approve",
         "POST /api/ai-tasks/{id}/reject",
@@ -783,7 +784,11 @@
         "revisionRealLlmCallEnabled": false,
         "realLlmArtifactsReadOnly": true,
         "frontendDirectRealLlmCall": false,
+        "exportRequiresAllApproved": true,
+        "frontendBuildsArchive": false,
+        "binaryDownload": false,
         "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
         "secretVisibleInFrontend": false
       },
       "components": [
@@ -1951,6 +1956,7 @@
     "MvpReviewWorkspace",
     "TeachingPackageReviewWorkspace",
     "TeachingPackageArtifactReviewRow",
+    "TeachingPackageLocalExportAction",
     "RealDemoReviewQueue",
     "ControlledDockerEvidenceReviewSignal",
     "GradingEvidenceReadiness",
@@ -2991,11 +2997,15 @@
       "route": "/review-center",
       "title": "Review Center",
       "priority": 1,
-      "purpose": "Review local mock AI outputs and high-risk MCP intents without batch approval, real publishing, or second-factor confirmation.",
+      "purpose": "Review local mock AI outputs and export an approved teaching package locally without batch approval, real publishing, or second-factor confirmation.",
       "apiDependencies": [
         {
           "method": "GET",
           "path": "/api/review-task-summary"
+        },
+        {
+          "method": "POST",
+          "path": "/api/teaching-packages/export"
         },
         {
           "method": "POST",
@@ -3040,6 +3050,7 @@
         "MvpReviewWorkspace",
         "TeachingPackageReviewWorkspace",
         "TeachingPackageArtifactReviewRow",
+        "TeachingPackageLocalExportAction",
         "ReviewCenterDataLoader",
         "RealDslContentQualityDecision",
         "RealDemoReviewQueue",
@@ -3073,6 +3084,9 @@
       "batchStateChangeAllowed": false,
       "reviewActionsArePerTask": true,
       "rejectRequiresReason": true,
+      "exportRequiresAllApproved": true,
+      "frontendBuildsArchive": false,
+      "binaryDownload": false,
       "realPublishAllowed": false,
       "realPublish": false,
       "realLlmArtifactsReadOnly": true,
@@ -3082,6 +3096,7 @@
         "highRiskIntentExecutionAllowed": false,
         "environmentDestroyed": false,
         "answerVisibleToCandidate": false,
+        "gradingRefVisibleToCandidate": false,
         "secretVisibleInFrontend": false
       },
       "dataSources": [
@@ -3092,6 +3107,7 @@
         "GET /api/review-task-summary.mvpReviewWorkspace",
         "query: workflowRunId",
         "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview",
+        "POST /api/teaching-packages/export.teachingPackageExport",
         "POST /api/ai-tasks/{id}/approve",
         "POST /api/ai-tasks/{id}/reject",
         "GET /api/review-tasks/{id}.mvpReviewWorkspace",

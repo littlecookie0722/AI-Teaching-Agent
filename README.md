@@ -51,7 +51,8 @@ local teaching-package export
 The project has already demonstrated a broader local-core PoC, including PPT,
 controlled grading evidence, local entity persistence, MCP, and Agent paths.
 Current development is now refocused on making the smaller Lab + Exam/Grading
-review-and-export workflow coherent and dependable. It is not a production
+review-and-export workflow coherent and dependable. The current local export
+is a six-file ZIP gated on three explicit human approvals. It is not a production
 hosted service, cloud resource manager, or automatic publishing system.
 
 The detailed delivery boundaries, implemented capabilities, and stop lines are
@@ -95,6 +96,7 @@ From a Git checkout, the installed console command and the historical
 ```powershell
 ai-teaching-agent lab generate-from-source --input examples/input/demo-source.md
 ai-teaching-agent exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml
+ai-teaching-agent teaching-package export --workflow-run-id <workflowRunId> --reviewer teacher_1
 ai-teaching-agent demo offline
 ai-teaching-agent quality dsl-eval --output examples/output/dsl-quality-eval.json
 python -m pytest -q
@@ -124,6 +126,14 @@ the PPTX artifact and previews to the user workspace. It requires Node.js and
 the optional presentations runtime; set `PRESENTATIONS_SKILL_DIR` when that
 runtime is not discoverable from the local Codex installation. Approval and
 local import-preview can continue from the same directory.
+
+After a `teaching-core` run has three manually approved tasks, `teaching-package
+export` writes `examples/output/teaching-packages/<workflowRunId>.zip` in the
+resolved workspace unless `--output` is provided. The ZIP contains exactly the
+manifest, Lab/Exam/Grading JSON, candidate-safe Exam preview, and review summary;
+the manifest excludes reviewer and export-time metadata so identical inputs stay
+deterministic, while those values are recorded only in the operation audit. The
+export does not call platform import, grading execution, or publishing paths.
 
 Every CLI command returns a JSON envelope. The default provider mode is local
 mock data. A real OpenAI-compatible model request requires explicit opt-in,

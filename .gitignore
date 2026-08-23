@@ -19,6 +19,7 @@ cli/.lab_cli_store.json
 # Phase 1 generated reports and exports
 examples/output/*.json
 examples/output/*.md
+examples/output/teaching-packages/
 !examples/output/README.md
 # Sanitized, read-only fixtures required by the clean-checkout regression suite.
 !examples/output/real-llm-lab.json

@@ -72,6 +72,7 @@ from cli.review_detail import (
 )
 from cli.review_pre_approve import build_pre_approve_review_check
 from cli.store import JsonTaskStore
+from cli.teaching_package_export import TeachingPackageExportError, export_teaching_package
 from cli.workflow import WorkflowStatus, create_workflow_run, create_workflow_step
 from backend.core_contract import BackendCoreRepositoryContract
 from backend.core_repository import CoreRepositoryError, sync_core_repository_from_store
@@ -5168,6 +5169,26 @@ def handle_request(
 
     if method == "POST" and path == "/api/grading/evidence-auto":
         return run_grading_evidence_auto(body or {}, store, trace_id)
+
+    if method == "POST" and path == "/api/teaching-packages/export":
+        payload = body or {}
+        if "output" in payload:
+            return fail(
+                "VALIDATION_ERROR",
+                "参数错误",
+                [{"field": "output", "reason": "API 不接受输出路径"}],
+                trace_id,
+            )
+        try:
+            result = export_teaching_package(
+                store,
+                workflow_run_id=str(payload.get("workflowRunId") or ""),
+                reviewer=str(payload.get("reviewer") or ""),
+                trace_id=trace_id,
+            )
+        except TeachingPackageExportError as exc:
+            return fail(exc.code, exc.message, exc.errors, trace_id)
+        return ok("教学包已导出到本地工作区", {"teachingPackageExport": result}, trace_id)
 
     if method == "POST" and path == "/api/backend/core-db/init":
         return initialize_backend_core_repository_request(body or {}, store, trace_id)

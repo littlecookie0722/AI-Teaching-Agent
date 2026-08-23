@@ -6,7 +6,7 @@ Phase 1 运行配置契约目录。当前只声明 Mock 默认值、环境变量
 
 - `runtime.contract.json`: Phase 1 配置契约。
 - `providers/provider.contract.json`: Provider Mock 契约，位于 `providers/` 目录。
-- `local-artifacts.contract.json`: 本地产物忽略契约。
+- `local-artifacts.contract.json`: 本地产物忽略契约；包含审核通过后生成的 `examples/output/teaching-packages/` 本地 ZIP。
 - `delivery-package.contract.json`: Phase 1 Mock 交付包和验收清单契约。
 - `.env.example`: 根目录本地配置示例。
 
@@ -41,7 +41,7 @@ python -m pytest
 
 - `.env.example` 只能包含空值或安全占位值。
 - 不得提交真实 `.env`。
-- 不得提交本地 Mock Store、生成报告、测试缓存或交付包归档。
+- 不得提交本地 Mock Store、生成报告、测试缓存、Phase 1 交付包归档或教学包 ZIP。
 - `examples/output/README.md` 可保留，`examples/output/*.json` 为本地生成物。
 - `phase1 export` 的交付包必须包含验收清单、安全断言和本地可复现命令。
 - 不得把 API Key、Token、密码写进代码或文档。

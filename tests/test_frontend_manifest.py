@@ -103,6 +103,10 @@ def test_review_center_aggregates_teaching_package_and_uses_per_task_review_acti
     assert 'id="teaching-package-export-ready"' in html
     assert 'id="teaching-package-reviewer"' in html
     assert 'id="teaching-package-artifacts"' in html
+    assert 'id="teaching-package-export-status"' in html
+    assert 'id="teaching-package-export-button"' in html
+    assert 'data-export-enabled="false"' in html
+    assert 'aria-disabled="true" disabled' in html
     assert '<script src="review-action-data.js"></script>' in html
 
     assert "getQueryWorkflowRunId" in loader_js
@@ -113,6 +117,23 @@ def test_review_center_aggregates_teaching_package_and_uses_per_task_review_acti
     assert 'data-package-review-action' in loader_js
     assert 'data-package-reject-reason' in loader_js
     assert "loadTaskDetail(taskId)" in loader_js
+    assert 'teachingPackageExportPath: "/api/teaching-packages/export"' in loader_js
+    assert "applyTeachingPackageExportState" in loader_js
+    assert "packageReview.exportReady === true" in loader_js
+    assert "exportTeachingPackage" in loader_js
+    assert "safeTeachingPackageExportMetadata" in loader_js
+    assert "payload.data.teachingPackageExport" in loader_js
+    assert "exportData.fileName || exportData.filename" in loader_js
+    assert "candidateSafety.candidateSafe === true" in loader_js
+    assert "candidateSafety.answerVisibleToCandidate === true" in loader_js
+    assert "candidateSafety.gradingRefVisibleToCandidate === true" in loader_js
+    assert "workflowRunId: workflowRunId" in loader_js
+    assert "reviewer: reviewer" in loader_js
+    assert "EXPORT_FAILED" in loader_js
+    assert "loadReviewCenterData()" in loader_js
+    assert loader_js.count("applyTeachingPackageExportState(null);") >= 2
+    assert "new Blob" not in loader_js
+    assert "createObjectURL" not in loader_js
     assert "POST /api/ai-tasks/{id}/approve" not in loader_js
     assert "POST /api/ai-tasks/{id}/reject" not in loader_js
 
@@ -129,26 +150,40 @@ def test_review_center_aggregates_teaching_package_and_uses_per_task_review_acti
     prototype = prototypes["/review-center"]
     assert "TeachingPackageReviewWorkspace" in page["components"]
     assert "TeachingPackageArtifactReviewRow" in page["components"]
+    assert "TeachingPackageLocalExportAction" in page["components"]
     assert "query: workflowRunId" in page["dataSources"]
     assert (
         "GET /api/review-task-summary?workflowRunId={workflowRunId}.reviewTaskSummary.teachingPackageReview"
         in page["dataSources"]
     )
+    assert "POST /api/teaching-packages/export.teachingPackageExport" in page["dataSources"]
     assert "frontend/review-action-data.js" in page["dataSources"]
     assert "POST /api/ai-tasks/{id}/approve" in page["dataSources"]
     assert "POST /api/ai-tasks/{id}/reject" in page["dataSources"]
     assert {dependency["path"] for dependency in page["apiDependencies"]} >= {
         "/api/review-task-summary",
+        "/api/teaching-packages/export",
         "/api/ai-tasks/{id}/approve",
         "/api/ai-tasks/{id}/reject",
     }
     assert page["safety"]["reviewActionsArePerTask"] is True
     assert page["safety"]["rejectRequiresReason"] is True
     assert page["safety"]["batchStateChangeAllowed"] is False
+    assert page["safety"]["exportRequiresAllApproved"] is True
+    assert page["safety"]["frontendBuildsArchive"] is False
+    assert page["safety"]["binaryDownload"] is False
+    assert page["safety"]["answerVisibleToCandidate"] is False
+    assert page["safety"]["gradingRefVisibleToCandidate"] is False
     assert "query: workflowRunId" in prototype["dataSources"]
+    assert "POST /api/teaching-packages/export.teachingPackageExport" in prototype["dataSources"]
     assert "POST /api/ai-tasks/{id}/approve" in prototype["dataSources"]
     assert "POST /api/ai-tasks/{id}/reject" in prototype["dataSources"]
+    assert prototype["safety"]["exportRequiresAllApproved"] is True
+    assert prototype["safety"]["frontendBuildsArchive"] is False
+    assert prototype["safety"]["binaryDownload"] is False
+    assert prototype["safety"]["gradingRefVisibleToCandidate"] is False
     assert ".runtime-strip," in html.split("@media (max-width: 920px)", 1)[1]
+    assert ".teaching-package-export-action," in html.split("@media (max-width: 920px)", 1)[1]
 
 
 def test_frontend_manifest_is_phase1_mock_contract():
@@ -930,6 +965,7 @@ def test_frontend_manifest_enforces_review_and_answer_safety():
     review_center_deps = {dependency["path"] for dependency in pages["/review-center"]["apiDependencies"]}
     assert review_center_deps == {
         "/api/review-task-summary",
+        "/api/teaching-packages/export",
         "/api/review-tasks/{id}",
         "/api/grading/records",
         "/api/backend/core-tasks/{id}",

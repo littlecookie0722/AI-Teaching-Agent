@@ -8,6 +8,7 @@
     coreReadinessPathTemplate: "/api/review-tasks/{id}/core-readiness",
     decisionNotePathTemplate: "/api/review-tasks/{id}/decision-note",
     workflowReportPathTemplate: "/api/workflow/report?file={file}",
+    teachingPackageExportPath: "/api/teaching-packages/export",
     evidenceAutoPath: "/api/grading/evidence-auto",
     evidenceAutoDefaults: {
       grading: "examples/output/real-llm-grading.json",
@@ -24,7 +25,10 @@
     fallbackMode: "STATIC_HTML_FALLBACK",
     agentEntityRefreshRequested: false,
     coreDbPath: "",
-    gradingDbPath: ""
+    gradingDbPath: "",
+    teachingPackageWorkflowRunId: "",
+    teachingPackageExportReady: false,
+    teachingPackageExportPending: false
   };
   var AGENT_CORE_NEXT_TOOL_OUTPUT_PREFIX = "examples/output/demo-agent-core-next-tool-execution-";
   var AGENT_CORE_NEXT_TOOL_OUTPUT_ARG_PREFIX = " --output examples/output/demo-agent-core-next-tool-execution-";
@@ -3444,6 +3448,169 @@
     return pill;
   }
 
+  function setTeachingPackageExportStatus(status, detail, tone) {
+    var node = byId("teaching-package-export-status");
+    if (!node) {
+      return;
+    }
+    node.textContent = status + (detail ? " · " + detail : "");
+    node.className = tone === "ok" ? "ok" : (tone === "blocked" ? "blocked" : "warning");
+  }
+
+  function updateTeachingPackageExportButton() {
+    var button = byId("teaching-package-export-button");
+    if (!button) {
+      return;
+    }
+    var enabled = state.teachingPackageExportReady === true
+      && state.teachingPackageExportPending !== true;
+    button.disabled = !enabled;
+    button.setAttribute("aria-disabled", boolText(!enabled));
+    button.setAttribute("data-export-enabled", boolText(state.teachingPackageExportReady === true));
+  }
+
+  function applyTeachingPackageExportState(packageReview) {
+    var available = packageReview && packageReview.available === true;
+    var workflowRunId = available ? String(packageReview.workflowRunId || "") : "";
+    state.teachingPackageWorkflowRunId = workflowRunId;
+    state.teachingPackageExportReady = Boolean(
+      available
+        && workflowRunId
+        && packageReview.exportReady === true
+    );
+    updateTeachingPackageExportButton();
+    if (!available) {
+      setTeachingPackageExportStatus("EXPORT_BLOCKED", "teachingPackageReview.available=false", "blocked");
+    } else if (!state.teachingPackageExportReady) {
+      setTeachingPackageExportStatus("EXPORT_BLOCKED", "exportReady=false", "blocked");
+    } else {
+      setTeachingPackageExportStatus("EXPORT_READY", "exportReady=true", "ok");
+    }
+  }
+
+  function safeExportMetadataValue(value) {
+    if (["string", "number", "boolean"].indexOf(typeof value) !== -1) {
+      return String(value);
+    }
+    return "none";
+  }
+
+  function safeTeachingPackageExportMetadata(exportData) {
+    var integrity = exportData && exportData.integrity && typeof exportData.integrity === "object"
+      ? exportData.integrity
+      : {};
+    var candidateSafety = exportData && exportData.candidateSafety
+      && typeof exportData.candidateSafety === "object"
+      ? exportData.candidateSafety
+      : {};
+    return {
+      workflowRunId: safeExportMetadataValue(exportData && exportData.workflowRunId),
+      fileName: safeExportMetadataValue(exportData && (exportData.fileName || exportData.filename)),
+      outputPath: safeExportMetadataValue(exportData && exportData.outputPath),
+      sha256: safeExportMetadataValue(
+        exportData && (exportData.sha256 || exportData.hash || integrity.sha256)
+      ),
+      sizeBytes: safeExportMetadataValue(
+        exportData && (typeof exportData.sizeBytes !== "undefined" ? exportData.sizeBytes : exportData.size)
+      ),
+      fileTotal: safeExportMetadataValue(
+        exportData && (
+          typeof exportData.fileTotal !== "undefined"
+            ? exportData.fileTotal
+            : exportData.includedFileTotal
+          )
+      ),
+      candidateSafe: candidateSafety.candidateSafe === true,
+      answerVisibleToCandidate: candidateSafety.answerVisibleToCandidate === true,
+      gradingRefVisibleToCandidate: candidateSafety.gradingRefVisibleToCandidate === true
+    };
+  }
+
+  function exportTeachingPackage() {
+    var workflowRunId = state.teachingPackageWorkflowRunId;
+    var reviewerInput = byId("teaching-package-reviewer");
+    var reviewer = reviewerInput ? String(reviewerInput.value || "").trim() : "";
+    if (state.teachingPackageExportReady !== true || !workflowRunId) {
+      setTeachingPackageExportStatus("EXPORT_BLOCKED", "exportReady=false", "blocked");
+      return Promise.resolve(null);
+    }
+    if (!reviewer) {
+      setTeachingPackageExportStatus("EXPORT_VALIDATION_ERROR", "reviewer is required", "blocked");
+      if (reviewerInput) {
+        reviewerInput.focus();
+      }
+      return Promise.resolve(null);
+    }
+    if (!window.fetch || state.teachingPackageExportPending === true) {
+      return Promise.resolve(null);
+    }
+
+    state.teachingPackageExportPending = true;
+    updateTeachingPackageExportButton();
+    setTeachingPackageExportStatus(
+      "EXPORT_PENDING",
+      "workflowRunId=" + workflowRunId,
+      "warning"
+    );
+    return fetch(state.teachingPackageExportPath, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        workflowRunId: workflowRunId,
+        reviewer: reviewer
+      })
+    }).then(function (response) {
+      return response.json().then(function (payload) {
+        if (!response.ok || !payload || payload.success !== true) {
+          throw new Error(payload && payload.code ? payload.code : "HTTP_" + response.status);
+        }
+        var exportData = payload.data && payload.data.teachingPackageExport
+          ? payload.data.teachingPackageExport
+          : {};
+        if (!exportData.outputPath || !(exportData.fileName || exportData.filename)) {
+          throw new Error("INVALID_EXPORT_PAYLOAD");
+        }
+        var metadata = safeTeachingPackageExportMetadata(exportData);
+        setTeachingPackageExportStatus(
+          "EXPORT_COMPLETE",
+          "fileName=" + metadata.fileName
+            + " · outputPath=" + metadata.outputPath
+            + " · sha256=" + metadata.sha256
+            + " · sizeBytes=" + metadata.sizeBytes
+            + " · fileTotal=" + metadata.fileTotal
+            + " · candidateSafe=" + boolText(metadata.candidateSafe)
+            + " · answerVisibleToCandidate=" + boolText(metadata.answerVisibleToCandidate)
+            + " · gradingRefVisibleToCandidate=" + boolText(metadata.gradingRefVisibleToCandidate),
+          "ok"
+        );
+        return payload;
+      }, function () {
+        throw new Error("INVALID_JSON_RESPONSE");
+      });
+    }).catch(function (error) {
+      var errorCode = error && error.message ? error.message : "EXPORT_REQUEST_FAILED";
+      return Promise.resolve(loadReviewCenterData()).then(function () {
+        setTeachingPackageExportStatus("EXPORT_FAILED", "code=" + errorCode, "blocked");
+        return null;
+      });
+    }).finally(function () {
+      state.teachingPackageExportPending = false;
+      updateTeachingPackageExportButton();
+    });
+  }
+
+  function setupTeachingPackageExportAction() {
+    var button = byId("teaching-package-export-button");
+    if (button) {
+      button.addEventListener("click", exportTeachingPackage);
+    }
+    updateTeachingPackageExportButton();
+  }
+
   function renderTeachingPackageArtifact(kind, item) {
     var row = document.createElement("div");
     var taskId = item.taskId || "";
@@ -3534,11 +3701,13 @@
       return;
     }
     if (!packageReview || packageReview.available !== true) {
+      applyTeachingPackageExportState(packageReview || null);
       panel.hidden = true;
       return;
     }
 
     panel.hidden = false;
+    applyTeachingPackageExportState(packageReview);
     var progress = packageReview.reviewProgress || {};
     var validation = packageReview.validation || {};
     var candidateSafety = packageReview.candidateSafeExamPreview || {};
@@ -3678,6 +3847,7 @@
     state.coreDbPath = getQueryCoreDbPath();
     state.gradingDbPath = getQueryGradingDbPath();
     state.agentEntityRefreshRequested = getQueryAgentEntityRefreshRequested();
+    applyTeachingPackageExportState(null);
     refreshMvpWorkspaceContextLinks(getQueryTaskId());
     refreshStaticRealDemoReviewLinks();
 
@@ -3687,7 +3857,7 @@
     }
 
     var taskId = getQueryTaskId();
-    safeFetchJson(summaryPath())
+    return safeFetchJson(summaryPath())
       .then(function (payload) {
         if (!payload || payload.success !== true || !payload.data) {
           throw new Error("INVALID_SUMMARY_PAYLOAD");
@@ -3709,6 +3879,7 @@
         return loadTaskDetail(taskId, { updateUrl: false });
       })
       .catch(function (error) {
+        applyTeachingPackageExportState(null);
         setState("STATIC_HTML_FALLBACK", "frontend/mock-data.json + static HTML", "apiLoadError=" + error.message);
       });
   }
@@ -3732,6 +3903,8 @@
     applyCoreWorkflowReadiness: applyCoreWorkflowReadiness,
     loadAgentCoreExecutionReport: loadAgentCoreExecutionReport,
     applyAgentCoreExecutionReport: applyAgentCoreExecutionReport,
+    applyTeachingPackageExportState: applyTeachingPackageExportState,
+    exportTeachingPackage: exportTeachingPackage,
     copySuggestedCoreNextCommand: copySuggestedCoreNextCommand,
     copySuggestedCoreReviewUrl: copySuggestedCoreReviewUrl,
     copyAgentReportSuggestedCoreNextCommand: copyAgentReportSuggestedCoreNextCommand,
@@ -3745,6 +3918,7 @@
       setupDecisionNoteAction();
       setupCoreNextStepCopyAction();
       setupAgentReportNextStepCopyAction();
+      setupTeachingPackageExportAction();
       loadAgentCoreExecutionReport();
       loadReviewCenterData();
     });
@@ -3753,6 +3927,7 @@
     setupDecisionNoteAction();
     setupCoreNextStepCopyAction();
     setupAgentReportNextStepCopyAction();
+    setupTeachingPackageExportAction();
     loadAgentCoreExecutionReport();
     loadReviewCenterData();
   }
