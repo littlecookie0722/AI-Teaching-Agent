@@ -97,10 +97,14 @@ REGRESSION_COMMANDS: dict[str, RegressionCommand] = {
     ),
     "ppt_quality_preflight": RegressionCommand(
         id="ppt_quality_preflight",
-        label="PPT artifact quality preflight",
-        paths=("tests/test_ppt_preflight.py",),
+        label="PPT layout preflight and artifact integrity",
+        paths=(
+            "tests/test_ppt_preflight.py",
+            "tests/test_pptx_artifact.py",
+            "tests/test_teaching_presentation.py",
+        ),
         owner="PPT",
-        reason="PPT source content density and renderer truncation risks remain visible before manual review.",
+        reason="PPT layout capacity, visible text, and generated artifact integrity stay aligned before manual review.",
     ),
     "real_llm_offline_schema": RegressionCommand(
         id="real_llm_offline_schema",

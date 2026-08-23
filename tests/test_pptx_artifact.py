@@ -162,6 +162,151 @@ def test_build_pptx_artifact_creates_six_slide_deck_and_consistent_previews(tmp_
         assert any(low != high for low, high in image.convert("RGB").getextrema())
 
 
+@pytest.mark.skipif(not OPTIONAL_DEPENDENCIES_AVAILABLE, reason="requires python-pptx and Pillow")
+def test_layout_text_limit_is_shared_by_pptx_and_png_renderer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    dsl = six_slide_dsl()
+    long_process_step = "步骤" * 42
+    long_hero_audience = "学习者" * 20
+    long_exercise_subtitle = "检查点" * 20
+    dsl["spec"]["slides"][3]["bullets"][0] = long_process_step
+    dsl["metadata"]["audience"] = long_hero_audience
+    dsl["spec"]["slides"][0].pop("subtitle")
+    dsl["spec"]["slides"][4]["bullets"] = ["完成主要任务"]
+    dsl["spec"]["slides"][4]["subtitle"] = long_exercise_subtitle
+    expected_display_text = pptx_artifact._rendered_text(long_process_step, 30)
+    full_hero_fallback = pptx_artifact.hero_subtitle_fallback(long_hero_audience, "45 min")
+    expected_subtitle = pptx_artifact._rendered_text(full_hero_fallback, 48)
+    expected_exercise_subtitle = pptx_artifact._rendered_text(long_exercise_subtitle, 36)
+    pptx_values: list[str] = []
+    image_values: list[str] = []
+    original_pptx_text = pptx_artifact._PptCanvas.text
+    original_image_text = pptx_artifact._ImageCanvas.text
+
+    def capture_pptx_text(self, value, *args, **kwargs):
+        pptx_values.append(value)
+        return original_pptx_text(self, value, *args, **kwargs)
+
+    def capture_image_text(self, value, *args, **kwargs):
+        image_values.append(value)
+        return original_image_text(self, value, *args, **kwargs)
+
+    monkeypatch.setattr(pptx_artifact._PptCanvas, "text", capture_pptx_text)
+    monkeypatch.setattr(pptx_artifact._ImageCanvas, "text", capture_image_text)
+
+    pptx_path = tmp_path / "course.pptx"
+    build_pptx_artifact(
+        dsl,
+        pptx_path=pptx_path,
+        preview_dir=tmp_path / "previews",
+        contact_sheet_path=tmp_path / "contact-sheet.png",
+    )
+
+    assert expected_display_text.endswith("…")
+    assert expected_display_text in pptx_values
+    assert expected_display_text in image_values
+    assert expected_subtitle in pptx_values
+    assert expected_subtitle in image_values
+    assert expected_exercise_subtitle in pptx_values
+    assert expected_exercise_subtitle in image_values
+    assert long_process_step not in pptx_values
+    assert long_process_step not in image_values
+    assert full_hero_fallback not in pptx_values
+    assert full_hero_fallback not in image_values
+    assert long_exercise_subtitle not in pptx_values
+    assert long_exercise_subtitle not in image_values
+    presentation = pytest.importorskip("pptx").Presentation(pptx_path)
+    visible_text = "\n".join(
+        str(getattr(shape, "text", ""))
+        for shape in presentation.slides[3].shapes
+    )
+    assert expected_display_text in visible_text
+    assert long_process_step not in visible_text
+    hero_text = "\n".join(
+        str(getattr(shape, "text", ""))
+        for shape in presentation.slides[0].shapes
+    )
+    assert expected_subtitle in hero_text
+    assert full_hero_fallback not in hero_text
+    exercise_text = "\n".join(
+        str(getattr(shape, "text", ""))
+        for shape in presentation.slides[4].shapes
+    )
+    assert expected_exercise_subtitle in exercise_text
+    assert long_exercise_subtitle not in exercise_text
+
+
+@pytest.mark.skipif(not OPTIONAL_DEPENDENCIES_AVAILABLE, reason="requires Pillow")
+def test_forced_ellipsize_marks_vertical_line_truncation() -> None:
+    image_module = pytest.importorskip("PIL.Image")
+    image_draw = pytest.importorskip("PIL.ImageDraw")
+    image_font = pytest.importorskip("PIL.ImageFont")
+    draw = image_draw.Draw(image_module.new("RGB", (320, 80), "white"))
+    font = pptx_artifact._load_font(image_font, 18, bold=False)
+
+    truncated = pptx_artifact._ellipsize(draw, "short line", font, 240, force=True)
+
+    assert truncated != "short line"
+    assert truncated.endswith("...")
+
+
+def test_exercise_subtitle_only_is_not_repeated_in_checkpoint_slot() -> None:
+    class RecordingCanvas:
+        def __init__(self) -> None:
+            self.values: list[str] = []
+
+        def rect(self, *args, **kwargs) -> None:
+            pass
+
+        def circle(self, *args, **kwargs) -> None:
+            pass
+
+        def text(self, value, *args, **kwargs) -> None:
+            self.values.append(value)
+
+    long_subtitle = "检查点" * 20
+    expected = pptx_artifact._rendered_text(long_subtitle, 36)
+    canvas = RecordingCanvas()
+    slide = pptx_artifact._Slide(1, "exercise", "课堂练习", long_subtitle, ())
+
+    pptx_artifact._draw_exercise(canvas, slide, {})
+
+    assert canvas.values.count(expected) == 1
+    assert long_subtitle not in canvas.values
+
+
+@pytest.mark.skipif(not OPTIONAL_DEPENDENCIES_AVAILABLE, reason="requires Pillow")
+@pytest.mark.parametrize(
+    ("slot", "limit", "width", "height", "size", "bold"),
+    [
+        ("hero_title", 24, 760, 190, 58, True),
+        ("section_title", 24, 1080, 76, 40, True),
+        ("concept_title", 24, 350, 210, 43, True),
+        ("exercise_title", 24, 1080, 76, 42, True),
+        ("summary_title", 22, 1100, 92, 46, True),
+        ("hero_subtitle", 48, 700, 80, 25, False),
+        ("concept_subtitle", 40, 340, 100, 21, False),
+        ("exercise_subtitle", 36, 438, 58, 21, False),
+        ("summary_subtitle", 40, 1120, 52, 20, False),
+        ("objectives_bullet", 64, 930, 72, 24, True),
+        ("concept_bullet", 40, 560, 68, 23, True),
+        ("process_bullet", 30, 190, 128, 21, True),
+        ("exercise_primary", 60, 430, 210, 30, True),
+        ("exercise_checkpoint", 36, 438, 58, 21, False),
+        ("summary_bullet", 40, 298, 130, 24, True),
+    ],
+)
+def test_renderer_safe_text_limits_fit_preview_boxes(slot, limit, width, height, size, bold) -> None:
+    deps = pptx_artifact._load_dependencies()
+    draw = deps.ImageDraw.Draw(deps.Image.new("RGB", (1280, 720), "white"))
+    font = pptx_artifact._load_font(deps.ImageFont, size, bold=bold)
+    line_height = max(size + 8, pptx_artifact._font_height(draw, font))
+    max_lines = max(1, height // line_height)
+
+    for character in ("W", "Ｗ", "汉"):
+        lines = pptx_artifact._wrap_lines(draw, character * limit, font, width)
+        assert len(lines) <= max_lines, f"{slot} overflowed for {character!r}: {len(lines)} > {max_lines}"
+
+
 def test_build_pptx_artifact_reports_missing_optional_dependencies(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     real_import = pptx_artifact.import_module
 

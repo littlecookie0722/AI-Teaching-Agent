@@ -21,12 +21,18 @@ def test_regression_profiles_are_predefined_and_safe():
     quick_profile = next(profile for profile in profiles["profiles"] if profile["id"] == "quick")
     core_profile = next(profile for profile in profiles["profiles"] if profile["id"] == "core")
     grading_command = next(command for command in core_profile["commands"] if command["id"] == "grading_core")
+    ppt_command = next(command for command in core_profile["commands"] if command["id"] == "ppt_quality_preflight")
 
     assert profiles["mode"] == "LOCAL_REGRESSION_TEST_MATRIX_PROFILES"
     assert profiles["defaultProfile"] == "quick"
     assert {profile["id"] for profile in profiles["profiles"]} >= {"quick", "core", "backend-core"}
     assert "frontend_core_manifest" in quick_profile["commandIds"]
     assert "tests/test_controlled_command_sandbox_executor.py" in grading_command["paths"]
+    assert set(ppt_command["paths"]) >= {
+        "tests/test_ppt_preflight.py",
+        "tests/test_pptx_artifact.py",
+        "tests/test_teaching_presentation.py",
+    }
     assert profiles["safety"]["predefinedProfilesOnly"] is True
     assert profiles["safety"]["arbitraryCommandAllowed"] is False
     assert profiles["safety"]["shellExecutionAllowed"] is False

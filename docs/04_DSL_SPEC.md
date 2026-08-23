@@ -28,8 +28,10 @@ python lab_cli.py dsl validate --kind ppt --file templates/ppt/examples/course-p
 ## PPT 产品契约
 
 - `templates/ppt/ppt.schema.json` 保持历史兼容，`spec.slides` 的全局最小数量不提升到 5。
-- `layout` 是可选字段，可取 `hero`、`objectives`、`concept`、`process`、`exercise` 或 `summary`；旧 DSL 不提供时，本地构建器按页面类型和标题确定版式。
-- `presentation-deck` 产品服务另行强制 5-8 页，默认 6 页，并要求封面、学习目标、核心概念、实验流程、候选人安全练习和总结语义完整。
+- `layout` 是可选字段，可取 `hero`、`objectives`、`concept`、`process`、`exercise` 或 `summary`；旧 DSL 不提供时，预检与本地构建器共用页面位置、类型和标题推断版式。
+- `presentation-deck` 产品服务另行强制 5-8 页，默认 6 页，并要求封面、学习目标、核心概念、实验流程、候选人安全练习和总结语义完整；产品生成的每页固定写入 `layout`。
+- 固定版式容量为：`hero=0`、`objectives=3`、`concept=4`、`process=4`、`exercise=4`、`summary=3` 条 bullet。产品生成会在写入 DSL 时按容量收敛；兼容 DSL 超出容量时，预检返回 `BULLETS_TRUNCATED_BY_RENDERER`，并用 `renderedBulletLimit` / `renderedBulletTotal` 报告实际值。
+- 标题、副标题和各版式 bullet 使用与画布一致的安全长度；超限兼容 DSL 会返回 `SLIDE_TITLE_LONG`、`SUBTITLE_TEXT_LONG` 或 `BULLET_TEXT_LONG`，PPTX 与 PNG 使用相同带省略号的显示文本。
 - 产品 Deck 的可见标题、副标题和 bullet 不得包含答案、答案文本、`gradingRef` 字面量或实际内部评分引用值。
 - PPT DSL、PPTX、逐页 PNG、contact sheet 和 manifest 都属于同一 child WorkflowRun 的本地审核产物；生成成功后仍为 `WAITING_REVIEW`。
 

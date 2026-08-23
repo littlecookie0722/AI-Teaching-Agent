@@ -8,8 +8,9 @@ directly.
 
 The core MVP generates linked Lab, Exam, and internal Grading artifacts,
 validates them, protects candidate-facing content, and stops for a human
-decision before local export. The selected next stage productizes a local PPTX
-deck from that approved package and adds page-by-page human review.
+decision before local export. The completed PPT stage productizes a local PPTX
+deck from that approved package, adds page-by-page human review, and now stays
+at its local generation/review/download stop line.
 
 ## Current MVP
 
@@ -183,9 +184,11 @@ runtime workflows, plus linked-score, grading-reference, candidate-safety, and
 minimum-content checks. It is deterministic and does not call a model or run
 learner code; see [the quality guide](quality/README.md).
 
-PPTX artifact builds also include a local advisory preflight report. It checks
-slide titles, body density, long text, and the six-bullet renderer limit; it
-does not modify the DSL, approve a task, or publish a deck.
+PPTX artifact builds also include a local advisory preflight report. It uses
+the same explicit or inferred layout as the renderer, checks each layout's
+three- or four-bullet capacity, title/subtitle/body density, and visible text
+limits, and reports the actual rendered totals. It does not modify the source
+DSL, approve a task, or publish a deck.
 
 When opening `frontend/ai-tasks.html?agentReport=<workflow-report-json>`, the
 AI Task Center forwards the report context to the read-only review summary. A

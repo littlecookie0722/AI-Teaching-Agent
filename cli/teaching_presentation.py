@@ -12,7 +12,13 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 from uuid import uuid4
 
-from quality.ppt_preflight import build_ppt_preflight_report
+from quality.ppt_preflight import (
+    build_ppt_preflight_report,
+    bullet_character_limit_for_layout,
+    rendered_bullet_limit_for_layout,
+    subtitle_character_limit_for_layout,
+    title_character_limit_for_layout,
+)
 
 from .ai_task import TaskStatus, create_waiting_review_task
 from .artifact import ArtifactKind, ArtifactStatus, create_artifact_record
@@ -390,12 +396,19 @@ def _build_presentation_dsl(
         ["理解课程中的关键概念", "按步骤完成课堂实践", "能够复盘并说明实践结果"],
     )
     concept_bullets = _concept_bullets(metadata, spec, objectives)
-    process_bullets = _process_bullets(steps)
+    process_slide_capacity = rendered_bullet_limit_for_layout("process")
+    if slide_count == 5:
+        process_slot_total = max(1, process_slide_capacity - 1)
+    elif slide_count == 6:
+        process_slot_total = process_slide_capacity
+    else:
+        process_slot_total = process_slide_capacity * 2
+    process_bullets = _process_bullets(steps, slot_limit=process_slot_total)
     exercise_bullets = _exercise_bullets(questions)
     summary_bullets = _ensure_bullets(
         [
             f"回顾：{objectives[0]}" if objectives else "回顾本课关键概念",
-            f"实践：完成 {len(steps)} 个实验步骤" if steps else "实践：按流程完成课堂任务",
+            f"流程：课件覆盖全部 {len(steps)} 个实验步骤" if steps else "流程：按步骤完成课堂任务",
             f"检查：完成 {len(questions)} 个课堂练习" if questions else "检查：完成课堂练习与自检",
             "整理成果并完成课堂复盘",
         ],
@@ -406,19 +419,27 @@ def _build_presentation_dsl(
         "hero",
         "title",
         title,
+        layout="hero",
         subtitle=_short_text(f"{audience} · {duration} 分钟 · 教学演示", 72),
     )
-    objectives_slide = _slide("objectives", "content", "学习目标", bullets=objective_bullets)
-    concept_slide = _slide("concept", "content", "核心概念", bullets=concept_bullets)
-    exercise_slide = _slide("exercise", "content", "课堂练习", bullets=exercise_bullets)
-    summary_slide = _slide("summary", "summary", "总结与下一步", bullets=summary_bullets)
+    objectives_slide = _slide(
+        "objectives",
+        "content",
+        "学习目标",
+        layout="objectives",
+        bullets=objective_bullets,
+    )
+    concept_slide = _slide("concept", "content", "核心概念", layout="concept", bullets=concept_bullets)
+    exercise_slide = _slide("exercise", "content", "课堂练习", layout="exercise", bullets=exercise_bullets)
+    summary_slide = _slide("summary", "summary", "总结与下一步", layout="summary", bullets=summary_bullets)
 
     if slide_count == 5:
         middle = _slide(
             "concept_process",
             "content",
             "核心概念与实验流程",
-            bullets=_ensure_bullets(concept_bullets[:2] + process_bullets[:3], process_bullets),
+            layout="process",
+            bullets=_ensure_bullets(concept_bullets[:1] + process_bullets[:3], process_bullets),
         )
         slides = [hero, objectives_slide, middle, exercise_slide, summary_slide]
     elif slide_count == 6:
@@ -426,7 +447,7 @@ def _build_presentation_dsl(
             hero,
             objectives_slide,
             concept_slide,
-            _slide("process", "content", "实验步骤", bullets=process_bullets),
+            _slide("process", "content", "实验步骤", layout="process", bullets=process_bullets),
             exercise_slide,
             summary_slide,
         ]
@@ -436,8 +457,8 @@ def _build_presentation_dsl(
             hero,
             objectives_slide,
             concept_slide,
-            _slide("process_1", "content", "实验步骤 · 准备", bullets=first_process),
-            _slide("process_2", "content", "实验步骤 · 完成", bullets=second_process),
+            _slide("process_1", "content", "实验步骤 · 准备", layout="process", bullets=first_process),
+            _slide("process_2", "content", "实验步骤 · 完成", layout="process", bullets=second_process),
             exercise_slide,
             summary_slide,
         ]
@@ -451,9 +472,15 @@ def _build_presentation_dsl(
             hero,
             objectives_slide,
             concept_slide,
-            _slide("concept_application", "content", "概念应用", bullets=application_bullets),
-            _slide("process_1", "content", "实验步骤 · 准备", bullets=first_process),
-            _slide("process_2", "content", "实验步骤 · 完成", bullets=second_process),
+            _slide(
+                "concept_application",
+                "content",
+                "概念应用",
+                layout="concept",
+                bullets=application_bullets,
+            ),
+            _slide("process_1", "content", "实验步骤 · 准备", layout="process", bullets=first_process),
+            _slide("process_2", "content", "实验步骤 · 完成", layout="process", bullets=second_process),
             exercise_slide,
             summary_slide,
         ]
@@ -877,18 +904,24 @@ def _slide(
     slide_type: str,
     title: str,
     *,
+    layout: str,
     subtitle: str | None = None,
     bullets: list[str] | None = None,
 ) -> dict[str, Any]:
     slide: dict[str, Any] = {
         "id": semantic_id,
         "type": slide_type,
-        "title": _short_text(title, 30),
+        "layout": layout,
+        "title": _short_text(title, title_character_limit_for_layout(layout)),
     }
     if subtitle:
-        slide["subtitle"] = _short_text(subtitle, 88)
+        slide["subtitle"] = _short_text(subtitle, subtitle_character_limit_for_layout(layout))
     if bullets:
-        slide["bullets"] = [_short_text(item, 88) for item in bullets[:5]]
+        rendered_bullet_limit = rendered_bullet_limit_for_layout(layout)
+        slide["bullets"] = [
+            _short_text(item, bullet_character_limit_for_layout(layout, index))
+            for index, item in enumerate(bullets[:rendered_bullet_limit])
+        ]
     return slide
 
 
@@ -904,13 +937,33 @@ def _concept_bullets(metadata: dict[str, Any], spec: dict[str, Any], objectives:
     return _ensure_bullets(candidates, ["理解关键概念", "识别实践重点", "说明方法的适用场景"])
 
 
-def _process_bullets(steps: list[dict[str, Any]]) -> list[str]:
+def _process_bullets(steps: list[dict[str, Any]], *, slot_limit: int) -> list[str]:
+    fallbacks = ["检查实践环境", "按步骤完成任务", "记录并复核实践结果"]
+    if not steps:
+        return _ensure_bullets([], fallbacks)
+
+    direct_step_total = len(steps)
+    if len(steps) > slot_limit:
+        direct_step_total = max(0, slot_limit - 1)
+
     items = []
-    for step in steps[:5]:
+    for step in steps[:direct_step_total]:
         title = _clean_text(step.get("title")) or "完成实验步骤"
         instruction = _clean_text(step.get("instruction"))
         items.append(f"{title}：{instruction}" if instruction else title)
-    return _ensure_bullets(items, ["检查实践环境", "按步骤完成任务", "记录并复核实践结果"])
+    if direct_step_total < len(steps):
+        remaining_total = len(steps) - direct_step_total
+        items.append(
+            f"步骤 {direct_step_total + 1}-{len(steps)}：完成其余 {remaining_total} 步并整理结果"
+        )
+
+    result = [_short_text(item, 88) for item in items if _clean_text(item)]
+    for fallback in fallbacks:
+        if len(result) >= min(3, slot_limit):
+            break
+        if fallback not in result:
+            result.append(fallback)
+    return result[:slot_limit]
 
 
 def _exercise_bullets(questions: list[dict[str, Any]]) -> list[str]:

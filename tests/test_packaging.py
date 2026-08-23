@@ -89,7 +89,7 @@ def test_wheel_installs_and_runs_from_outside_checkout(tmp_path: Path) -> None:
         assert len(metadata_members) == 1
         metadata_lines = archive.read(metadata_members[0]).decode("utf-8").splitlines()
     assert REQUIRED_WHEEL_ASSETS <= wheel_members
-    assert "Version: 0.1.9" in metadata_lines
+    assert "Version: 0.1.10" in metadata_lines
     assert not any(member.startswith("tests/") for member in wheel_members)
     assert not any(member.startswith("examples/output/") for member in wheel_members)
 

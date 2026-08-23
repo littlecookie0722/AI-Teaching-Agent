@@ -1,7 +1,7 @@
 # 项目进度地图与防跑偏清单
 
 > 最后更新：2026-08-23
-> 当前定位：AI 教学智能体（独立精简版）。Lab + Exam/Grading 教学包闭环已完成；用户已明确选择 PPT 产品化作为下一阶段，当前目标是从已批准教学包生成 5-8 页可演示、可逐页审核并可本地下载的教学 PPT。
+> 当前定位：AI 教学智能体（独立精简版）。Lab + Exam/Grading 教学包与 PPT 产品化闭环均已达到停止线；PPT 当前只处理真实样本复现的具体版式、兼容性或安全缺陷，不继续扩张在线编辑、云上传或发布能力。
 > 使用方式：本文件只维护当前路线、优先级和功能停止线；全局执行约束以项目根目录 `AGENTS.md` 为准。继续开发前先看本文件的“下一步路线”和相关停止线，避免在同一个功能点反复加门禁、加展示页或加运营材料。
 
 ---
@@ -22,7 +22,7 @@
   -> 本地下载
 ```
 
-精简教学包 MVP 已达到停止线。2026-08-23 用户在 PPT 产品化与自动评分产品化中明确选择 PPT；因此当前只把既有 PPT/PPTX PoC 收敛为上述教学包的本地演示课件，不并行恢复受控评分、内部实体、MCP、Agent 或其他前端路线。
+精简教学包 MVP 已达到停止线。2026-08-23 用户在 PPT 产品化与自动评分产品化中明确选择 PPT；既有 PPT/PPTX PoC 已于 v0.1.10 收敛为上述教学包的本地演示课件并完成真实样本质量回归，后续只修复具体缺陷，不并行恢复受控评分、内部实体、MCP、Agent 或其他前端路线。
 
 ### 1.1 独立智能体定位与内部闭环
 
@@ -91,12 +91,13 @@ Markdown 输入
 | 教学包审核聚合 v0.1.7 | `GET /api/review-task-summary?workflowRunId=...` 从已有 WorkflowRun、Artifact 和 AI Task 派生 Lab / Exam / Grading 教学包审核摘要；默认审核页展示三类路径、Schema/质量、候选人安全、审核进度和导出就绪状态，并逐项复用已有 approve/reject API。拒绝必须填写原因，不新增 TeachingPackage 实体或批量审核接口；历史 `legacy-all` 查询仍保留四类任务兼容。 | `cli/review_batch.py`、`backend/mock_api.py`、`frontend/review-center.html`、`frontend/review-center-data.js`、`frontend/review-action-data.js`、`tests/test_backend_mock_api.py`、`tests/test_frontend_manifest.py` | M-L | 已达到审核聚合停止线；下一步只实现全部三项人工批准后的本地教学包导出，不继续添加同义审核页、批量决定或发布能力。 |
 | 本地教学包导出 v0.1.8 | `lab-cli teaching-package export --workflow-run-id ... --reviewer ...` 与 `POST /api/teaching-packages/export` 只对 `teaching-core` 批次开放；Lab / Exam / Grading 三项必须全部人工批准，导出前重新校验 Schema 并重新生成候选人安全预览，默认原子写出 `examples/output/teaching-packages/<workflowRunId>.zip`。ZIP 固定包含 manifest、三类 DSL、候选预览和审核摘要六个成员；不依赖平台实体、不执行评分、不联网、不改变任务状态、不发布。 | `cli/teaching_package_export.py`、`cli/lab_cli.py`、`backend/mock_api.py`、`frontend/review-center.html`、`tests/test_teaching_package_export.py`、`tests/test_backend_mock_api.py`、`tests/test_frontend_manifest.py` | S-M | 已达到本地导出切片和精简 MVP 停止线；作为 v0.1.9 PPT 的已批准源批次继续保持兼容。 |
 | 教学 PPT 产品化 v0.1.9 | `ppt generate-from-teaching-package` 与 `POST /api/teaching-presentations/generate` 只接受已批准、`exportReady=true` 的 `teaching-core` 批次，默认生成 6 页并支持 5-8 页。服务创建独立 child WorkflowRun、单个 `PPT_GENERATION` / `WAITING_REVIEW` 任务及 PPT DSL/PPTX Artifact；本地渲染 16:9 PPTX、逐页 PNG、contact sheet 和 manifest。审核中心支持生成、预览、逐页结论、整套批准/退回及批准后下载；答案文本或 `gradingRef` 泄漏、Schema/契约/预检失败和部分构建均被阻断。 | `cli/teaching_presentation.py`、`cli/pptx_artifact.py`、`cli/lab_cli.py`、`backend/mock_api.py`、`backend/app.py`、`frontend/review-center.html`、`tests/test_teaching_presentation.py`、`tests/test_pptx_artifact.py`、`tests/test_teaching_presentation_frontend.py` | L | 已达到 5-8 页本地可演示课件停止线；不新增在线编辑器、云上传、平台导入或发布。 |
+| 教学 PPT 版式质量回归 v0.1.10 | 产品 PPT DSL 显式写入版式并按 objectives/summary 3 条、concept/process/exercise 4 条的真实容量生成；预检与构建器共用显式/推断版式、标题/副标题/bullet 安全长度和实际渲染统计，PPTX/PNG 共用带省略号显示文本。普通知识材料完成 5/6/7/8 页本地回归，5/8 页另经 PowerPoint 2021 打开、回写、PDF/PNG 导出验证；旧无 layout DSL 同步回归。 | `quality/ppt_preflight.py`、`cli/teaching_presentation.py`、`cli/pptx_artifact.py`、`tests/test_ppt_preflight.py`、`tests/test_pptx_artifact.py`、`tests/test_teaching_presentation.py` | S-M | 已修复预检假 PASS、整条 bullet 静默丢失和长中文无提示裁切；继续遵守 PPT 停止线。 |
 | AI 生成教学实验稳定 v1 | 第一个主功能已收敛为 Markdown 输入生成任务专属 Lab DSL：`lab generate-from-source` / `POST /api/labs/generate` 会输出 `examples/output/<task_id>-lab.json`，DSL 指向本次输入素材，至少包含 2 个学习目标和 3 个实验步骤，创建 `WAITING_REVIEW` 任务，返回 `labFeatureReadiness`，并提供审核详情、`lab import-preview`、`lab mock-import` 下一步入口；CLI 默认 Mock，也支持显式 `--provider-mode real-llm` 用 OpenAI-compatible 模型真实生成 Lab DSL 后进入同一审核链路；不调用真实平台、不发布。 | `python lab_cli.py lab generate-from-source --input examples/input/demo-source.md`、`python lab_cli.py lab generate-from-source --input examples/input/demo-source.md --provider-mode real-llm --model deepseek-v4-flash --base-url https://api.deepseek.com --explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish`、`POST /api/labs/generate`、`tests/test_cli.py::test_lab_generate_from_source_returns_json`、`tests/test_cli.py::test_lab_generate_from_source_real_llm_mode_uses_explicit_opt_in_and_stays_review_gated`、`tests/test_backend_mock_api.py::test_lab_generate_creates_waiting_review_task`、`quality regression-matrix --profile quick` | M | 已达到稳定 v1 停止线；后续不再围绕 Lab 生成页/命令追加同义展示壳，除非真实 LLM 生成 Lab 出现具体 Schema 或内容质量失败样本。 |
 | Lab DSL 转 Exam+Grading 稳定 v1 | 第二个主功能已收敛为 Lab DSL 输入生成任务专属 Exam DSL、Grading DSL 和候选人安全预览：`exam generate-from-lab --lab <Lab DSL>` 会先校验 Lab DSL，输出 `examples/output/<task_id>-exam.json`、`examples/output/<task_id>-grading.json`、`examples/output/<task_id>-exam-candidate-preview.json`，创建同一个 `WAITING_REVIEW` 任务，返回 `examGradingFeatureReadiness`；CLI 保留旧 `--lab-id` Mock 兼容路径，也支持显式 `--provider-mode real-llm` 用 OpenAI-compatible 模型真实生成 Exam/Grading 后做跨产物归一化，确保题目 `gradingRef` 覆盖到 `checks` / `assessmentPlan`、总分对齐、候选端不展示 `answer` 或内部 `gradingRef`；审核通过后可继续本地 `exam import-preview` 和 `grade import-preview`，不调用真实平台、不发布。 | `python lab_cli.py exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml`、`python lab_cli.py exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml --provider-mode real-llm --model deepseek-v4-flash --base-url https://api.deepseek.com --explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish`、`tests/test_cli.py::test_exam_generate_from_lab_real_llm_mode_outputs_task_specific_exam_grading_and_candidate_preview`、`tests/test_cli.py::test_exam_generate_from_lab_real_llm_mode_requires_lab_dsl`、`tests/test_cli.py::test_exam_and_grading_import_preview_from_approved_task`、`quality regression-matrix --profile quick` | M | 已达到稳定 v1 停止线；后续不再围绕旧 `--lab-id` Mock、候选预览或审核页追加同义展示壳，除非真实 LLM 生成 Exam/Grading 出现具体 Schema 或内容质量失败样本。 |
 | 真实 LLM Demo 工作流 | 真实 DSL 输出、报告、Provider audit、token usage、review detail；真实调用失败时会在 `--output` 写 `PHASE2_WORKFLOW_FAILURE_REPORT`，保留 Provider 错误上下文和 Schema 诊断，且不创建 AI Task、不发布；`provider real-llm-runtime-config` 已返回无密钥 `commandReadiness` 和 `safeCommandTemplates`，用于减少真实调用前的 PowerShell 手工拼接错误。 | `docs/18_REAL_LLM_DEMO_WORKFLOW.md`、`examples/output/*real-llm*` | L | 已可演示，稳定性待提升。 |
 | 真实输出归一化 | 已修复多类真实模型常见 Schema 偏差，如材料对象、答案字符串、资源对象、Lab grading ref 形状、Lab materials/steps、Lab step 字段别名、Exam questions、Exam question 字段别名、Grading checks/assessmentPlan 字段别名、PPT slides 字段别名和对象映射等，并建立 Schema 漂移矩阵回归入口；Schema 失败会返回不含答案/密钥原值的 `schemaFailureDiagnostic`，辅助定位 Prompt 或归一化缺口；2026-07-06 使用 DeepSeek v4 flash 跑通 Lab / Exam / Grading / PPT 四类真实 DSL 在线样本，随后又用 3 份不同输入素材连续跑通 3 轮真实四类 DSL 生成，12 份 DSL 独立校验全通过且保持 `WAITING_REVIEW`；同日 live 复核再次用 DeepSeek v4 flash 跑通四类 DSL，4/4 Schema 通过、`schemaRepairAttempted=false`、`blockingIssueTotal=0`；2026-07-12 又以 Linux 日志分析、Python 数据清洗、Web API 测试三份素材完成最终 12/12 文件级校验和候选预览脱敏验证，期间发现一次 Lab objective 数量不足，仅收紧 Prompt 为至少 2 个不同目标并复跑通过，未新增 Schema 归一化规则；`/api/workflow/report?file=...` 和 `review-center.html?agentReport=...` 已可只读读取本轮真实 workflow report。 | `phase2 workflow run --provider-mode real-llm` 的失败/成功记录、`docs/25_REAL_LLM_SCHEMA_DRIFT_MATRIX.md`、`examples/output/p0-deepseek-v4-flash-workflow-report.json`、`examples/output/p0-deepseek-v4-flash-multi-round-summary.json`、`examples/output/p0-deepseek-v4-flash-live-summary.json` | M | P0 在线稳定性已有连续通过样本；后续只按实际失败样本补归一化，否则转向自定义真实产物路径接入 Review Center / 前端 2.0 产品化，不再新增门禁或运营内容。 |
 | Exam 候选人预览 | 移除答案、阻断标准答案泄漏、生成选手端预览。 | `python lab_cli.py exam candidate-preview ...` | M | 已完成，需接入真实前端。 |
-| PPT DSL 与 PPTX Artifact PoC | 从 PPT DSL 生成本地 `.pptx`、manifest、预览产物，等待审核。 | `python lab_cli.py ppt artifact build ...`、`docs/22_PPTX_ARTIFACT_POC.md` | L | 历史 PoC 保持兼容；默认本地 Python 渲染器与产品链路见 v0.1.9。 |
+| PPT DSL 与 PPTX Artifact PoC | 从 PPT DSL 生成本地 `.pptx`、manifest、预览产物，等待审核。 | `python lab_cli.py ppt artifact build ...`、`docs/22_PPTX_ARTIFACT_POC.md` | L | 历史 PoC 保持兼容；默认本地 Python 渲染器与产品链路见 v0.1.10。 |
 | Demo Bundle | 复放真实 LLM 产物，汇总 Schema 校验、候选预览、只读沙箱证据和 PPTX Artifact。 | `python lab_cli.py phase2 demo-bundle build/report ...`、`docs/21_REAL_LLM_DEMO_BUNDLE.md` | L | 已完成，可作为演示闭环入口。 |
 | 可复现 Offline Demo | `demo offline` 使用本地 deterministic fixture / MockProvider，串联四类 DSL Schema 校验、候选人安全预览、`WAITING_REVIEW` 和质量摘要；默认不需要 API Key，不联网、不执行选手代码、不发布。失败时保持统一 JSON envelope，且不会落盘未通过校验的 summary 或候选人预览。 | `python lab_cli.py demo offline`、`tests/test_offline_demo.py`、`quality regression-matrix --profile quick/core`、`.github/workflows/core-regression-matrix.yml` | S-M | B1 已完成，达到无 Key 可复现停止线；后续不再新增同义 Demo 入口，转入 MCP 契约稳定化或其他核心业务缺口。 |
 | 自动评分 Mock | `file_exists` / `stdout_contains` / `pytest` / `notebook_cell` / `json_field` / `log_keyword` 计划化报告。 | `sandbox/grade_runner.py`、`python lab_cli.py grade run ...` | L | Mock/计划层已完成，真实执行沙箱未生产化。 |
@@ -162,7 +163,7 @@ Markdown 输入
 | 前端 2.0 | 用真实 API 做实验生成、试题生成、评分报告、审核中心和 AI Task 页面；AI Task 页已完成普通任务 / Backend Core 只读 loader，并在 v0.1.4 增加 `agentReport` 真实批次摘要、四类产物 synthetic task card 和带上下文的 Review Detail 加载。 | XL | P1 | 先完成核心 5 页，不继续堆运营页；AI Task 页已达到普通任务、Backend Core 和自定义真实报告批次的只读列表/详情加载停止线，下一步转生成页、审核页、评分报告页或导入预览页的具体产品化缺陷。 |
 | 受控评分沙箱生产化 | 已有本地 Docker PoC、本地 `GradingJob`、本地 `GradingRecord`、显式/后端默认本地 SQLite 仓储、claim lease、过期 claim 回收、重试上限、单次 worker、有限批次 drain、quota 摘要、资源保留计划、本地人工复核、审核详情/核心就绪接入、平台实体 readiness 的 GradingRecord 复核证据接入和本地镜像供应链审计；2026-07-12 已收口 `local-python-pytest-controlled-v1` 执行画像，报告/评分记录保留网络、只读挂载、资源限制、输出策略、镜像 labels/tag/digest 与 Docker/镜像不可用诊断。还缺真实后端 API、真实平台复核 API、生产镜像仓库/签名策略和更严格隔离策略。 | XL | P1 | 支持一类题型进入真实后端任务流和人工复核，并能在 `grading_rule` 平台实体 readiness 中看到评分记录复核证据；本地 Python/pytest 路径达到上述画像、诊断、测试和文档后停止，不再重复实现同义 PoC、默认 SQLite 策略、claim 回收、有限 drain、quota 摘要、镜像审计透传、readiness evidence 字段或新增禁用壳。 |
 | 自动评分生产化 | 从 Grading DSL 到评分任务队列、结果入库、人工复核、选手不可见答案保护。 | XL | P1 | 支持一类语言/题型先闭环，不一次性覆盖所有题型。 |
-| PPT 质量提升 | 六种教学版式、16:9 PPTX、逐页预览、contact sheet、质量预检和人工页审。 | L | P1 | v0.1.9 已让 5-8 页教学 PPT 达到本地可演示停止线；不做复杂在线编辑器。 |
+| PPT 质量提升 | 六种教学版式、16:9 PPTX、逐页预览、contact sheet、质量预检和人工页审。 | L | P1 | v0.1.10 已完成真实样本容量、长文本和 PowerPoint 兼容回归；不做复杂在线编辑器。 |
 | MCP Server 真部署 | 启动真实 MCP Server，暴露稳定工具，接入工具权限、审计、审核；本地 stdio 客户端配置和 `local-core-mvp` 调用顺序已记录。 | L-XL | P2 | 只封装已稳定 CLI/API，不把业务规则藏到 Agent prompt；当前本地停止线是 stdio + local-core profile + 人工审核点，不做网络 MCP 服务或真实平台工具。 |
 | 智能体 MVP | Agent 根据目标调用核心 MCP 工具，生成任务计划并停在审核点。 | L-XL | P2 | 能完成一条演示链路，不允许自动发布或自动销毁资源。 |
 | VM / Notebook 环境管理 | 实验环境镜像、Notebook 启停、资源配额、回收、审计。 | XL | P3 | 先对接测试环境，不碰生产云资源。 |
@@ -195,7 +196,8 @@ B1 停止线：默认 fixture 可稳定返回 `status=PASS`，四类 DSL Schema 
 
 2026-08-16，PPTX Artifact 构建增加了本地 `quality.ppt_preflight`：在已通过
 PPT Schema 校验、仍为 `WAITING_REVIEW` 的 DSL 上，逐页报告空标题、正文密度、
-长文本、估算溢出和 renderer 最多显示 6 个 bullet 的截断风险。结果写入构建
+长文本、估算溢出和 bullet 截断风险；当时预检统一假定 6 条容量，该假设已在
+v0.1.10 被显式/推断版式的真实 0/3/4 条容量替代。结果写入构建
 JSON、manifest、`PPTX_FILE` Artifact metadata、Demo Bundle 和页级 `qaSignals`，
 并加入 quick/core 固定回归矩阵。
 
@@ -298,6 +300,12 @@ PNG、contact sheet 和 manifest；构建失败不会创建新任务、WorkflowR
 通过注册 Artifact 的同源 URL 展示预览，支持逐页 `APPROVED` / `NEEDS_REVIEW` /
 `REVISE_REQUIRED`，只有全部页面通过后才能批准整套课件，且只有整套批准后才允许下载
 PPTX。该阶段不调用 LLM、网络、平台导入、评分沙箱或发布，也不提供在线编辑器。
+
+### 4.10 v0.1.10 教学 PPT 版式质量回归
+
+2026-08-23 使用不含个人信息、密钥或业务数据的普通知识材料复测 5/6/7/8 页课件，确认 v0.1.9 的产品 DSL 每页可生成 5 条 bullet，而固定版式只显示 3-4 条，旧预检仍按 6 条统计，导致 `PASS` 课件静默丢失内容；长中文流程、标题和封面副标题还可能在 PNG 中无提示裁切，并与 PPTX 文本不一致。
+
+本次让产品 DSL 显式写入版式并在生成阶段按实际容量与安全长度收敛；5/6 页的有限流程槽会用最后一槽明确聚合剩余源 Lab 步骤，避免源到 DSL 阶段再次静默丢失。预检和构建器共用版式推断、容量及文字上限，旧无 `layout` DSL 仍可构建，但超容量或超长时会明确进入 `NEEDS_REVIEW`。PPTX 与 PNG 使用相同的显示文本和省略号，`renderedBulletLimit` / `renderedBulletTotal` 对应实际输出。5/6/7/8 页本地样本与完整人工审核/下载均通过；其中 5/8 页另通过 PowerPoint 2021 打开、回写、PDF/PNG、OOXML 与 SHA-256 验证。未恢复在线编辑、云上传、平台导入或发布。
 
 ---
 

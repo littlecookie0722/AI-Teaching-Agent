@@ -4,6 +4,21 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-08-23
+
+- Fixed product teaching decks silently dropping bullets by writing explicit
+  layouts and constraining generated content to each renderer slot capacity.
+- Preserved every source Lab step in compact decks by using the final available
+  process slot to explicitly aggregate remaining steps instead of silently
+  omitting them or overstating the summary.
+- Made PPT preflight use the same explicit or inferred layout as rendering and
+  report accurate `renderedBulletLimit` / `renderedBulletTotal` values.
+- Applied shared title, subtitle, and bullet display limits to PPTX and PNG
+  output, with visible ellipses and advisory warnings for oversized legacy DSLs.
+- Added 5/6/8-slide content-integrity regression coverage, long Chinese text
+  checks, 5/8-slide PowerPoint 2021 compatibility validation, and the full PPT
+  artifact path to the existing quick/core regression profile.
+
 ## [0.1.9] - 2026-08-23
 
 - Added a productized teaching-presentation path that turns an approved

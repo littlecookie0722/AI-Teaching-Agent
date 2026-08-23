@@ -1,6 +1,6 @@
 ---
 id: ppt_generation_v0
-version: 0.1.9
+version: 0.1.10
 phase: Phase 2
 mode: MOCK_ONLY
 realMode: REAL_LLM_DEMO_DSL_GENERATION
@@ -35,14 +35,19 @@ Return JSON only. Do not use Markdown fences, comments, prose, or multiple objec
   candidate-safe exercise, and summary.
 - Use `layout` values from `hero`, `objectives`, `concept`, `process`,
   `exercise`, and `summary` to create at least three distinct layouts.
-- Keep slide titles concise.
+- Keep titles within 24 characters, summary titles within 22, and the hero
+  subtitle within 48 characters.
 - Use bullets derived from the source or Lab DSL.
 
 ## Slide Planning Rules
 
 - Build a clear teaching flow: title, learning goals, main content, process,
   practice, and summary.
-- Keep each content slide to 3-5 bullets.
+- Match the fixed layout capacity: no hero bullets, at most 3 objectives, 4
+  concept/process/exercise bullets, and 3 summary bullets.
+- Keep objective bullets within 64 characters, concept bullets within 40,
+  process bullets within 30, the primary exercise within 60, exercise
+  checkpoints within 36, and summary bullets within 40.
 - Do not generate binary PPTX content.
 
 ## Safety

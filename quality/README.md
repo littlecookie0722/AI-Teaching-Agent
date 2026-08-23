@@ -31,8 +31,9 @@ python -m pytest tests/test_dsl_quality_eval.py -q
 
 `ppt artifact build` 和真实 Demo Bundle 会调用 `quality.ppt_preflight`，对
 已通过 Schema 校验的 PPT DSL 做本地、确定性的审核前检查。报告包含逐页标题、
-正文密度、长文本、估算溢出和渲染器最多显示 6 个 bullet 的截断风险，并写入
-构建 JSON、manifest、PPTX Artifact metadata 和页级 `qaSignals`。该检查是
+正文密度、长文本、估算溢出，以及显式或推断版式的实际 0/3/4 条 bullet 容量；
+`renderedBulletLimit` / `renderedBulletTotal` 与构建器一致，并写入构建 JSON、
+manifest、PPTX Artifact metadata 和页级 `qaSignals`。该检查是
 `advisoryOnly=true`：不会修改 DSL、改变 `WAITING_REVIEW`、自动批准或发布。
 
 ```powershell
@@ -42,7 +43,7 @@ python lab_cli.py quality regression-matrix --profile quick --dry-run
 
 ## 输入说明
 
-- `profile`: 预定义测试矩阵，当前支持 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`。`quick` / `core` 已包含 `lab_generation_v1`、`exam_grading_generation_v1`、`offline_demo`、`ppt_quality_preflight`、`grading_stable_v1` 和 `frontend_core_manifest`：`offline_demo` 保护无 API Key 的四类 DSL、候选人预览和审核状态闭环；`ppt_quality_preflight` 保护 PPT 内容密度和渲染截断风险报告；其余核心命令分别保护 Lab 生成、Exam/Grading 生成、Grading 稳定闭环和核心前端页面契约。真实 LLM 生成路径用离线假适配验证显式 opt-in、模型/base URL/API surface 传参、Provider 审计和人工审核边界；`grading_stable_v1` 默认不联网、不读取密钥、不调用真实平台。
+- `profile`: 预定义测试矩阵，当前支持 `quick`、`core`、`backend-core`、`real-llm-offline`、`mcp`。`quick` / `core` 已包含 `lab_generation_v1`、`exam_grading_generation_v1`、`offline_demo`、`ppt_quality_preflight`、`grading_stable_v1` 和 `frontend_core_manifest`：`offline_demo` 保护无 API Key 的四类 DSL、候选人预览和审核状态闭环；`ppt_quality_preflight` 保护 PPT 版式容量、可见文本、预检与真实 Artifact 完整性；其余核心命令分别保护 Lab 生成、Exam/Grading 生成、Grading 稳定闭环和核心前端页面契约。真实 LLM 生成路径用离线假适配验证显式 opt-in、模型/base URL/API surface 传参、Provider 审计和人工审核边界；`grading_stable_v1` 默认不联网、不读取密钥、不调用真实平台。
 - `output`: 可选 JSON 报告路径，建议写入 `examples/output/` 或临时目录。
 - `timeoutSeconds`: 单条 pytest 命令超时时间。
 - `dryRun`: 只列出将执行的固定命令，不运行测试。

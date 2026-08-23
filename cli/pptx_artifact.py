@@ -14,6 +14,15 @@ import tempfile
 from types import SimpleNamespace
 from typing import Any
 
+from quality.ppt_preflight import (
+    bullet_character_limit_for_layout,
+    hero_subtitle_fallback,
+    presentation_duration_label,
+    resolve_ppt_layout,
+    subtitle_character_limit_for_layout,
+    title_character_limit_for_layout,
+)
+
 
 SLIDE_WIDTH = 1280
 SLIDE_HEIGHT = 720
@@ -228,7 +237,7 @@ def _normalize_dsl(dsl: dict[str, Any]) -> tuple[list[_Slide], dict[str, str]]:
     metadata = {
         "title": _text(metadata_source.get("title"), "Teaching deck"),
         "audience": _text(metadata_source.get("audience"), "Learners"),
-        "duration": _duration_label(metadata_source.get("durationMinutes")),
+        "duration": presentation_duration_label(metadata_source.get("durationMinutes")),
     }
     _assert_canvas_text_allowed(metadata["title"], "dsl.metadata.title")
     _assert_canvas_text_allowed(metadata["audience"], "dsl.metadata.audience")
@@ -247,7 +256,13 @@ def _normalize_dsl(dsl: dict[str, Any]) -> tuple[list[_Slide], dict[str, str]]:
             raise _validation_error(f"dsl.spec.slides[{position - 1}].bullets", "must be an array")
         bullets = tuple(_text(value, "") for value in raw_bullets if _text(value, ""))
         explicit_layout = _text(raw_slide.get("layout"), "").lower()
-        layout = explicit_layout or _infer_layout(position, len(raw_slides), slide_type, title)
+        layout = resolve_ppt_layout(
+            explicit_layout=explicit_layout,
+            index=position,
+            total=len(raw_slides),
+            slide_type=slide_type,
+            title=title,
+        )
         if layout not in ALLOWED_LAYOUTS:
             raise _validation_error(
                 f"dsl.spec.slides[{position - 1}].layout",
@@ -259,21 +274,6 @@ def _normalize_dsl(dsl: dict[str, Any]) -> tuple[list[_Slide], dict[str, str]]:
             _assert_canvas_text_allowed(bullet, f"dsl.spec.slides[{position - 1}].bullets[{bullet_index}]")
         slides.append(_Slide(position, layout, title, subtitle, bullets))
     return slides, metadata
-
-
-def _infer_layout(index: int, total: int, slide_type: str, title: str) -> str:
-    normalized_title = title.casefold()
-    if index == 1 or slide_type == "title":
-        return "hero"
-    if slide_type == "summary" or index == total:
-        return "summary"
-    if any(token in normalized_title for token in ("objective", "goal", "learning outcome", "\u76ee\u6807")):
-        return "objectives"
-    if any(token in normalized_title for token in ("process", "workflow", "steps", "\u6d41\u7a0b", "\u6b65\u9aa4")):
-        return "process"
-    if any(token in normalized_title for token in ("exercise", "practice", "task", "\u7ec3\u4e60", "\u5b9e\u8df5")):
-        return "exercise"
-    return "concept"
 
 
 def _assert_canvas_text_allowed(value: str, field: str) -> None:
@@ -346,8 +346,12 @@ def _draw_hero(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, INK)
     canvas.rect(0, 0, 18, SLIDE_HEIGHT, CORAL)
     canvas.text("TEACHING DECK", 72, 72, 420, 34, 18, GOLD, bold=True)
-    canvas.text(slide.title, 72, 150, 760, 190, 58, WHITE, bold=True, valign="middle")
-    subtitle = slide.subtitle or f"{metadata['audience']}  |  {metadata['duration']}"
+    title = _rendered_text(slide.title, title_character_limit_for_layout("hero"))
+    canvas.text(title, 72, 150, 760, 190, 58, WHITE, bold=True, valign="middle")
+    subtitle = _rendered_text(
+        slide.subtitle or hero_subtitle_fallback(metadata["audience"], metadata["duration"]),
+        subtitle_character_limit_for_layout("hero"),
+    )
     canvas.text(subtitle, 76, 366, 700, 80, 25, "D9E2EC")
     canvas.rect(900, 92, 250, 250, TEAL, radius=28)
     canvas.text("01", 930, 116, 190, 120, 74, WHITE, bold=True, align="center")
@@ -359,8 +363,12 @@ def _draw_hero(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
 def _draw_objectives(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
     del metadata
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, PAPER)
-    _draw_section_heading(canvas, "LEARNING OUTCOMES", slide.title, TEAL)
-    items = _display_items(slide, 3)
+    title = _rendered_text(slide.title, title_character_limit_for_layout("objectives"))
+    _draw_section_heading(canvas, "LEARNING OUTCOMES", title, TEAL)
+    items = [
+        _rendered_text(item, bullet_character_limit_for_layout("objectives", index))
+        for index, item in enumerate(_display_items(slide, 3))
+    ]
     colors = ((TEAL, TEAL_SOFT), (CORAL, CORAL_SOFT), (BLUE, BLUE_SOFT))
     for index, item in enumerate(items):
         top = 214 + index * 132
@@ -376,10 +384,15 @@ def _draw_concept(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, WHITE)
     canvas.rect(0, 0, 472, SLIDE_HEIGHT, TEAL)
     canvas.text("CORE IDEA", 58, 62, 300, 34, 17, GOLD, bold=True)
-    canvas.text(slide.title, 58, 126, 350, 210, 43, WHITE, bold=True, valign="middle")
+    title = _rendered_text(slide.title, title_character_limit_for_layout("concept"))
+    canvas.text(title, 58, 126, 350, 210, 43, WHITE, bold=True, valign="middle")
     if slide.subtitle:
-        canvas.text(slide.subtitle, 60, 366, 340, 100, 21, "DDF4EE")
-    items = _display_items(slide, 4)
+        subtitle = _rendered_text(slide.subtitle, subtitle_character_limit_for_layout("concept"))
+        canvas.text(subtitle, 60, 366, 340, 100, 21, "DDF4EE")
+    items = [
+        _rendered_text(item, bullet_character_limit_for_layout("concept", index))
+        for index, item in enumerate(_display_items(slide, 4))
+    ]
     for index, item in enumerate(items):
         top = 104 + index * 122
         canvas.rect(540, top, 650, 92, PAPER, radius=12)
@@ -390,8 +403,12 @@ def _draw_concept(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
 def _draw_process(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
     del metadata
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, PAPER)
-    _draw_section_heading(canvas, "PROCESS", slide.title, CORAL)
-    items = _display_items(slide, 4)
+    title = _rendered_text(slide.title, title_character_limit_for_layout("process"))
+    _draw_section_heading(canvas, "PROCESS", title, CORAL)
+    items = [
+        _rendered_text(item, bullet_character_limit_for_layout("process", index))
+        for index, item in enumerate(_display_items(slide, 4))
+    ]
     count = len(items)
     card_width = 230 if count >= 4 else 280
     gap = 42
@@ -412,10 +429,24 @@ def _draw_exercise(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, "EEF2F5")
     canvas.rect(0, 0, SLIDE_WIDTH, 188, CORAL)
     canvas.text("PRACTICE", 70, 44, 250, 30, 17, GOLD_SOFT, bold=True)
-    canvas.text(slide.title, 68, 82, 1080, 76, 42, WHITE, bold=True)
-    items = _display_items(slide, 4)
+    title = _rendered_text(slide.title, title_character_limit_for_layout("exercise"))
+    canvas.text(title, 68, 82, 1080, 76, 42, WHITE, bold=True)
+    items = [
+        _rendered_text(
+            item,
+            (
+                bullet_character_limit_for_layout("exercise", index)
+                if slide.bullets
+                else subtitle_character_limit_for_layout("exercise")
+            ),
+        )
+        for index, item in enumerate(_display_items(slide, 4))
+    ]
     first = items[0]
-    rest = items[1:] or [slide.subtitle or "Apply the idea to a concrete example."]
+    rest = items[1:]
+    if not rest:
+        fallback = slide.subtitle if slide.bullets and slide.subtitle else "Apply the idea to a concrete example."
+        rest = [_rendered_text(fallback, bullet_character_limit_for_layout("exercise", 1))]
     canvas.rect(72, 236, 520, 368, WHITE, radius=18)
     canvas.text("TASK", 104, 270, 180, 30, 16, CORAL, bold=True)
     canvas.text(first, 104, 326, 430, 210, 30, INK, bold=True, valign="middle")
@@ -432,8 +463,12 @@ def _draw_summary(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
     canvas.rect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT, INK)
     canvas.rect(0, 0, SLIDE_WIDTH, 16, GOLD)
     canvas.text("TAKEAWAYS", 72, 62, 260, 30, 17, TEAL_SOFT, bold=True)
-    canvas.text(slide.title, 70, 108, 1100, 92, 46, WHITE, bold=True)
-    items = _display_items(slide, 3)
+    title = _rendered_text(slide.title, title_character_limit_for_layout("summary"))
+    canvas.text(title, 70, 108, 1100, 92, 46, WHITE, bold=True)
+    items = [
+        _rendered_text(item, bullet_character_limit_for_layout("summary", index))
+        for index, item in enumerate(_display_items(slide, 3))
+    ]
     colors = (TEAL, CORAL, BLUE)
     for index, item in enumerate(items):
         x = 72 + index * 390
@@ -442,7 +477,8 @@ def _draw_summary(canvas: Any, slide: _Slide, metadata: dict[str, str]) -> None:
         canvas.text(f"0{index + 1}", x + 26, 292, 100, 42, 25, colors[index % 3], bold=True)
         canvas.text(item, x + 26, 354, 298, 130, 24, WHITE, bold=True, valign="middle")
     if slide.subtitle:
-        canvas.text(slide.subtitle, 72, 570, 1120, 52, 20, "CBD5E1", align="center")
+        subtitle = _rendered_text(slide.subtitle, subtitle_character_limit_for_layout("summary"))
+        canvas.text(subtitle, 72, 570, 1120, 52, 20, "CBD5E1", align="center")
 
 
 def _draw_section_heading(canvas: Any, kicker: str, title: str, accent: str) -> None:
@@ -463,6 +499,12 @@ def _display_items(slide: _Slide, limit: int) -> list[str]:
     if not items:
         items.append(slide.title)
     return items
+
+
+def _rendered_text(value: str, maximum: int) -> str:
+    if len(value) <= maximum:
+        return value
+    return value[: maximum - 1].rstrip() + "…"
 
 
 class _PptCanvas:
@@ -568,7 +610,7 @@ class _ImageCanvas:
         max_lines = max(1, height // line_height)
         if len(lines) > max_lines:
             lines = lines[:max_lines]
-            lines[-1] = _ellipsize(self.draw, lines[-1], font, width)
+            lines[-1] = _ellipsize(self.draw, lines[-1], font, width, force=True)
         block_height = len(lines) * line_height
         cursor_y = y if valign == "top" else y + max(0, (height - block_height) // (2 if valign == "middle" else 1))
         for line in lines:
@@ -691,8 +733,8 @@ def _split_token(draw: Any, value: str, font: Any, max_width: int) -> tuple[str,
     return fitting, ""
 
 
-def _ellipsize(draw: Any, value: str, font: Any, max_width: int) -> str:
-    if draw.textlength(value, font=font) <= max_width:
+def _ellipsize(draw: Any, value: str, font: Any, max_width: int, *, force: bool = False) -> str:
+    if not force and draw.textlength(value, font=font) <= max_width:
         return value
     suffix = "..."
     trimmed = value
@@ -704,14 +746,6 @@ def _ellipsize(draw: Any, value: str, font: Any, max_width: int) -> str:
 def _font_height(draw: Any, font: Any) -> int:
     bounds = draw.textbbox((0, 0), "Ag", font=font)
     return max(1, bounds[3] - bounds[1] + 6)
-
-
-def _duration_label(value: Any) -> str:
-    if isinstance(value, bool):
-        return "Course session"
-    if isinstance(value, (int, float)) and value > 0:
-        return f"{int(value)} min"
-    return "Course session"
 
 
 def _text(value: Any, fallback: str) -> str:

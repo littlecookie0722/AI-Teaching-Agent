@@ -56,7 +56,7 @@
     },
     {
       "id": "ppt_generation_v0",
-      "version": "0.1.9",
+      "version": "0.1.10",
       "title": "PPT DSL generation prompt",
       "path": "prompts/workflows/ppt_generation.md",
       "owner": "teaching-operations",

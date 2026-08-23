@@ -198,7 +198,43 @@ def test_generate_default_deck_stays_review_gated_and_preserves_parent_export(tm
     assert Path(exported["outputPath"]).parent == workspace / "examples" / "output" / "teaching-packages"
 
 
-def test_generate_with_default_builder_creates_openable_pptx_and_png_reviews(tmp_path, monkeypatch):
+def test_generate_constrains_long_hero_subtitle_before_preflight(tmp_path, monkeypatch):
+    store, generated, _ = _create_workflow(tmp_path, monkeypatch, approve=True)
+    run_id = generated["data"]["workflowRun"]["id"]
+    lab_artifact = next(
+        artifact
+        for artifact in store.list_artifacts(workflow_run_id=run_id)
+        if artifact.kind == ArtifactKind.LAB_DSL
+    )
+    lab_path = Path(lab_artifact.path)
+    lab = json.loads(lab_path.read_text(encoding="utf-8"))
+    lab["spec"]["targetUsers"] = ["学习者" * 20]
+    lab_path.write_text(json.dumps(lab, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    result = generate_teaching_presentation(
+        store,
+        workflow_run_id=run_id,
+        reviewer="teacher_ppt",
+        output_root=tmp_path / "presentation-output",
+        builder=_fake_builder,
+    )
+
+    hero = result["presentationDsl"]["spec"]["slides"][0]
+    hero_quality = result["qualityReport"]["slides"][0]
+    assert len(hero["subtitle"]) == 48
+    assert hero["subtitle"].endswith("…")
+    assert hero_quality["subtitleCharacterTotal"] == 48
+    assert hero_quality["renderedSubtitleCharacterLimit"] == 48
+    assert hero_quality["estimatedTextOverflow"] is False
+    assert result["qualityReport"]["status"] == "PASS"
+
+
+@pytest.mark.parametrize("slide_count", [5, 6, 8])
+def test_generate_with_default_builder_preserves_all_dsl_text_in_pptx_and_png_reviews(
+    tmp_path,
+    monkeypatch,
+    slide_count,
+):
     store, generated, _ = _create_workflow(tmp_path, monkeypatch, approve=True)
     run_id = generated["data"]["workflowRun"]["id"]
 
@@ -206,6 +242,7 @@ def test_generate_with_default_builder_creates_openable_pptx_and_png_reviews(tmp
         store,
         workflow_run_id=run_id,
         reviewer="teacher_ppt",
+        slide_count=slide_count,
         output_root=tmp_path / "presentation-output",
     )
 
@@ -213,8 +250,26 @@ def test_generate_with_default_builder_creates_openable_pptx_and_png_reviews(tmp
     image_module = pytest.importorskip("PIL.Image")
     pptx_path = Path(result["pptxArtifact"]["path"])
     presentation = presentation_module.Presentation(pptx_path)
-    assert len(presentation.slides) == 6
+    assert len(presentation.slides) == slide_count
     assert presentation.slide_width / presentation.slide_height == pytest.approx(16 / 9, rel=1e-4)
+
+    source_slides = result["presentationDsl"]["spec"]["slides"]
+    quality_slides = result["qualityReport"]["slides"]
+    assert result["qualityReport"]["status"] == "PASS"
+    for source_slide, quality_slide, rendered_slide in zip(
+        source_slides,
+        quality_slides,
+        presentation.slides,
+        strict=True,
+    ):
+        visible_text = "\n".join(
+            text
+            for shape in rendered_slide.shapes
+            if (text := str(getattr(shape, "text", "")).strip())
+        )
+        assert source_slide["title"] in visible_text
+        assert all(bullet in visible_text for bullet in source_slide.get("bullets", []))
+        assert quality_slide["bulletTotal"] == quality_slide["renderedBulletTotal"]
 
     metadata = result["pptxArtifact"]["metadata"]
     for preview in metadata["slidePreviews"]:
@@ -226,7 +281,7 @@ def test_generate_with_default_builder_creates_openable_pptx_and_png_reviews(tmp
         assert contact_sheet.height > 0
 
 
-@pytest.mark.parametrize("slide_count", [5, 8])
+@pytest.mark.parametrize("slide_count", [5, 6, 7, 8])
 def test_generate_supports_five_to_eight_slide_product_range(tmp_path, monkeypatch, slide_count):
     store, generated, _ = _create_workflow(tmp_path, monkeypatch, approve=True)
     run_id = generated["data"]["workflowRun"]["id"]
@@ -247,6 +302,92 @@ def test_generate_supports_five_to_eight_slide_product_range(tmp_path, monkeypat
     assert slides[0]["type"] == "title"
     assert slides[-1]["type"] == "summary"
     assert all(any(role in slide_id for slide_id in slide_ids) for role in ("hero", "objectives", "concept", "process", "exercise", "summary"))
+    assert result["qualityReport"]["status"] == "PASS"
+    assert all(slide.get("layout") for slide in slides)
+    assert all(
+        report["bulletTotal"] == report["renderedBulletTotal"]
+        for report in result["qualityReport"]["slides"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("slide_count", "step_total", "direct_step_total", "aggregate_range"),
+    [
+        (5, 5, 2, "步骤 3-5"),
+        (6, 5, 3, "步骤 4-5"),
+        (8, 9, 7, "步骤 8-9"),
+    ],
+)
+def test_generate_aggregates_source_steps_that_exceed_process_layout_slots(
+    tmp_path,
+    monkeypatch,
+    slide_count,
+    step_total,
+    direct_step_total,
+    aggregate_range,
+):
+    store, generated, _ = _create_workflow(tmp_path, monkeypatch, approve=True)
+    run_id = generated["data"]["workflowRun"]["id"]
+    lab_artifact = next(
+        artifact
+        for artifact in store.list_artifacts(workflow_run_id=run_id)
+        if artifact.kind == ArtifactKind.LAB_DSL
+    )
+    lab_path = Path(lab_artifact.path)
+    lab = json.loads(lab_path.read_text(encoding="utf-8"))
+    lab["spec"]["steps"] = [
+        {
+            "id": f"step_{index}",
+            "title": f"操作{index}",
+            "instruction": f"完成普通知识任务{index}",
+            "expectedResult": f"得到普通验证结果{index}",
+        }
+        for index in range(1, step_total + 1)
+    ]
+    lab_path.write_text(json.dumps(lab, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    result = generate_teaching_presentation(
+        store,
+        workflow_run_id=run_id,
+        reviewer="teacher_ppt",
+        slide_count=slide_count,
+        output_root=tmp_path / f"presentation-output-{slide_count}",
+        builder=_fake_builder,
+    )
+
+    slides = result["presentationDsl"]["spec"]["slides"]
+    process_slides = [slide for slide in slides if slide.get("layout") == "process"]
+    assert process_slides
+    assert all(len(slide.get("bullets", [])) == 4 for slide in process_slides)
+    process_bullets = []
+    for slide in process_slides:
+        bullets = slide.get("bullets", [])
+        process_bullets.extend(bullets[1:] if slide["id"].endswith("_concept_process") else bullets)
+    rendered_process = "\n".join(process_bullets)
+    for index in range(1, direct_step_total + 1):
+        assert f"操作{index}" in rendered_process
+    aggregate_bullet = next(bullet for bullet in process_bullets if aggregate_range in bullet)
+    assert aggregate_bullet == (
+        f"{aggregate_range}：完成其余 {step_total - direct_step_total} 步并整理结果"
+    )
+    assert not aggregate_bullet.endswith("…")
+    assert all(len(bullet) <= 30 for bullet in process_bullets)
+
+    summary = next(slide for slide in slides if slide["layout"] == "summary")
+    assert f"覆盖全部 {step_total} 个实验步骤" in "\n".join(summary["bullets"])
+    assert result["qualityReport"]["status"] == "PASS"
+    process_quality = [
+        report for report in result["qualityReport"]["slides"] if report["layout"] == "process"
+    ]
+    assert all(
+        report["bulletTotal"] == report["renderedBulletTotal"] == report["renderedBulletLimit"] == 4
+        and report["estimatedTextOverflow"] is False
+        for report in process_quality
+    )
+    assert all(
+        report["bulletTotal"] == report["renderedBulletTotal"]
+        for report in result["qualityReport"]["slides"]
+    )
 
 
 @pytest.mark.parametrize("slide_count", [4, 9])
