@@ -452,7 +452,7 @@
           <h2 id="generation-input-title">生成输入</h2>
           <p>本地教学素材与生成参数</p>
         </div>
-        <span class="pill">4 类 DSL</span>
+        <span class="pill">3 类核心 DSL</span>
       </div>
 
       <form id="generation-workspace-form" novalidate>
@@ -518,7 +518,7 @@
           </label>
         </div>
         <div class="action-bar">
-          <button id="generation-run" class="primary" type="submit">一键生成 4 类 DSL</button>
+          <button id="generation-run" class="primary" type="submit">生成教学包</button>
           <span class="pill warn">人工审核前不可发布</span>
         </div>
       </form>
@@ -528,7 +528,7 @@
       <div class="section-head">
         <div>
           <h2 id="generation-result-title">生成与审核队列</h2>
-          <p>Lab / Exam / Grading / PPT</p>
+          <p>Lab + Exam/Grading</p>
         </div>
         <span class="pill">POST /api/phase2/workflows/content-generation/run</span>
       </div>
@@ -539,7 +539,7 @@
         <div class="progress-track" aria-hidden="true">
           <div id="generation-progress-bar" class="progress-bar"></div>
         </div>
-        <span id="generation-progress-label" class="pill">0 / 4</span>
+        <span id="generation-progress-label" class="pill">0 / 3</span>
       </div>
 
       <div class="summary-grid" aria-label="生成批次摘要">
@@ -549,7 +549,7 @@
         </div>
         <div class="metric">
           <span>已生成 DSL</span>
-          <strong id="generation-dsl-total">0 / 4</strong>
+          <strong id="generation-dsl-total">0 / 3</strong>
         </div>
         <div class="metric">
           <span>待审核任务</span>
@@ -601,18 +601,6 @@
           <a id="generation-grading-review" class="button" href="#" aria-disabled="true">审核 Grading</a>
         </article>
 
-        <article class="task-row" data-kind="ppt" data-state="NOT_STARTED">
-          <div class="task-kind">
-            <span class="pill">PPT</span>
-            <strong id="generation-ppt-status">NOT_STARTED</strong>
-          </div>
-          <div class="task-body">
-            <strong id="generation-ppt-task">task=not_created</strong>
-            <p id="generation-ppt-path" class="task-path">dslPath=none</p>
-            <p id="generation-ppt-quality" class="task-meta">schema=waiting · quality=waiting</p>
-          </div>
-          <a id="generation-ppt-review" class="button" href="#" aria-disabled="true">审核 PPT</a>
-        </article>
       </div>
 
       <div class="action-bar">

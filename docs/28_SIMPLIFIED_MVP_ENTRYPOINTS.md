@@ -1,7 +1,7 @@
 # 精简 MVP 入口与实施边界
 
-> 状态：入口盘点与决策已完成，行为改造尚未开始。
-> 日期：2026-08-22
+> 状态：生成入口与 `teaching-core` profile 已完成，审核聚合与本地导出待实现。
+> 日期：2026-08-23
 > 上位约束：`AGENTS.md`、`docs/24_PROJECT_PROGRESS_MAP.md`
 
 ## 1. 目标
@@ -93,8 +93,8 @@ review-summary.json
 
 ## 6. 实施顺序
 
-1. 为既有内容生成 API 增加 `artifactProfile=teaching-core`，补正常、非法 profile、Schema 失败和兼容路径测试。
-2. 将 `generation-workspace.html` 默认切到 `teaching-core`，只展示三类产物和一个审核中心入口。
+1. 已完成：为既有内容生成 API 增加 `artifactProfile=teaching-core`，补正常、非法 profile、失败不落任务和兼容路径测试。
+2. 已完成：将 `generation-workspace.html` 默认切到 `teaching-core`，只展示三类产物和一个审核中心入口。
 3. 让 `review-center.html` 按 `workflowRun.id` 展示教学包进度，并接入已有逐任务人工决定。
 4. 增加仅对全部已批准任务开放的本地教学包导出。
 5. 收敛主导航和 E2E，保留旧入口的直接 URL 与契约回归。
@@ -111,4 +111,3 @@ review-summary.json
 - 审核：三个任务逐项 approve/reject，拒绝必须填写 reason，状态可由同一审核中心回读。
 - 脱敏：候选人预览中不存在答案或 `gradingRef`。
 - 导出：未全部批准时阻断；全部批准后产出六个本地文件且不触发外部行为。
-

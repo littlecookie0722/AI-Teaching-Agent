@@ -6,7 +6,7 @@
 
 ## 当前默认入口
 
-- `generation-workspace.html`：唯一默认生成入口。现有实现仍固定生成 Lab / Exam / Grading / PPT；下一实现切片将通过兼容的 `artifactProfile=teaching-core` 收敛为前三类。
+- `generation-workspace.html`：唯一默认生成入口。现已固定传入兼容的 `artifactProfile=teaching-core`，只生成 Lab / Exam / Grading 三类核心产物；旧四类行为保留在未传 profile 的 API 兼容路径中。
 - `review-center.html`：唯一默认审核入口。现有实现已集中读取队列和详情；下一实现切片将按 `workflowRun.id` 聚合教学包并接入已有逐任务 approve/reject 动作。
 - `lab-generate.html`、`exam-generate.html` 和三个独立审核页：保留直接 URL，作为兼容、诊断和审核中心功能等价前的深层入口。
 - PPT、评分、平台实体、AI Task、MCP、Agent 和运营页面：退出当前主导航，只做必要的兼容性、安全或阻断性缺陷修复。
@@ -270,7 +270,7 @@ python -m pytest
 - `dashboard.html` 不发起网络请求，不执行自动发布，不创建真实资源，不展示密钥。
 - `delivery.html` 不发起网络请求，不上传交付包，不启用真实 Provider，不调用真实大模型，不执行真实沙箱，不自动发布或真实发布。
 - `review-center.html` 可只读加载由 CLI / 后端既有链路生成的真实 LLM workflow report；页面自身不读取密钥、不直接调用真实 LLM。同源 Backend Mock 启动时可调用 `POST /api/grading/evidence-auto` 生成本地评分证据报告；不执行真实审核、不自动发布、不执行高风险 MCP 意图、不确认二次因子、不销毁真实环境。
-- `generation-workspace.html` 只向同源后端发送一次生成请求；前端不接收或持久化 API Key，不自动审核，不发布，四类生成任务均停在 `WAITING_REVIEW`。
+- `generation-workspace.html` 只向同源后端发送一次带 `artifactProfile=teaching-core` 的生成请求，并展示 Lab / Exam / Grading 三类关联产物、候选安全摘要和审核入口；前端不接收或持久化 API Key，不自动审核，不发布，三个生成任务均停在 `WAITING_REVIEW`。
 - `ai-tasks.html` 仅在同源 Backend Mock 启动时发起只读 GET；默认读取 `/api/ai-tasks`，带 `coreDbPath` 时读取 `/api/backend/core-tasks`。它不启动真实 Agent，不执行审核动作，不自动发布，不执行批量状态变更。
 - `labs.html` 不发起网络请求，不批量变更状态，不自动发布，不发布真实实验。
 - `lab-generate.html` 默认只向同源 Backend Mock 发起 Mock 请求；用户明确选择 `real-llm` 后同源后端才可读取环境变量密钥并发送请求。前端不直接调用模型 Provider、不读取密钥、不抓取远程素材、不执行未知 Shell。

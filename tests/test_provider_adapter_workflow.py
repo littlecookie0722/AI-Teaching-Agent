@@ -3,6 +3,7 @@ from pathlib import Path
 
 import ai_workflows.provider_adapter_workflow as workflow_module
 from ai_workflows.provider_adapter_workflow import (
+    ARTIFACT_PROFILE_TEACHING_CORE,
     PHASE2_REAL_LLM_MODE,
     PHASE2_WORKFLOW_ID,
     PHASE2_REAL_LLM_DEMO_MODE,
@@ -653,6 +654,46 @@ def test_run_phase2_content_generation_real_demo_records_four_real_dsl(tmp_path,
     assert report["acceptanceSignals"]["realLlmDemoGeneratedAllDsl"] is True
     assert report["acceptanceSignals"]["realLlmDemoRequestCount"] == 4
     assert report["acceptanceSignals"]["realLlmMinimalLabConnected"] is False
+
+
+def test_run_phase2_content_generation_teaching_core_skips_real_ppt_request(tmp_path, monkeypatch):
+    calls = []
+    output_refs = {
+        "lab": str(tmp_path / "core-lab.json"),
+        "exam": str(tmp_path / "core-exam.json"),
+        "grading": str(tmp_path / "core-grading.json"),
+        "ppt": str(tmp_path / "must-not-exist-ppt.json"),
+    }
+
+    def fake_run(request, *, root):
+        calls.append(request.kind)
+        return fake_real_demo_generation(request, root=root)
+
+    monkeypatch.setattr(workflow_module, "run_real_llm_demo_dsl_generation", fake_run)
+
+    report = run_phase2_content_generation(
+        input_ref="examples/input/demo-source.md",
+        reviewer="teacher_1",
+        trace_id="trace_teaching_core_real",
+        root=ROOT,
+        provider_mode=PROVIDER_MODE_REAL_LLM,
+        artifact_profile=ARTIFACT_PROFILE_TEACHING_CORE,
+        real_output_refs=output_refs,
+        real_llm_model="test-model",
+        explicit_real_call_opt_in=True,
+        confirm_waiting_review=True,
+        confirm_no_auto_publish=True,
+    )
+
+    assert calls == ["lab", "exam", "grading"]
+    assert report["artifactProfile"] == "teaching-core"
+    assert report["generatedKinds"] == ["lab", "exam", "grading"]
+    assert list(report["generatedDsl"]) == ["lab", "exam", "grading"]
+    assert report["safety"]["realLlmGeneratedKinds"] == ["lab", "exam", "grading"]
+    assert report["safety"]["realLlmRequestCount"] == 3
+    assert report["acceptanceSignals"]["realLlmGeneratedAllDsl"] is True
+    assert not (tmp_path / "must-not-exist-ppt.json").exists()
+    assert "真实 LLM 已生成 Lab/Exam/Grading 三类核心 DSL，全部仍需人工审核" in report["reviewSummary"]["reviewHighlights"]
 
 
 def test_run_phase2_content_generation_real_llm_records_four_real_dsl(tmp_path, monkeypatch):

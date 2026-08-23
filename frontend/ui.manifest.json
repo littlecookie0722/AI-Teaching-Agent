@@ -23,12 +23,14 @@
         "POST /api/phase2/workflows/content-generation/run.createdTasks",
         "POST /api/phase2/workflows/content-generation/run.generatedDsl",
         "POST /api/phase2/workflows/content-generation/run.workflowRun",
+        "POST /api/phase2/workflows/content-generation/run.teachingPackageSummary",
+        "POST /api/phase2/workflows/content-generation/run.candidateSafeExamPreview",
+        "request.artifactProfile=teaching-core",
         "query: coreDbPath, gradingDbPath, agentReport",
         "review-center.html?taskId={taskId}",
         "lab-review.html?taskId={taskId}",
         "exam-review.html?taskId={taskId}",
-        "grading-review.html?taskId={taskId}",
-        "ppt-review.html?taskId={taskId}"
+        "grading-review.html?taskId={taskId}"
       ],
       "blockedActions": [
         "frontendDirectRealLlmGenerate",
@@ -1976,7 +1978,7 @@
       "route": "/generation-workspace",
       "title": "One-click Generation Workspace",
       "priority": 1,
-      "purpose": "Generate Lab, Exam, Grading, and PPT DSL from one local teaching source, keep all four tasks in WAITING_REVIEW, and route each artifact into human review.",
+      "purpose": "Generate linked Lab, Exam, and Grading DSL from one local teaching source, keep all three tasks in WAITING_REVIEW, and route the teaching package into human review.",
       "apiDependencies": [
         {
           "method": "POST",
@@ -1994,13 +1996,15 @@
         "POST /api/phase2/workflows/content-generation/run.createdTasks",
         "POST /api/phase2/workflows/content-generation/run.generatedDsl",
         "POST /api/phase2/workflows/content-generation/run.workflowRun",
+        "POST /api/phase2/workflows/content-generation/run.teachingPackageSummary",
+        "POST /api/phase2/workflows/content-generation/run.candidateSafeExamPreview",
+        "request.artifactProfile=teaching-core",
         "frontendDirectRealLlmCall=false",
         "query: coreDbPath, gradingDbPath, agentReport",
         "review-center.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "lab-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
         "exam-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
-        "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}",
-        "ppt-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
+        "grading-review.html?taskId={taskId}&coreDbPath={path}&gradingDbPath={path}&agentReport={workflowReport}"
       ],
       "mockDataPath": "frontend/mock-data.json",
       "prototypePath": "frontend/generation-workspace.html",

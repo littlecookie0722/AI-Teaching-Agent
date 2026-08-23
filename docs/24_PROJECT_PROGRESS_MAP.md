@@ -1,6 +1,6 @@
 # 项目进度地图与防跑偏清单
 
-> 最后更新：2026-08-22
+> 最后更新：2026-08-23
 > 当前定位：AI 教学智能体（独立精简版）。当前唯一产品目标是把一份 Markdown 教学材料转换为可人工审核、可本地导出的 Lab + Exam 教学包；Grading 是 Exam 的内部配套规则。
 > 使用方式：本文件只维护当前路线、优先级和功能停止线；全局执行约束以项目根目录 `AGENTS.md` 为准。继续开发前先看本文件的“下一步路线”和相关停止线，避免在同一个功能点反复加门禁、加展示页或加运营材料。
 
@@ -82,6 +82,7 @@ MVP 达标后，下一阶段只能在 PPT 产品化和自动评分产品化中�
 | 真实 SDK 安装与 client 边界 | 安装 OpenAI SDK、SDK import、client 构造、环境变量边界。 | `docs/13_REAL_SDK_INSTALL_EXECUTION.md`、`docs/14_REAL_SDK_CLIENT_BOUNDARY_EXECUTION.md` | M | 已完成，不再扩展同义门禁。 |
 | 最小真实 LLM PoC | 显式 opt-in 后发送一次真实请求生成 Lab DSL。 | `python lab_cli.py provider real-llm-minimal-poc run ...`、`docs/15_REAL_LLM_MINIMAL_POC.md` | L | 已完成，后续归入核心生成质量。 |
 | 真实 LLM 四类 DSL | 真实模型生成 Lab / Exam / Grading / PPT DSL，默认等待审核。 | `python lab_cli.py phase2 workflow run --provider-mode real-llm ...` | L | 已可用，Schema 归一化仍需增强。 |
+| 精简教学包生成 v0.1.6 | 既有内容生成 API 支持兼容的 `artifactProfile=teaching-core`，只生成相互关联的 Lab / Exam / Grading，创建 3 个 `WAITING_REVIEW` 任务，并返回候选人安全 Exam 预览、教学包级摘要和审核入口；默认生成页显式使用该 profile。未传字段继续执行 `legacy-all` 四类行为；真实模式不请求 PPT。 | `POST /api/phase2/workflows/content-generation/run`、`frontend/generation-workspace.html`、`tests/test_provider_adapter_workflow.py`、`tests/test_backend_mock_api.py`、`tests/test_frontend_manifest.py` | M | 已达到生成切片停止线；下一步转向同一 `workflowRun.id` 的三类审核聚合，不继续添加第二个生成 API 或同义生成页。 |
 | AI 生成教学实验稳定 v1 | 第一个主功能已收敛为 Markdown 输入生成任务专属 Lab DSL：`lab generate-from-source` / `POST /api/labs/generate` 会输出 `examples/output/<task_id>-lab.json`，DSL 指向本次输入素材，至少包含 2 个学习目标和 3 个实验步骤，创建 `WAITING_REVIEW` 任务，返回 `labFeatureReadiness`，并提供审核详情、`lab import-preview`、`lab mock-import` 下一步入口；CLI 默认 Mock，也支持显式 `--provider-mode real-llm` 用 OpenAI-compatible 模型真实生成 Lab DSL 后进入同一审核链路；不调用真实平台、不发布。 | `python lab_cli.py lab generate-from-source --input examples/input/demo-source.md`、`python lab_cli.py lab generate-from-source --input examples/input/demo-source.md --provider-mode real-llm --model deepseek-v4-flash --base-url https://api.deepseek.com --explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish`、`POST /api/labs/generate`、`tests/test_cli.py::test_lab_generate_from_source_returns_json`、`tests/test_cli.py::test_lab_generate_from_source_real_llm_mode_uses_explicit_opt_in_and_stays_review_gated`、`tests/test_backend_mock_api.py::test_lab_generate_creates_waiting_review_task`、`quality regression-matrix --profile quick` | M | 已达到稳定 v1 停止线；后续不再围绕 Lab 生成页/命令追加同义展示壳，除非真实 LLM 生成 Lab 出现具体 Schema 或内容质量失败样本。 |
 | Lab DSL 转 Exam+Grading 稳定 v1 | 第二个主功能已收敛为 Lab DSL 输入生成任务专属 Exam DSL、Grading DSL 和候选人安全预览：`exam generate-from-lab --lab <Lab DSL>` 会先校验 Lab DSL，输出 `examples/output/<task_id>-exam.json`、`examples/output/<task_id>-grading.json`、`examples/output/<task_id>-exam-candidate-preview.json`，创建同一个 `WAITING_REVIEW` 任务，返回 `examGradingFeatureReadiness`；CLI 保留旧 `--lab-id` Mock 兼容路径，也支持显式 `--provider-mode real-llm` 用 OpenAI-compatible 模型真实生成 Exam/Grading 后做跨产物归一化，确保题目 `gradingRef` 覆盖到 `checks` / `assessmentPlan`、总分对齐、候选端不展示 `answer` 或内部 `gradingRef`；审核通过后可继续本地 `exam import-preview` 和 `grade import-preview`，不调用真实平台、不发布。 | `python lab_cli.py exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml`、`python lab_cli.py exam generate-from-lab --lab templates/lab/examples/basic-lab.yaml --provider-mode real-llm --model deepseek-v4-flash --base-url https://api.deepseek.com --explicit-real-call-opt-in --confirm-waiting-review --confirm-no-auto-publish`、`tests/test_cli.py::test_exam_generate_from_lab_real_llm_mode_outputs_task_specific_exam_grading_and_candidate_preview`、`tests/test_cli.py::test_exam_generate_from_lab_real_llm_mode_requires_lab_dsl`、`tests/test_cli.py::test_exam_and_grading_import_preview_from_approved_task`、`quality regression-matrix --profile quick` | M | 已达到稳定 v1 停止线；后续不再围绕旧 `--lab-id` Mock、候选预览或审核页追加同义展示壳，除非真实 LLM 生成 Exam/Grading 出现具体 Schema 或内容质量失败样本。 |
 | 真实 LLM Demo 工作流 | 真实 DSL 输出、报告、Provider audit、token usage、review detail；真实调用失败时会在 `--output` 写 `PHASE2_WORKFLOW_FAILURE_REPORT`，保留 Provider 错误上下文和 Schema 诊断，且不创建 AI Task、不发布；`provider real-llm-runtime-config` 已返回无密钥 `commandReadiness` 和 `safeCommandTemplates`，用于减少真实调用前的 PowerShell 手工拼接错误。 | `docs/18_REAL_LLM_DEMO_WORKFLOW.md`、`examples/output/*real-llm*` | L | 已可演示，稳定性待提升。 |
@@ -121,7 +122,7 @@ MVP 达标后，下一阶段只能在 PPT 产品化和自动评分产品化中�
 - `review-center.html` 已支持 `coreDbPath` 只读补充：详情读取会保留原有 `GET /api/review-tasks/{id}` 聚合审核详情，同时在 URL 带 `coreDbPath` 时调用 `GET /api/backend/core-tasks/{id}?coreDbPath=...` 作为 repository-backed 任务基本信息 fallback；该能力只填充标题、状态、artifact 计数和发布阻断摘要，不创建任务、不审核、不发布。后续不要继续为审核页追加同义 Backend Core 只读壳，除非真实前端 2.0 或真实后端 API 挂载明确需要新的业务字段。
 - `lab-generate.html` 与 `exam-generate.html` 已收敛为 `LocalCoreGenerationWorkspace`：Lab 生成页的 `LabGenerationCloseLoopAction` 会在页面初始化和 `POST /api/labs/generate` 成功后刷新审核中心、Lab 审核页和本地导入预览深链；Exam 生成页的 `ExamGenerationCloseLoopAction` 会在页面初始化和 `POST /api/exams/generate-from-lab` 成功后刷新审核中心、Exam 审核页、Grading 审核页、Exam 导入预览和 Grading 导入预览深链。两个页面都会从 URL 读取 `coreDbPath`、`gradingDbPath`、`agentReport`，生成请求 body 只写入 `coreDbPath` 以便任务和 Artifact 进入同一本地 Backend Core repository，后续 Review Center、独立审核页和 Platform Entities 深链继续保留三类本地上下文。两个工作区都只读取本次生成响应，不新增 API，不自动审核、不发布、不调用真实平台；前端自身不读取密钥、不直接调用真实 LLM，真实 LLM 产物仍通过 CLI / one-click / 后端既有链路进入同一审核闭环；Exam 固定 `answerVisibleToCandidate=false` 与 `gradingRefVisibleToCandidate=false`。后续不要再围绕生成页追加同义“生成成功下一步/上下文透传/结果导航”壳，除非真实 API 返回字段变化导致深链错误。
 - `ppt-generate.html` 已补齐同一条本地核心生成工作台：页面通过 `PptGenerateDataLoader` 调用 `POST /api/ppt/generate`，从本地 Markdown 创建 `WAITING_REVIEW` PPT DSL 任务，并将 `taskId`、`pptDslPath`、`coreDbPath`、`gradingDbPath`、`agentReport` 透传到 Review Center、PPT 审核页和 `entityKind=ppt` 本地导入预览入口。三类生成页的同源 HTTP 回归均覆盖“页面资源可加载 -> 发起 Mock 生成 -> 生成 DSL 路径 -> 审核详情仍为 WAITING_REVIEW”；PPT 页面不输入或保存模型密钥，不生成真实 PPT 文件，不发布，也不出现真实平台发送入口。该生成工作台已达到当前停止线，后续只修复具体 API、可用性或视觉交互缺陷，不再新增同义生成导航壳。
-- `generation-workspace.html` 已将四类生成入口收敛为一个可操作批次：页面只调用一次 `POST /api/phase2/workflows/content-generation/run`，从同一本地教学素材生成 Lab / Exam / Grading / PPT DSL，并消费 `createdTasks`、`generatedDsl`、`workflowRun` 展示进度、Schema/内容质量状态、产物路径和四个独立审核入口；成功批次固定产生 4 个 `WAITING_REVIEW` 任务，并可整批进入 Review Center。默认 Mock，真实模式需要显式确认且密钥只由同源后端读取；前端固定 `frontendDirectRealLlmCall=false`、`answerVisibleToCandidate=false`、`gradingRefVisibleToCandidate=false`、`autoPublishAllowed=false`。该一键生成入口到四类人工审核导航已达到当前停止线，后续转向审核动作的具体交互缺陷或导入预览产品化，不再新增第二个批次生成页或同义后端编排接口。
+- `generation-workspace.html` 已收敛为精简教学包生成入口：页面只调用一次 `POST /api/phase2/workflows/content-generation/run` 并固定传 `artifactProfile=teaching-core`，从同一本地教学素材生成 Lab / Exam / Grading DSL，消费 `createdTasks`、`generatedDsl`、`workflowRun`、候选安全预览和教学包摘要，展示三类进度、Schema/内容质量状态、产物路径和审核入口；成功批次固定产生 3 个 `WAITING_REVIEW` 任务，不创建 PPT 任务。默认 Mock，真实模式需要显式确认且密钥只由同源后端读取；前端固定 `frontendDirectRealLlmCall=false`、`answerVisibleToCandidate=false`、`autoPublishAllowed=false`。该精简生成入口已达到当前停止线，下一步按同一 `workflowRun.id` 聚合审核，不再新增第二个批次生成页或同义后端编排接口。
 - `grading-workspace.html` 已补齐本地自动评分工作台：使用已有 GradingJob / GradingRecord HTTP 服务执行“创建任务 -> 运行受控评分 -> 读取评分记录 -> 人工记录 approve-ready / needs-evidence / needs-revision”的同步闭环；页面从 AI Task 与 Grading Report 进入时保留 `taskId`、`coreDbPath`、`gradingDbPath`、`agentReport`，运行后回到 Grading Report、Review Center 和 AI Task。页面执行仅限已有本地受控评分 API，记录复核不改变 AI Task 状态，不自动审核、不发布、不发送真实平台请求。后续只处理实际评分执行、隔离、报告可读性或复核交互缺陷，不再创建同义评分工作台或门禁。
 - `ai-tasks.html` 已新增 `TaskExecutionWorkspace` 本地闭环导航工作区：复用 `GET /api/ai-tasks`、`GET /api/backend/core-tasks?coreDbPath=...`、`GET /api/ai-tasks/{id}`、`GET /api/review-task-summary` 和当前任务的 `GET /api/grading/records` 只读数据，在页面初始化、静态 fallback 和选中任务时刷新审核中心、评分报告和本地导入预览入口。Exam / Grading 生成任务只要已关联 `GradingRecord.reportPath`，即可打开同一份本地评分报告和评分工作台；所有跳转保留 `coreDbPath`、`gradingDbPath`、`agentReport` 上下文，并展示候选答案保护、下一步人工动作和 `method=GET only` 边界；长状态、本地路径和 report 参数会在卡片内换行，避免 1280px 宽度下横向滚动。该工作区不新增 API、不发送 POST、不 approve/reject、不批量变更、不启动 Agent、不发布。后续不要再围绕 AI Task 首屏追加同义“任务导航/状态总览”壳，下一步前端产品化应转向生成页、导入预览页或具体视觉/交互缺陷。
 - `review-center.html` 已新增 `MVP Review Workspace` 首屏工作区：复用 `GET /api/review-task-summary`、`GET /api/review-tasks/{id}` 和 `GET /api/review-tasks/{id}/core-readiness`，汇总四类真实 DSL 批次校验数、当前任务、评分证据、本地导入预览、当前审核入口、评分报告入口和下一步人工动作；页面初始化、详情 404 或静态兜底时也会把首屏审核页和评分报告入口刷新为带 `coreDbPath`、`gradingDbPath`、`agentReport` 的本地深链，长状态、路径和 `entryHref` 会在卡片内换行，避免 1280px 宽度下横向滚动；首屏使用 `LOCAL_CORE_MVP`，明确真实 LLM 产物为只读加载且页面不直接发起 LLM 请求，避免把已加载真实产物误标为 Mock。评分报告入口只在 `mergedGradingEvidence.latestReportPath` 存在时启用，防止将 Lab / Exam / PPT DSL 路径误传到评分报告页。该工作区不新增 API、不执行 CLI、不 approve/reject/publish，只减少演示时在队列、证据、导入预览和报告入口之间来回查找。后续不要再围绕 Review Center 首屏追加同义“总览/工作台/摘要”壳，下一步前端产品化应转向 Grading Report、AI Task、生成页或导入预览页的具体体验缺陷。
@@ -134,7 +135,6 @@ MVP 达标后，下一阶段只能在 PPT 产品化和自动评分产品化中�
 
 | 功能 | 还缺什么 | 复杂度 | 优先级 | 做到什么就停 |
 | --- | --- | --- | --- | --- |
-| 精简生成入口 | 从一份 Markdown 完成 Lab + Exam/Grading 生成，不要求用户在四类产物或多个页面间编排。 | M | P0 | 一个入口可完成生成并给出明确的审核下一步。 |
 | Lab + Exam/Grading 质量 | 复用现有真实 LLM、Schema 和归一化能力，只修复这三类产物的实际失败样本和跨产物引用问题。 | M | P0 | 固定离线样本稳定通过；在线失败按样本回归，不预造规则。 |
 | 单一审核流程 | 将 Lab、Exam 和内部 Grading 的关键信息、候选人安全预览、批准/退回动作组织成一条教师可理解的流程。 | M-L | P0 | 教师无需跨多个工作台即可完成一次教学包审核。 |
 | 本地教学包导出 | 把审核后的 Lab、Exam、Grading 和候选人安全预览作为一个本地成果包导出，不发送外部平台。 | S-M | P0 | 导出内容可复现、可定位、无答案泄漏且不自动发布。 |
@@ -227,6 +227,20 @@ import-dry-run DTO；`coreDbPath`、`gradingDbPath` 与 `agentReport` 跨页保�
 Platform Entities 本地闭环、PPT 不再误回落到 Lab API、固定契约与浏览器回归通过”
 停止线后，不继续围绕导入预览页增加同义步骤或真实平台操作。
 
+### 4.6 v0.1.6 精简教学包生成
+
+2026-08-23，既有 `POST /api/phase2/workflows/content-generation/run` 增加
+`artifactProfile=teaching-core`。该 profile 在 Provider 层只生成 Lab / Exam /
+Grading，创建 3 个 `WAITING_REVIEW` 任务，并在落任务前构建候选人安全 Exam
+预览；响应同时返回以 `workflowRun.id` 关联三类任务的只读教学包摘要和审核入口。
+`frontend/generation-workspace.html` 已显式使用该 profile，并只展示三类产物。
+
+未传 profile 时继续按 `legacy-all` 生成历史四类产物。真实 LLM 的
+`teaching-core` 路径只发送三类请求，不生成空 PPT 任务或 Artifact。非法 profile、
+Provider/Schema 失败和候选预览脱敏失败都在创建审核任务前停止。达到“一份
+Markdown 生成三类相互关联、Schema 已验证、候选安全且等待人工审核的产物”停止线
+后，下一步进入同一批次的审核聚合，不继续增加同义生成 API、页面或门禁。
+
 ---
 
 ## 5. 后续推荐路线
@@ -234,10 +248,10 @@ Platform Entities 本地闭环、PPT 不再误回落到 Lab API、固定契约�
 ### P0：完成精简教学包闭环
 
 1. 默认生成入口已选定为 `frontend/generation-workspace.html`，默认审核入口已选定为 `frontend/review-center.html`；盘点与兼容决策见 `docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md`。
-2. 下一实现切片为既有 `POST /api/phase2/workflows/content-generation/run` 增加兼容的 `artifactProfile=teaching-core`，仅生成 Lab + Exam/Grading；未传字段时保持历史四类行为。
-3. 增加本地教学包导出：只导出已审核闭环需要的文件，不发送外部平台、不自动发布。
-4. 真实输出归一化只处理 Lab + Exam/Grading 的实际失败样本，不预先发明规则。
-5. 建立聚焦 E2E：Mock 正常路径和错误路径必测，真实 LLM 使用离线样本与可选在线测试分开。
+2. `artifactProfile=teaching-core` 精简生成切片已完成；未传字段保持历史四类行为。
+3. 下一实现切片为默认审核入口按同一 `workflowRun.id` 展示三类产物、校验结果，并支持逐项批准或退回。
+4. 增加本地教学包导出：只导出已审核闭环需要的文件，不发送外部平台、不自动发布。
+5. 真实输出归一化只处理 Lab + Exam/Grading 的实际失败样本；聚焦 E2E 区分离线 Mock 与可选在线测试。
 
 ### P1：MVP 验收后单选
 
@@ -270,9 +284,9 @@ Platform Entities 本地闭环、PPT 不再误回落到 Lab API、固定契约�
 | 顺序 | 任务 | 复杂度 |
 | --- | --- | --- |
 | 1 | 已完成：默认生成入口选定 `generation-workspace.html`，默认审核入口选定 `review-center.html`；复用边界、兼容策略和差距记录在 `docs/28_SIMPLIFIED_MVP_ENTRYPOINTS.md`。 | S |
-| 2 | 为既有内容生成 API 增加 `artifactProfile=teaching-core`，让默认生成入口从一份 Markdown 只产出 Lab + Exam/Grading，并返回教学包级摘要、候选人安全预览和审核入口；未传字段保持历史四类行为。 | M |
+| 2 | 已完成：既有内容生成 API 增加 `artifactProfile=teaching-core`，默认生成入口只产出 Lab + Exam/Grading，并返回教学包级摘要、候选人安全预览和审核入口；未传字段保持历史四类行为。 | M |
 | 3 | 让默认审核入口在一条流程中展示三类关联产物、校验结果，并支持批准或退回。 | M-L |
 | 4 | 增加不依赖平台实体的本地教学包导出，保持 `WAITING_REVIEW` 和人工审核边界。 | S-M |
 | 5 | 为上述闭环补 Mock 正常路径、错误路径、状态和脱敏回归；真实 LLM 仅追加实际失败样本。 | M |
 
-当前最建议下一步：执行任务 2，为现有内容生成 API 增加兼容的 `teaching-core` profile，并让默认生成页面显式使用该 profile。此前四类 DSL 一键 Demo、PPTX、评分 evidence、平台实体、MCP 和 Agent 仍可回归或演示，但不再决定当前产品范围。
+当前最建议下一步：执行任务 3，让默认审核入口按同一 `workflowRun.id` 聚合 Lab / Exam / Grading，并复用已有逐任务人工批准/退回 API。此前四类 DSL 一键 Demo、PPTX、评分 evidence、平台实体、MCP 和 Agent 仍可回归或演示，但不再决定当前产品范围。

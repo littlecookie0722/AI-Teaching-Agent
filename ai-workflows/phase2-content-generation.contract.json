@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "phase": "Phase 2",
   "mode": "MOCK_ONLY",
   "workflowId": "phase2_content_generation",
   "title": "Phase 2 Mock Content Generation Workflow",
-  "description": "MockProvider-first AI Workflow orchestrator for generating Lab, Exam, Grading, and PPT DSL review bundles. Default mode does not call real LLMs, cloud resources, agents, or sandboxes. Explicit real-llm-demo mode can call a real LLM to generate four review-gated DSL artifacts.",
+  "description": "MockProvider-first AI Workflow orchestrator. The legacy-all profile generates Lab, Exam, Grading, and PPT DSL; teaching-core generates only linked Lab, Exam, and Grading DSL plus a candidate-safe Exam preview. Default mode does not call real LLMs, cloud resources, agents, or sandboxes.",
   "entrypoints": {
     "cliRun": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-content-generation-report.json",
     "cliRunRealLlmMinimalLab": "python lab_cli.py phase2 workflow run --input examples/input/demo-source.md --reviewer teacher_1 --output examples/output/phase2-real-llm-workflow-report.json --provider-mode real-llm-minimal --real-lab-output examples/output/phase2-real-llm-lab.json --model <model-name> --explicit-real-call-opt-in --confirm-single-request --confirm-lab-only --confirm-waiting-review --confirm-no-auto-publish",
@@ -12,6 +12,23 @@
     "cliReport": "python lab_cli.py phase2 workflow report --file examples/output/phase2-content-generation-report.json",
     "pythonHelper": "ai_workflows.provider_adapter_workflow.run_phase2_content_generation"
   },
+  "artifactProfiles": [
+    {
+      "id": "legacy-all",
+      "defaultWhenOmitted": true,
+      "generatedKinds": ["lab", "exam", "grading", "ppt"],
+      "reviewTaskCount": 4
+    },
+    {
+      "id": "teaching-core",
+      "defaultForGenerationWorkspace": true,
+      "generatedKinds": ["lab", "exam", "grading"],
+      "reviewTaskCount": 3,
+      "candidateSafeExamPreview": true,
+      "teachingPackageSummary": true,
+      "realLlmRequestCountWithoutRepair": 3
+    }
+  ],
   "providerModes": [
     {
       "id": "mock",
@@ -347,6 +364,9 @@
   },
   "failurePolicy": {
     "providerFailureCreatesAiTask": false,
+    "schemaFailureCreatesAiTask": false,
+    "candidatePreviewFailureCreatesAiTask": false,
+    "invalidArtifactProfileCreatesAiTask": false,
     "providerFailurePublishesContent": false,
     "schemaValidationFailurePublishesContent": false,
     "includeProviderErrorContext": true

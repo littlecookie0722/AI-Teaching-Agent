@@ -13,7 +13,6 @@
     lab: { taskType: "LAB_GENERATION", reviewPage: "lab-review.html" },
     exam: { taskType: "EXAM_GENERATION", reviewPage: "exam-review.html" },
     grading: { taskType: "GRADING_GENERATION", reviewPage: "grading-review.html" },
-    ppt: { taskType: "PPT_GENERATION", reviewPage: "ppt-review.html" },
   };
 
   function $(id) {
@@ -84,12 +83,12 @@
   }
 
   function setProgress(completed) {
-    const normalized = Math.max(0, Math.min(4, Number(completed) || 0));
+    const normalized = Math.max(0, Math.min(3, Number(completed) || 0));
     const bar = $("generation-progress-bar");
     if (bar) {
-      bar.style.width = String(normalized * 25) + "%";
+      bar.style.width = String((normalized / 3) * 100) + "%";
     }
-    setText("generation-progress-label", normalized + " / 4");
+    setText("generation-progress-label", normalized + " / 3");
   }
 
   function setLink(id, href, enabled) {
@@ -144,6 +143,7 @@
       {
         input: $("generation-source").value.trim(),
         reviewer: $("generation-reviewer").value.trim(),
+        artifactProfile: "teaching-core",
         targetUsers: $("generation-target-users").value.trim(),
         durationMinutes: Number($("generation-duration").value),
         difficulty: $("generation-difficulty").value,
@@ -211,6 +211,7 @@
       traceId: payload && payload.traceId ? payload.traceId : "-",
       mode: data.mode || "-",
       providerMode: data.providerMode || "-",
+      artifactProfile: data.artifactProfile || "-",
       workflow: data.workflowRun
         ? {
             id: data.workflowRun.id || "-",
@@ -241,6 +242,8 @@
         };
         return summary;
       }, {}),
+      teachingPackageSummary: data.teachingPackageSummary || null,
+      candidateSafeExamPreview: data.candidateSafeExamPreview || null,
       safety: {
         frontendDirectRealLlmCall: false,
         autoPublishAllowed: false,
@@ -271,10 +274,10 @@
     });
 
     const workflow = data.workflowRun || {};
-    const firstTaskId = state.lastTaskIds.lab || state.lastTaskIds.exam || state.lastTaskIds.grading || state.lastTaskIds.ppt || "";
+    const firstTaskId = state.lastTaskIds.lab || state.lastTaskIds.exam || state.lastTaskIds.grading || "";
     setProgress(completed);
     setText("generation-workflow-status", workflow.status || "COMPLETED");
-    setText("generation-dsl-total", completed + " / 4");
+    setText("generation-dsl-total", completed + " / 3");
     setText("generation-review-total", waitingReview);
     setText("generation-provider-summary", data.providerMode || data.mode || "-");
     setText(
@@ -288,8 +291,8 @@
     );
     setText("generation-result-json", JSON.stringify(safeResult(payload), null, 2));
     setApiState(
-      completed === 4 && waitingReview === 4
-        ? "COMPLETED · 4 类 DSL 已生成，4 个任务等待人工审核"
+      completed === 3 && waitingReview === 3
+        ? "COMPLETED · 教学包已生成，3 个任务等待人工审核"
         : "COMPLETED_WITH_REVIEW_REQUIRED · 请检查生成结果",
       ""
     );
@@ -308,7 +311,7 @@
     setAllTaskStates("ERROR", "generation failed · review task not created");
     setProgress(0);
     setText("generation-workflow-status", "FAILED");
-    setText("generation-dsl-total", "0 / 4");
+    setText("generation-dsl-total", "0 / 3");
     setText("generation-review-total", "0");
     setLink("generation-review-center", "review-center.html", false);
     setText(
@@ -366,11 +369,11 @@
     setAllTaskStates("GENERATING", "request submitted · waiting for schema validation");
     setProgress(0);
     setText("generation-workflow-status", "RUNNING");
-    setText("generation-dsl-total", "0 / 4");
+    setText("generation-dsl-total", "0 / 3");
     setText("generation-review-total", "0");
     setText("generation-provider-summary", body.providerMode);
     setLink("generation-review-center", "review-center.html", false);
-    setApiState("RUNNING · 后端正在生成并校验 4 类 DSL", "pending");
+    setApiState("RUNNING · 后端正在生成并校验 Lab + Exam/Grading", "pending");
 
     try {
       const payload = await postJson(state.generatePath, body);
@@ -379,7 +382,7 @@
       renderError(errorPayload);
     } finally {
       button.disabled = false;
-      button.textContent = "一键生成 4 类 DSL";
+      button.textContent = "生成教学包";
     }
   }
 

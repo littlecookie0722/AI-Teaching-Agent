@@ -4,6 +4,19 @@ All notable project changes will be documented here.
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-08-23
+
+- Added the compatible `teaching-core` artifact profile to the existing
+  content-generation API, producing only linked Lab, Exam, and Grading DSL.
+- Added a candidate-safe Exam preview and teaching-package generation summary
+  before the three tasks enter `WAITING_REVIEW`.
+- Switched the default generation workspace to the three-artifact teaching
+  package while preserving the historical four-artifact API behavior when no
+  profile is supplied.
+- Ensured real-LLM teaching-core runs skip the PPT request and generation,
+  Schema, profile, or redaction failures create no review tasks.
+- Included the Phase 2 content-generation contract in the installable wheel.
+
 ## [0.1.5] - 2026-08-22
 
 - Connected PPT generation and review pages to the existing local PPT Deck

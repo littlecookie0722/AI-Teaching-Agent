@@ -5,12 +5,12 @@ AI Workflow 契约目录。当前 Phase 2 默认仍为 MockProvider-first 工作
 ## 输入说明
 
 - `workflow.manifest.json`: Phase 1 Mock Workflow 契约。
-- `phase2-content-generation.contract.json`: Phase 2 内容生成工作流契约，默认 Mock 编排 Lab / Exam / Grading / PPT DSL；显式 `real-llm-minimal` 模式只让 Lab DSL 使用真实 LLM 单请求；显式 `real-llm-demo` 模式让 Lab / Exam / Grading / PPT 四类 DSL 各用一次真实 LLM 请求生成。
+- `phase2-content-generation.contract.json`: Phase 2 内容生成工作流契约；`legacy-all` 保持 Lab / Exam / Grading / PPT 四类兼容行为，`teaching-core` 只编排 Lab / Exam / Grading。真实模式仍需显式 opt-in，并只请求 profile 包含的产物。
 - `phase2-exam-conversion.contract.json`: Phase 2 Mock 试题改造工作流契约，读取 Lab DSL 和 Notebook JSON，生成 Exam / Grading DSL 审核包。
 - `phase2-grading-generation.contract.json`: Phase 2 Mock 评分脚本生成工作流契约，读取 Exam DSL，生成 Grading DSL 审核包和 `assessmentPlan` 质量信号。
 - `phase2-ppt-generation.contract.json`: Phase 2 Mock PPT / 文档生成工作流契约，读取 Markdown，先生成 slide plan JSON，再生成 PPT DSL 审核包。
 - `phase2-workflow-registry.contract.json`: Phase 2 Mock Workflow 能力目录，集中声明可查询的 Workflow、契约路径、CLI / Backend 入口和安全标记。
-- `ai_workflows/provider_adapter_workflow.py`: Workflow 侧 Provider Adapter helper，统一生成 Lab / Exam / Grading / PPT DSL；默认 Mock，显式 real 模式支持 Lab 最小 PoC 或四类 DSL Demo。
+- `ai_workflows/provider_adapter_workflow.py`: Workflow 侧 Provider Adapter helper，按 artifact profile 统一生成 Lab / Exam / Grading / PPT DSL；默认 Mock，显式 real 模式支持 Lab 最小 PoC、三类核心教学包或四类兼容 Demo。
 - `ai_workflows/workflow_registry.py`: Workflow Registry 查询 helper，用于 CLI 和 Backend 的只读能力发现。
 - `provider-audit-workflow.contract.json`: Workflow 级 Provider 调用审计契约，要求入口层写入本地 `providerCallAuditEvents`。
 - 每个 workflow 需要声明：
@@ -37,7 +37,7 @@ PPT DSL      -> WAITING_REVIEW
 Mock Report  -> COMPLETED
 ```
 
-Phase 2 `phase2_content_generation` 同时写入本地 AI Task、Provider 审计、Workflow Run、Artifact 清单和 Workflow Report JSON，生成类 DSL 继续保持 `WAITING_REVIEW`。该工作流支持 Lab 生成业务参数，并在报告、Lab Artifact metadata 和审核详情中输出 `labGenerationContext`、`qualitySignals`、`reviewHighlights` 和 `providerSummary`。显式真实 Lab 模式会把 Lab provider 标记为 `openai` / `realLlmCalled=true`，Exam / Grading / PPT 仍为 Mock。显式真实 Demo 模式会把 Lab / Exam / Grading / PPT 四类 provider 都标记为真实调用，并记录 `realLlmRequestCount=4`。
+Phase 2 `phase2_content_generation` 同时写入本地 AI Task、Provider 审计、Workflow Run、Artifact 清单和 Workflow Report JSON，生成类 DSL 继续保持 `WAITING_REVIEW`。未指定 profile 时使用 `legacy-all` 保持四类兼容行为；`teaching-core` 只生成 Lab / Exam / Grading，并在任务落库前构建候选人安全预览。真实模式只请求 profile 中的种类，因此 `teaching-core` 正常为 3 次请求，`legacy-all` 为 4 次请求。
 
 Phase 2 `phase2_exam_conversion` 额外读取 `examples/notebooks/demo-lab.ipynb`，只解析 Notebook JSON，不执行 cell；候选人预览会复用 `ai_workflows/exam_candidate_preview.py` 移除标准答案，并检测答案文本是否意外进入候选人字段。报告会输出 `qualitySignals`，覆盖标准答案隐藏、题目 gradingRef 与评分 check 对齐、Exam / Grading 分值一致性、评分计划可解释性，并同步写入 Exam / Grading Artifact metadata。`qualitySignals.grading.assessmentPlan` 会从 Grading DSL checks 派生评分前计划，包含 `inputSummary`、`executionPlan.requiredLimits`、`mockEvidence.status`、`riskLevel` 和 `sandboxRequiredBeforeRealExecution`，用于和 Phase 3 `reportDetail.checkPlans` 保持字段语义一致。
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-teaching-agent"
-version = "0.1.5"
+version = "0.1.6"
 description = "Review-gated AI workflows for teaching labs, exams, grading, and presentation plans."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -67,6 +67,7 @@ py-modules = ["lab_cli"]
 where = ["."]
 include = [
   "agents*",
+  "ai-workflows*",
   "ai_workflows*",
   "backend*",
   "cli*",

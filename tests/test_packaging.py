@@ -15,6 +15,7 @@ from tests.runtime_requirements import presentations_runtime_available
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_WHEEL_ASSETS = {
+    "ai-workflows/phase2-content-generation.contract.json",
     "config/runtime.contract.json",
     "evals/dsl_quality/v1/manifest.json",
     "evals/dsl_quality/v1/baseline-bundle.json",

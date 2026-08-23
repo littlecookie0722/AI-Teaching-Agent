@@ -5640,6 +5640,102 @@ def test_phase2_content_generation_workflow_creates_review_bundle(tmp_path):
     assert runs["data"]["total"] == 1
 
 
+def test_phase2_teaching_core_profile_creates_candidate_safe_three_task_package(tmp_path):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+
+    payload = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+
+    assert_api_envelope(payload)
+    assert payload["success"] is True
+    data = payload["data"]
+    assert data["artifactProfile"] == "teaching-core"
+    assert data["report"]["artifactProfile"] == "teaching-core"
+    assert data["report"]["generatedKinds"] == ["lab", "exam", "grading"]
+    assert list(data["generatedDsl"]) == ["lab", "exam", "grading"]
+    assert [task["taskType"] for task in data["createdTasks"]] == [
+        "LAB_GENERATION",
+        "EXAM_GENERATION",
+        "GRADING_GENERATION",
+    ]
+    assert {task["status"] for task in data["createdTasks"]} == {"WAITING_REVIEW"}
+    assert "generate_ppt_dsl" not in [step["name"] for step in data["report"]["steps"]]
+    assert "PPT_DSL" not in {artifact["kind"] for artifact in data["artifacts"]}
+
+    preview = data["candidateSafeExamPreview"]
+    assert preview["answersRemoved"] is True
+    assert preview["answerVisibleToCandidate"] is False
+    assert preview["redaction"]["candidateSafe"] is True
+    assert all("answer" not in question and "gradingRef" not in question for question in preview["questions"])
+
+    summary = data["teachingPackageSummary"]
+    assert summary["workflowRunId"] == data["workflowRun"]["id"]
+    assert summary["artifactProfile"] == "teaching-core"
+    assert summary["status"] == "WAITING_REVIEW"
+    assert list(summary["artifacts"]) == ["lab", "exam", "grading"]
+    assert summary["reviewProgress"] == {"total": 3, "waitingReview": 3, "approved": 0, "rejected": 0}
+    assert summary["exportReady"] is False
+    assert summary["reviewEntry"]["path"] == "/review-center.html"
+
+    persisted = JsonTaskStore(store_path)
+    assert len(persisted.list()) == 3
+
+
+def test_phase2_content_generation_rejects_invalid_artifact_profile_without_tasks(tmp_path):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+
+    payload = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "all-the-things"},
+    )
+
+    assert_api_envelope(payload)
+    assert payload["success"] is False
+    assert payload["code"] == "VALIDATION_ERROR"
+    assert payload["errors"] == [
+        {"field": "artifactProfile", "reason": "必须是 legacy-all 或 teaching-core"}
+    ]
+    assert JsonTaskStore(store_path).list() == []
+
+
+def test_phase2_teaching_core_schema_failure_creates_no_review_tasks(tmp_path, monkeypatch):
+    store_path = tmp_path / "store.json"
+    source = tmp_path / "source.md"
+    source.write_text("# Demo Source", encoding="utf-8")
+
+    def fail_schema(**kwargs):
+        raise mock_api.ProviderError(
+            "SCHEMA_VALIDATION_ERROR",
+            "Exam DSL Schema 校验失败",
+            [{"field": "$.spec.questions", "reason": "fixture failure"}],
+        )
+
+    monkeypatch.setattr(mock_api, "run_phase2_content_generation", fail_schema)
+
+    payload = handle_request(
+        "POST",
+        "/api/phase2/workflows/content-generation/run",
+        store_path=store_path,
+        body={"input": str(source), "reviewer": "teacher_1", "artifactProfile": "teaching-core"},
+    )
+
+    assert_api_envelope(payload)
+    assert payload["success"] is False
+    assert payload["code"] == "SCHEMA_VALIDATION_ERROR"
+    assert JsonTaskStore(store_path).list() == []
+    assert JsonTaskStore(store_path).list_artifacts() == []
+
+
 def test_phase2_content_generation_workflow_validates_required_frontend_inputs(tmp_path):
     store_path = tmp_path / "store.json"
     source = tmp_path / "source.md"
@@ -5962,6 +6058,7 @@ def test_phase2_content_generation_api_passes_real_llm_options(tmp_path, monkeyp
     assert payload["success"] is False
     assert payload["code"] == "STOP_TEST"
     assert captured["provider_mode"] == "real-llm"
+    assert captured["artifact_profile"] == "legacy-all"
     assert captured["real_llm_model"] == "test-model"
     assert captured["real_llm_base_url"] == "https://example.test/v1"
     assert captured["api_surface"] == "chat.completions"
@@ -5973,6 +6070,7 @@ def test_phase2_content_generation_api_passes_real_llm_options(tmp_path, monkeyp
     assert captured["confirm_no_auto_publish"] is True
     assert payload["providerErrorContext"]["providerId"] == "openai"
     assert payload["providerErrorContext"]["mode"] == "MOCK_ONLY"
+    assert JsonTaskStore(store_path).list() == []
 
 
 def test_phase2_exam_conversion_workflow_creates_review_bundle(tmp_path):

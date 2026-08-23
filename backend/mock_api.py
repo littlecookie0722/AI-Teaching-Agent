@@ -110,6 +110,7 @@ from ai_workflows.exam_conversion_workflow import (
     ExamConversionInputError,
     run_phase2_exam_conversion,
 )
+from ai_workflows.exam_candidate_preview import ExamCandidatePreviewError, build_candidate_safe_exam_preview
 from ai_workflows.grading_generation_workflow import (
     PHASE2_GRADING_STEP_BY_KIND,
     PHASE2_GRADING_WORKFLOW_ID,
@@ -124,6 +125,8 @@ from ai_workflows.ppt_generation_workflow import (
     run_phase2_ppt_generation,
 )
 from ai_workflows.provider_adapter_workflow import (
+    ARTIFACT_PROFILE_LEGACY_ALL,
+    ARTIFACT_PROFILE_TEACHING_CORE,
     PHASE2_GENERATION_STEP_BY_KIND,
     PHASE2_WORKFLOW_ID,
     PROVIDER_MODE_MOCK,
@@ -2620,8 +2623,15 @@ def create_phase2_review_tasks(
             generated["exam"]["dslId"],
             generated["grading"]["dslPath"],
         ),
-        "ppt": ("PPT_GENERATION", "Phase 2 Mock PPT DSL generation", "markdown", input_ref, generated["ppt"]["dslPath"]),
     }
+    if "ppt" in generated:
+        task_specs["ppt"] = (
+            "PPT_GENERATION",
+            "Phase 2 Mock PPT DSL generation",
+            "markdown",
+            input_ref,
+            generated["ppt"]["dslPath"],
+        )
     tasks = {}
     for kind, (task_type, title, input_type, source_ref, final_result_path) in task_specs.items():
         task = store.save(
@@ -2733,23 +2743,29 @@ def save_phase2_artifacts(
                 "workflowContentQualitySummary": content_quality_summary,
             },
         ),
-        save_artifact(
-            store,
-            kind=ArtifactKind.PPT_DSL,
-            path=generated["ppt"]["dslPath"],
-            title="Phase 2 Mock PPT DSL",
-            status=ArtifactStatus.WAITING_REVIEW,
-            trace_id=trace_id,
-            task_id=tasks["ppt"].id,
-            source_ref=str(input_path),
-            metadata={
-                "dslKind": "PPT",
-                "artifactGenerated": False,
-                "providerAdapter": generated["ppt"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
-                "workflowId": PHASE2_WORKFLOW_ID,
-                "contentQualitySummary": content_quality_items.get("ppt", {}),
-                "workflowContentQualitySummary": content_quality_summary,
-            },
+        *(
+            [
+                save_artifact(
+                    store,
+                    kind=ArtifactKind.PPT_DSL,
+                    path=generated["ppt"]["dslPath"],
+                    title="Phase 2 Mock PPT DSL",
+                    status=ArtifactStatus.WAITING_REVIEW,
+                    trace_id=trace_id,
+                    task_id=tasks["ppt"].id,
+                    source_ref=str(input_path),
+                    metadata={
+                        "dslKind": "PPT",
+                        "artifactGenerated": False,
+                        "providerAdapter": generated["ppt"].get("provider", {}).get("adapterId", "mock_provider_adapter"),
+                        "workflowId": PHASE2_WORKFLOW_ID,
+                        "contentQualitySummary": content_quality_items.get("ppt", {}),
+                        "workflowContentQualitySummary": content_quality_summary,
+                    },
+                )
+            ]
+            if "ppt" in generated
+            else []
         ),
         save_artifact(
             store,
@@ -4290,6 +4306,14 @@ def run_phase2_workflow(payload: dict[str, Any], store: JsonTaskStore, trace_id:
     reviewer = payload.get("reviewer")
     if not reviewer:
         return fail("VALIDATION_ERROR", "参数错误", [{"field": "reviewer", "reason": "缺少参数"}], trace_id)
+    artifact_profile = str(payload.get("artifactProfile") or ARTIFACT_PROFILE_LEGACY_ALL)
+    if artifact_profile not in {ARTIFACT_PROFILE_LEGACY_ALL, ARTIFACT_PROFILE_TEACHING_CORE}:
+        return fail(
+            "VALIDATION_ERROR",
+            "参数错误",
+            [{"field": "artifactProfile", "reason": "必须是 legacy-all 或 teaching-core"}],
+            trace_id,
+        )
     input_path = resolve_local_path(str(input_value))
     if not input_path.exists() or not input_path.is_file():
         return fail("VALIDATION_ERROR", "参数错误", [{"field": "input", "reason": "文件不存在"}], trace_id)
@@ -4353,10 +4377,21 @@ def run_phase2_workflow(payload: dict[str, Any], store: JsonTaskStore, trace_id:
             confirm_waiting_review=payload.get("confirmWaitingReview") is True,
             confirm_no_auto_publish=payload.get("confirmNoAutoPublish") is True,
             repair_on_schema_failure=payload.get("repairOnSchemaFailure") is True,
+            artifact_profile=artifact_profile,
         )
     except ProviderError as exc:
         provider_id = "openai" if provider_mode in real_provider_modes else "mock"
         return provider_error_response(exc, trace_id, provider_id=provider_id)
+    candidate_safe_exam_preview = None
+    if artifact_profile == ARTIFACT_PROFILE_TEACHING_CORE:
+        try:
+            candidate_safe_exam_preview = build_candidate_safe_exam_preview(
+                report["providerGenerations"]["exam"]["dsl"],
+                source_path=report["generatedDsl"]["exam"]["dslPath"],
+                trace_id=trace_id,
+            )
+        except ExamCandidatePreviewError as exc:
+            return fail(exc.code, exc.message, exc.errors, trace_id)
     tasks = create_phase2_review_tasks(store, report=report, input_ref=str(input_path), trace_id=trace_id)
     link_phase2_tasks(report, tasks)
     provider_audit_events = save_provider_bundle_audits(
@@ -4407,11 +4442,37 @@ def run_phase2_workflow(payload: dict[str, Any], store: JsonTaskStore, trace_id:
             artifact_record.workflowRunId = workflow_run.id
             store.save_artifact(artifact_record)
             linked_artifacts.append(artifact_record.to_dict())
+    teaching_package_summary = None
+    if artifact_profile == ARTIFACT_PROFILE_TEACHING_CORE:
+        teaching_package_summary = {
+            "component": "TeachingPackageGenerationSummary",
+            "workflowRunId": workflow_run.id,
+            "artifactProfile": ARTIFACT_PROFILE_TEACHING_CORE,
+            "sourceRef": str(input_path),
+            "status": "WAITING_REVIEW",
+            "artifacts": {
+                kind: {
+                    "taskId": tasks[kind].id,
+                    "status": tasks[kind].status.value,
+                    "dslPath": report["generatedDsl"][kind]["dslPath"],
+                    "schemaValidated": report["generatedDsl"][kind].get("schemaValidated") is True,
+                }
+                for kind in ("lab", "exam", "grading")
+            },
+            "candidateSafeExamPreview": candidate_safe_exam_preview,
+            "reviewProgress": {"total": 3, "waitingReview": 3, "approved": 0, "rejected": 0},
+            "exportReady": False,
+            "reviewEntry": {
+                "path": "/review-center.html",
+                "workflowRunId": workflow_run.id,
+            },
+        }
     return ok(
         "Phase 2 Workflow 已执行，生成内容等待人工审核",
         {
             "mode": report["mode"],
             "providerMode": report["providerMode"],
+            "artifactProfile": artifact_profile,
             "report": report,
             "workflowRun": workflow_run.to_dict(),
             "materialAnalysis": material_analysis,
@@ -4419,6 +4480,8 @@ def run_phase2_workflow(payload: dict[str, Any], store: JsonTaskStore, trace_id:
             "artifacts": linked_artifacts,
             "generatedDsl": report["generatedDsl"],
             "reviewSummary": report["reviewSummary"],
+            "candidateSafeExamPreview": candidate_safe_exam_preview,
+            "teachingPackageSummary": teaching_package_summary,
             "safety": report["safety"],
         },
         trace_id,

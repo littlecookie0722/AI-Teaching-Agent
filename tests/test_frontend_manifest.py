@@ -31,8 +31,8 @@ def test_one_click_generation_workspace_has_single_workflow_request_and_review_r
     assert 'id="generation-api-state"' in html
     assert 'id="generation-progress-bar"' in html
     assert '<script src="generation-workspace-data.js"></script>' in html
-    assert "Lab / Exam / Grading / PPT" in html
-    for kind in ("lab", "exam", "grading", "ppt"):
+    assert "Lab + Exam/Grading" in html
+    for kind in ("lab", "exam", "grading"):
         assert f'id="generation-{kind}-status"' in html
         assert f'id="generation-{kind}-task"' in html
         assert f'id="generation-{kind}-path"' in html
@@ -45,13 +45,14 @@ def test_one_click_generation_workspace_has_single_workflow_request_and_review_r
     assert "workflowRun" in script
     assert 'setAllTaskStates("GENERATING"' in script
     assert 'setAllTaskStates("ERROR"' in script
-    assert 'completed === 4 && waitingReview === 4' in script
+    assert 'artifactProfile: "teaching-core"' in script
+    assert 'completed === 3 && waitingReview === 3' in script
     assert "VALIDATION_ERROR" in script
     assert "REAL_LLM_CONFIRMATION_REQUIRED" in script
     assert "lab-review.html" in script
     assert "exam-review.html" in script
     assert "grading-review.html" in script
-    assert "ppt-review.html" in script
+    assert "ppt-review.html" not in script
     assert "review-center.html" in script
     assert "autoPublishAllowed: false" in script
     assert "answerVisibleToCandidate: false" in script
@@ -67,12 +68,17 @@ def test_one_click_generation_workspace_has_single_workflow_request_and_review_r
     assert page["apiDependencies"] == [
         {"method": "POST", "path": "/api/phase2/workflows/content-generation/run"}
     ]
+    assert "request.artifactProfile=teaching-core" in page["dataSources"]
+    assert "POST /api/phase2/workflows/content-generation/run.teachingPackageSummary" in page["dataSources"]
+    assert "POST /api/phase2/workflows/content-generation/run.candidateSafeExamPreview" in page["dataSources"]
+    assert all("ppt-review.html" not in source for source in page["dataSources"])
     assert "OneClickGenerationWorkspace" in page["components"]
     assert page["safety"]["generatedStatus"] == "WAITING_REVIEW"
     assert page["safety"]["frontendDirectRealLlmCall"] is False
     assert page["safety"]["answerVisibleToCandidate"] is False
     assert page["safety"]["autoPublishAllowed"] is False
     assert prototype["path"] == "frontend/generation-workspace.html"
+    assert "request.artifactProfile=teaching-core" in prototype["dataSources"]
     assert prototype["safety"] == page["safety"]
     assert "generation-workspace.html" in read_text("frontend/review-center.html")
     assert "generation-workspace.html" in read_text("frontend/README.md")

@@ -41,6 +41,12 @@ PHASE2_GENERATION_STEP_BY_KIND = {
     "grading": "generate_grading_dsl",
     "ppt": "generate_ppt_dsl",
 }
+ARTIFACT_PROFILE_LEGACY_ALL = "legacy-all"
+ARTIFACT_PROFILE_TEACHING_CORE = "teaching-core"
+ARTIFACT_KINDS_BY_PROFILE = {
+    ARTIFACT_PROFILE_LEGACY_ALL: ("lab", "exam", "grading", "ppt"),
+    ARTIFACT_PROFILE_TEACHING_CORE: ("lab", "exam", "grading"),
+}
 
 PHASE2_SAFETY = {
     "realLlmCalled": False,
@@ -415,6 +421,7 @@ def generate_real_llm_demo_dsl_bundle(
     confirm_no_auto_publish: bool = False,
     repair_on_schema_failure: bool = False,
     api_surface: str = "auto",
+    include_ppt: bool = True,
 ) -> dict[str, dict[str, Any]]:
     refs = {**REAL_LLM_DEMO_OUTPUT_REFS, **(output_refs or {})}
     lab = generate_real_llm_demo_dsl_via_provider(
@@ -483,31 +490,33 @@ def generate_real_llm_demo_dsl_bundle(
         trace_id=trace_id,
         root=root,
     )
-    ppt = generate_real_llm_demo_dsl_via_provider(
-        "ppt",
-        input_ref=input_ref,
-        output_ref=refs["ppt"],
-        input_payload=_real_demo_input_payload(
-            kind="ppt",
+    bundle = {"lab": lab, "exam": exam, "grading": grading}
+    if include_ppt:
+        bundle["ppt"] = generate_real_llm_demo_dsl_via_provider(
+            "ppt",
             input_ref=input_ref,
-            lab_generation_context=lab_generation_context,
-            lab=lab["dsl"],
-            exam=exam["dsl"],
-            grading=grading["dsl"],
-        ),
-        model=real_llm_model,
-        base_url=real_llm_base_url,
-        timeout_seconds=timeout_seconds,
-        max_output_tokens=max_output_tokens,
-        explicit_real_call_opt_in=explicit_real_call_opt_in,
-        confirm_waiting_review=confirm_waiting_review,
-        confirm_no_auto_publish=confirm_no_auto_publish,
-        repair_on_schema_failure=repair_on_schema_failure,
-        api_surface=api_surface,
-        trace_id=trace_id,
-        root=root,
-    )
-    return {"lab": lab, "exam": exam, "grading": grading, "ppt": ppt}
+            output_ref=refs["ppt"],
+            input_payload=_real_demo_input_payload(
+                kind="ppt",
+                input_ref=input_ref,
+                lab_generation_context=lab_generation_context,
+                lab=lab["dsl"],
+                exam=exam["dsl"],
+                grading=grading["dsl"],
+            ),
+            model=real_llm_model,
+            base_url=real_llm_base_url,
+            timeout_seconds=timeout_seconds,
+            max_output_tokens=max_output_tokens,
+            explicit_real_call_opt_in=explicit_real_call_opt_in,
+            confirm_waiting_review=confirm_waiting_review,
+            confirm_no_auto_publish=confirm_no_auto_publish,
+            repair_on_schema_failure=repair_on_schema_failure,
+            api_surface=api_surface,
+            trace_id=trace_id,
+            root=root,
+        )
+    return bundle
 
 
 def generate_real_llm_dsl_bundle(
@@ -526,6 +535,7 @@ def generate_real_llm_dsl_bundle(
     confirm_no_auto_publish: bool = False,
     repair_on_schema_failure: bool = False,
     api_surface: str = "auto",
+    include_ppt: bool = True,
 ) -> dict[str, dict[str, Any]]:
     bundle = generate_real_llm_demo_dsl_bundle(
         input_ref=input_ref,
@@ -542,6 +552,7 @@ def generate_real_llm_dsl_bundle(
         confirm_no_auto_publish=confirm_no_auto_publish,
         repair_on_schema_failure=repair_on_schema_failure,
         api_surface=api_surface,
+        include_ppt=include_ppt,
     )
     for generation in bundle.values():
         generation["provider"]["adapterId"] = REAL_LLM_PROVIDER_ADAPTER
@@ -570,7 +581,9 @@ def generate_workflow_dsl_bundle(
     confirm_no_auto_publish: bool = False,
     repair_on_schema_failure: bool = False,
     api_surface: str = "auto",
+    artifact_kinds: tuple[str, ...] = ARTIFACT_KINDS_BY_PROFILE[ARTIFACT_PROFILE_LEGACY_ALL],
 ) -> dict[str, dict[str, Any]]:
+    include_ppt = "ppt" in artifact_kinds
     if provider_mode == PROVIDER_MODE_MOCK:
         lab = generate_mock_dsl_via_adapter("lab", input_ref=input_ref, trace_id=trace_id, root=root)
     elif provider_mode == PROVIDER_MODE_REAL_LLM_MINIMAL:
@@ -606,6 +619,7 @@ def generate_workflow_dsl_bundle(
             confirm_no_auto_publish=confirm_no_auto_publish,
             repair_on_schema_failure=repair_on_schema_failure,
             api_surface=api_surface,
+            include_ppt=include_ppt,
         )
     elif provider_mode == PROVIDER_MODE_REAL_LLM_DEMO:
         return generate_real_llm_demo_dsl_bundle(
@@ -623,6 +637,7 @@ def generate_workflow_dsl_bundle(
             confirm_no_auto_publish=confirm_no_auto_publish,
             repair_on_schema_failure=repair_on_schema_failure,
             api_surface=api_surface,
+            include_ppt=include_ppt,
         )
     else:
         raise ProviderError(
@@ -632,8 +647,10 @@ def generate_workflow_dsl_bundle(
         )
     exam = generate_mock_dsl_via_adapter("exam", input_ref=lab["dslId"], trace_id=trace_id, root=root)
     grading = generate_mock_dsl_via_adapter("grading", input_ref=exam["dslId"], trace_id=trace_id, root=root)
-    ppt = generate_mock_dsl_via_adapter("ppt", input_ref=input_ref, trace_id=trace_id, root=root)
-    return {"lab": lab, "exam": exam, "grading": grading, "ppt": ppt}
+    bundle = {"lab": lab, "exam": exam, "grading": grading}
+    if include_ppt:
+        bundle["ppt"] = generate_mock_dsl_via_adapter("ppt", input_ref=input_ref, trace_id=trace_id, root=root)
+    return bundle
 
 
 def _summarize_generation(
@@ -1193,11 +1210,23 @@ def _lab_quality_signals(
     if not teaching_style_match:
         review_highlights.append("确认教学风格是否符合本次生成参数")
     if real_llm_source_mode == REAL_LLM_SOURCE_MODE_MINIMAL:
-        review_highlights.append("真实 LLM 仅用于 Lab DSL，Exam/Grading/PPT 仍为 Mock")
+        review_highlights.append(
+            "真实 LLM 仅用于 Lab DSL，Exam/Grading/PPT 仍为 Mock"
+            if "ppt" in bundle
+            else "真实 LLM 仅用于 Lab DSL，Exam/Grading 仍为 Mock"
+        )
     elif real_llm_source_mode == REAL_LLM_SOURCE_MODE_OFFICIAL:
-        review_highlights.append("真实 LLM 已生成 Lab/Exam/Grading/PPT 四类 DSL，全部仍需人工审核")
+        review_highlights.append(
+            "真实 LLM 已生成 Lab/Exam/Grading/PPT 四类 DSL，全部仍需人工审核"
+            if "ppt" in bundle
+            else "真实 LLM 已生成 Lab/Exam/Grading 三类核心 DSL，全部仍需人工审核"
+        )
     elif real_llm_source_mode == REAL_LLM_SOURCE_MODE_DEMO:
-        review_highlights.append("真实 LLM Demo 已生成 Lab/Exam/Grading/PPT 四类 DSL，全部仍需人工审核")
+        review_highlights.append(
+            "真实 LLM Demo 已生成 Lab/Exam/Grading/PPT 四类 DSL，全部仍需人工审核"
+            if "ppt" in bundle
+            else "真实 LLM Demo 已生成 Lab/Exam/Grading 三类核心 DSL，全部仍需人工审核"
+        )
 
     schema_checks = {
         kind: {
@@ -1328,7 +1357,15 @@ def run_phase2_content_generation(
     confirm_no_auto_publish: bool = False,
     repair_on_schema_failure: bool = False,
     api_surface: str = "auto",
+    artifact_profile: str = ARTIFACT_PROFILE_LEGACY_ALL,
 ) -> dict[str, Any]:
+    artifact_kinds = ARTIFACT_KINDS_BY_PROFILE.get(artifact_profile)
+    if artifact_kinds is None:
+        raise ProviderError(
+            "PHASE2_ARTIFACT_PROFILE_INVALID",
+            "Phase 2 Workflow 不支持的 artifact profile",
+            [{"field": "artifactProfile", "reason": artifact_profile}],
+        )
     normalized_lab_context = normalize_lab_generation_context(lab_generation_context)
     bundle = generate_workflow_dsl_bundle(
         input_ref=input_ref,
@@ -1350,6 +1387,7 @@ def run_phase2_content_generation(
         confirm_no_auto_publish=confirm_no_auto_publish,
         repair_on_schema_failure=repair_on_schema_failure,
         api_surface=api_surface,
+        artifact_kinds=artifact_kinds,
     )
     real_lab_mode = provider_mode == PROVIDER_MODE_REAL_LLM_MINIMAL
     real_llm_mode = provider_mode == PROVIDER_MODE_REAL_LLM
@@ -1431,6 +1469,8 @@ def run_phase2_content_generation(
         "phase": "Phase 2",
         "mode": workflow_mode,
         "providerMode": provider_mode,
+        "artifactProfile": artifact_profile,
+        "generatedKinds": list(artifact_kinds),
         "title": (
             "Phase 2 Real LLM Workflow"
             if real_llm_mode
@@ -1504,10 +1544,10 @@ def run_phase2_content_generation(
             "reviewGateRequired": True,
             "mockOnly": not (real_lab_mode or real_llm_mode or real_demo_mode),
             "realLlmConnected": real_llm_mode,
-            "realLlmGeneratedAllDsl": real_llm_mode and set(safety.get("realLlmGeneratedKinds", [])) == {"lab", "exam", "grading", "ppt"},
+            "realLlmGeneratedAllDsl": real_llm_mode and set(safety.get("realLlmGeneratedKinds", [])) == set(artifact_kinds),
             "realLlmRequestCount": safety.get("realLlmRequestCount", 0) if real_llm_mode else 0,
             "realLlmDemoConnected": real_demo_mode,
-            "realLlmDemoGeneratedAllDsl": real_demo_mode and set(safety.get("realLlmGeneratedKinds", [])) == {"lab", "exam", "grading", "ppt"},
+            "realLlmDemoGeneratedAllDsl": real_demo_mode and set(safety.get("realLlmGeneratedKinds", [])) == set(artifact_kinds),
             "realLlmDemoRequestCount": safety.get("realLlmRequestCount", 0) if real_demo_mode else 0,
             "realLlmMinimalLabConnected": real_lab_mode,
             "realLabOnly": real_lab_mode,
