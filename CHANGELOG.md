@@ -15,6 +15,9 @@ All notable project changes will be documented here.
   report accurate `renderedBulletLimit` / `renderedBulletTotal` values.
 - Applied shared title, subtitle, and bullet display limits to PPTX and PNG
   output, with visible ellipses and advisory warnings for oversized legacy DSLs.
+- Tightened hero, exercise, and summary title limits against both Windows and
+  Linux fallback fonts so the same display-safe contract holds in local and CI
+  rendering environments.
 - Added 5/6/8-slide content-integrity regression coverage, long Chinese text
   checks, 5/8-slide PowerPoint 2021 compatibility validation, and the full PPT
   artifact path to the existing quick/core regression profile.

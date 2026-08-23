@@ -169,26 +169,36 @@ def test_ppt_preflight_flags_layout_specific_long_chinese_text():
     assert sum(issue["code"] == "SUBTITLE_TEXT_LONG" for issue in report["issues"]) == 2
 
 
-@pytest.mark.parametrize(("title", "expected_status"), [("W" * 22, "PASS"), ("W" * 23, "NEEDS_REVIEW")])
-def test_ppt_preflight_summary_title_limit_matches_single_line_renderer(title, expected_status):
+@pytest.mark.parametrize(
+    ("layout", "slide_type", "limit"),
+    [("hero", "title", 22), ("exercise", "content", 23), ("summary", "summary", 21)],
+)
+@pytest.mark.parametrize(("extra_characters", "expected_status"), [(0, "PASS"), (1, "NEEDS_REVIEW")])
+def test_ppt_preflight_title_limits_match_cross_platform_renderer(
+    layout,
+    slide_type,
+    limit,
+    extra_characters,
+    expected_status,
+):
+    slide = {
+        "id": "slide_1",
+        "type": slide_type,
+        "layout": layout,
+        "title": "W" * (limit + extra_characters),
+    }
+    if layout != "hero":
+        slide["bullets"] = ["Takeaway"]
     report = build_ppt_preflight_report(
         {
             "spec": {
-                "slides": [
-                    {
-                        "id": "slide_1",
-                        "type": "summary",
-                        "layout": "summary",
-                        "title": title,
-                        "bullets": ["Takeaway"],
-                    }
-                ]
+                "slides": [slide]
             }
         }
     )
 
     assert report["status"] == expected_status
-    assert report["slides"][0]["renderedTitleCharacterLimit"] == 22
+    assert report["slides"][0]["renderedTitleCharacterLimit"] == limit
 
 
 def test_ppt_preflight_checks_hero_metadata_fallback_subtitle():

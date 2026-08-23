@@ -22,12 +22,12 @@ LAYOUT_RENDERED_BULLET_LIMITS = {
     "summary": 3,
 }
 LAYOUT_TITLE_CHARACTER_LIMITS = {
-    "hero": 24,
+    "hero": 22,
     "objectives": 24,
     "concept": 24,
     "process": 24,
-    "exercise": 24,
-    "summary": 22,
+    "exercise": 23,
+    "summary": 21,
 }
 LAYOUT_SUBTITLE_CHARACTER_LIMITS = {
     "hero": 48,

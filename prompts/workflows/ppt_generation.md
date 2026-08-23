@@ -35,8 +35,8 @@ Return JSON only. Do not use Markdown fences, comments, prose, or multiple objec
   candidate-safe exercise, and summary.
 - Use `layout` values from `hero`, `objectives`, `concept`, `process`,
   `exercise`, and `summary` to create at least three distinct layouts.
-- Keep titles within 24 characters, summary titles within 22, and the hero
-  subtitle within 48 characters.
+- Keep hero titles within 22 characters, exercise titles within 23, summary
+  titles within 21, all other titles within 24, and hero subtitles within 48.
 - Use bullets derived from the source or Lab DSL.
 
 ## Slide Planning Rules

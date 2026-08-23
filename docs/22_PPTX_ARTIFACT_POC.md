@@ -24,7 +24,7 @@
 
 `--slide-count` 支持 5-8。生成服务强制页数范围、首尾语义、必要教学段落、唯一页 ID、Schema、泄漏检查和质量预检；全局 PPT Schema 继续允许历史短 Deck，以保持旧接口兼容。
 
-产品 DSL 会显式写入 `hero` / `objectives` / `concept` / `process` / `exercise` / `summary` 版式，并按实际画布容量生成 bullet：学习目标和总结最多 3 条，核心概念、实验流程和课堂练习最多 4 条。5/6 页课件的流程槽不足以逐条展示全部源 Lab 步骤时，最后一个可用流程槽会明确聚合剩余步骤的编号范围和数量，避免源步骤静默消失或总结夸大覆盖范围。标题、副标题和 bullet 也按版式安全长度收敛，超长显示文本保留明确省略号。旧 DSL 可继续省略 `layout`，预检和构建器会用同一规则推断版式。
+产品 DSL 会显式写入 `hero` / `objectives` / `concept` / `process` / `exercise` / `summary` 版式，并按实际画布容量生成 bullet：学习目标和总结最多 3 条，核心概念、实验流程和课堂练习最多 4 条。5/6 页课件的流程槽不足以逐条展示全部源 Lab 步骤时，最后一个可用流程槽会明确聚合剩余步骤的编号范围和数量，避免源步骤静默消失或总结夸大覆盖范围。标题、副标题和 bullet 也按版式安全长度收敛；hero / exercise / summary 标题分别限制为 22 / 23 / 21 字符，其他标题为 24，以兼容 Windows 与 Linux fallback 字体，超长显示文本保留明确省略号。旧 DSL 可继续省略 `layout`，预检和构建器会用同一规则推断版式。
 
 成功生成后会创建独立 `teaching_presentation_generation` child WorkflowRun，不向父教学包追加 PPT Artifact。父教学包的三项审核摘要与六成员 ZIP 因而保持不变。
 

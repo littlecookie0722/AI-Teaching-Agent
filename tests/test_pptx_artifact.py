@@ -278,11 +278,11 @@ def test_exercise_subtitle_only_is_not_repeated_in_checkpoint_slot() -> None:
 @pytest.mark.parametrize(
     ("slot", "limit", "width", "height", "size", "bold"),
     [
-        ("hero_title", 24, 760, 190, 58, True),
+        ("hero_title", 22, 760, 190, 58, True),
         ("section_title", 24, 1080, 76, 40, True),
         ("concept_title", 24, 350, 210, 43, True),
-        ("exercise_title", 24, 1080, 76, 42, True),
-        ("summary_title", 22, 1100, 92, 46, True),
+        ("exercise_title", 23, 1080, 76, 42, True),
+        ("summary_title", 21, 1100, 92, 46, True),
         ("hero_subtitle", 48, 700, 80, 25, False),
         ("concept_subtitle", 40, 340, 100, 21, False),
         ("exercise_subtitle", 36, 438, 58, 21, False),
